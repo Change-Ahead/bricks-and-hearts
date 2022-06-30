@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <RootNamespace>bricks_and_hearts</RootNamespace>
+    <RootNamespace>BricksAndHearts</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>

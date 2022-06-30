@@ -1,8 +1,8 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using bricks_and_hearts.Models;
+using BricksAndHearts.Models;
 
-namespace bricks_and_hearts.Controllers;
+namespace BricksAndHearts.Controllers;
 
 public class HomeController : Controller
 {

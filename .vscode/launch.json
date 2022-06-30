@@ -10,7 +10,7 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/web/bin/Debug/net6.0/bricks-and-hearts.dll",
+            "program": "${workspaceFolder}/web/bin/Debug/net6.0/BricksAndHearts.dll",
             "args": [],
             "cwd": "${workspaceFolder}/web",
             "stopAtEntry": false,

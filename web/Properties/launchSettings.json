@@ -8,7 +8,7 @@
     }
   },
   "profiles": {
-    "bricks_and_hearts": {
+    "BricksAndHearts": {
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,

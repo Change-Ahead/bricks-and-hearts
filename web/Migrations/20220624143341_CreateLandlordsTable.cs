@@ -2,7 +2,7 @@
 
 #nullable disable
 
-namespace bricks_and_hearts.Migrations
+namespace BricksAndHearts.Migrations
 {
     public partial class CreateLandlordsTable : Migration
     {

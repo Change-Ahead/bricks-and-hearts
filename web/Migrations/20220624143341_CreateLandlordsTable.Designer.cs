@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace bricks_and_hearts.Migrations
+namespace BricksAndHearts.Migrations
 {
     [DbContext(typeof(BricksAndHeartsDbContext))]
     [Migration("20220624143341_CreateLandlordsTable")]
