@@ -6,10 +6,10 @@ namespace BricksAndHearts
     public class BricksAndHeartsDbContext : DbContext
     {
         private readonly IConfiguration _config;
-		public BricksAndHeartsDbContext(IConfiguration config)
-		{
-			_config = config;
-		}
+        public BricksAndHeartsDbContext(IConfiguration config)
+        {
+            _config = config;
+        }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -21,5 +21,5 @@ namespace BricksAndHearts
         }
 
         public DbSet<LandlordDbModel> Landlords { get; set; } = null!;
-    } 
+    }
 }
