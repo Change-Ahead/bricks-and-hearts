@@ -1,4 +1,4 @@
-namespace bricks_and_hearts.Models;
+namespace BricksAndHearts.Models;
 
 public class ErrorViewModel
 {
