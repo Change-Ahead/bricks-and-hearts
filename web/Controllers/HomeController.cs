@@ -4,7 +4,7 @@ using BricksAndHearts.ViewModels;
 
 namespace BricksAndHearts.Controllers;
 
-public class HomeController : Controller
+public class HomeController : AbstractController
 {
     private readonly ILogger<HomeController> _logger;
 
