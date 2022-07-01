@@ -1,25 +1,29 @@
 using BricksAndHearts.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BricksAndHearts
+namespace BricksAndHearts;
+
+public class BricksAndHeartsDbContext : DbContext
 {
-    public class BricksAndHeartsDbContext : DbContext
+    private readonly IConfiguration _config;
+
+    public BricksAndHeartsDbContext(IConfiguration config)
     {
-        private readonly IConfiguration _config;
-        public BricksAndHeartsDbContext(IConfiguration config)
-        {
-            _config = config;
-        }
+        _config = config;
+    }
 
-        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        {
-            optionsBuilder.UseSqlServer(_config.GetValue<string>("DBConnectionString"));
-        }
+    public DbSet<LandlordDbModel> Landlords { get; set; } = null!;
+    public DbSet<UserDbModel> Users { get; set; } = null!;
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-        }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseSqlServer(_config.GetValue<string>("DBConnectionString"));
+    }
 
-        public DbSet<LandlordDbModel> Landlords { get; set; } = null!;
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<UserDbModel>()
+            .HasIndex(u => u.GoogleAccountId)
+            .IsUnique();
     }
 }
