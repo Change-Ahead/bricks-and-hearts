@@ -1,0 +1,29 @@
+﻿@model AdminViewModel
+@{
+    ViewData["Title"] = "Admin Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    @{
+        if (Model.CurrentUser != null)
+        {
+            <p>
+                Logged in as @Model.CurrentUser.GoogleName
+            </p>
+            if (Model.CurrentUser.IsAdmin)
+            {
+                <p>You are an admin :)</p>
+            }
+            else
+            {
+                <p>You are not an admin :(</p>
+            }
+        }
+        else
+        {
+            <a href="@Url.Action("Index", "Login")">Login</a>
+        }
+    }
+</div>

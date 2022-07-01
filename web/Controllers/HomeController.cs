@@ -15,7 +15,12 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
-        return View();
+        var model = new HomeViewModel
+        {
+            IsLoggedIn = User.Identity?.IsAuthenticated ?? false,
+            UserName = User.Identity?.Name
+        };
+        return View(model);
     }
 
     public IActionResult Privacy()
