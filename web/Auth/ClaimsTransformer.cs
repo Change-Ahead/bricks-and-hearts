@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using BricksAndHearts.Models;
+using BricksAndHearts.Database;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,5 @@
 ﻿using BricksAndHearts.Auth;
+using BricksAndHearts.Database;
 using BricksAndHearts.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

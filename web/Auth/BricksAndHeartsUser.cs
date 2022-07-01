@@ -1,5 +1,5 @@
 ﻿using System.Security.Claims;
-using BricksAndHearts.Models;
+using BricksAndHearts.Database;
 
 namespace BricksAndHearts.Auth;
 

@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace BricksAndHearts.Models;
+namespace BricksAndHearts.Database;
 
 [Table("User")]
 public class UserDbModel

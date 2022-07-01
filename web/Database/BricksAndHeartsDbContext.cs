@@ -1,7 +1,6 @@
-using BricksAndHearts.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace BricksAndHearts;
+namespace BricksAndHearts.Database;
 
 public class BricksAndHeartsDbContext : DbContext
 {
