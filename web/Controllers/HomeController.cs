@@ -1,6 +1,6 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
-using BricksAndHearts.Models;
+using BricksAndHearts.ViewModels;
 
 namespace BricksAndHearts.Controllers;
 

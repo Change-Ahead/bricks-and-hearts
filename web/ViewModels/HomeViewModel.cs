@@ -1,4 +1,4 @@
-﻿namespace BricksAndHearts.Models;
+﻿namespace BricksAndHearts.ViewModels;
 
 public class HomeViewModel
 {

@@ -1,6 +1,6 @@
 ﻿using BricksAndHearts.Auth;
 
-namespace BricksAndHearts.Models;
+namespace BricksAndHearts.ViewModels;
 
 public class AdminViewModel
 {
