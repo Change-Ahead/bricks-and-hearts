@@ -15,7 +15,7 @@ public interface ILandlordService
         Success
     }
 
-    public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordCreateModel createModel, BricksAndHeartsUser user);
+    public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel, BricksAndHeartsUser user);
 }
 
 public class LandlordService : ILandlordService
@@ -29,11 +29,12 @@ public class LandlordService : ILandlordService
 
     // Create a new landlord record and associate it with a user
     public async Task<ILandlordService.LandlordRegistrationResult> RegisterLandlordWithUser(
-        LandlordCreateModel createModel,
+        LandlordProfileModel createModel,
         BricksAndHeartsUser user)
     {
         var dbModel = new LandlordDbModel
         {
+            Title = createModel.Title,
             FirstName = createModel.FirstName,
             LastName = createModel.LastName,
             CompanyName = createModel.CompanyName,

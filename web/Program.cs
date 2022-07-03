@@ -16,7 +16,7 @@ builder.Services.AddAuthentication(options => options.DefaultScheme = CookieAuth
     .AddCookie(options =>
     {
         // If a user hits an [Authorize] endpoint without a cookie, redirect here
-        options.LoginPath = "/login";
+        options.LoginPath = "/login/google";
         // When a user doesn't have the right role (like "Admin") return a 403
         options.Events.OnRedirectToAccessDenied = context =>
         {

@@ -3,11 +3,12 @@ using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace BricksAndHearts.Controllers;
 
 [Authorize]
-[Route("/landlord/register")]
+[Route("/landlord")]
 public class LandlordController : AbstractController
 {
     private readonly BricksAndHeartsDbContext _dbContext;
@@ -23,17 +24,17 @@ public class LandlordController : AbstractController
     }
 
     [HttpGet]
-    [Route("")]
-    public ActionResult Index()
+    [Route("register")]
+    public ActionResult RegisterGet()
     {
         var currentUser = GetCurrentUser();
         if (currentUser.LandlordId != null)
         {
             _logger.LogWarning("User {UserId} is already registered, will redirect to profile", currentUser.Id);
-            return Redirect("/landlord/me/profile");
+            return Redirect(Url.Action("MyProfile")!);
         }
 
-        return View("Create", new LandlordCreateModel
+        return View("Register", new LandlordProfileModel
         {
             Email = GetCurrentUser().GoogleEmail
         });
@@ -41,10 +42,13 @@ public class LandlordController : AbstractController
 
     [HttpPost]
     [Route("")]
-    public async Task<ActionResult> Create([FromForm] LandlordCreateModel createModel)
+    public async Task<ActionResult> RegisterPost([FromForm] LandlordProfileModel createModel)
     {
         // This does checks based on the annotations (e.g. [Required]) on LandlordCreateModel
-        if (!ModelState.IsValid) return View("Create");
+        if (!ModelState.IsValid)
+        {
+            return View("Register");
+        }
 
         var user = GetCurrentUser();
 
@@ -54,20 +58,53 @@ public class LandlordController : AbstractController
         {
             case ILandlordService.LandlordRegistrationResult.Success:
                 _logger.LogInformation("Successfully created landlord for user {UserId}", user.Id);
-                return Redirect("/landlord/me/profile");
+                return Redirect(Url.Action("MyProfile")!);
 
             case ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered:
                 _logger.LogWarning("Email already registered {Email}", createModel.Email);
                 ModelState.AddModelError("Email", "Email already registered");
-                return View("Create");
+                return View("Register");
 
             case ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord:
                 _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
                 TempData["FlashMessage"] = "Already registered!"; // TODO: Landlord profile page should display this message
-                return Redirect("/landlord/me/profile");
+                return Redirect(Url.Action("MyProfile")!);
 
             default:
                 throw new Exception($"Unknown landlord registration error ${result}");
         }
+    }
+
+    [HttpGet]
+    [Route("{id:int}/profile")]
+    public async Task<ActionResult> Profile([FromRoute] int id)
+    {
+        var user = GetCurrentUser();
+        if (user.LandlordId != id && !user.IsAdmin)
+        {
+            return StatusCode(403);
+        }
+
+        var landlord = await _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id);
+        if (landlord == null)
+        {
+            return StatusCode(404);
+        }
+
+        var viewModel = LandlordProfileModel.FromDbModel(landlord);
+        return View("Profile", viewModel);
+    }
+
+    [HttpGet]
+    [Route("me/profile")]
+    public async Task<ActionResult> MyProfile()
+    {
+        var landlordId = GetCurrentUser().LandlordId;
+        if (landlordId == null)
+        {
+            return StatusCode(404);
+        }
+
+        return await Profile(landlordId.Value);
     }
 }

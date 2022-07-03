@@ -1,9 +1,10 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using BricksAndHearts.Database;
 
 namespace BricksAndHearts.ViewModels;
 
-public class LandlordCreateModel
+public class LandlordProfileModel
 {
     [Required]
     [StringLength(60)]
@@ -30,4 +31,17 @@ public class LandlordCreateModel
 
     [Phone]
     public string Phone { get; set; } = string.Empty;
+
+    public static LandlordProfileModel FromDbModel(LandlordDbModel landlord)
+    {
+        return new LandlordProfileModel
+        {
+            CompanyName = landlord.CompanyName,
+            Email = landlord.Email,
+            FirstName = landlord.FirstName,
+            LastName = landlord.LastName,
+            Phone = landlord.Phone,
+            Title = landlord.Title
+        };
+    }
 }

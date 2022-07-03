@@ -14,11 +14,18 @@
             <p>
                 Logged in as @Model.UserName
             </p>
-            <a class="btn btn-success" asp-controller="Landlord" asp-action="Index">Register as a Landlord</a>
+            if (Model.IsRegisteredAsLandlord)
+            {
+                <a class="btn btn-primary" asp-controller="Landlord" asp-action="MyProfile">Go to profile</a>
+            }
+            else
+            {
+                <a class="btn btn-success" asp-controller="Landlord" asp-action="RegisterGet">Register as a Landlord</a>
+            }
         }
         else
         {
-            <a class="btn btn-primary" href="@Url.Action("Index", "Login")">Login with Google</a>
+            <a class="btn btn-primary" href="@Url.Action("Google", "Login")">Login with Google</a>
         }
     }
 </div>
