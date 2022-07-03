@@ -17,10 +17,12 @@ namespace BricksAndHearts.Auth;
 public class ClaimsTransformer : IClaimsTransformation
 {
     private readonly BricksAndHeartsDbContext _context;
+    private readonly ILogger<ClaimsTransformer> _logger;
 
-    public ClaimsTransformer(BricksAndHeartsDbContext context)
+    public ClaimsTransformer(BricksAndHeartsDbContext context, ILogger<ClaimsTransformer> logger)
     {
         _context = context;
+        _logger = logger;
     }
 
     public async Task<ClaimsPrincipal> TransformAsync(ClaimsPrincipal principal)
@@ -33,10 +35,12 @@ public class ClaimsTransformer : IClaimsTransformation
 
         // Find the user in the DB
         var databaseUser = await _context.Users.FirstOrDefaultAsync(u => u.GoogleAccountId == googleAccountId);
-        // ReSharper disable once ConvertIfStatementToNullCoalescingExpression
         if (databaseUser == null)
+        {
             // If they don't exist yet, create them
             databaseUser = await CreateUserInDatabase(googleAccountId, existingClaimsIdentity);
+            _logger.LogInformation("Created new user '{UserEmail}' in database with id {UserId}", databaseUser.GoogleEmail, databaseUser.Id);
+        }
 
         var claims = new List<Claim>(existingClaimsIdentity.Claims);
         // If they're an admin in the database, add the role to their claims
