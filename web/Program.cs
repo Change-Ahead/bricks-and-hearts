@@ -33,7 +33,7 @@ builder.Services.AddAuthentication(options => options.DefaultScheme = CookieAuth
 
 builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformer>();
 builder.Services.AddControllersWithViews();
-builder.Services.AddScoped<ILandlordRegistrationService, LandlordRegistrationService>();
+builder.Services.AddScoped<ILandlordService, LandlordService>();
 
 var app = builder.Build();
 

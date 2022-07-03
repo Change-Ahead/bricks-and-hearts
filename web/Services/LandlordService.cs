@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BricksAndHearts.Services;
 
-public interface ILandlordRegistrationService
+public interface ILandlordService
 {
     public enum LandlordRegistrationResult
     {
@@ -18,17 +18,17 @@ public interface ILandlordRegistrationService
     public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordCreateModel createModel, BricksAndHeartsUser user);
 }
 
-public class LandlordRegistrationService : ILandlordRegistrationService
+public class LandlordService : ILandlordService
 {
     private readonly BricksAndHeartsDbContext _dbContext;
 
-    public LandlordRegistrationService(BricksAndHeartsDbContext dbContext)
+    public LandlordService(BricksAndHeartsDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
     // Create a new landlord record and associate it with a user
-    public async Task<ILandlordRegistrationService.LandlordRegistrationResult> RegisterLandlordWithUser(
+    public async Task<ILandlordService.LandlordRegistrationResult> RegisterLandlordWithUser(
         LandlordCreateModel createModel,
         BricksAndHeartsUser user)
     {
@@ -47,11 +47,11 @@ public class LandlordRegistrationService : ILandlordRegistrationService
             // Check there isn't already a Landlord with that email. Nothing depends on this currently, but it would probably mean the landlord is a duplicate.
             // This requires Serializable isolation, otherwise it will not lock any rows, and two racing registrations could create duplicate records.
             if (await _dbContext.Landlords.AnyAsync(l => l.Email == createModel.Email))
-                return ILandlordRegistrationService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered;
+                return ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered;
 
             // Check the user doesn't already have a landlord associated.
             var userRecord = _dbContext.Users.Single(u => u.Id == user.Id);
-            if (userRecord.LandlordId != null) return ILandlordRegistrationService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord;
+            if (userRecord.LandlordId != null) return ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord;
 
             // Insert the landlord and call SaveChanges.
             // Entity Framework will insert the record and populate dbModel.Id with the new record's id.
@@ -68,6 +68,6 @@ public class LandlordRegistrationService : ILandlordRegistrationService
 
         user.LandlordId = dbModel.Id;
 
-        return ILandlordRegistrationService.LandlordRegistrationResult.Success;
+        return ILandlordService.LandlordRegistrationResult.Success;
     }
 }

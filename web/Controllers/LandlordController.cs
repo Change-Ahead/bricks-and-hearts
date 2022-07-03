@@ -8,18 +8,18 @@ namespace BricksAndHearts.Controllers;
 
 [Authorize]
 [Route("/landlord/register")]
-public class LandlordRegistrationController : AbstractController
+public class LandlordController : AbstractController
 {
     private readonly BricksAndHeartsDbContext _dbContext;
-    private readonly ILandlordRegistrationService _landlordRegistrationService;
-    private readonly ILogger<LandlordRegistrationController> _logger;
+    private readonly ILandlordService _landlordService;
+    private readonly ILogger<LandlordController> _logger;
 
-    public LandlordRegistrationController(ILogger<LandlordRegistrationController> logger, BricksAndHeartsDbContext dbContext,
-        ILandlordRegistrationService landlordRegistrationService)
+    public LandlordController(ILogger<LandlordController> logger, BricksAndHeartsDbContext dbContext,
+        ILandlordService landlordService)
     {
         _dbContext = dbContext;
         _logger = logger;
-        _landlordRegistrationService = landlordRegistrationService;
+        _landlordService = landlordService;
     }
 
     [HttpGet]
@@ -48,20 +48,20 @@ public class LandlordRegistrationController : AbstractController
 
         var user = GetCurrentUser();
 
-        var result = await _landlordRegistrationService.RegisterLandlordWithUser(createModel, user);
+        var result = await _landlordService.RegisterLandlordWithUser(createModel, user);
 
         switch (result)
         {
-            case ILandlordRegistrationService.LandlordRegistrationResult.Success:
+            case ILandlordService.LandlordRegistrationResult.Success:
                 _logger.LogInformation("Successfully created landlord for user {UserId}", user.Id);
                 return Redirect("/landlord/me/profile");
 
-            case ILandlordRegistrationService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered:
+            case ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered:
                 _logger.LogWarning("Email already registered {Email}", createModel.Email);
                 ModelState.AddModelError("Email", "Email already registered");
                 return View("Create");
 
-            case ILandlordRegistrationService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord:
+            case ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord:
                 _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
                 TempData["FlashMessage"] = "Already registered!"; // TODO: Landlord profile page should display this message
                 return Redirect("/landlord/me/profile");
