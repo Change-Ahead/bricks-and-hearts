@@ -1,5 +1,6 @@
 using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
+using BricksAndHearts.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.CookiePolicy;
@@ -32,6 +33,7 @@ builder.Services.AddAuthentication(options => options.DefaultScheme = CookieAuth
 
 builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformer>();
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<ILandlordRegistrationService, LandlordRegistrationService>();
 
 var app = builder.Build();
 

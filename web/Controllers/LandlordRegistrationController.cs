@@ -1,4 +1,5 @@
 ﻿using BricksAndHearts.Database;
+using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,16 +11,28 @@ namespace BricksAndHearts.Controllers;
 public class LandlordRegistrationController : AbstractController
 {
     private readonly BricksAndHeartsDbContext _dbContext;
+    private readonly ILandlordRegistrationService _landlordRegistrationService;
+    private readonly ILogger<LandlordRegistrationController> _logger;
 
-    public LandlordRegistrationController(BricksAndHeartsDbContext dbContext)
+    public LandlordRegistrationController(ILogger<LandlordRegistrationController> logger, BricksAndHeartsDbContext dbContext,
+        ILandlordRegistrationService landlordRegistrationService)
     {
         _dbContext = dbContext;
+        _logger = logger;
+        _landlordRegistrationService = landlordRegistrationService;
     }
 
     [HttpGet]
     [Route("")]
     public ActionResult Index()
     {
+        var currentUser = GetCurrentUser();
+        if (currentUser.LandlordId != null)
+        {
+            _logger.LogWarning("User {UserId} is already registered, will redirect to profile", currentUser.Id);
+            return Redirect("/landlord/me/profile");
+        }
+
         return View("Create", new LandlordCreateModel
         {
             Email = GetCurrentUser().GoogleEmail
@@ -30,22 +43,31 @@ public class LandlordRegistrationController : AbstractController
     [Route("")]
     public async Task<ActionResult> Create([FromForm] LandlordCreateModel createModel)
     {
-        if (!ModelState.IsValid)
+        // This does checks based on the annotations (e.g. [Required]) on LandlordCreateModel
+        if (!ModelState.IsValid) return View("Create");
+
+        var user = GetCurrentUser();
+
+        var result = await _landlordRegistrationService.RegisterLandlordWithUser(createModel, user);
+
+        switch (result)
         {
-            return View("Create");
+            case ILandlordRegistrationService.LandlordRegistrationResult.Success:
+                _logger.LogInformation("Successfully created landlord for user {UserId}", user.Id);
+                return Redirect("/landlord/me/profile");
+
+            case ILandlordRegistrationService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered:
+                _logger.LogWarning("Email already registered {Email}", createModel.Email);
+                ModelState.AddModelError("Email", "Email already registered");
+                return View("Create");
+
+            case ILandlordRegistrationService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord:
+                _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
+                TempData["FlashMessage"] = "Already registered!"; // TODO: Landlord profile page should display this message
+                return Redirect("/landlord/me/profile");
+
+            default:
+                throw new Exception($"Unknown landlord registration error ${result}");
         }
-
-        var dbModel = new LandlordDbModel
-        {
-            FirstName = createModel.FirstName,
-            LastName = createModel.LastName,
-            CompanyName = createModel.CompanyName,
-            Email = createModel.Email,
-            Phone = createModel.Phone,
-        };
-        _dbContext.Landlords.Add(dbModel);
-        await _dbContext.SaveChangesAsync();
-
-        return Redirect("/landlord/me/profile"); // qq
     }
 }
