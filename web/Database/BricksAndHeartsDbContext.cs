@@ -24,5 +24,10 @@ public class BricksAndHeartsDbContext : DbContext
         modelBuilder.Entity<UserDbModel>()
             .HasIndex(u => u.GoogleAccountId)
             .IsUnique();
+
+        modelBuilder.Entity<UserDbModel>()
+            .HasOne<LandlordDbModel>(u => u.Landlord)
+            .WithOne(l => l.User)
+            .HasForeignKey<UserDbModel>(u => u.LandlordId);
     }
 }

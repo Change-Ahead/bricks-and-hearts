@@ -7,9 +7,10 @@ namespace BricksAndHearts.Controllers;
 
 [Authorize]
 [Route("/landlord/register")]
-public class LandlordRegistrationController: AbstractController
+public class LandlordRegistrationController : AbstractController
 {
     private readonly BricksAndHeartsDbContext _dbContext;
+
     public LandlordRegistrationController(BricksAndHeartsDbContext dbContext)
     {
         _dbContext = dbContext;
@@ -38,6 +39,9 @@ public class LandlordRegistrationController: AbstractController
         {
             FirstName = createModel.FirstName,
             LastName = createModel.LastName,
+            CompanyName = createModel.CompanyName,
+            Email = createModel.Email,
+            Phone = createModel.Phone,
         };
         _dbContext.Landlords.Add(dbModel);
         await _dbContext.SaveChangesAsync();
