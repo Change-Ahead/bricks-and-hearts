@@ -41,10 +41,10 @@ public class LandlordController : AbstractController
     }
 
     [HttpPost]
-    [Route("")]
+    [Route("register")]
     public async Task<ActionResult> RegisterPost([FromForm] LandlordProfileModel createModel)
     {
-        // This does checks based on the annotations (e.g. [Required]) on LandlordCreateModel
+        // This does checks based on the annotations (e.g. [Required]) on LandlordProfileModel
         if (!ModelState.IsValid)
         {
             return View("Register");
@@ -67,7 +67,7 @@ public class LandlordController : AbstractController
 
             case ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord:
                 _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
-                TempData["FlashMessage"] = "Already registered!"; // TODO: Landlord profile page should display this message
+                TempData["FlashMessage"] = "Already registered!"; // This will be displayed on the Profile page
                 return Redirect(Url.Action("MyProfile")!);
 
             default:

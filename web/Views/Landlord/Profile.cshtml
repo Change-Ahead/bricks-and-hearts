@@ -7,6 +7,14 @@
 <h1>Profile</h1>
 
 <div>
+    @{
+        if (TempData["FlashMessage"] != null)
+        {
+            <div class="alert alert-warning" role="alert">
+                @TempData["FlashMessage"]
+            </div>
+        }
+    }
     <h4>Landlord</h4>
     <hr/>
     <dl class="row">

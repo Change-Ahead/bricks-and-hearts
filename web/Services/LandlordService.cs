@@ -45,25 +45,25 @@ public class LandlordService : ILandlordService
         // We want to atomically update multiple records (insert a landlord, then set the user's landlord id), so first start a transaction
         await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
         {
-            // Check there isn't already a Landlord with that email. Nothing depends on this currently, but it would probably mean the landlord is a duplicate.
-            // This requires Serializable isolation, otherwise it will not lock any rows, and two racing registrations could create duplicate records.
+            // Check there isn't already a Landlord with that email. Nothing depends on this currently, but it would probably mean the landlord is a duplicate
+            // This requires Serializable isolation, otherwise it will not lock any rows, and two racing registrations could create duplicate records
             if (await _dbContext.Landlords.AnyAsync(l => l.Email == createModel.Email))
                 return ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered;
 
-            // Check the user doesn't already have a landlord associated.
+            // Check the user doesn't already have a landlord associated
             var userRecord = _dbContext.Users.Single(u => u.Id == user.Id);
             if (userRecord.LandlordId != null) return ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord;
 
-            // Insert the landlord and call SaveChanges.
-            // Entity Framework will insert the record and populate dbModel.Id with the new record's id.
+            // Insert the landlord and call SaveChanges
+            // Entity Framework will insert the record and populate dbModel.Id with the new record's id
             _dbContext.Landlords.Add(dbModel);
             await _dbContext.SaveChangesAsync();
 
-            // Now we can update the user record too,
+            // Now we can update the user record too
             userRecord.LandlordId = dbModel.Id;
             await _dbContext.SaveChangesAsync();
 
-            // and commit.
+            // and finally commit
             await transaction.CommitAsync();
         }
 
