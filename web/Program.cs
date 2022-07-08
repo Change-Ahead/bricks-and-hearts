@@ -1,5 +1,6 @@
 using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
+using BricksAndHearts.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.CookiePolicy;
@@ -15,7 +16,7 @@ builder.Services.AddAuthentication(options => options.DefaultScheme = CookieAuth
     .AddCookie(options =>
     {
         // If a user hits an [Authorize] endpoint without a cookie, redirect here
-        options.LoginPath = "/login";
+        options.LoginPath = "/login/google";
         // When a user doesn't have the right role (like "Admin") return a 403
         options.Events.OnRedirectToAccessDenied = context =>
         {
@@ -32,6 +33,7 @@ builder.Services.AddAuthentication(options => options.DefaultScheme = CookieAuth
 
 builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformer>();
 builder.Services.AddControllersWithViews();
+builder.Services.AddScoped<ILandlordService, LandlordService>();
 
 var app = builder.Build();
 

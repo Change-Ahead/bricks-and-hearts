@@ -1,10 +1,10 @@
 ﻿using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 using BricksAndHearts.ViewModels;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BricksAndHearts.Controllers;
 
-public class HomeController : Controller
+public class HomeController : AbstractController
 {
     private readonly ILogger<HomeController> _logger;
 
@@ -15,10 +15,12 @@ public class HomeController : Controller
 
     public IActionResult Index()
     {
+        var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
         var model = new HomeViewModel
         {
-            IsLoggedIn = User.Identity?.IsAuthenticated ?? false,
-            UserName = User.Identity?.Name
+            IsLoggedIn = isAuthenticated,
+            UserName = User.Identity?.Name,
+            IsRegisteredAsLandlord = isAuthenticated && GetCurrentUser().LandlordId != null
         };
         return View(model);
     }

@@ -4,18 +4,28 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Bricks & Hearts</h1>
+    <p>Welcome to Bricks & Hearts.</p>
+    <p>Under construction for <a href="https://www.changeahead.org.uk/">Change Ahead</a></p>
+    <p>This is a (work in progress) portal for landlords to manage properties they would like to make available to disadvantaged tenants looking social housing.</p>
     @{
         if (Model.IsLoggedIn)
         {
             <p>
                 Logged in as @Model.UserName
             </p>
+            if (Model.IsRegisteredAsLandlord)
+            {
+                <a class="btn btn-primary" asp-controller="Landlord" asp-action="MyProfile">Go to profile</a>
+            }
+            else
+            {
+                <a class="btn btn-success" asp-controller="Landlord" asp-action="RegisterGet">Register as a Landlord</a>
+            }
         }
         else
         {
-            <a href="@Url.Action("Index", "Login")">Login</a>
+            <a class="btn btn-primary" href="@Url.Action("Google", "Login")">Login with Google</a>
         }
     }
 </div>
