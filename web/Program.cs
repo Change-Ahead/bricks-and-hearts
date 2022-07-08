@@ -37,6 +37,11 @@ builder.Services.AddScoped<ILandlordService, LandlordService>();
 
 var app = builder.Build();
 
+if (app.Configuration.GetValue<bool>("MigrateOnStartup"))
+{
+    BricksAndHeartsDbContext.MigrateDatabase(app);
+}
+
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
