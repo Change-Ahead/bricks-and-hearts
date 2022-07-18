@@ -55,7 +55,15 @@ public class AdminController : AbstractController
             return RedirectToAction(nameof(Index));
         }
 
-        _adminService.RequestAdminAccess(user);
+        var result = _adminService.RequestAdminAccess(user);
+        if (result == IAdminService.RequestAdminAccessResult.ErrorUserNotFound)
+        {
+            _logger.LogWarning("User {UserId} not found",user.Id);
+            TempData["FlashType"] = "danger";
+            TempData["FlashMessage"] = "User not found";
+
+            return RedirectToAction(nameof(Index));
+        }
         
         _logger.LogInformation("Successfully requested admin access for user {UserId}",user.Id);
         TempData["FlashType"] = "success";
