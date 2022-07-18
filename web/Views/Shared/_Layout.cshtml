@@ -32,7 +32,7 @@
                         @if (User.Identity?.IsAuthenticated == true)
                         {
                             <li class="nav-item" style="margin-left: auto;">
-                                <a href="/TODO/profile" class="nav-link">@(((BricksAndHeartsUser)User.Identity).GoogleEmail)</a>
+                                <a class="nav-link">@(((BricksAndHeartsUser)User.Identity).GoogleEmail)</a>
                             </li>
                             <li class="nav-item" style="margin-left: auto;">
                                 @using (Html.BeginForm("Logout", "Login", FormMethod.Post))
