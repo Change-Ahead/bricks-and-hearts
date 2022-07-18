@@ -28,7 +28,6 @@ public class HomeController : AbstractController
 
     public IActionResult Privacy()
     {
-        return StatusCode(418);
         return View();
     }
 
