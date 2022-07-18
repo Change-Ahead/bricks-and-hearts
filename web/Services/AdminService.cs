@@ -5,13 +5,7 @@ namespace BricksAndHearts.Services;
 
 public interface IAdminService
 {
-    public enum RequestAdminAccessResult
-    {
-        ErrorUserNotFound,
-        Success
-    }
-    
-    public RequestAdminAccessResult RequestAdminAccess(BricksAndHeartsUser user);
+    public void RequestAdminAccess(BricksAndHeartsUser user);
 }
 
 public class AdminService : IAdminService
@@ -23,12 +17,10 @@ public class AdminService : IAdminService
         _dbContext = dbContext;
     }
 
-    public IAdminService.RequestAdminAccessResult RequestAdminAccess(BricksAndHeartsUser user)
+    public void RequestAdminAccess(BricksAndHeartsUser user)
     {
         var userRecord = _dbContext.Users.SingleOrDefault(u => u.Id == user.Id);
-        if (userRecord == null) return IAdminService.RequestAdminAccessResult.ErrorUserNotFound;
         userRecord.HasRequestedAdmin = true;
         _dbContext.SaveChanges();
-        return IAdminService.RequestAdminAccessResult.Success;
     }
 }
