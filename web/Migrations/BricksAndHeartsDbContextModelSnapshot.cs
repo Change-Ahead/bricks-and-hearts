@@ -78,6 +78,9 @@ namespace BricksAndHearts.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("HasRequestedAdmin")
+                        .HasColumnType("bit");
+
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("bit");
 
