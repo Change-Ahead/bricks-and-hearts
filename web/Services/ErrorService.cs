@@ -1,7 +1,12 @@
 ﻿namespace BricksAndHearts.Services;
-public class ErrorService
+
+public interface IErrorService
 {
-    public static (string, string) GetStatusMessage(int statusCode)
+    public (string statusName, string statusMessage) GetStatusMessage(int statusCode);
+}
+public class ErrorService : IErrorService
+{ 
+    public (string statusName, string statusMessage) GetStatusMessage(int statusCode)
     {
         return statusCode switch
         {

@@ -34,12 +34,13 @@ public class HomeController : AbstractController
     [Route("/Error/{status:int}")]
     public IActionResult Error(int status)
     {
-        var errorInfo = ErrorService.GetStatusMessage(status);
+        ErrorService errorService = new ErrorService();
+        var errorInfo = errorService.GetStatusMessage(status);
         return View(new ErrorViewModel
         {
             RequestId = status.ToString(),
-            StatusName = errorInfo.Item1,
-            StatusMessage = errorInfo.Item2
+            StatusName = errorInfo.statusName,
+            StatusMessage = errorInfo.statusMessage
         });
     }
 }
