@@ -113,7 +113,7 @@ public class LandlordController : AbstractController
         var landlordId = GetCurrentUser().LandlordId;
         if (!landlordId.HasValue)
         {
-            return RedirectToAction();
+            return StatusCode(403);
         }
 
         var listOfProperties = _landlordService.GetListOfProperties(landlordId.Value);
