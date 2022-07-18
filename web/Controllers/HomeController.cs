@@ -28,16 +28,19 @@ public class HomeController : AbstractController
 
     public IActionResult Privacy()
     {
+        return StatusCode(418);
         return View();
     }
 
     [Route("/Error/{status:int}")]
     public IActionResult Error(int status)
     {
+        var errorInfo = ErrorService.GetStatusMessage(status);
         return View(new ErrorViewModel
         {
             RequestId = status.ToString(),
-            StatusMessage = ErrorService.GetStatusMessage(status)
+            StatusName = errorInfo.Item1,
+            StatusMessage = errorInfo.Item2
         });
     }
 }
