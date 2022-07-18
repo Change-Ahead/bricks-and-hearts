@@ -19,11 +19,14 @@
             else
             {
                 <p>You are not an admin :(</p>
+                <a class="btn btn-primary" href="@Url.Action("RequestAdminAccess", "Admin")">Request admin access</a>
             }
         }
         else
         {
             <a href="@Url.Action("Google", "Login")">Login</a>
         }
+        
+        
     }
 </div>

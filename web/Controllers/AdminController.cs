@@ -26,4 +26,12 @@ public class AdminController : AbstractController
 
         return View(viewModel);
     }
+    
+    [HttpPost]
+    public IActionResult RequestAdminAccess()
+    {
+        return View("Index");
+    }
+
+
 }
