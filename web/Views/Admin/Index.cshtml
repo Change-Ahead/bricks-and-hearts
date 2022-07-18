@@ -7,7 +7,7 @@
 
 <div class="text-center">
     @{
-        if ((TempData["FlashMessage"] != null)&&(TempData["FlashType"]!=null))
+        if (TempData["FlashMessage"] != null && TempData["FlashType"] != null)
         {
             <div class="alert alert-@TempData["FlashType"]" role="alert">
                 @TempData["FlashMessage"]

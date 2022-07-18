@@ -23,6 +23,4 @@ public class BricksAndHeartsUser : ClaimsIdentity
     public bool IsAdmin { get; set; }
 
     public int? LandlordId { get; set; }
-    
-
 }

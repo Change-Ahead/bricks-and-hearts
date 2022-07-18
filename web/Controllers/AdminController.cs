@@ -40,7 +40,6 @@ public class AdminController : AbstractController
         {
             _logger.LogWarning("Not authenticated user");
             TempData["FlashType"] = "danger";
-
             TempData["FlashMessage"] = "Not logged in";
 
             return RedirectToAction(nameof(Index));
@@ -57,10 +56,11 @@ public class AdminController : AbstractController
         }
 
         _adminService.RequestAdminAccess(user);
-        TempData["FlashType"] = "success";
-
-        TempData["FlashMessage"] = "Successfully requested admin access";
+        
         _logger.LogInformation("Successfully requested admin access for user {UserId}",user.Id);
+        TempData["FlashType"] = "success";
+        TempData["FlashMessage"] = "Successfully requested admin access";
+
         return RedirectToAction(nameof(Index));
     }
 

@@ -7,6 +7,7 @@ public interface IAdminService
 {
     public void RequestAdminAccess(BricksAndHeartsUser user);
 }
+
 public class AdminService : IAdminService
 {
     private readonly BricksAndHeartsDbContext _dbContext;
