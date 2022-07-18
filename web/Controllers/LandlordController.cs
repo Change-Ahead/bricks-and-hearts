@@ -107,4 +107,17 @@ public class LandlordController : AbstractController
 
         return await Profile(landlordId.Value);
     }
+
+    public IActionResult ViewProperties()
+    {
+        var landlordId = GetCurrentUser().LandlordId;
+        if (!landlordId.HasValue)
+        {
+            return RedirectToAction();
+        }
+
+        var listOfProperties = _landlordService.GetListOfProperties(landlordId.Value);
+        return View("Properties", new PropertiesDashboardViewModel(listOfProperties));
+    }
+
 }
