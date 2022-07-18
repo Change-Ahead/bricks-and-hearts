@@ -39,8 +39,8 @@ public class HomeController : AbstractController
         return View(new ErrorViewModel
         {
             RequestId = status.ToString(),
-            StatusName = errorInfo.statusName,
-            StatusMessage = errorInfo.statusMessage
+            StatusName = errorInfo.StatusName,
+            StatusMessage = errorInfo.StatusMessage
         });
     }
 }
