@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BricksAndHearts.Controllers;
 
-[Authorize(Roles = "Admin")]
 public class AdminController : AbstractController
 {
     private readonly BricksAndHeartsDbContext _dbContext;
@@ -19,8 +18,7 @@ public class AdminController : AbstractController
         _adminService = adminService;
         _dbContext = dbContext;
     }
-
-    [AllowAnonymous]
+    
     public IActionResult Index()
     {
         var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
@@ -30,21 +28,10 @@ public class AdminController : AbstractController
         return View(viewModel);
     }
 
-    [AllowAnonymous]
+    [Authorize]
     [HttpPost]
     public IActionResult RequestAdminAccess()
     {
-        var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
-
-        if (!isAuthenticated)
-        {
-            _logger.LogWarning("Not authenticated user");
-            TempData["FlashType"] = "danger";
-            TempData["FlashMessage"] = "Not logged in";
-
-            return RedirectToAction(nameof(Index));
-        }
-
         var user = GetCurrentUser();
         if (user.IsAdmin)
         {
@@ -71,6 +58,4 @@ public class AdminController : AbstractController
 
         return RedirectToAction(nameof(Index));
     }
-
-
 }
