@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BricksAndHearts.Migrations
 {
     [DbContext(typeof(BricksAndHeartsDbContext))]
-    [Migration("20220718092020_HasRequestedAdmin")]
-    partial class HasRequestedAdmin
+    [Migration("20220718155426_AddHasRequestedAdminToUser")]
+    partial class AddHasRequestedAdminToUser
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

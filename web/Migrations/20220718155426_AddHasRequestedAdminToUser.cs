@@ -4,7 +4,7 @@
 
 namespace BricksAndHearts.Migrations
 {
-    public partial class HasRequestedAdmin : Migration
+    public partial class AddHasRequestedAdminToUser : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
