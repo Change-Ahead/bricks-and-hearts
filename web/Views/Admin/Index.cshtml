@@ -1,9 +1,19 @@
-﻿@model AdminViewModel
+﻿@using System.Net
+@using System.Formats.Asn1
+@model AdminViewModel
 @{
     ViewData["Title"] = "Admin Page";
 }
 
 <div class="text-center">
+    @{
+        if ((TempData["FlashMessage"] != null)&&(TempData["FlashType"]!=null))
+        {
+            <div class="alert alert-@TempData["FlashType"]" role="alert">
+                @TempData["FlashMessage"]
+            </div>
+        }
+    }
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
     @{
@@ -19,14 +29,17 @@
             else
             {
                 <p>You are not an admin :(</p>
-                <a class="btn btn-primary" href="@Url.Action("RequestAdminAccess", "Admin")">Request admin access</a>
+                @using (Html.BeginForm("RequestAdminAccess", "Admin", FormMethod.Post))
+                {
+                    <button type="submit" class="btn btn-primary">Request Admin Access</button>
+                }
             }
         }
         else
         {
             <a href="@Url.Action("Google", "Login")">Login</a>
         }
-        
-        
+
+
     }
 </div>
