@@ -2,13 +2,14 @@
 
 public interface IErrorService
 {
-    public (string statusName, string statusMessage) GetStatusMessage(int statusCode);
+    public (string StatusName, string StatusMessage) GetStatusMessage(int StatusCode);
 }
+
 public class ErrorService : IErrorService
 { 
-    public (string statusName, string statusMessage) GetStatusMessage(int statusCode)
+    public (string StatusName, string StatusMessage) GetStatusMessage(int StatusCode)
     {
-        return statusCode switch
+        return StatusCode switch
         {
             400 => ("Bad Request",
                 "The request cannot be processed by the server. This may be due to an error in the request which has been input."),
