@@ -14,4 +14,5 @@ public class LandlordDbModel
     public string Phone { get; set; } = null!;
 
     public virtual UserDbModel? User { get; set; }
+    public virtual List<PropertyDbModel>? Properties { get; set; }
 }

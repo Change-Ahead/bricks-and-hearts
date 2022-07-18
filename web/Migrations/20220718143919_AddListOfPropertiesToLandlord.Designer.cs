@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BricksAndHearts.Migrations
 {
     [DbContext(typeof(BricksAndHeartsDbContext))]
-    [Migration("20220718134225_CreatePropertiesTable")]
-    partial class CreatePropertiesTable
+    [Migration("20220718143919_AddListOfPropertiesToLandlord")]
+    partial class AddListOfPropertiesToLandlord
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -60,6 +60,28 @@ namespace BricksAndHearts.Migrations
                     b.ToTable("Landlord");
                 });
 
+            modelBuilder.Entity("BricksAndHearts.Database.PropertyDbModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("LandlordId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LandlordId");
+
+                    b.ToTable("Property");
+                });
+
             modelBuilder.Entity("BricksAndHearts.Database.UserDbModel", b =>
                 {
                     b.Property<int>("Id")
@@ -98,6 +120,17 @@ namespace BricksAndHearts.Migrations
                     b.ToTable("User");
                 });
 
+            modelBuilder.Entity("BricksAndHearts.Database.PropertyDbModel", b =>
+                {
+                    b.HasOne("BricksAndHearts.Database.LandlordDbModel", "Landlord")
+                        .WithMany("Properties")
+                        .HasForeignKey("LandlordId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Landlord");
+                });
+
             modelBuilder.Entity("BricksAndHearts.Database.UserDbModel", b =>
                 {
                     b.HasOne("BricksAndHearts.Database.LandlordDbModel", "Landlord")
@@ -109,6 +142,8 @@ namespace BricksAndHearts.Migrations
 
             modelBuilder.Entity("BricksAndHearts.Database.LandlordDbModel", b =>
                 {
+                    b.Navigation("Properties");
+
                     b.Navigation("User");
                 });
 #pragma warning restore 612, 618

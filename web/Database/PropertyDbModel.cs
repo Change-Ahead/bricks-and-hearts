@@ -1,5 +1,8 @@
-﻿namespace BricksAndHearts.Database;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
+namespace BricksAndHearts.Database;
+
+[Table("Property")]
 public class PropertyDbModel
 {
     public int Id { get; set; }

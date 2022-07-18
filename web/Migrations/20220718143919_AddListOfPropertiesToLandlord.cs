@@ -4,7 +4,7 @@
 
 namespace BricksAndHearts.Migrations
 {
-    public partial class CreatePropertiesTable : Migration
+    public partial class AddListOfPropertiesToLandlord : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
