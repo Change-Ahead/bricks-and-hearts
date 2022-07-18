@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics;
+using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 
@@ -30,9 +31,16 @@ public class HomeController : AbstractController
         return View();
     }
 
-    [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-    public IActionResult Error()
+    [Route("/Error/{status:int}")]
+    public IActionResult Error(int status)
     {
-        return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        ErrorService errorService = new ErrorService();
+        var errorInfo = errorService.GetStatusMessage(status);
+        return View(new ErrorViewModel
+        {
+            RequestId = status.ToString(),
+            StatusName = errorInfo.statusName,
+            StatusMessage = errorInfo.statusMessage
+        });
     }
 }
