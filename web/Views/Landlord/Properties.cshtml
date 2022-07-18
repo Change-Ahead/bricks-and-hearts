@@ -6,3 +6,24 @@
 
 <h2>My properties</h2>
 
+<table class="table">
+  <thead>
+    <tr>
+      <th scope="col">#</th>
+      <th scope="col">Address</th>
+    </tr>
+  </thead>
+  <tbody>
+  @{
+    int i = 1;
+  }
+  @foreach (var prop in Model.Properties)
+  {
+    <tr>
+      <th scope="row">@i</th>
+      <td>@prop.Address</td>
+    </tr>
+    i++;
+  }
+  </tbody>
+</table>
