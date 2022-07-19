@@ -107,7 +107,7 @@ public class LandlordController : AbstractController
 
         return await Profile(landlordId.Value);
     }
-
+    [Route("/properties")]
     public IActionResult ViewProperties()
     {
         var landlordId = GetCurrentUser().LandlordId;
@@ -119,5 +119,11 @@ public class LandlordController : AbstractController
         var databaseResult = _landlordService.GetListOfProperties(landlordId.Value);
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
         return View("Properties", new PropertiesDashboardViewModel(listOfProperties));
+    }
+
+    [Route("/create-property")]
+    public IActionResult CreateProperty()
+    {
+        return RedirectToAction("Index","Home");
     }
 }

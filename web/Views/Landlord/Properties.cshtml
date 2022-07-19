@@ -8,10 +8,15 @@
 
 <table class="table">
   <thead>
-    <tr>
-      <th scope="col">#</th>
-      <th scope="col">Address</th>
-    </tr>
+  <tr>
+    <th scope="col">#</th>
+    <th scope="col">Address</th>
+    <th scope="col">Type</th>
+    <th scope="col"># of Bedrooms</th>
+    <th scope="col">Created</th>
+    <th scope="col">Rent (pcm)</th>
+    <th scope="col">Description</th>
+  </tr>
   </thead>
   <tbody>
   @{
@@ -22,8 +27,18 @@
     <tr>
       <th scope="row">@i</th>
       <td>@prop.Address</td>
+      <td>@prop.PropertyType</td>
+      <td>@prop.NumOfBedrooms</td>
+      <td>@prop.CreationTime</td>
+      <td>@prop.Rent</td>
+      <td>@prop.Description</td>
     </tr>
     i++;
   }
   </tbody>
 </table>
+@using (Html.BeginForm("CreateProperty", "Landlord", FormMethod.Post))
+{
+  <button class="btn btn-primary"> Add new property</button>
+}
+
