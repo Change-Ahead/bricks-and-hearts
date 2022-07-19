@@ -120,10 +120,19 @@ public class LandlordController : AbstractController
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
         return View("Properties", new PropertiesDashboardViewModel(listOfProperties));
     }
-
-    [Route("/create-property")]
-    public IActionResult CreateProperty()
+    
+    [HttpGet]
+    [Route("/add-property")]
+    public IActionResult AddNewProperty()
     {
-        return RedirectToAction("Index","Home");
+        return View();
+    }
+
+    
+    [HttpPost]
+    [Route("/add-property")]
+    public async Task<ActionResult> AddNewProperty([FromForm] PropertyViewModel createModel)
+    {
+        return View("AddNewProperty");
     }
 }

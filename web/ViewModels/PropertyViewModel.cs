@@ -8,10 +8,14 @@ public class PropertyViewModel
     [Required] public PropertyAddress Address { get; set; }
 
     [Required] 
-    public string PropertyType { get; set; } = string.Empty;
+    public string PropertyType { get; set; } = String.Empty;
+    [Required]
     public int NumOfBedrooms { get; set; } = 0;
-    public DateTime CreationTime { get; set; }
+    public DateTime CreationTime { get; set; } = DateTime.Now;
+    
+    [Required]
     public int Rent { get; set; } = 0;
+    [Required]
     public string Description { get; set; } = String.Empty;
     
     public static PropertyViewModel FromDbModel(PropertyDbModel property)
@@ -38,10 +42,14 @@ public class PropertyViewModel
 
 public class PropertyAddress
 {
-    public string AddressLine1 { get; set; }
-    public string AddressLine2 { get; set; }
-    public string AddressLine3 { get; set; }
-    public string TownOrCity { get; set; }
-    public string County { get; set; }
-    public string Postcode { get; set; }
+    [Required]
+    public string AddressLine1 { get; set; } = String.Empty;
+    public string? AddressLine2 { get; set; }
+    public string? AddressLine3 { get; set; }
+    [Required]
+    public string TownOrCity { get; set; } = String.Empty;
+    [Required]
+    public string County { get; set; } = String.Empty;
+    [Required]
+    public string Postcode { get; set; } = String.Empty;
 }
