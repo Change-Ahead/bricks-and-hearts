@@ -20,14 +20,14 @@ public class AdminService : IAdminService
 
     public void RequestAdminAccess(BricksAndHeartsUser user)
     {
-        var userRecord = _dbContext.Users.SingleOrDefault(u => u.Id == user.Id);
+        var userRecord = _dbContext.Users.Single(u => u.Id == user.Id);
         userRecord.HasRequestedAdmin = true;
         _dbContext.SaveChanges();
     }
-    
+
     public void CancelAdminAccessRequest(BricksAndHeartsUser user)
     {
-        var userRecord = _dbContext.Users.SingleOrDefault(u => u.Id == user.Id);
+        var userRecord = _dbContext.Users.Single(u => u.Id == user.Id);
         userRecord.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
     }
