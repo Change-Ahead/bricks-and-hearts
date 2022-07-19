@@ -31,6 +31,11 @@ public class BricksAndHeartsDbContext : DbContext
             .HasOne(u => u.Landlord)
             .WithOne(l => l.User)
             .HasForeignKey<UserDbModel>(u => u.LandlordId);
+
+        modelBuilder.Entity<PropertyDbModel>()
+            .HasOne(p => p.Landlord)
+            .WithMany(l => l.Properties)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 
     public static void MigrateDatabase(WebApplication app)

@@ -17,7 +17,7 @@ namespace BricksAndHearts.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.6")
+                .HasAnnotation("ProductVersion", "6.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -126,7 +126,7 @@ namespace BricksAndHearts.Migrations
                     b.HasOne("BricksAndHearts.Database.LandlordDbModel", "Landlord")
                         .WithMany("Properties")
                         .HasForeignKey("LandlordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Landlord");

@@ -12,14 +12,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BricksAndHearts.Migrations
 {
     [DbContext(typeof(BricksAndHeartsDbContext))]
-    [Migration("20220718143919_AddListOfPropertiesToLandlord")]
-    partial class AddListOfPropertiesToLandlord
+    [Migration("20220719134520_CreatePropertiesTable")]
+    partial class CreatePropertiesTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.6")
+                .HasAnnotation("ProductVersion", "6.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -125,7 +125,7 @@ namespace BricksAndHearts.Migrations
                     b.HasOne("BricksAndHearts.Database.LandlordDbModel", "Landlord")
                         .WithMany("Properties")
                         .HasForeignKey("LandlordId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Landlord");
