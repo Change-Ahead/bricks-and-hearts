@@ -17,4 +17,6 @@ public class UserDbModel
 
     public int? LandlordId { get; set; }
     public virtual LandlordDbModel? Landlord { get; set; }
+    
+    public bool HasRequestedAdmin { get; set; }
 }
