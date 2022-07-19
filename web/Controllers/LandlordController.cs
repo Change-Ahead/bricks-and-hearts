@@ -117,8 +117,7 @@ public class LandlordController : AbstractController
         }
 
         var databaseResult = _landlordService.GetListOfProperties(landlordId.Value);
-        var listOfProperties = new List<PropertyViewModel>();
-        databaseResult.ForEach(p => listOfProperties.Add(PropertyViewModel.FromDbModel(p)));
+        var listOfProperties = databaseResult.Select(p => PropertyViewModel.FromDbModel(p));
         return View("Properties", new PropertiesDashboardViewModel(listOfProperties));
     }
 
