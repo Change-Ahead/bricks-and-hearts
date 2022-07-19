@@ -35,20 +35,20 @@ public class AdminService : IAdminService
         _dbContext.SaveChanges();
     }
 
-    private List<UserDbModel> GetCurrentAdmins()
+    private async Task<List<UserDbModel>> GetCurrentAdmins()
     {
-        List<UserDbModel> CurrentAdmins = _dbContext.Users.Where(u => u.IsAdmin == true).ToList();
+        List<UserDbModel> CurrentAdmins = await _dbContext.Users.Where(u => u.IsAdmin == true).ToListAsync();
         return CurrentAdmins;
     }
 
-    private List<UserDbModel> GetPendingAdmins()
+    private async Task<List<UserDbModel>> GetPendingAdmins()
     {
-        List<UserDbModel> PendingAdmins = _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToList();
+        List<UserDbModel> PendingAdmins = await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
         return PendingAdmins;
     }
 
-    public (List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins) GetAdminLists()
+    public async Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists()
     {
-        return (GetCurrentAdmins(), GetPendingAdmins());
+        return (await GetCurrentAdmins(), await GetPendingAdmins());
     }
 }

@@ -72,23 +72,14 @@ public class AdminController : AbstractController
         return RedirectToAction(nameof(Index));
     }
 
-    [Authorize]
+    [Authorize(Roles="Admin")]
     [HttpGet]
-    public IActionResult AdminList()
+    public async Task<IActionResult> AdminList()
     {
-        if (GetCurrentUser().IsAdmin)
-        {
-            AdminListModel adminListModel = new AdminListModel();
-            var adminLists = _adminService.GetAdminLists();
-            adminListModel.CurrentAdmins = adminLists.CurrentAdmins;
-            adminListModel.PendingAdmins = adminLists.PendingAdmins;
-            return View(adminListModel);
-        }
-        else
-        {
-            return StatusCode(403);
-        }
-        
-
+        AdminListModel adminListModel = new AdminListModel();
+        var adminLists = await _adminService.GetAdminLists();
+        adminListModel.CurrentAdmins = adminLists.CurrentAdmins;
+        adminListModel.PendingAdmins = adminLists.PendingAdmins;
+        return View(adminListModel);
     }
 }
