@@ -71,4 +71,13 @@ public class AdminController : AbstractController
 
         return RedirectToAction(nameof(Index));
     }
+
+    public IActionResult AdminList()
+    {
+        AdminListModel adminListModel = new AdminListModel();
+        var adminLists = _adminService.GetAdminLists();
+        adminListModel.CurrentAdmins = adminLists.CurrentAdmins;
+        adminListModel.PendingAdmins = adminLists.PendingAdmins;
+        return View("Admins", adminListModel);
+    }
 }
