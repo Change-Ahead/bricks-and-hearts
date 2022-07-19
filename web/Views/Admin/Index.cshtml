@@ -1,6 +1,4 @@
-﻿@using System.Net
-@using System.Formats.Asn1
-@model AdminViewModel
+﻿@model AdminViewModel
 @{
     ViewData["Title"] = "Admin Page";
 }
@@ -29,9 +27,19 @@
             else
             {
                 <p>You are not an admin :(</p>
-                @using (Html.BeginForm("RequestAdminAccess", "Admin", FormMethod.Post))
+                @if (Model.CurrentUser.HasRequestedAdmin)
                 {
-                    <button type="submit" class="btn btn-primary">Request Admin Access</button>
+                    @using (Html.BeginForm("CancelAdminAccessRequest", "Admin", FormMethod.Post))
+                    {
+                        <button type="submit" class="btn btn-danger">Cancel Admin Access Request</button>
+                    }
+                }
+                else
+                {
+                    @using (Html.BeginForm("RequestAdminAccess", "Admin", FormMethod.Post))
+                    {
+                        <button type="submit" class="btn btn-primary">Request Admin Access</button>
+                    }
                 }
             }
         }

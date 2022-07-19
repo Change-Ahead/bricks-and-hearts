@@ -12,6 +12,7 @@ public class BricksAndHeartsUser : ClaimsIdentity
         GoogleEmail = dbUser.GoogleEmail;
         IsAdmin = dbUser.IsAdmin;
         LandlordId = dbUser.LandlordId;
+        HasRequestedAdmin = dbUser.HasRequestedAdmin;
     }
 
     public int Id { get; set; }
@@ -23,4 +24,7 @@ public class BricksAndHeartsUser : ClaimsIdentity
     public bool IsAdmin { get; set; }
 
     public int? LandlordId { get; set; }
+    
+    public bool HasRequestedAdmin { get; set; }
+
 }

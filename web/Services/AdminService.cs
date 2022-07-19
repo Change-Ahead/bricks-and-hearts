@@ -6,6 +6,7 @@ namespace BricksAndHearts.Services;
 public interface IAdminService
 {
     public void RequestAdminAccess(BricksAndHeartsUser user);
+    public void CancelAdminAccessRequest(BricksAndHeartsUser user);
 }
 
 public class AdminService : IAdminService
@@ -21,6 +22,13 @@ public class AdminService : IAdminService
     {
         var userRecord = _dbContext.Users.SingleOrDefault(u => u.Id == user.Id);
         userRecord.HasRequestedAdmin = true;
+        _dbContext.SaveChanges();
+    }
+    
+    public void CancelAdminAccessRequest(BricksAndHeartsUser user)
+    {
+        var userRecord = _dbContext.Users.SingleOrDefault(u => u.Id == user.Id);
+        userRecord.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
     }
 }
