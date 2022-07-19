@@ -16,7 +16,7 @@ public interface ILandlordService
     }
 
     public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel, BricksAndHeartsUser user);
-    public List<PropertyViewModel> GetListOfProperties(int landlordId);
+    public List<PropertyDbModel> GetListOfProperties(int landlordId);
 
 }
 
@@ -74,15 +74,9 @@ public class LandlordService : ILandlordService
         return ILandlordService.LandlordRegistrationResult.Success;
     }
 
-    public List<PropertyViewModel> GetListOfProperties(int landlordId)
+    public List<PropertyDbModel> GetListOfProperties(int landlordId)
     {
-
-        var landlord = _dbContext.Landlords
-            .Include(l => l.Properties)
-            .SingleOrDefault(l => l.Id == landlordId);
-        // Assumes landlord does exist
-        var listOfProperties = new List<PropertyViewModel>(); 
-        landlord.Properties.ForEach(p=> listOfProperties.Add(PropertyViewModel.FromDbModel(p)));
-        return listOfProperties;
+        return _dbContext.Properties
+            .Where(p => p.LandlordId == landlordId).ToList();
     }
 }

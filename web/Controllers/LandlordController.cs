@@ -116,7 +116,9 @@ public class LandlordController : AbstractController
             return StatusCode(403);
         }
 
-        var listOfProperties = _landlordService.GetListOfProperties(landlordId.Value);
+        var databaseResult = _landlordService.GetListOfProperties(landlordId.Value);
+        var listOfProperties = new List<PropertyViewModel>();
+        databaseResult.ForEach(p => listOfProperties.Add(PropertyViewModel.FromDbModel(p)));
         return View("Properties", new PropertiesDashboardViewModel(listOfProperties));
     }
 
