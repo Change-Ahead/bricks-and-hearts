@@ -30,6 +30,11 @@ public class HomeController : AbstractController
     {
         return View();
     }
+    
+    public IActionResult ContactUs()
+    {
+        return View();
+    }
 
     [Route("/Error/{status:int}")]
     public IActionResult Error(int status)
