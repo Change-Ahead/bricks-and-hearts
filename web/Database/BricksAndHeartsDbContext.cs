@@ -35,6 +35,7 @@ public class BricksAndHeartsDbContext : DbContext
         modelBuilder.Entity<PropertyDbModel>()
             .HasOne(p => p.Landlord)
             .WithMany(l => l.Properties)
+            .HasForeignKey(p => p.LandlordId)
             .OnDelete(DeleteBehavior.Restrict);
     }
 
