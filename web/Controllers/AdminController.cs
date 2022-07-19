@@ -78,6 +78,6 @@ public class AdminController : AbstractController
         var adminLists = _adminService.GetAdminLists();
         adminListModel.CurrentAdmins = adminLists.CurrentAdmins;
         adminListModel.PendingAdmins = adminLists.PendingAdmins;
-        return View("Admins", adminListModel);
+        return View(adminListModel);
     }
 }

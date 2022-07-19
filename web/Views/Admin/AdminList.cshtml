@@ -1,0 +1,62 @@
+@using Microsoft.EntityFrameworkCore.Metadata.Internal
+@model AdminListModel
+
+@{
+    ViewData["Title"] = "Admin List";
+}
+
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <title>Admin List</title>
+    </head>
+<body>
+
+<div>
+    <h2>Pending Admins</h2>
+    <table class="display" class="table table-striped" id="pendingAdminTable">
+        <thead>
+        <tr>
+            <th>Google Email</th>
+            <th>Google Name</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var pendingAdmin in Model.PendingAdmins)
+        {
+            <tr>
+                <td>@pendingAdmin.GoogleEmail</td>
+                <td>@pendingAdmin.GoogleUserName</td>
+                <td>Actions</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+<br/>
+<div>
+    <h2>Current Admins</h2>
+    <table class="display" class="table table-striped" id="adminTable">
+        <thead>
+        <tr>
+            <th>Google Email</th>
+            <th>Google Name</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var currentAdmin in Model.CurrentAdmins)
+        {
+            <tr>
+                <td>@currentAdmin.GoogleEmail</td>
+                <td>@currentAdmin.GoogleUserName</td>
+                <td>Actions</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
