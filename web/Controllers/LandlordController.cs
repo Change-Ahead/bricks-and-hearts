@@ -120,7 +120,7 @@ public class LandlordController : AbstractController
             return StatusCode(403);
         }
 
-        var databaseResult = _propertyService.GetPropertiesByLandlord(landlordId.Value);
+        var databaseResult = _landlordService.GetListOfProperties(landlordId.Value);
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
         return View("Properties", new PropertiesDashboardViewModel(listOfProperties));
     }
@@ -152,5 +152,30 @@ public class LandlordController : AbstractController
         _propertyService.AddNewProperty(newPropertyModel, landlordId.Value);
 
         return RedirectToAction("ViewProperties");
+    }
+
+    [HttpGet]
+    public ActionResult EditProfilePage(string userEmail, int tabNum)
+    {
+        var landlord = _dbContext.Landlords.SingleOrDefault(l => l.Email == userEmail);
+        return View("EditProfilePage", landlord);
+    }
+
+    [HttpPost]
+    public ActionResult EditProfileUpdate([FromForm] LandlordDbModel createModel)
+    {
+        var editedLandlord = _dbContext.Landlords.SingleOrDefault(l => l.Id == createModel.Id);
+        
+        editedLandlord.Title = createModel.Title;
+        editedLandlord.FirstName = createModel.FirstName;
+        editedLandlord.LastName = createModel.LastName;
+        editedLandlord.CompanyName = createModel.CompanyName;
+        /*TODO: check that the email input is not currently registered*/
+        editedLandlord.Email = createModel.Email;      
+        editedLandlord.Phone = createModel.Phone;
+
+        _dbContext.Update(editedLandlord);
+        _dbContext.SaveChanges();
+        return View("Profile", LandlordProfileModel.FromDbModel(editedLandlord));
     }
 }
