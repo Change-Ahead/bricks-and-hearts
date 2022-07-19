@@ -60,5 +60,4 @@ public class LandlordProfileModel
             CurrentUserIsAdmin = user.IsAdmin
         };
     }
-    
 }

@@ -18,6 +18,8 @@ public interface ILandlordService
     public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel, BricksAndHeartsUser user);
     public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int id);
     public Task ApproveLandlord(int landlordId, BricksAndHeartsUser user);
+    public LandlordDbModel UpdateLandlord(LandlordDbModel createModel);
+
 }
 
 public class LandlordService : ILandlordService
@@ -95,5 +97,21 @@ public class LandlordService : ILandlordService
         landlord.ApprovalTime = DateTime.Now;
         landlord.ApprovalAdminId = user.Id;
         await _dbContext.SaveChangesAsync();
+    }
+
+    public LandlordDbModel UpdateLandlord(LandlordDbModel createModel)
+    {
+        var editedLandlord = _dbContext.Landlords.SingleOrDefault(l => l.Id == createModel.Id);
+        editedLandlord.Title = createModel.Title;
+        editedLandlord.FirstName = createModel.FirstName;
+        editedLandlord.LastName = createModel.LastName;
+        editedLandlord.CompanyName = createModel.CompanyName;
+        /*TODO: check that the new email input is not currently registered*/
+        editedLandlord.Email = createModel.Email;      
+        editedLandlord.Phone = createModel.Phone;
+
+        _dbContext.Update(editedLandlord);
+        _dbContext.SaveChanges();
+        return editedLandlord;
     }
 }

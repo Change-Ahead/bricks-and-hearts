@@ -141,4 +141,48 @@ public class LandlordController : AbstractController
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
         return View("Properties", new PropertiesDashboardViewModel(listOfProperties));
     }
+
+    [HttpGet]
+    [Route("/add-property")]
+    public IActionResult AddNewProperty()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    [Route("/add-property")]
+    public ActionResult AddNewProperty([FromForm] PropertyViewModel newPropertyModel)
+    {
+        var landlordId = GetCurrentUser().LandlordId;
+        if (!landlordId.HasValue)
+        {
+            return StatusCode(403);
+        }
+
+        // This does checks based on the annotations (e.g. [Required]) on PropertyViewModel
+        if (!ModelState.IsValid)
+        {
+            return View(newPropertyModel);
+        }
+
+        // add property to database
+        _propertyService.AddNewProperty(newPropertyModel, landlordId.Value);
+
+        return RedirectToAction("ViewProperties");
+    }
+
+    [HttpGet]
+    public ActionResult EditProfilePage(string userEmail, int tabNum)
+    {
+        var landlord = _dbContext.Landlords.SingleOrDefault(l => l.Email == userEmail);
+        return View("EditProfilePage", landlord);
+    }
+
+    [HttpPost]
+    public ActionResult EditProfileUpdate([FromForm] LandlordDbModel createModel)
+    {
+        var editedLandlord = _landlordService.UpdateLandlord(createModel);
+
+        return View("Profile", LandlordProfileModel.FromDbModel(editedLandlord));
+    }
 }
