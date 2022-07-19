@@ -9,10 +9,9 @@ using Xunit;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Admin;
 
-public class AdminControllerTests
+public class AdminControllerTests: AdminControllerTestsBase
 {
-    private readonly ClaimsPrincipal _anonUser = A.Fake<ClaimsPrincipal>();
-    private readonly AdminController _underTest = new(null, null);
+
 
     [Fact]
     public void Index_WhenCalledByAnonymousUser_ReturnsViewWithLoginLink()

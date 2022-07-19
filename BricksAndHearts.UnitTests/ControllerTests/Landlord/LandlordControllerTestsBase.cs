@@ -1,6 +1,9 @@
-﻿namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
+﻿using BricksAndHearts.Controllers;
+using BricksAndHearts.Services;
 
-public class LandlordControllerTestsBase
+namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
+
+public class LandlordControllerTestsBase : ControllerTestsBase
 {
-    
+    protected readonly LandlordController _underTest = new(null, null, new LandlordService(null));
 }
