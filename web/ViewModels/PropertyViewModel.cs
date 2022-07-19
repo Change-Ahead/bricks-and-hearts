@@ -7,10 +7,22 @@ public class PropertyViewModel
 {
     [Required] public PropertyAddress Address { get; set; }
 
+    [Required] 
+    public string PropertyType { get; set; } = string.Empty;
+    public int NumOfBedrooms { get; set; } = 0;
+    public DateTime CreationTime { get; set; }
+    public int Rent { get; set; } = 0;
+    public string Description { get; set; } = String.Empty;
+    
     public static PropertyViewModel FromDbModel(PropertyDbModel property)
     {
         return new PropertyViewModel
         {
+            PropertyType = property.PropertyType,
+            NumOfBedrooms = property.NumOfBedrooms,
+            CreationTime = property.CreationTime,
+            Rent = property.Rent,
+            Description = property.Description,
             Address = new PropertyAddress
             {
                 AddressLine1 = property.AddressLine1,

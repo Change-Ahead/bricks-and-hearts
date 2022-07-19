@@ -15,4 +15,11 @@ public class PropertyDbModel
     public string TownOrCity { get; set; }
     public string County { get; set; }
     public string Postcode { get; set; }
+    
+    public string PropertyType { get; set; }
+    public int NumOfBedrooms { get; set; }
+    public DateTime CreationTime { get; set; }
+    public int Rent { get; set; }
+    public string Description { get; set; }
+
 }

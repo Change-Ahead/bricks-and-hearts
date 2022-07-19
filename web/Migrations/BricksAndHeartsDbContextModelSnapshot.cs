@@ -80,7 +80,24 @@ namespace BricksAndHearts.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<DateTime>("CreationTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int>("LandlordId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("NumOfBedrooms")
+                        .HasColumnType("int");
+
+                    b.Property<string>("PropertyType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("Rent")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
