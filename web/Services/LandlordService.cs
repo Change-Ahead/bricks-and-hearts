@@ -16,6 +16,8 @@ public interface ILandlordService
     }
 
     public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel, BricksAndHeartsUser user);
+    public List<PropertyDbModel> GetListOfProperties(int landlordId);
+
 }
 
 public class LandlordService : ILandlordService
@@ -70,5 +72,11 @@ public class LandlordService : ILandlordService
         user.LandlordId = dbModel.Id;
 
         return ILandlordService.LandlordRegistrationResult.Success;
+    }
+
+    public List<PropertyDbModel> GetListOfProperties(int landlordId)
+    {
+        return _dbContext.Properties
+            .Where(p => p.LandlordId == landlordId).ToList();
     }
 }

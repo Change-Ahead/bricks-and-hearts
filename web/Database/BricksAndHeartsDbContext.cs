@@ -13,6 +13,7 @@ public class BricksAndHeartsDbContext : DbContext
 
     public DbSet<LandlordDbModel> Landlords { get; set; } = null!;
     public DbSet<UserDbModel> Users { get; set; } = null!;
+    public DbSet<PropertyDbModel> Properties { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -30,6 +31,12 @@ public class BricksAndHeartsDbContext : DbContext
             .HasOne(u => u.Landlord)
             .WithOne(l => l.User)
             .HasForeignKey<UserDbModel>(u => u.LandlordId);
+
+        modelBuilder.Entity<PropertyDbModel>()
+            .HasOne(p => p.Landlord)
+            .WithMany(l => l.Properties)
+            .HasForeignKey(p => p.LandlordId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 
     public static void MigrateDatabase(WebApplication app)
