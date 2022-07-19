@@ -120,4 +120,28 @@ public class LandlordController : AbstractController
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
         return View("Properties", new PropertiesDashboardViewModel(listOfProperties));
     }
+
+    [HttpGet]
+    public ActionResult EditProfilePage(string userEmail, int tabNum)
+    {
+        var landord = _dbContext.Landlords.SingleOrDefault(l => l.Email == userEmail);
+        return View(landord);
+    }
+
+    [HttpPost]
+    public ActionResult EditProfileUpdate([FromForm] LandlordDbModel createModel)
+    {
+        var editedLandlord = _dbContext.Landlords.SingleOrDefault(l => l.Email == createModel.Email);
+        
+        editedLandlord.Title = createModel.Title;
+        editedLandlord.FirstName = createModel.FirstName;
+        editedLandlord.LastName = createModel.LastName;
+        editedLandlord.CompanyName = createModel.CompanyName;
+        editedLandlord.Email = createModel.Email;      
+        editedLandlord.Phone = createModel.Phone;
+
+        _dbContext.Update(editedLandlord);
+        _dbContext.SaveChanges();
+        return View("Profile", LandlordProfileModel.FromDbModel(editedLandlord));
+    }
 }

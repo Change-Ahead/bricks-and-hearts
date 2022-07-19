@@ -58,6 +58,28 @@ input.invalid {
   background-color: #04AA6D;
 }
 
-.tables{
+/*.tables{
   width: 50%;
+}*/
+.setWidth{
+  width: 50%;
+}
+
+.ProfileStyling{
+  white-space: nowrap;
+}
+
+.ProfileStyling .button .h4 {
+  display: inline;
+}
+
+.ProfileStyling button {
+  float: right;
+  text-align: right;
+  margin-left: 80%;
+}
+
+.bg-primary p-2 rounded-1 {
+  position: fixed;
+  right: 70%;
 }

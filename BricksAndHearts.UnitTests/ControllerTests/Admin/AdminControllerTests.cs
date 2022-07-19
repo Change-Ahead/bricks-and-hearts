@@ -1,4 +1,4 @@
-﻿using BricksAndHearts.ViewModels;
+using BricksAndHearts.ViewModels;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;

@@ -18,48 +18,62 @@
     <h4>Landlord</h4>
     
     <hr/>
+    <div class="setWidth">
+        <div class="d-flex p-2 justify-content-between">
+            <h4>Personal details</h4>
+            <td><input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { userEmail = Model.Email, numTab = 0 })'" /></td>
+        </div>
     
-    <h4>Personal details</h4>
-    
-    <div class="tables">
-        <table class="table table-bordered">
-            <tbody>
-            <tr>
-                <td>@Html.DisplayNameFor(model => model.FirstName)</td>
-                <td>@Html.DisplayFor(model => model.FirstName)</td>
-            </tr>
-            <tr>
-                <td>@Html.DisplayNameFor(model => model.LastName)</td>
-                <td>@Html.DisplayFor(model => model.LastName)</td>
-            </tr>
-        </table>
+        <div class="tables">
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <td>@Html.DisplayNameFor(model => model.FirstName)</td>
+                    <td>@Html.DisplayFor(model => model.FirstName)</td>
+                </tr>
+                <tr>
+                    <td>@Html.DisplayNameFor(model => model.LastName)</td>
+                    <td>@Html.DisplayFor(model => model.LastName)</td>
+                </tr>
+            </table>
+        </div>
     </div>
 
-    <h4>Landlord details</h4>
+    <div class="setWidth">
+        <div class="d-flex p-2 justify-content-between">
+            <h4>Landlord details</h4>
+            <td><input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new {userEmail = Model.Email})'" /></td>
+        </div>
     
-    <div class="tables">
-        <table class="table table-bordered">
-            <tbody>
-            <tr>
-                <td>@Html.DisplayNameFor(model => model.CompanyName)</td>
-                <td>@Html.DisplayFor(model => model.CompanyName)</td>
-            </tr>
-        </table>
+        <div class="tables">
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <td>@Html.DisplayNameFor(model => model.CompanyName)</td>
+                    <td>@Html.DisplayFor(model => model.CompanyName)</td>
+                </tr>
+            </table>
+        </div>
     </div>
 
-    <h4>Contact details</h4>
-    <div class="tables">
-        <table class="table table-bordered">
-            <tbody>
-            <tr>
-                <td>@Html.DisplayNameFor(model => model.Email)</td>
-                <td>@Html.DisplayFor(model => model.Email)</td>
-            </tr>
-            <tr>
-                <td>@Html.DisplayNameFor(model => model.Phone)</td>
-                <td>@Html.DisplayFor(model => model.Phone)</td>
-            </tr>
-        </table>
+    <div class="setWidth">
+        <div class="d-flex p-2 justify-content-between">
+            <h4>Contact details</h4>
+            <td><input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new {userEmail = Model.Email})'" /></td>
+        </div>
+        <div class="tables">
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <td>@Html.DisplayNameFor(model => model.Email)</td>
+                    <td>@Html.DisplayFor(model => model.Email)</td>
+                </tr>
+                <tr>
+                    <td>@Html.DisplayNameFor(model => model.Phone)</td>
+                    <td>@Html.DisplayFor(model => model.Phone)</td>
+                </tr>
+            </table>
+        </div>
     </div>
     
     <h4>ChangeAhead Charter</h4>

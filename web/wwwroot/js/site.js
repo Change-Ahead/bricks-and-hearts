@@ -1,6 +1,7 @@
 ﻿let currentTab = 0;
 showTab(currentTab);
 
+
 function showTab(currentTab) {
     let tabList = document.getElementsByClassName("registerTab");
     tabList[currentTab].style.display = "block";
