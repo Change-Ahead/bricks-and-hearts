@@ -107,6 +107,7 @@ public class LandlordController : AbstractController
 
         return await Profile(landlordId.Value);
     }
+
     [Route("/properties")]
     public IActionResult ViewProperties()
     {
@@ -120,7 +121,7 @@ public class LandlordController : AbstractController
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
         return View("Properties", new PropertiesDashboardViewModel(listOfProperties));
     }
-    
+
     [HttpGet]
     [Route("/add-property")]
     public IActionResult AddNewProperty()
@@ -128,10 +129,9 @@ public class LandlordController : AbstractController
         return View();
     }
 
-    
     [HttpPost]
     [Route("/add-property")]
-    public async Task<ActionResult> AddNewProperty([FromForm] PropertyViewModel createModel)
+    public IActionResult AddNewProperty([FromForm] PropertyViewModel createModel)
     {
         return View("AddNewProperty");
     }

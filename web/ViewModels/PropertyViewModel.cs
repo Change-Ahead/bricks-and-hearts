@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using BricksAndHearts.Database;
 
 namespace BricksAndHearts.ViewModels;
@@ -7,14 +8,18 @@ public class PropertyViewModel
 {
     [Required] public PropertyAddress Address { get; set; }
 
-    [Required] 
+    [Required]
     public string PropertyType { get; set; } = String.Empty;
+
     [Required]
-    public int NumOfBedrooms { get; set; } = 0;
+    [Range(0, 100, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
+    [DisplayName("Number of Bedrooms")]
+    public int? NumOfBedrooms { get; set; } = null;
     public DateTime CreationTime { get; set; } = DateTime.Now;
-    
+
     [Required]
-    public int Rent { get; set; } = 0;
+    [Range(0, 10000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
+    public int? Rent { get; set; } = null;
     [Required]
     public string Description { get; set; } = String.Empty;
     
