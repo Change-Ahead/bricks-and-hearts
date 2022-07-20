@@ -4,7 +4,9 @@
 name: Build and run tests on Pull Requests and Push commands
 
 on:
-  pull_request
+  pull_request:
+    branches:
+      [ main ]
 
 jobs:
   build:
