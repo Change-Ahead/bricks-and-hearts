@@ -4,6 +4,7 @@ using BricksAndHearts.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.CookiePolicy;
+using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,9 +33,10 @@ builder.Services.AddAuthentication(options => options.DefaultScheme = CookieAuth
     });
 
 builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformer>();
-builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ILandlordService, LandlordService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
+
+builder.Services.AddControllersWithViews(options => { options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()); });
 
 var app = builder.Build();
 
