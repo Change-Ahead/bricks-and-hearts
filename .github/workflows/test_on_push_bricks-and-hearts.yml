@@ -6,9 +6,9 @@ name: Build and run tests on Pull Requests and Push commands
 on:
   pull_request
 
-
 jobs:
   build:
+    name: Build and run tests
     runs-on: ubuntu-latest
 
     steps:
