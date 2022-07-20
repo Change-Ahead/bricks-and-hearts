@@ -47,13 +47,13 @@
                     <ul class="navbar-nav ms-auto">
                         @if (User.Identity?.IsAuthenticated == true)
                         {
-                            <li class="nav-item" style="margin-left: auto;">
+                            <li class="nav-item">
                                 <a class="nav-link">@(((BricksAndHeartsUser)User.Identity).GoogleEmail)</a>
                             </li>
-                            <li class="nav-item" style="margin-left: auto;">
+                            <li class="nav-item">
                                 @using (Html.BeginForm("Logout", "Login", FormMethod.Post))
                                 {
-                                    <button type="submit" class="btn btn-link nav-link">Log out</button>
+                                    <button type="submit" class="btn btn-link nav-link border-0">Log out</button>
                                 }
                             </li>
                         }
