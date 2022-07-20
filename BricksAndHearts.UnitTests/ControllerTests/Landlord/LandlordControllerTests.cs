@@ -10,7 +10,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     [Fact]
     public void RegisterGet_CalledByUnregisteredUser_ReturnsRegisterViewWithEmail()
     {
-        // Arrange 
+        // Arrange
         var unregisteredUser = CreateUnregisteredUserInController(_underTest);
 
         // Act
@@ -18,6 +18,6 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
         // Assert
         result!.Model.Should().BeOfType<LandlordProfileModel>()
-            .Which.Email.Should().Be(unregisteredUser.GoogleEmail);
+            .Which.Email.Should().Be("deliberate bug");
     }
 }
