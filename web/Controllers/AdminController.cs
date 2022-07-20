@@ -139,4 +139,21 @@ public class AdminController : AbstractController
                 "danger",
                 "Already an admin"));
     }
+
+    [HttpPost]
+    public async Task<ActionResult> AcceptAdminRequest(AdminListModel userToAcceptList, int userToAcceptId)
+    {
+        var userToAccept = _dbContext.Users.SingleOrDefault(u => u.Id == userToAcceptId);
+        
+        userToAccept.IsAdmin = true;
+        userToAccept.HasRequestedAdmin = false;
+        _dbContext.SaveChanges();
+        
+        AdminListModel adminListModel = new AdminListModel();
+        var adminLists = await _adminService.GetAdminLists();
+        adminListModel.CurrentAdmins = adminLists.CurrentAdmins;
+        adminListModel.PendingAdmins = adminLists.PendingAdmins;
+        
+        return View("AdminList", adminListModel);
+    }
 }
