@@ -32,6 +32,10 @@ public class LandlordProfileModel
     [Phone]
     public string Phone { get; set; } = string.Empty;
 
+    public string LandlordStatus { get; set; } = string.Empty;
+
+    public bool LandlordProvidedCharterStatus { get; set; } = false;
+
     public static LandlordProfileModel FromDbModel(LandlordDbModel landlord)
     {
         return new LandlordProfileModel
@@ -41,7 +45,10 @@ public class LandlordProfileModel
             FirstName = landlord.FirstName,
             LastName = landlord.LastName,
             Phone = landlord.Phone,
-            Title = landlord.Title
+            Title = landlord.Title,
+            LandlordStatus = landlord.LandlordStatus,
+            LandlordProvidedCharterStatus = landlord.LandlordProvidedCharterStatus
         };
     }
+    
 }

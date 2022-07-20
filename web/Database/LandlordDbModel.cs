@@ -13,6 +13,9 @@ public class LandlordDbModel
     public string Email { get; set; } = null!;
     public string Phone { get; set; } = null!;
 
+    public string LandlordStatus { get; set; } = null!;
+    public bool LandlordProvidedCharterStatus { get; set; } = false;
+
     public virtual UserDbModel? User { get; set; }
     public virtual List<PropertyDbModel>? Properties { get; set; }
 }
