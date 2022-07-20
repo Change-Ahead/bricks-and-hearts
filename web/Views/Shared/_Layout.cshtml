@@ -23,17 +23,16 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        @if (User.Identity?.IsAuthenticated == true)
+                        @if (User.IsInRole("Admin"))
                         {
-                            @if (((BricksAndHeartsUser)User.Identity).IsAdmin)
-                            {
+                            <li>
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="AdminList">Admin List</a>
-                            }
+                            </li>
                         }
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
                         </li>
-                        @if (User.Identity?.IsAuthenticated == true && ((BricksAndHeartsUser)User.Identity).LandlordId != null)
+                        @if (User.IsInRole("Landlord"))
                         {
                             <li class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Landlord" asp-action="RegisterGet">Profile</a>

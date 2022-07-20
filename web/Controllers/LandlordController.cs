@@ -107,7 +107,8 @@ public class LandlordController : AbstractController
 
         return await Profile(landlordId.Value);
     }
-
+    
+    [HttpGet]
     public IActionResult ViewProperties()
     {
         var landlordId = GetCurrentUser().LandlordId;

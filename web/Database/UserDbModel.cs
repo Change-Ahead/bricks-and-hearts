@@ -14,7 +14,7 @@ public class UserDbModel
     public string GoogleEmail { get; set; } = null!;
 
     public bool IsAdmin { get; set; }
-
+    
     public int? LandlordId { get; set; }
     public virtual LandlordDbModel? Landlord { get; set; }
     
