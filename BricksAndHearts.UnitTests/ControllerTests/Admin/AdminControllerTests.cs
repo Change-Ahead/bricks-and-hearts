@@ -1,7 +1,4 @@
-﻿using System.Security.Claims;
-using BricksAndHearts.Controllers;
-using BricksAndHearts.ViewModels;
-using FakeItEasy;
+﻿using BricksAndHearts.ViewModels;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -9,10 +6,8 @@ using Xunit;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Admin;
 
-public class AdminControllerTests: AdminControllerTestsBase
+public class AdminControllerTests : AdminControllerTestsBase
 {
-
-
     [Fact]
     public void Index_WhenCalledByAnonymousUser_ReturnsViewWithLoginLink()
     {

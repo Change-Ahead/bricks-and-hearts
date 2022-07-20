@@ -11,7 +11,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     public void RegisterGet_CalledByUnregisteredUser_ReturnsRegisterViewWithEmail()
     {
         // Arrange 
-        var unregisteredUser = CreateUserInControllerContext(_underTest);
+        var unregisteredUser = CreateUnregisteredUserInController(_underTest);
 
         // Act
         var result = _underTest.RegisterGet() as ViewResult;

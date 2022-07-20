@@ -12,7 +12,7 @@ public class ControllerTestsBase
 {
     protected readonly ClaimsPrincipal _anonUser = A.Fake<ClaimsPrincipal>();
 
-    protected BricksAndHeartsUser CreateUserInControllerContext(Controller _underTest)
+    protected BricksAndHeartsUser CreateUnregisteredUserInController(Controller _underTest)
     {
         // Arrange
         var userDbModel = new UserDbModel()

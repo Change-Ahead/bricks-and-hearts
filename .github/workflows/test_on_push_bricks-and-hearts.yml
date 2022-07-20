@@ -4,8 +4,7 @@
 name: Build and run tests on Pull Requests and Push commands
 
 on:
-  pull_request:
-    types: [ assigned, opened, synchronize, reopened]
+  pull_request
 
 
 jobs:
@@ -22,7 +21,7 @@ jobs:
           include-prerelease: true
 
       - name: Build with dotnet
-        run: dotnet build --configuration Release
+        run: dotnet build
 
       - name: Test with dotnet
         run: dotnet test
