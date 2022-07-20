@@ -36,6 +36,9 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ILandlordService, LandlordService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 
+builder.Services.AddOptions<EmailConfigOptions>()
+    .Bind(builder.Configuration.GetSection(EmailConfigOptions.Email));
+
 var app = builder.Build();
 
 if (app.Configuration.GetValue<bool>("MigrateOnStartup"))
