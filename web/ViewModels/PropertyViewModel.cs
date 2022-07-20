@@ -8,21 +8,21 @@ public class PropertyViewModel
 {
     [Required] public PropertyAddress Address { get; set; }
 
-    [Required]
-    public string PropertyType { get; set; } = String.Empty;
+    [Required] public string PropertyType { get; set; } = string.Empty;
 
     [Required]
     [Range(0, 100, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
     [DisplayName("Number of Bedrooms")]
-    public int? NumOfBedrooms { get; set; } = null;
+    public int NumOfBedrooms { get; set; }
+
     public DateTime CreationTime { get; set; } = DateTime.Now;
 
     [Required]
     [Range(0, 10000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
-    public int? Rent { get; set; } = null;
-    [Required]
-    public string Description { get; set; } = String.Empty;
-    
+    public int Rent { get; set; }
+
+    [Required] public string Description { get; set; } = string.Empty;
+
     public static PropertyViewModel FromDbModel(PropertyDbModel property)
     {
         return new PropertyViewModel
@@ -47,14 +47,10 @@ public class PropertyViewModel
 
 public class PropertyAddress
 {
-    [Required]
-    public string AddressLine1 { get; set; } = String.Empty;
+    [Required] public string AddressLine1 { get; set; } = string.Empty;
     public string? AddressLine2 { get; set; }
     public string? AddressLine3 { get; set; }
-    [Required]
-    public string TownOrCity { get; set; } = String.Empty;
-    [Required]
-    public string County { get; set; } = String.Empty;
-    [Required]
-    public string Postcode { get; set; } = String.Empty;
+    [Required] public string TownOrCity { get; set; } = string.Empty;
+    [Required] public string County { get; set; } = string.Empty;
+    [Required] public string Postcode { get; set; } = string.Empty;
 }

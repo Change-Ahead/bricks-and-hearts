@@ -13,7 +13,7 @@
     <div asp-validation-summary="All" class="text-danger"></div>
     <div class="my-3">
         <label asp-for="Address.AddressLine1" class="form-label">Address Line 1</label>
-        <input asp-for="Address.AddressLine1" class="form-control"/>
+        <input asp-for="Address.AddressLine1" class="form-control" required/>
         <span asp-validation-for="Address.AddressLine1" class="text-danger"></span>
     </div>
     <div class="my-3">
@@ -28,24 +28,24 @@
     </div>
     <div class="my-3">
         <label asp-for="Address.TownOrCity" class="form-label">Town or City</label>
-        <input asp-for="Address.TownOrCity" class="form-control"/>
+        <input asp-for="Address.TownOrCity" class="form-control" required/>
         <span asp-validation-for="Address.TownOrCity" class="text-danger"></span>
     </div>
     <div class="my-3">
         <label asp-for="Address.County" class="form-label">County</label>
-        <input asp-for="Address.County" class="form-control"/>
+        <input asp-for="Address.County" class="form-control" required/>
         <span asp-validation-for="Address.County" class="text-danger"></span>
     </div>
     <div class="my-3">
         <label asp-for="Address.Postcode" class="form-label">Postcode</label>
-        <input asp-for="Address.Postcode" class="form-control"/>
+        <input asp-for="Address.Postcode" class="form-control" required/>
         <span asp-validation-for="Address.Postcode" class="text-danger"></span>
     </div>
     <h4>Property details</h4>
     <div class="my-3">
         <label asp-for="PropertyType" class="form-label">Property type</label>
-        <select asp-for="PropertyType" class="form-select">
-            <option selected></option>
+        <select asp-for="PropertyType" class="form-select" required>
+            <option selected disabled value="">Choose a property type</option>
             <option>Top floor flat</option>
             <option>Mid floor flat</option>
             <option>Ground floor flat</option>
@@ -58,17 +58,17 @@
     </div>
     <div class="my-3">
         <label asp-for="NumOfBedrooms" class="form-label">Number of bedrooms</label>
-        <input asp-for="NumOfBedrooms" class="form-control"/>
+        <input asp-for="NumOfBedrooms" class="form-control" required/>
         <span asp-validation-for="NumOfBedrooms" class="text-danger"></span>
     </div>
     <div class="my-3">
         <label asp-for="Rent" class="form-label">Rent £ (pcm)</label>
-        <input asp-for="Rent" class="form-control"/>
+        <input asp-for="Rent" class="form-control" required/>
         <span asp-validation-for="Rent" class="text-danger"></span>
     </div>
     <div class="my-3">
         <label asp-for="Description" class="form-label">Description</label>
-        <textarea asp-for="Description" class="form-control" rows="5"></textarea>
+        <textarea asp-for="Description" class="form-control" rows="5" required></textarea>
         <span asp-validation-for="Description" class="text-danger"></span>
     </div>
     <div class="mt-4">
