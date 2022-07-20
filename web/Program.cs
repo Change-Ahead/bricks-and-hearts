@@ -40,6 +40,9 @@ builder.Services.AddApplicationInsightsTelemetry();
 
 builder.Services.AddControllersWithViews(options => { options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()); });
 
+builder.Services.AddOptions<EmailConfigOptions>()
+    .Bind(builder.Configuration.GetSection(EmailConfigOptions.Email));
+
 var app = builder.Build();
 
 if (app.Configuration.GetValue<bool>("MigrateOnStartup"))
