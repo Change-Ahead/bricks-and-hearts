@@ -71,4 +71,15 @@ public class AdminController : AbstractController
 
         return RedirectToAction(nameof(Index));
     }
+
+    [Authorize(Roles="Admin")]
+    [HttpGet]
+    public async Task<IActionResult> AdminList()
+    {
+        AdminListModel adminListModel = new AdminListModel();
+        var adminLists = await _adminService.GetAdminLists();
+        adminListModel.CurrentAdmins = adminLists.CurrentAdmins;
+        adminListModel.PendingAdmins = adminLists.PendingAdmins;
+        return View(adminListModel);
+    }
 }
