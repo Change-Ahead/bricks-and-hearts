@@ -74,26 +74,40 @@ public class AdminController : AbstractController
 
     [Authorize(Roles="Admin")]
     [HttpGet]
-    public async Task<IActionResult> AdminList()
+    public async Task<AdminListModel> GetAdminList()
     {
-        var adminLists = await _adminService.GetAdminLists();
-        AdminListModel adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
-        return View(adminListModel);
-    }
-
-    [HttpPost]
-    public async Task<ActionResult> AcceptAdminRequest(AdminListModel userToAcceptList, int userToAcceptId)
-    {
-        var userToAccept = _dbContext.Users.SingleOrDefault(u => u.Id == userToAcceptId);
-        
-        userToAccept.IsAdmin = true;
-        userToAccept.HasRequestedAdmin = false;
-        _dbContext.SaveChanges();
-        
         AdminListModel adminListModel = new AdminListModel();
         var adminLists = await _adminService.GetAdminLists();
         adminListModel.CurrentAdmins = adminLists.CurrentAdmins;
         adminListModel.PendingAdmins = adminLists.PendingAdmins;
+        return adminListModel;
+    }
+
+    [Authorize(Roles="Admin")]
+    [HttpGet]
+    public async Task<IActionResult> AdminList()
+    {
+        AdminListModel adminListModel = GetAdminList().Result;
+        return View(adminListModel);
+    }
+
+    [HttpGet]
+    public UserDbModel findUserFromId(int userId)
+    {
+        return _dbContext.Users.SingleOrDefault(u => u.Id == userId);
+    }
+    
+    [Authorize(Roles="Admin")]
+    [HttpPost]
+    public async Task<ActionResult> AcceptAdminRequest(AdminListModel userToAcceptList, int userToAcceptId)
+    {
+        var userToAccept = findUserFromId(userToAcceptId);
+        
+        userToAccept.IsAdmin = true;
+        userToAccept.HasRequestedAdmin = false;
+        _dbContext.SaveChanges();
+
+        AdminListModel adminListModel = GetAdminList().Result;
         
         return View("AdminList", adminListModel);
     }
