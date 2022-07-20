@@ -21,7 +21,13 @@
             <tr>
                 <td>@pendingAdmin.GoogleEmail</td>
                 <td>@pendingAdmin.GoogleUserName</td>
-                <td>Actions</td>
+                @*<td><input type="button" class="btn btn-outline-success" value="Accept" onclick="location.href='@Url.Action("AcceptAdminRequest", "Admin", new {userToAccept = pendingAdmin})'"/></td>*@
+                <td>
+                    @using (Html.BeginForm("AcceptAdminRequest", "Admin",new {userToAcceptId = pendingAdmin.Id}, FormMethod.Post))
+                    {
+                        <button type="submit"  class="btn btn-outline-success">Accept</button>
+                    }
+                </td>
             </tr>
         }
         </tbody>
