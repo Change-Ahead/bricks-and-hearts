@@ -13,14 +13,16 @@ public class LandlordController : AbstractController
 {
     private readonly BricksAndHeartsDbContext _dbContext;
     private readonly ILandlordService _landlordService;
+    private readonly IPropertyService _propertyService;
     private readonly ILogger<LandlordController> _logger;
 
     public LandlordController(ILogger<LandlordController> logger, BricksAndHeartsDbContext dbContext,
-        ILandlordService landlordService)
+        ILandlordService landlordService, IPropertyService propertyService)
     {
         _dbContext = dbContext;
         _logger = logger;
         _landlordService = landlordService;
+        _propertyService = propertyService;
     }
 
     [HttpGet]
@@ -117,7 +119,7 @@ public class LandlordController : AbstractController
             return StatusCode(403);
         }
 
-        var databaseResult = _landlordService.GetListOfProperties(landlordId.Value);
+        var databaseResult = _propertyService.GetPropertiesByLandlord(landlordId.Value);
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
         return View("Properties", new PropertiesDashboardViewModel(listOfProperties));
     }
@@ -131,8 +133,23 @@ public class LandlordController : AbstractController
 
     [HttpPost]
     [Route("/add-property")]
-    public IActionResult AddNewProperty([FromForm] PropertyViewModel createModel)
+    public async Task<ActionResult> AddNewProperty([FromForm] PropertyViewModel newPropertyModel)
     {
-        return View("AddNewProperty");
+        var landlordId = GetCurrentUser().LandlordId;
+        if (!landlordId.HasValue)
+        {
+            return StatusCode(403);
+        }
+
+        // This does checks based on the annotations (e.g. [Required]) on PropertyViewModel
+        if (!ModelState.IsValid)
+        {
+            return View();
+        }
+
+        // add property to database
+        await _propertyService.AddNewProperty(newPropertyModel, landlordId.Value);
+
+        return RedirectToAction("ViewProperties");
     }
 }
