@@ -52,23 +52,42 @@ public class AdminController : AbstractController
         if (user.IsAdmin)
         {
             LoggerAlreadyAdminWarning(_logger, user);
+
             return RedirectToAction(nameof(Index));
         }
 
         _adminService.CancelAdminAccessRequest(user);
+
         FlashRequestSuccess(_logger, user, "cancelled admin access request");
+
         return RedirectToAction(nameof(Index));
     }
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
+    public async Task<AdminListModel> GetAdminList()
+    {
+        AdminListModel adminListModel = new AdminListModel();
+        var adminLists = await _adminService.GetAdminLists();
+        adminListModel.CurrentAdmins = adminLists.CurrentAdmins;
+        adminListModel.PendingAdmins = adminLists.PendingAdmins;
+        return adminListModel;
+    }
+
+    [Authorize(Roles="Admin")]
+    [HttpGet]
     public async Task<IActionResult> AdminList()
     {
-        var adminLists = await _adminService.GetAdminLists();
-        AdminListModel adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
+        AdminListModel adminListModel = GetAdminList().Result;
         return View(adminListModel);
     }
 
+    [HttpGet]
+    public UserDbModel findUserFromId(int userId)
+    {
+        return _dbContext.Users.SingleOrDefault(u => u.Id == userId);
+    }
+    
     [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> LandlordList(string? approvalStatus = "")
@@ -143,16 +162,13 @@ public class AdminController : AbstractController
     [HttpPost]
     public async Task<ActionResult> AcceptAdminRequest(AdminListModel userToAcceptList, int userToAcceptId)
     {
-        var userToAccept = _dbContext.Users.SingleOrDefault(u => u.Id == userToAcceptId);
+        var userToAccept = findUserFromId(userToAcceptId);
         
         userToAccept.IsAdmin = true;
         userToAccept.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
-        
-        AdminListModel adminListModel = new AdminListModel();
-        var adminLists = await _adminService.GetAdminLists();
-        adminListModel.CurrentAdmins = adminLists.CurrentAdmins;
-        adminListModel.PendingAdmins = adminLists.PendingAdmins;
+
+        AdminListModel adminListModel = GetAdminList().Result;
         
         return View("AdminList", adminListModel);
     }
