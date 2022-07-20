@@ -9,7 +9,7 @@ public interface IAdminService
 {
     public void RequestAdminAccess(BricksAndHeartsUser user);
     public void CancelAdminAccessRequest(BricksAndHeartsUser user);
-    public (List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins) GetAdminLists();
+    public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
 }
 
 public class AdminService : IAdminService
