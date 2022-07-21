@@ -15,6 +15,8 @@ public interface IAdminService
     public string? FindExistingInviteLink(int landlordId);
     public string CreateNewInviteLink(int landlordId);
     public void DeleteExistingInviteLink(int landlordId);
+    public void ApproveAdminAccessRequest(int userId);
+    public Task<List<LandlordDbModel>> GetUnapprovedLandlords();
 }
 
 public class AdminService : IAdminService
@@ -111,5 +113,18 @@ public class AdminService : IAdminService
         var pendingAdmins =
             await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
         return pendingAdmins;
+    }
+    public async void ApproveAdminAccessRequest(int userId)
+    {
+        var userToAdmin = _dbContext.Users.SingleOrDefault(u => u.Id == userId);
+        userToAdmin.IsAdmin = true;
+        userToAdmin.HasRequestedAdmin = false;
+        _dbContext.SaveChanges();
+    }
+    
+    public async Task<List<LandlordDbModel>> GetUnapprovedLandlords()
+    {
+        List<LandlordDbModel> UnapprovedLandlords = await _dbContext.Landlords.Where(u => u.CharterApproved == false).ToListAsync();
+        return UnapprovedLandlords;
     }
 }
