@@ -15,6 +15,7 @@ public class LandlordDbModel
 
     public string LandlordStatus { get; set; } = null!;
     public bool LandlordProvidedCharterStatus { get; set; } = false;
+    public bool CharterApproved { get; set; } = false;
 
     public virtual UserDbModel? User { get; set; }
     public virtual List<PropertyDbModel>? Properties { get; set; }
