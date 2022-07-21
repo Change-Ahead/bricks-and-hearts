@@ -110,6 +110,7 @@ public class LandlordController : AbstractController
         return await Profile(landlordId.Value);
     }
 
+    [HttpGet]
     [Route("/properties")]
     public IActionResult ViewProperties()
     {
