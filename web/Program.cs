@@ -1,4 +1,5 @@
 using BricksAndHearts.Auth;
+using BricksAndHearts.Controllers;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -35,6 +36,7 @@ builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformer>();
 builder.Services.AddControllersWithViews();
 builder.Services.AddScoped<ILandlordService, LandlordService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
+builder.Services.AddScoped<IMailService, MailService>();
 
 builder.Services.AddOptions<EmailConfigOptions>()
     .Bind(builder.Configuration.GetSection(EmailConfigOptions.Email));
