@@ -54,7 +54,9 @@ public class LandlordService : ILandlordService
             // Check the user doesn't already have a landlord associated
             var userRecord = _dbContext.Users.Single(u => u.Id == user.Id);
             if (userRecord.LandlordId != null)
+            {
                 return ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord;
+            }
 
             // Insert the landlord and call SaveChanges
             // Entity Framework will insert the record and populate dbModel.Id with the new record's id
