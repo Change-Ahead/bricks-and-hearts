@@ -15,8 +15,10 @@ public interface ILandlordService
         Success
     }
 
-    public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel,
-        BricksAndHeartsUser user);
+    public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel, BricksAndHeartsUser user);
+    public List<PropertyDbModel> GetListOfProperties(int landlordId);
+    public Task<LandlordDbModel> GetLandlordFromId(int id);
+
 }
 
 public class LandlordService : ILandlordService
@@ -76,5 +78,16 @@ public class LandlordService : ILandlordService
         user.LandlordId = dbModel.Id;
 
         return ILandlordService.LandlordRegistrationResult.Success;
+    }
+
+    public Task<LandlordDbModel> GetLandlordFromId(int id)
+    {
+        return _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id);
+    }
+
+    public List<PropertyDbModel> GetListOfProperties(int landlordId)
+    {
+        return _dbContext.Properties
+            .Where(p => p.LandlordId == landlordId).ToList();
     }
 }

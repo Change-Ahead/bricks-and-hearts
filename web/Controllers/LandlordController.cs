@@ -3,7 +3,6 @@ using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BricksAndHearts.Controllers;
 
@@ -11,7 +10,6 @@ namespace BricksAndHearts.Controllers;
 [Route("/landlord")]
 public class LandlordController : AbstractController
 {
-    private readonly BricksAndHeartsDbContext _dbContext;
     private readonly ILandlordService _landlordService;
     private readonly IPropertyService _propertyService;
     private readonly ILogger<LandlordController> _logger;
@@ -19,7 +17,6 @@ public class LandlordController : AbstractController
     public LandlordController(ILogger<LandlordController> logger, BricksAndHeartsDbContext dbContext,
         ILandlordService landlordService, IPropertyService propertyService)
     {
-        _dbContext = dbContext;
         _logger = logger;
         _landlordService = landlordService;
         _propertyService = propertyService;
@@ -87,13 +84,13 @@ public class LandlordController : AbstractController
             return StatusCode(403);
         }
 
-        var landlord = await _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id);
+        var landlord = _landlordService.GetLandlordFromId(id);
         if (landlord == null)
         {
             return StatusCode(404);
         }
 
-        var viewModel = LandlordProfileModel.FromDbModel(landlord);
+        var viewModel = LandlordProfileModel.FromDbModel(await landlord);
         return View("Profile", viewModel);
     }
 
