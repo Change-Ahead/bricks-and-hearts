@@ -1,26 +1,35 @@
 ﻿using BricksAndHearts.Auth;
 using MailKit.Net.Smtp;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using MimeKit;
 
 namespace BricksAndHearts.Controllers;
 
-[AllowAnonymous]
-public class MailController : Controller
+public interface IMailService
+{
+    public void SendMsg(
+        string msgBody = "Hi",
+        string msgFromAddress = "tech@changeahead.org.uk",
+        string msgToAddress = "alice.luo@softwire.com",
+        string subject = "From Softwire Intern Alice",
+        string msgFromName = "",
+        string msgToName = ""
+    );
+}
+public class MailService: IMailService
 {
     private readonly IOptions<EmailConfigOptions> _config;
 
-    public MailController(IOptions<EmailConfigOptions> config)
+    public MailService(IOptions<EmailConfigOptions> config)
     {
         _config = config;
     }
+    
 
-    public IActionResult SendMsg(
+    public void SendMsg(
+        string msgBody = "Hi",
         string msgFromAddress = "tech@changeahead.org.uk",
         string msgToAddress = "alice.luo@softwire.com",
-        string msgBody = "Hi",
         string subject = "From Softwire Intern Alice",
         string msgFromName = "",
         string msgToName = ""
@@ -44,6 +53,5 @@ public class MailController : Controller
             client.Send(message);
             client.Disconnect(true);
         }
-        return RedirectToAction(nameof(Index),"Home");
     }
 }

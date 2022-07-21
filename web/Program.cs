@@ -1,4 +1,5 @@
 using BricksAndHearts.Auth;
+using BricksAndHearts.Controllers;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using Microsoft.AspNetCore.Authentication;
@@ -36,6 +37,8 @@ builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformer>();
 builder.Services.AddScoped<ILandlordService, LandlordService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IPropertyService, PropertyService>();
+builder.Services.AddScoped<IMailService, MailService>();
+
 builder.Services.AddApplicationInsightsTelemetry();
 
 builder.Services.AddControllersWithViews(options => { options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute()); });

@@ -12,14 +12,16 @@ public class LandlordController : AbstractController
 {
     private readonly ILandlordService _landlordService;
     private readonly IPropertyService _propertyService;
+    private readonly IMailService _mailService;
     private readonly ILogger<LandlordController> _logger;
 
     public LandlordController(ILogger<LandlordController> logger, BricksAndHeartsDbContext dbContext,
-        ILandlordService landlordService, IPropertyService propertyService)
+        ILandlordService landlordService, IPropertyService propertyService, IMailService mailService)
     {
         _logger = logger;
         _landlordService = landlordService;
         _propertyService = propertyService;
+        _mailService = mailService;
     }
 
     [HttpGet]
@@ -57,6 +59,8 @@ public class LandlordController : AbstractController
         {
             case ILandlordService.LandlordRegistrationResult.Success:
                 _logger.LogInformation("Successfully created landlord for user {UserId}", user.Id);
+                _mailService.SendMsg("A Landlord has just registered");
+
                 return Redirect(Url.Action("MyProfile")!);
 
             case ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered:
