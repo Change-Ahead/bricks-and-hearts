@@ -42,7 +42,7 @@
     <div class="setWidth">
         <div class="d-flex p-2 justify-content-between">
             <h4>Landlord details</h4>
-            <td><input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new {userEmail = Model.Email})'" /></td>
+            <td><input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new {userEmail = Model.Email, numTab = 1})'" /></td>
         </div>
     
         <div class="tables">
@@ -59,7 +59,7 @@
     <div class="setWidth">
         <div class="d-flex p-2 justify-content-between">
             <h4>Contact details</h4>
-            <td><input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new {userEmail = Model.Email})'" /></td>
+            <td><input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new {userEmail = Model.Email, numTab = 2})'" /></td>
         </div>
         <div class="tables">
             <table class="table table-bordered">

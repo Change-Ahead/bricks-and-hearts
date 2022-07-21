@@ -108,6 +108,8 @@ public class LandlordController : AbstractController
         return await Profile(landlordId.Value);
     }
 
+    [HttpGet]
+    [Route("/ViewProperties")]
     public IActionResult ViewProperties()
     {
         var landlordId = GetCurrentUser().LandlordId;
@@ -124,8 +126,8 @@ public class LandlordController : AbstractController
     [HttpGet]
     public ActionResult EditProfilePage(string userEmail, int tabNum)
     {
-        var landord = _dbContext.Landlords.SingleOrDefault(l => l.Email == userEmail);
-        return View(landord);
+        var landlord = _dbContext.Landlords.SingleOrDefault(l => l.Email == userEmail);
+        return View("EditProfilePage", landlord);
     }
 
     [HttpPost]
