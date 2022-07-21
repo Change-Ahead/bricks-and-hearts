@@ -52,4 +52,12 @@ public class HomeController : AbstractController
             StatusMessage = errorInfo.StatusMessage
         });
     }
+
+    [HttpGet]
+    [Route("/ExceptionTest")]
+    public IActionResult ExceptionTest()
+    {
+        throw new Exception("For testing purposes only");
+    }
+    
 }
