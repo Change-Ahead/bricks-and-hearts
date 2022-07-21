@@ -74,41 +74,25 @@ public class AdminController : AbstractController
 
     [Authorize(Roles="Admin")]
     [HttpGet]
-    public async Task<AdminListModel> GetAdminList()
+    [Route("AdminList")]
+    public async Task<IActionResult> GetAdminList()
     {
         AdminListModel adminListModel = new AdminListModel();
+        
         var adminLists = await _adminService.GetAdminLists();
+        
         adminListModel.CurrentAdmins = adminLists.CurrentAdmins;
         adminListModel.PendingAdmins = adminLists.PendingAdmins;
-        return adminListModel;
+        
+        return View("AdminList", adminListModel);
     }
 
-    [Authorize(Roles="Admin")]
-    [HttpGet]
-    public async Task<IActionResult> AdminList()
-    {
-        AdminListModel adminListModel = GetAdminList().Result;
-        return View(adminListModel);
-    }
-
-    [HttpGet]
-    public UserDbModel findUserFromId(int userId)
-    {
-        return _dbContext.Users.SingleOrDefault(u => u.Id == userId);
-    }
-    
     [Authorize(Roles="Admin")]
     [HttpPost]
     public async Task<ActionResult> AcceptAdminRequest(AdminListModel userToAcceptList, int userToAcceptId)
     {
-        var userToAccept = findUserFromId(userToAcceptId);
-        
-        userToAccept.IsAdmin = true;
-        userToAccept.HasRequestedAdmin = false;
-        _dbContext.SaveChanges();
+        _adminService.ApproveAdminAccessRequest(userToAcceptId);
 
-        AdminListModel adminListModel = GetAdminList().Result;
-        
-        return View("AdminList", adminListModel);
+        return RedirectToAction("GetAdminList");
     }
 }

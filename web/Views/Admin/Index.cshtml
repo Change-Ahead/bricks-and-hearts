@@ -23,7 +23,7 @@
             if (Model.CurrentUser.IsAdmin)
             {
                 <p>You are an admin :)</p>
-                <a asp-action="AdminList" asp-controller="Admin"><i class="bi bi-card-list"></i>View Admin List & Pending Admins</a>
+                <a asp-action="GetAdminList" asp-controller="Admin"><i class="bi bi-card-list"></i>View Admin List & Pending Admins</a>
             }
             else
             {

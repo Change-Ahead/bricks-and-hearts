@@ -33,4 +33,26 @@ public class ControllerTestsBase
         };
         return unregisteredUser;
     }
+    
+    protected BricksAndHeartsUser CreateAdminUserInController(Controller _underTest)
+    {
+        // Arrange
+        var userDbModel = new UserDbModel()
+        {
+            Id = 1,
+            GoogleUserName = "John Doe",
+            GoogleEmail = "test.email@gmail.com",
+            IsAdmin = true,
+            LandlordId = null,
+        };
+
+        var adminUser = new BricksAndHeartsUser(userDbModel, new List<Claim>(), "google");
+        var adminUserPrincipal = new ClaimsPrincipal(adminUser);
+
+        _underTest.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = adminUserPrincipal }
+        };
+        return adminUser;
+    }
 }
