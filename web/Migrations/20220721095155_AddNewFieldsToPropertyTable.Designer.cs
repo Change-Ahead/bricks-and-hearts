@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BricksAndHearts.Migrations
 {
     [DbContext(typeof(BricksAndHeartsDbContext))]
-    [Migration("20220720093507_MakeAddressLines2And3Nullable")]
-    partial class MakeAddressLines2And3Nullable
+    [Migration("20220721095155_AddNewFieldsToPropertyTable")]
+    partial class AddNewFieldsToPropertyTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -40,6 +40,13 @@ namespace BricksAndHearts.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("FirstName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("LandlordProvidedCharterStatus")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("LandlordStatus")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -136,6 +143,9 @@ namespace BricksAndHearts.Migrations
                     b.Property<string>("GoogleUserName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("HasRequestedAdmin")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("IsAdmin")
                         .HasColumnType("bit");
