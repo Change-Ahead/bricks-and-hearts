@@ -36,6 +36,8 @@ public class LandlordProfileModel
 
     public bool LandlordProvidedCharterStatus { get; set; } = false;
 
+    public bool CharterApproved { get; set; } = false;
+
     public static LandlordProfileModel FromDbModel(LandlordDbModel landlord)
     {
         return new LandlordProfileModel
@@ -47,7 +49,8 @@ public class LandlordProfileModel
             Phone = landlord.Phone,
             Title = landlord.Title,
             LandlordStatus = landlord.LandlordStatus,
-            LandlordProvidedCharterStatus = landlord.LandlordProvidedCharterStatus
+            LandlordProvidedCharterStatus = landlord.LandlordProvidedCharterStatus,
+            CharterApproved = landlord.CharterApproved
         };
     }
     

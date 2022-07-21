@@ -13,8 +13,12 @@ public class LandlordDbModel
     public string Email { get; set; } = null!;
     public string Phone { get; set; } = null!;
 
-    public string LandlordStatus { get; set; } = null!;
+    //Type of landlord
+    public string LandlordStatus { get; set; } = null!; 
+    //Whether the landlord claims to have signed the charter
     public bool LandlordProvidedCharterStatus { get; set; } = false;
+    //Whether the charter has been approved by an admin
+    public bool CharterApproved { get; set; } = false;
 
     public virtual UserDbModel? User { get; set; }
     public virtual List<PropertyDbModel>? Properties { get; set; }

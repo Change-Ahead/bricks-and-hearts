@@ -63,6 +63,13 @@
     </div>
     
     <h4>ChangeAhead Charter</h4>
-    @*TODO: Database does not include this in this branch yet.*@
+    @if (Model.CharterApproved)
+    {
+        <p>Charter status: Approved</p>
+    }
+    else
+    {
+        <p>Charter status: Pending</p>
+    }
     
 </div>
