@@ -16,6 +16,7 @@ public interface IMailService
         string msgToName = ""
     );
 }
+
 public class MailService: IMailService
 {
     private readonly IOptions<EmailConfigOptions> _config;
@@ -25,7 +26,6 @@ public class MailService: IMailService
         _config = config;
     }
     
-
     public void SendMsg(
         string msgBody = "Hi",
         string msgFromAddress = "tech@changeahead.org.uk",
