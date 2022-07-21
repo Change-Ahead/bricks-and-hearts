@@ -6,7 +6,9 @@ namespace BricksAndHearts.Services;
 public interface IPropertyService
 {
     public List<PropertyDbModel> GetPropertiesByLandlord(int landlordId);
-    public void AddNewProperty(PropertyViewModel createModel, int landlordId);
+    public int AddNewProperty(PropertyViewModel createModel, int landlordId, bool isIncomplete = true);
+    public void UpdateProperty(int propertyId, PropertyViewModel updateModel, bool isIncomplete = true);
+    public int? GetIncompletePropertyId(int landlordId);
 }
 
 public class PropertyService : IPropertyService
@@ -25,12 +27,13 @@ public class PropertyService : IPropertyService
     }
 
     // Create a new property record and associate it with a landlord
-    public void AddNewProperty(PropertyViewModel createModel, int landlordId)
+    public int AddNewProperty(PropertyViewModel createModel, int landlordId, bool isIncomplete = true)
     {
         var dbModel = new PropertyDbModel
         {
             LandlordId = landlordId,
             CreationTime = DateTime.Now,
+            IsIncomplete = isIncomplete,
 
             AddressLine1 = createModel.Address!.AddressLine1,
             AddressLine2 = createModel.Address.AddressLine2,
@@ -48,5 +51,38 @@ public class PropertyService : IPropertyService
         // Add the new property to the database
         _dbContext.Properties.Add(dbModel);
         _dbContext.SaveChanges();
+
+        return dbModel.Id;
+    }
+
+    // Update any fields that are not null in updateModel
+    public void UpdateProperty(int propertyId, PropertyViewModel updateModel, bool isIncomplete = true)
+    {
+        var dbModel = _dbContext.Properties.Single(p => p.Id == propertyId);
+
+        if (updateModel.Address != null)
+        {
+            dbModel.AddressLine1 = updateModel.Address.AddressLine1;
+            dbModel.AddressLine2 = updateModel.Address.AddressLine2;
+            dbModel.AddressLine3 = updateModel.Address.AddressLine3;
+            dbModel.TownOrCity = updateModel.Address.TownOrCity;
+            dbModel.County = updateModel.Address.County;
+            dbModel.Postcode = updateModel.Address.Postcode;
+        }
+
+        dbModel.PropertyType = updateModel.PropertyType ?? dbModel.PropertyType;
+        dbModel.NumOfBedrooms = updateModel.NumOfBedrooms ?? dbModel.NumOfBedrooms;
+        dbModel.Rent = updateModel.Rent ?? dbModel.Rent;
+        dbModel.Description = updateModel.Description ?? dbModel.Description;
+
+        dbModel.IsIncomplete = isIncomplete;
+        _dbContext.SaveChanges();
+    }
+
+    public int? GetIncompletePropertyId(int landlordId)
+    {
+        return _dbContext.Properties
+            .Single(p => p.LandlordId == landlordId && p.IsIncomplete == true)
+            .Id;
     }
 }

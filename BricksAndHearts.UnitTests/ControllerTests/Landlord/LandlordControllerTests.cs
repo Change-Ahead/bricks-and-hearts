@@ -25,7 +25,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
             .Which.Email.Should().Be(unregisteredUser.GoogleEmail);
     }
 
-    [Fact]
+    /*[Fact]
     public void AddNewPropertyPost_CalledByUnregisteredUser_Returns403()
     {
         // Arrange 
@@ -71,5 +71,5 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Assert
         A.CallTo(() => propertyService.AddNewProperty(formResultModel, 1)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
-    }
+    }*/
 }

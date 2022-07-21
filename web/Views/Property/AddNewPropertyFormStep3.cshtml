@@ -1,0 +1,25 @@
+﻿@model PropertyViewModel
+
+@{
+    ViewData["Title"] = "Add Property";
+}
+
+<h1>Add new property</h1>
+
+<hr/>
+
+@using (Html.BeginForm("AddNewProperty_Continue", "Property", new {step = 3}, FormMethod.Post, null, new { @class = "w-50"}))
+{
+    <h2>Rent</h2>
+    
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="my-3">
+        <label asp-for="Rent" class="form-label">Rent £ (pcm)</label>
+        <input asp-for="Rent" class="form-control" required/>
+        <span asp-validation-for="Rent" class="text-danger"></span>
+    </div>
+
+    <div class="mt-4">
+        <input type="submit" value="Continue" class="btn btn-primary"/>
+    </div>
+}
