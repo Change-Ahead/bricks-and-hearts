@@ -14,6 +14,7 @@ public class HomeController : AbstractController
         _logger = logger;
     }
 
+    [HttpGet]
     public IActionResult Index()
     {
         var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
@@ -25,12 +26,20 @@ public class HomeController : AbstractController
         };
         return View(model);
     }
-
+    
+    [HttpGet]
     public IActionResult Privacy()
     {
         return View();
     }
-
+    
+    [HttpGet]
+    public IActionResult ContactUs()
+    {
+        return View();
+    }
+    
+    [HttpGet]
     [Route("/Error/{status:int}")]
     public IActionResult Error(int status)
     {
