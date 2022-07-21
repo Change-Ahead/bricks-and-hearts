@@ -8,8 +8,9 @@ public class PropertyDbModel
     public int Id { get; set; }
     public int LandlordId { get; set; }
     public virtual LandlordDbModel Landlord { get; set; } = null!;
+    public bool IsIncomplete { get; set; }
 
-    public string? AddressLine1 { get; set; } // Will be fixed properly by BNH-34
+    public string? AddressLine1 { get; set; }
     public string? AddressLine2 { get; set; }
     public string? AddressLine3 { get; set; }
     public string? TownOrCity { get; set; }
