@@ -1,14 +1,12 @@
-﻿using System.Data;
-using BricksAndHearts.Database;
+﻿using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
-using Microsoft.EntityFrameworkCore;
 
 namespace BricksAndHearts.Services;
 
 public interface IPropertyService
 {
     public List<PropertyDbModel> GetPropertiesByLandlord(int landlordId);
-    public Task AddNewProperty(PropertyViewModel createModel, int landlordId);
+    public void AddNewProperty(PropertyViewModel createModel, int landlordId);
 }
 
 public class PropertyService : IPropertyService
@@ -27,7 +25,7 @@ public class PropertyService : IPropertyService
     }
 
     // Create a new property record and associate it with a landlord
-    public async Task AddNewProperty(PropertyViewModel createModel, int landlordId)
+    public void AddNewProperty(PropertyViewModel createModel, int landlordId)
     {
         var dbModel = new PropertyDbModel
         {
@@ -47,21 +45,8 @@ public class PropertyService : IPropertyService
             Description = createModel.Description
         };
 
-        // We want to atomically update multiple records (insert a property, then add it to its landlord's list of properties), so first start a transaction
-        await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
-        {
-            // Insert the property and call SaveChanges
-            // Entity Framework will insert the record and populate dbModel.Id with the new record's id
-            _dbContext.Properties.Add(dbModel);
-            await _dbContext.SaveChangesAsync();
-
-            // Now we can update the landlord record too
-            var landlordRecord = _dbContext.Landlords.Single(l => l.Id == landlordId);
-            landlordRecord.Properties.Add(dbModel);
-            await _dbContext.SaveChangesAsync();
-
-            // and finally commit
-            await transaction.CommitAsync();
-        }
+        // Add the new property to the database
+        _dbContext.Properties.Add(dbModel);
+        _dbContext.SaveChanges();
     }
 }

@@ -133,7 +133,7 @@ public class LandlordController : AbstractController
 
     [HttpPost]
     [Route("/add-property")]
-    public async Task<ActionResult> AddNewProperty([FromForm] PropertyViewModel newPropertyModel)
+    public ActionResult AddNewProperty([FromForm] PropertyViewModel newPropertyModel)
     {
         var landlordId = GetCurrentUser().LandlordId;
         if (!landlordId.HasValue)
@@ -144,11 +144,11 @@ public class LandlordController : AbstractController
         // This does checks based on the annotations (e.g. [Required]) on PropertyViewModel
         if (!ModelState.IsValid)
         {
-            return View();
+            return View(newPropertyModel);
         }
 
         // add property to database
-        await _propertyService.AddNewProperty(newPropertyModel, landlordId.Value);
+        _propertyService.AddNewProperty(newPropertyModel, landlordId.Value);
 
         return RedirectToAction("ViewProperties");
     }
