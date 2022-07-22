@@ -54,6 +54,11 @@ public class PropertyController : AbstractController
             return StatusCode(403);
         }
 
+        if (!ModelState.IsValid)
+        {
+            return View("AddNewProperty", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
+        }
+
         // Get the property we're currently adding
         var property = _propertyService.GetIncompleteProperty(landlordId.Value);
         if (property == null)
@@ -61,7 +66,7 @@ public class PropertyController : AbstractController
             if (step == 1)
             {
                 // Create new record in the database for this property
-                _propertyService.AddNewProperty(newPropertyModel, landlordId.Value, isIncomplete: true);
+                _propertyService.AddNewProperty(landlordId.Value, newPropertyModel, isIncomplete: true);
 
                 // Go to step 2
                 return RedirectToAction("AddNewProperty_Continue", new { step = 2 });
