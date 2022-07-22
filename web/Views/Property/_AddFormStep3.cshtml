@@ -1,0 +1,10 @@
+﻿@model PropertyViewModel
+
+<h2>Rent</h2>
+
+<div asp-validation-summary="All" class="text-danger"></div>
+<div class="my-3">
+    <label asp-for="Rent" class="form-label">Rent £ (pcm)</label>
+    <input asp-for="Rent" class="form-control" required/>
+    <span asp-validation-for="Rent" class="text-danger"></span>
+</div>

@@ -1,5 +1,4 @@
-﻿using BricksAndHearts.Database;
-using BricksAndHearts.Services;
+﻿using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,14 +9,11 @@ namespace BricksAndHearts.Controllers;
 [Route("/property")]
 public class PropertyController : AbstractController
 {
-    private readonly BricksAndHeartsDbContext _dbContext;
     private readonly IPropertyService _propertyService;
     private readonly ILogger<PropertyController> _logger;
 
-    public PropertyController(BricksAndHeartsDbContext dbContext, IPropertyService propertyService,
-        ILogger<PropertyController> logger)
+    public PropertyController(IPropertyService propertyService, ILogger<PropertyController> logger)
     {
-        _dbContext = dbContext;
         _propertyService = propertyService;
         _logger = logger;
     }
@@ -25,84 +21,96 @@ public class PropertyController : AbstractController
     [HttpGet("add")]
     public ActionResult AddNewProperty_Begin()
     {
-        // Start at the form for step 1
-        return View("AddNewPropertyFormStep1");
-    }
-
-    [HttpPost("add")]
-    public ActionResult AddNewProperty_Begin([FromForm] PropertyViewModel newPropertyModel)
-    {
-        var landlordId = GetCurrentUser().LandlordId;
-        if (!landlordId.HasValue)
-        {
-            return StatusCode(403);
-        }
-
-        // This does checks based on the annotations (e.g. [Required]) on PropertyViewModel
-        if (!ModelState.IsValid)
-        {
-            return RedirectToAction("AddNewProperty_Begin");
-        }
-
-        // Create new record in the database for this property
-        _propertyService.AddNewProperty(newPropertyModel, landlordId.Value, isIncomplete: true);
-
-        // Go to step 2
-        return RedirectToAction("AddNewProperty_Continue", new { step = 2 });
+        // Start at step 1
+        return AddNewProperty_Continue(1);
     }
 
     [HttpGet("add/step/{step:int}")]
     public ActionResult AddNewProperty_Continue([FromRoute] int step)
     {
+        // Can replace with Role in future
+        var landlordId = GetCurrentUser().LandlordId;
+        if (!landlordId.HasValue)
+        {
+            return StatusCode(403);
+        }
+
+        // See if we're already adding a property
+        var dbModel = _propertyService.GetIncompleteProperty(landlordId.Value);
+        var property = dbModel == null
+            ? new PropertyViewModel { Address = new PropertyAddress() }
+            : PropertyViewModel.FromDbModel(dbModel);
+
         // Show the form for this step
-        return View("AddNewPropertyFormStep" + step);
+        return View("AddNewProperty", new AddNewPropertyViewModel { Step = step, Property = property });
     }
 
     [HttpPost("add/step/{step:int}")]
-    public ActionResult AddNewProperty_Continue([FromRoute] int step, [FromForm] PropertyViewModel updateModel)
+    public ActionResult AddNewProperty_Continue([FromRoute] int step, [FromForm] PropertyViewModel newPropertyModel)
     {
         var landlordId = GetCurrentUser().LandlordId;
         if (!landlordId.HasValue)
         {
             return StatusCode(403);
         }
-        
-        // Get Id of the property we're currently adding
-        var propertyId = _propertyService.GetIncompletePropertyId(landlordId.Value);
-        if (!propertyId.HasValue)
+
+        // Get the property we're currently adding
+        var property = _propertyService.GetIncompleteProperty(landlordId.Value);
+        if (property == null)
         {
-            // Start over
-            return RedirectToAction("AddNewProperty_Begin");
+            if (step == 1)
+            {
+                // Create new record in the database for this property
+                _propertyService.AddNewProperty(newPropertyModel, landlordId.Value, isIncomplete: true);
+
+                // Go to step 2
+                return RedirectToAction("AddNewProperty_Continue", new { step = 2 });
+            }
+            else
+            {
+                // No property in progress
+                return RedirectToAction("ViewProperties", "Landlord");
+            }
         }
+        else if (step < AddNewPropertyViewModel.MaximumStep)
+        {
+            // Update the property's record with the values entered at this step
+            _propertyService.UpdateProperty(property.Id, newPropertyModel, isIncomplete: true);
 
-        // Update the property's record with the values entered at this step
-        _propertyService.UpdateProperty(propertyId.Value, updateModel, isIncomplete: true);
+            // Go to next step
+            return RedirectToAction("AddNewProperty_Continue", new { step = step + 1 });
+        }
+        else
+        {
+            // Update the property's record with the final set of values
+            _propertyService.UpdateProperty(property.Id, newPropertyModel, isIncomplete: false);
 
-        // Go to next step
-        return RedirectToAction("AddNewProperty_Continue", new { step = step + 1 });
+            // Finished adding property, so go to View Properties page
+            return RedirectToAction("ViewProperties", "Landlord");
+        }
     }
 
-    [HttpPost("add/submit")]
-    public ActionResult AddNewProperty_Submit([FromForm] PropertyViewModel updateModel)
+    [HttpPost("add/cancel")]
+    public ActionResult AddNewProperty_Cancel()
     {
         var landlordId = GetCurrentUser().LandlordId;
         if (!landlordId.HasValue)
         {
             return StatusCode(403);
         }
-        
-        // Get Id of the property we're currently adding
-        var propertyId = _propertyService.GetIncompletePropertyId(landlordId.Value);
-        if (!propertyId.HasValue)
+
+        // Get the property we're currently adding
+        var property = _propertyService.GetIncompleteProperty(landlordId.Value);
+        if (property == null)
         {
-            // Start over
-            return RedirectToAction("AddNewProperty_Begin");
+            // No property in progress
+            return RedirectToAction("ViewProperties", "Landlord");
         }
 
-        // Update the property's record with the final set of values
-        _propertyService.UpdateProperty(propertyId.Value, updateModel, isIncomplete: false);
+        // Delete partially complete property
+        _propertyService.DeleteProperty(property);
 
-        // Finished adding property, so go to View Properties page
+        // Go to View Properties page
         return RedirectToAction("ViewProperties", "Landlord");
     }
 }
