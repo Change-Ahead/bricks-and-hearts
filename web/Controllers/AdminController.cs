@@ -1,3 +1,4 @@
+using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
@@ -8,7 +9,6 @@ namespace BricksAndHearts.Controllers;
 
 public class AdminController : AbstractController
 {
-    private readonly BricksAndHeartsDbContext _dbContext;
     private readonly IAdminService _adminService;
     private readonly ILogger<HomeController> _logger;
 
@@ -16,7 +16,6 @@ public class AdminController : AbstractController
     {
         _logger = logger;
         _adminService = adminService;
-        _dbContext = dbContext;
     }
     
     public IActionResult Index()
