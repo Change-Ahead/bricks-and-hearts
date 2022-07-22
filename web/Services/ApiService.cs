@@ -1,11 +1,15 @@
 ﻿using BricksAndHearts.Auth;
+using BricksAndHearts.ViewModels;
 using Microsoft.Extensions.Options;
+using Newtonsoft.Json;
 
 namespace BricksAndHearts.Services;
 
 public interface IApiService
 {
     public Task<string> MakeApiRequestToAzureMaps(string postalCode);
+    public Task<PropertyViewModel> AutofillAddress(PropertyViewModel model);
+
 }
 
 public class ApiService : IApiService
@@ -39,31 +43,57 @@ public class ApiService : IApiService
         }
         return responseBody;
     }
-    // Begin code copied from BusBoard
-    /*public static async Task<Dictionary<string,string>> Post2LatLong(string postCode)
+    public PostcodeApiResponseViewModel TurnResponseBodyToModel(string responseBody)
     {
-        // Make API call
-        string uri = $"http://api.postcodes.io/postcodes/{postCode}";
-        string responseBody = await MakeApiReq(uri, "Access to postcode API");
-           
-        // Deserialize JSON
-        PostCodeResponse postCodeResponse = JsonConvert.DeserializeObject<PostCodeResponse>(responseBody);
-        string lat;
-        string lon;
-        try
+        if (string.IsNullOrEmpty(responseBody))
         {
-            lat = postCodeResponse.res["latitude"].ToString();
-            lon = postCodeResponse.res["longitude"].ToString();
+            return new PostcodeApiResponseViewModel();
         }
-        catch
+
+        PostcodeApiResponseViewModel postcodeResponse =
+            JsonConvert.DeserializeObject<PostcodeApiResponseViewModel>(responseBody);
+        return postcodeResponse;
+    }
+
+    public async Task<PropertyViewModel> AutofillAddress(PropertyViewModel model)
+    {
+        if (string.IsNullOrEmpty(model.Address.Postcode))
         {
-            return new Dictionary<string, string>();
+            throw new ArgumentException("Model does not has a postcode!");
         }
-            
-        return new Dictionary<string, string>()
+
+        if (string.IsNullOrEmpty(model.Address.AddressLine1))
         {
-            { "long", lon },
-            { "lat", lat },
-        };
-    }*/
+            throw new ArgumentException("Model does not has address line 1!");
+        }
+
+        string postCode = model.Address.Postcode;
+        string responseBody = await MakeApiRequestToAzureMaps(postCode);
+        PostcodeApiResponseViewModel postcodeResponse = TurnResponseBodyToModel(responseBody);
+        if (postcodeResponse.ListOfResults == null)
+        {
+            return model;
+        }
+
+        BricksAndHearts.ViewModels.Results results = postcodeResponse.ListOfResults[0];
+        if (results.Address == null)
+        {
+            return model;
+        }
+        
+        if (results.Address.Keys.ToList().Contains("streetName"))
+        {
+            model.Address.AddressLine2 = results.Address["streetName"];
+        }
+        if (results.Address.Keys.ToList().Contains("municipality"))
+        {
+            model.Address.TownOrCity = results.Address["municipality"];
+        }
+        if (results.Address.Keys.ToList().Contains("countrySecondarySubdivision"))
+        {
+            model.Address.County = results.Address["countrySecondarySubdivision"];
+        }
+
+        return model;
+    }
 }
