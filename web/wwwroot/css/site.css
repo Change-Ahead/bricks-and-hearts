@@ -59,5 +59,10 @@ input.invalid {
 }
 
 .tables{
-  width: 50%;
+  display:inline-block;
+  clear:both;
+}
+
+.tables .table{
+  width: 100%;
 }
