@@ -8,7 +8,8 @@ public interface IPropertyService
     public List<PropertyDbModel> GetPropertiesByLandlord(int landlordId);
     public int AddNewProperty(PropertyViewModel createModel, int landlordId, bool isIncomplete = true);
     public void UpdateProperty(int propertyId, PropertyViewModel updateModel, bool isIncomplete = true);
-    public int? GetIncompletePropertyId(int landlordId);
+    public void DeleteProperty(PropertyDbModel property);
+    public PropertyDbModel? GetIncompleteProperty(int landlordId);
 }
 
 public class PropertyService : IPropertyService
@@ -79,10 +80,14 @@ public class PropertyService : IPropertyService
         _dbContext.SaveChanges();
     }
 
-    public int? GetIncompletePropertyId(int landlordId)
+    public void DeleteProperty(PropertyDbModel property)
     {
-        return _dbContext.Properties
-            .Single(p => p.LandlordId == landlordId && p.IsIncomplete == true)
-            .Id;
+        _dbContext.Properties.Remove(property);
+        _dbContext.SaveChanges();
+    }
+
+    public PropertyDbModel? GetIncompleteProperty(int landlordId)
+    {
+        return _dbContext.Properties.SingleOrDefault(p => p.LandlordId == landlordId && p.IsIncomplete == true);
     }
 }
