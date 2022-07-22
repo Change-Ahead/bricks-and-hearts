@@ -32,7 +32,7 @@ public class PropertyService : IPropertyService
             LandlordId = landlordId,
             CreationTime = DateTime.Now,
 
-            AddressLine1 = createModel.Address.AddressLine1,
+            AddressLine1 = createModel.Address!.AddressLine1,
             AddressLine2 = createModel.Address.AddressLine2,
             AddressLine3 = createModel.Address.AddressLine3,
             TownOrCity = createModel.Address.TownOrCity,
