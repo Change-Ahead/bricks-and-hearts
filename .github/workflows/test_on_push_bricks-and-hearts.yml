@@ -23,7 +23,7 @@ jobs:
           include-prerelease: true
 
       - name: Build with dotnet
-        run: dotnet build
+        run: dotnet build -warnaserror
 
       - name: Test with dotnet
         run: dotnet test
