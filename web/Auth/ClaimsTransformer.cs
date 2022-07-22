@@ -45,6 +45,7 @@ public class ClaimsTransformer : IClaimsTransformation
         var claims = new List<Claim>(existingClaimsIdentity.Claims);
         // If they're an admin in the database, add the role to their claims
         if (databaseUser.IsAdmin) claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+        if (databaseUser.LandlordId != null) claims.Add(new Claim(ClaimTypes.Role, "Landlord"));
 
         // Build and return our new user principal
         var newClaimsIdentity = new BricksAndHeartsUser(databaseUser, claims, existingClaimsIdentity.AuthenticationType);
