@@ -6,7 +6,7 @@ namespace BricksAndHearts.Services;
 public interface IPropertyService
 {
     public List<PropertyDbModel> GetPropertiesByLandlord(int landlordId);
-    public int AddNewProperty(PropertyViewModel createModel, int landlordId, bool isIncomplete = true);
+    public int AddNewProperty(int landlordId, PropertyViewModel createModel, bool isIncomplete = true);
     public void UpdateProperty(int propertyId, PropertyViewModel updateModel, bool isIncomplete = true);
     public void DeleteProperty(PropertyDbModel property);
     public PropertyDbModel? GetIncompleteProperty(int landlordId);
@@ -28,7 +28,7 @@ public class PropertyService : IPropertyService
     }
 
     // Create a new property record and associate it with a landlord
-    public int AddNewProperty(PropertyViewModel createModel, int landlordId, bool isIncomplete = true)
+    public int AddNewProperty(int landlordId, PropertyViewModel createModel, bool isIncomplete = true)
     {
         var dbModel = new PropertyDbModel
         {
