@@ -72,4 +72,13 @@
         <p>Charter status: Pending</p>
     }
     
+    @if (Model.CurrentUserIsAdmin)
+    {
+        @using (Html.BeginForm("ApproveCharter", "Admin", FormMethod.Post))
+        {
+            <input type="hidden" id="checkInId" name="Id" value=@Model.Id>
+            <button type="submit" class="btn custom-btn-primary">Approve Landlord</button>
+        }
+    }
+
 </div>

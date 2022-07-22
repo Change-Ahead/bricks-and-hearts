@@ -1,11 +1,14 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
 
 namespace BricksAndHearts.ViewModels;
 
 public class LandlordProfileModel
 {
+    public int Id { get; set; }
+
     [Required]
     [StringLength(60)]
     [DisplayName("Title")]
@@ -38,10 +41,14 @@ public class LandlordProfileModel
 
     public bool CharterApproved { get; set; } = false;
 
-    public static LandlordProfileModel FromDbModel(LandlordDbModel landlord)
+    public bool CurrentUserIsAdmin { get; set; }
+    public int CurrentUserId { get; set; }
+
+    public static LandlordProfileModel FromDbModel(LandlordDbModel landlord, BricksAndHeartsUser user)
     {
         return new LandlordProfileModel
         {
+            Id = landlord.Id,
             CompanyName = landlord.CompanyName,
             Email = landlord.Email,
             FirstName = landlord.FirstName,
@@ -50,7 +57,9 @@ public class LandlordProfileModel
             Title = landlord.Title,
             LandlordStatus = landlord.LandlordStatus,
             LandlordProvidedCharterStatus = landlord.LandlordProvidedCharterStatus,
-            CharterApproved = landlord.CharterApproved
+            CharterApproved = landlord.CharterApproved,
+            CurrentUserIsAdmin = user.IsAdmin,
+            CurrentUserId = user.Id
         };
     }
     

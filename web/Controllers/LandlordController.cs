@@ -102,7 +102,7 @@ public class LandlordController : AbstractController
             return StatusCode(404);
         }
 
-        var viewModel = LandlordProfileModel.FromDbModel(landlord);
+        var viewModel = LandlordProfileModel.FromDbModel(landlord, user);
         return View("Profile", viewModel);
     }
 
