@@ -4,7 +4,6 @@
 @{
     ViewData["Title"] = "Edit Profile";
 }
-@*TODO: validate inputs*@
 <h1>Edit your Landlord Profile</h1>
 
 <div class="row">
@@ -48,7 +47,7 @@
                 </div>
                 <div class="form-group my-3">
                     <label class="control-label">Company (optional)</label>
-                    <input asp-for="CompanyName" class="form-control company"/>
+                    <input asp-for="CompanyName" class="form-control empty"/>
                     <span asp-validation-for="CompanyName" class="text-danger"></span>
                 </div>
             </div>

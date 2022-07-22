@@ -164,18 +164,8 @@ public class LandlordController : AbstractController
     [HttpPost]
     public ActionResult EditProfileUpdate([FromForm] LandlordDbModel createModel)
     {
-        var editedLandlord = _dbContext.Landlords.SingleOrDefault(l => l.Id == createModel.Id);
-        
-        editedLandlord.Title = createModel.Title;
-        editedLandlord.FirstName = createModel.FirstName;
-        editedLandlord.LastName = createModel.LastName;
-        editedLandlord.CompanyName = createModel.CompanyName;
-        /*TODO: check that the email input is not currently registered*/
-        editedLandlord.Email = createModel.Email;      
-        editedLandlord.Phone = createModel.Phone;
+        var editedLandlord = _landlordService.UpdateLandlord(createModel);
 
-        _dbContext.Update(editedLandlord);
-        _dbContext.SaveChanges();
         return View("Profile", LandlordProfileModel.FromDbModel(editedLandlord));
     }
 }

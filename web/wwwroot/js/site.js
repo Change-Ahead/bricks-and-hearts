@@ -44,7 +44,7 @@ function validateForm() {
     for (tabInputIterator = 0; tabInputIterator < tabInputList.length; tabInputIterator++) {
         // Validation checks for the form
         let currentField = tabInputList[tabInputIterator]
-        if ((currentField.value == "" && currentField.className!=="form-control empty")
+        if ((currentField.value == "" && currentField.className !== "form-control empty")
         || (currentField.type == "email" && (currentField.value.indexOf("@") == -1))
         || (currentField.type == "tel" && !Number.isInteger(Number(currentField.value.replace(/\+/g,"")))))
         {
