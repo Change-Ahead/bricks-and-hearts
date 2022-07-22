@@ -17,7 +17,7 @@
     </tr>
     </thead>
     <tbody>
-    @foreach (var landlord in Model.UnapprovedLandlords)
+    @foreach (var landlord in Model.UnapprovedLandlords!)
     {
         <tr class ="clickable"
             onclick="location.href = '@Url.Action("Profile", "Landlord", new { id = landlord!.Id })'">

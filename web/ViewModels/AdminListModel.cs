@@ -10,6 +10,6 @@ public class AdminListModel
         PendingAdmins = pendingAdmins;
     }
     
-    public List<UserDbModel>? CurrentAdmins { get; set; }
-    public List<UserDbModel>? PendingAdmins { get; set; }
+    public List<UserDbModel> CurrentAdmins { get; set; }
+    public List<UserDbModel> PendingAdmins { get; set; }
 }
