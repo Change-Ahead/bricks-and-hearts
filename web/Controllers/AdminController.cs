@@ -80,4 +80,13 @@ public class AdminController : AbstractController
         AdminListModel adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
         return View(adminListModel);
     }
+    
+    [Authorize(Roles="Admin")]
+    [HttpGet]
+    public async Task<IActionResult> LandlordList()
+    {
+        LandlordListModel landlordListModel = new LandlordListModel();
+        landlordListModel.UnapprovedLandlords = await _adminService.GetUnapprovedLandlords();
+        return View(landlordListModel);
+    }
 }
