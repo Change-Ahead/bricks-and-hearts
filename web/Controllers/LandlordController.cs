@@ -84,13 +84,13 @@ public class LandlordController : AbstractController
             return StatusCode(403);
         }
 
-        var landlord = _landlordService.GetLandlordFromId(id);
+        var landlord = await _landlordService.GetLandlordIfExistsFromId(id);
         if (landlord == null)
         {
             return StatusCode(404);
         }
 
-        var viewModel = LandlordProfileModel.FromDbModel(await landlord);
+        var viewModel = LandlordProfileModel.FromDbModel(landlord);
         return View("Profile", viewModel);
     }
 

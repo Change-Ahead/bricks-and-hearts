@@ -17,7 +17,7 @@ public interface ILandlordService
 
     public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel, BricksAndHeartsUser user);
     public List<PropertyDbModel> GetListOfProperties(int landlordId);
-    public Task<LandlordDbModel> GetLandlordFromId(int id);
+    public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int id);
 
 }
 
@@ -80,7 +80,7 @@ public class LandlordService : ILandlordService
         return ILandlordService.LandlordRegistrationResult.Success;
     }
 
-    public Task<LandlordDbModel> GetLandlordFromId(int id)
+    public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int id)
     {
         return _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id);
     }
