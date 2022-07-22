@@ -41,7 +41,9 @@ public class LandlordService : ILandlordService
             LastName = createModel.LastName,
             CompanyName = createModel.CompanyName,
             Email = createModel.Email,
-            Phone = createModel.Phone
+            Phone = createModel.Phone,
+            LandlordStatus = createModel.LandlordStatus,
+            LandlordProvidedCharterStatus = createModel.LandlordProvidedCharterStatus
         };
 
         // We want to atomically update multiple records (insert a landlord, then set the user's landlord id), so first start a transaction

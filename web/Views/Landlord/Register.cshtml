@@ -40,7 +40,7 @@
             <div class="registerTab" id="Landlord details">
                 <div class="form-group my-3">
                     <label>Landlord type:</label>
-                    @Html.DropDownList("LandlordType", new List<SelectListItem>
+                    @Html.DropDownList("LandlordStatus", new List<SelectListItem>
                     {
                         new SelectListItem { Text = "Private Residential Sector", Value = "Private Residential Sector", Selected = true },
                         new SelectListItem { Text = "Housing association", Value = "Housing association" },
@@ -49,7 +49,7 @@
                 </div>
                 <div class="form-group my-3">
                     <label class="control-label">Company (optional)</label>
-                    <input asp-for="CompanyName" class="form-control"/>
+                    <input asp-for="CompanyName" class="form-control empty"/>
                     <span asp-validation-for="CompanyName" class="text-danger"></span>
                 </div>
             </div>
