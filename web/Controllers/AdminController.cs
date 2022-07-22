@@ -10,9 +10,9 @@ public class AdminController : AbstractController
 {
     private readonly BricksAndHeartsDbContext _dbContext;
     private readonly IAdminService _adminService;
-    private readonly ILogger<HomeController> _logger;
+    private readonly ILogger<AdminController> _logger;
 
-    public AdminController(ILogger<HomeController> logger, BricksAndHeartsDbContext dbContext, IAdminService adminService)
+    public AdminController(ILogger<AdminController> logger, BricksAndHeartsDbContext dbContext, IAdminService adminService)
     {
         _logger = logger;
         _adminService = adminService;
