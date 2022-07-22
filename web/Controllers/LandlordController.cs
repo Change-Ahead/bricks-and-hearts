@@ -133,7 +133,7 @@ public class LandlordController : AbstractController
     [HttpPost]
     public ActionResult EditProfileUpdate([FromForm] LandlordDbModel createModel)
     {
-        var editedLandlord = _dbContext.Landlords.SingleOrDefault(l => l.Email == createModel.Email);
+        var editedLandlord = _dbContext.Landlords.SingleOrDefault(l => l.Id == createModel.Id);
         
         editedLandlord.Title = createModel.Title;
         editedLandlord.FirstName = createModel.FirstName;

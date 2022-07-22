@@ -12,6 +12,7 @@
         <form method="post" asp-controller="Landlord" asp-action="EditProfileUpdate" id="landlordEntry">
         <div asp-validation-summary="All" class="text-danger"></div>
             <div class="registerTab" id="Name">
+                @Html.HiddenFor(l => l.Id, new {Value = Model.Id})
                 <div class="form-group my-3">
                     <label>Title:</label>
                     @Html.DropDownList("Title", new List<SelectListItem>
@@ -53,7 +54,11 @@
             </div>
             
             <div class="registerTab" id="Contact details">
-                @Html.HiddenFor(l => l.Email, new {Value = Model.Email})
+                <div class="form-group my-3">
+                    <label asp-for="Email" class="control-label"></label>
+                    <input type="tel" asp-for="Email" class="form-control"/>
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
                 <div class="form-group my-3">
                     <label asp-for="Phone" class="control-label"></label>
                     <input type="tel" asp-for="Phone" class="form-control"/>
