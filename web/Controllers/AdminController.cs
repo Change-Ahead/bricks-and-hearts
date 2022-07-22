@@ -35,40 +35,32 @@ public class AdminController : AbstractController
         var user = GetCurrentUser();
         if (user.IsAdmin)
         {
-            _logger.LogWarning("User {UserId} already an admin",user.Id);
-            TempData["FlashType"] = "danger";
-            TempData["FlashMessage"] = "Already an admin";
+            LoggerAlreadyAdminWarning(user);
 
             return RedirectToAction(nameof(Index));
         }
 
         _adminService.RequestAdminAccess(user);
-
-        _logger.LogInformation("Successfully requested admin access for user {UserId}",user.Id);
-        TempData["FlashType"] = "success";
-        TempData["FlashMessage"] = "Successfully requested admin access";
-
+        
+        FlashRequestSuccess(user, "requested admin access");
+        
         return RedirectToAction(nameof(Index));
     }
-
+    
     public IActionResult CancelAdminAccessRequest()
     {
         var user = GetCurrentUser();
         if (user.IsAdmin)
         {
-            _logger.LogWarning("User {UserId} already an admin",user.Id);
-            TempData["FlashType"] = "danger";
-            TempData["FlashMessage"] = "Already an admin";
+            LoggerAlreadyAdminWarning(user);
 
             return RedirectToAction(nameof(Index));
         }
 
         _adminService.CancelAdminAccessRequest(user);
-
-        _logger.LogInformation("Successfully cancelled admin access request for user {UserId}",user.Id);
-        TempData["FlashType"] = "success";
-        TempData["FlashMessage"] = "Successfully cancelled admin access request";
-
+        
+        FlashRequestSuccess(user, "cancelled admin access request");
+        
         return RedirectToAction(nameof(Index));
     }
 
