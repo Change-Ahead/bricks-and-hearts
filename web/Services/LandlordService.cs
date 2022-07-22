@@ -18,7 +18,9 @@ public interface ILandlordService
     public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel, BricksAndHeartsUser user);
     public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int id);
     public Task ApproveLandlord(int landlordId, BricksAndHeartsUser user);
-    public LandlordDbModel UpdateLandlord(LandlordDbModel createModel);
+    public LandlordDbModel UpdateEditedLandlord(LandlordDbModel createModel);
+    public bool CheckForDuplicateEmail(LandlordDbModel createModel);
+    public LandlordDbModel? GetLandlordFromEmail(string userEmail);
 
 }
 
@@ -99,19 +101,34 @@ public class LandlordService : ILandlordService
         await _dbContext.SaveChangesAsync();
     }
 
-    public LandlordDbModel UpdateLandlord(LandlordDbModel createModel)
+    public LandlordDbModel UpdateEditedLandlord(LandlordDbModel createModel)
     {
         var editedLandlord = _dbContext.Landlords.SingleOrDefault(l => l.Id == createModel.Id);
-        editedLandlord.Title = createModel.Title;
+        editedLandlord!.Title = createModel.Title;
         editedLandlord.FirstName = createModel.FirstName;
         editedLandlord.LastName = createModel.LastName;
         editedLandlord.CompanyName = createModel.CompanyName;
-        /*TODO: check that the new email input is not currently registered*/
-        editedLandlord.Email = createModel.Email;      
+        editedLandlord.Email = createModel.Email;
         editedLandlord.Phone = createModel.Phone;
 
         _dbContext.Update(editedLandlord);
         _dbContext.SaveChanges();
         return editedLandlord;
+    }
+    
+    public LandlordDbModel? GetLandlordFromEmail(string userEmail)
+    {
+        var foundLandlord = _dbContext.Landlords.SingleOrDefault(l => l.Email == userEmail);
+        return foundLandlord;
+    }
+
+    public bool CheckForDuplicateEmail(LandlordDbModel createModel)
+    {
+        var editedLandlord = _dbContext.Landlords.SingleOrDefault(l => l.Id == createModel.Id);
+        if (editedLandlord != null && (_dbContext.Landlords.SingleOrDefault(l => l.Email == createModel.Email)==null || editedLandlord.Email==createModel.Email))
+        {
+            return false;
+        }
+        return true;
     }
 }

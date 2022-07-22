@@ -172,17 +172,25 @@ public class LandlordController : AbstractController
     }
 
     [HttpGet]
-    public ActionResult EditProfilePage(string userEmail, int tabNum)
+    [Route("edit")]
+    public ActionResult EditProfilePage(string userEmail)
     {
-        var landlord = _dbContext.Landlords.SingleOrDefault(l => l.Email == userEmail);
+        var landlord = _landlordService.GetLandlordFromEmail(userEmail);
         return View("EditProfilePage", landlord);
     }
 
     [HttpPost]
+    [Route("edit")]
     public ActionResult EditProfileUpdate([FromForm] LandlordDbModel createModel)
     {
-        var editedLandlord = _landlordService.UpdateLandlord(createModel);
-
+        bool isEmailDuplicated = _landlordService.CheckForDuplicateEmail(createModel);
+        if (isEmailDuplicated)
+        {
+            _logger.LogWarning("Email already registered {Email}", createModel.Email);
+            ModelState.AddModelError("Email", "Email already registered");
+            return View("EditProfilePage", createModel);
+        }
+        var editedLandlord = _landlordService.UpdateEditedLandlord(createModel);
         return View("Profile", LandlordProfileModel.FromDbModel(editedLandlord));
     }
 }

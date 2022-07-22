@@ -1,5 +1,16 @@
-﻿let currentTab = 0;
-showTab(currentTab);
+﻿var currentTab = 0;
+
+function setCurrentTab(inputTab){
+    currentTab = inputTab
+    localStorage.setItem("someVarKey", currentTab);
+}
+
+if (window.location.pathname == "/landlord/register" || window.location.pathname == "/landlord/edit"){
+    if(localStorage.getItem("someVarKey")!=null){
+        currentTab = parseInt(localStorage.getItem("someVarKey"));
+    }
+    showTab(currentTab);
+}
 
 function showTab(currentTab) {
     let tabList = document.getElementsByClassName("registerTab");
@@ -44,7 +55,7 @@ function validateForm() {
     for (tabInputIterator = 0; tabInputIterator < tabInputList.length; tabInputIterator++) {
         // Validation checks for the form
         let currentField = tabInputList[tabInputIterator]
-        if ((currentField.value == "" && currentField.className !== "form-control empty")
+        if ((currentField.value == "" && currentField.className!=="form-control empty")
         || (currentField.type == "email" && (currentField.value.indexOf("@") == -1))
         || (currentField.type == "tel" && !Number.isInteger(Number(currentField.value.replace(/\+/g,"")))))
         {
