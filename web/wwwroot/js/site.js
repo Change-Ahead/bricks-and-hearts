@@ -42,8 +42,12 @@ function validateForm() {
     tabInputList = tabList[currentTab].getElementsByTagName("input");
     // A loop that checks every input field in the current tab:
     for (tabInputIterator = 0; tabInputIterator < tabInputList.length; tabInputIterator++) {
-        // If a field is empty...
-        if (tabInputList[tabInputIterator].value == "") {
+        // Validation checks for the form
+        let currentField = tabInputList[tabInputIterator]
+        if ((currentField.value == "" && currentField.className!=="form-control empty")
+        || (currentField.type == "email" && (currentField.value.indexOf("@") == -1))
+        || (currentField.type == "tel" && !Number.isInteger(Number(currentField.value.replace(/\+/g,"")))))
+        {
             // add an "invalid" class to the field:
             tabInputList[tabInputIterator].className += " invalid";
             // and set the current valid status to false:
