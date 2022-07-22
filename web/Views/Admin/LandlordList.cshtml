@@ -20,7 +20,7 @@
     @foreach (var landlord in Model.UnapprovedLandlords)
     {
         <tr class ="clickable"
-            onclick="location.href = '@Url.Action("Profile", "Landlord", new { id = landlord.Id })'">
+            onclick="location.href = '@Url.Action("Profile", "Landlord", new { id = landlord!.Id })'">
             <td>@landlord.FirstName</td>
             <td>@landlord.LastName</td>
             <td>@landlord.CompanyName</td>

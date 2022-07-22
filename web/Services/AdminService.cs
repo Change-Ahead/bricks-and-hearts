@@ -10,7 +10,7 @@ public interface IAdminService
     public void RequestAdminAccess(BricksAndHeartsUser user);
     public void CancelAdminAccessRequest(BricksAndHeartsUser user);
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
-    public Task<List<LandlordDbModel?>> GetUnapprovedLandlords();
+    public Task<List<LandlordDbModel>> GetUnapprovedLandlords();
 }
 
 public class AdminService : IAdminService
@@ -53,9 +53,9 @@ public class AdminService : IAdminService
         return (await GetCurrentAdmins(), await GetPendingAdmins());
     }
     
-    public async Task<List<LandlordDbModel?>> GetUnapprovedLandlords()
+    public async Task<List<LandlordDbModel>> GetUnapprovedLandlords()
     {
-        List<LandlordDbModel?> UnapprovedLandlords = await _dbContext.Landlords.Where(u => u.CharterApproved == false).ToListAsync();
+        List<LandlordDbModel> UnapprovedLandlords = await _dbContext.Landlords.Where(u => u.CharterApproved == false).ToListAsync();
         return UnapprovedLandlords;
     }
 }
