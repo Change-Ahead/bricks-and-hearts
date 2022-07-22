@@ -10,11 +10,13 @@ namespace BricksAndHearts.Controllers;
 public class PropertyController : AbstractController
 {
     private readonly IPropertyService _propertyService;
+    private readonly IApiService _apiService;
     private readonly ILogger<PropertyController> _logger;
 
-    public PropertyController(IPropertyService propertyService, ILogger<PropertyController> logger)
+    public PropertyController(IPropertyService propertyService, ILogger<PropertyController> logger, IApiService apiService)
     {
         _propertyService = propertyService;
+        _apiService = apiService;
         _logger = logger;
     }
 
@@ -46,7 +48,7 @@ public class PropertyController : AbstractController
     }
 
     [HttpPost("add/step/{step:int}")]
-    public ActionResult AddNewProperty_Continue([FromRoute] int step, [FromForm] PropertyViewModel newPropertyModel)
+    public async Task<IActionResult> AddNewProperty_Continue([FromRoute] int step, [FromForm] PropertyViewModel newPropertyModel)
     {
         var landlordId = GetCurrentUser().LandlordId;
         if (!landlordId.HasValue)
@@ -73,6 +75,9 @@ public class PropertyController : AbstractController
                 }
                 else
                 {
+                    PropertyViewModel resultModel = await _apiService.AutofillAddress(newPropertyModel);
+                    newPropertyModel = resultModel;
+
                     // Create new record in the database for this property
                     _propertyService.AddNewProperty(landlordId.Value, newPropertyModel, isIncomplete: true);
                 }
