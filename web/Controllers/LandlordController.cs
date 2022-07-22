@@ -118,6 +118,15 @@ public class LandlordController : AbstractController
 
         return await Profile(landlordId.Value);
     }
+    
+    [Authorize(Roles="Admin")]
+    [HttpPost]
+    public async Task<ActionResult> ApproveCharter(int landlordId)
+    {
+        var user = GetCurrentUser();
+        await _landlordService.ApproveLandlord(landlordId, user);
+        return RedirectToAction("Profile", "Landlord", new { Id = landlordId });
+    }
 
     [HttpGet]
     [Route("/properties")]

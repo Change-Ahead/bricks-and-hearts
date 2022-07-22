@@ -22,7 +22,6 @@ public class AdminController : AbstractController
     {
         _logger = logger;
         _adminService = adminService;
-        _dbContext = dbContext;
     }
 
     public IActionResult Index()
