@@ -6,7 +6,7 @@
 
 <h2>Unapproved Landlords</h2>
 
-<table class="table">
+<table class="table table-hover">
     <thead>
     <tr>
         <th scope="col">First Name</th>
@@ -19,7 +19,8 @@
     <tbody>
     @foreach (var landlord in Model.UnapprovedLandlords)
     {
-        <tr>
+        <tr class ="clickable"
+            onclick="location.href = '@Url.Action("Profile", "Landlord", new { id = landlord.Id })'">
             <td>@landlord.FirstName</td>
             <td>@landlord.LastName</td>
             <td>@landlord.CompanyName</td>
