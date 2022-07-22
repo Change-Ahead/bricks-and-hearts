@@ -1,19 +1,31 @@
-﻿namespace BricksAndHearts.Services;
+﻿using BricksAndHearts.Auth;
+using Microsoft.Extensions.Options;
 
+namespace BricksAndHearts.Services;
 
-public class ApiService
+public interface IApiService
+{
+    public Task<string> MakeApiRequestToAzureMaps(string postalCode);
+}
+
+public class ApiService : IApiService
 {
     private readonly HttpClient _client = new HttpClient();
     private readonly ILogger<ApiService> _logger;
-    
-    public ApiService(ILogger<ApiService> logger)
+    private readonly IOptions<AzureMapsOptions> _options;
+
+    public ApiService(ILogger<ApiService> logger, IOptions<AzureMapsOptions> options)
     {
         _logger = logger;
+        _options = options;
     }
-    
-    private async Task<string> MakeApiRequest(string uri)
+
+    public async Task<string> MakeApiRequestToAzureMaps(string postalCode)
     {
-        string responseBody = "";
+        string uri =
+            $"https://atlas.microsoft.com/search/address/structured/json?api-version=1.0&countryCode=GB&postalCode={postalCode}&subscription-key={_options.Value.SubscriptionKey}";
+        string responseBody = String.Empty;
+        _logger.LogInformation("Making API Request to {0}",uri);
         try
         {
             HttpResponseMessage response = await _client.GetAsync(uri);
@@ -27,7 +39,6 @@ public class ApiService
         }
         return responseBody;
     }
-    
     // Begin code copied from BusBoard
     /*public static async Task<Dictionary<string,string>> Post2LatLong(string postCode)
     {
