@@ -157,14 +157,14 @@ public class LandlordController : AbstractController
     [HttpGet]
     public ActionResult EditProfilePage(string userEmail, int tabNum)
     {
-        var landlord = _dbContext.Landlords.SingleOrDefault(l => l.Email == userEmail);
+        var landlord = _landlordService.GetLandlordFromEmail(userEmail);
         return View("EditProfilePage", landlord);
     }
 
     [HttpPost]
     public ActionResult EditProfileUpdate([FromForm] LandlordDbModel createModel)
     {
-        var editedLandlord = _landlordService.UpdateLandlord(createModel);
+        var editedLandlord = _landlordService.UpdateEditedLandlord(createModel);
 
         return View("Profile", LandlordProfileModel.FromDbModel(editedLandlord));
     }

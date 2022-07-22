@@ -17,7 +17,8 @@ public interface ILandlordService
 
     public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel,
         BricksAndHeartsUser user);
-    public LandlordDbModel UpdateLandlord(LandlordDbModel createModel);
+    public LandlordDbModel UpdateEditedLandlord(LandlordDbModel createModel);
+    public LandlordDbModel? GetLandlordFromEmail(string userEmail);
 
 }
 
@@ -86,10 +87,10 @@ public class LandlordService : ILandlordService
             .Where(p => p.LandlordId == landlordId).ToList();
     }
 
-    public LandlordDbModel UpdateLandlord(LandlordDbModel createModel)
+    public LandlordDbModel UpdateEditedLandlord(LandlordDbModel createModel)
     {
         var editedLandlord = _dbContext.Landlords.SingleOrDefault(l => l.Id == createModel.Id);
-        editedLandlord.Title = createModel.Title;
+        editedLandlord!.Title = createModel.Title;
         editedLandlord.FirstName = createModel.FirstName;
         editedLandlord.LastName = createModel.LastName;
         editedLandlord.CompanyName = createModel.CompanyName;
@@ -100,5 +101,11 @@ public class LandlordService : ILandlordService
         _dbContext.Update(editedLandlord);
         _dbContext.SaveChanges();
         return editedLandlord;
+    }
+    
+    public LandlordDbModel? GetLandlordFromEmail(string userEmail)
+    {
+        var foundLandlord = _dbContext.Landlords.SingleOrDefault(l => l.Email == userEmail);
+        return foundLandlord;
     }
 }
