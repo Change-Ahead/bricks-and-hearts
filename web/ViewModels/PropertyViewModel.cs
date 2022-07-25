@@ -49,9 +49,9 @@ public class PropertyAddress
 {
     [Required] [StringLength(10000)] public string AddressLine1 { get; set; } = string.Empty;
 
-    [StringLength(10000)] public string AddressLine2 { get; set; } = string.Empty;
+    [StringLength(10000)] public string? AddressLine2 { get; set; }
 
-    [StringLength(10000)] public string AddressLine3 { get; set; } = string.Empty;
+    [StringLength(10000)] public string? AddressLine3 { get; set; }
 
     [Required] [StringLength(10000)] public string TownOrCity { get; set; } = string.Empty;
 
