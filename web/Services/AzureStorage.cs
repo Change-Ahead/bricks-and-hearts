@@ -7,10 +7,10 @@ namespace BricksAndHearts.Services
 {
     public interface IAzureStorage
     {
-        Task<BlobResponseDto> UploadAsync(IFormFile file);
-        //Task<BlobDto> DownloadAsync(string blobFilename);
-        //Task<BlobResponseDto> DeleteAsync(string blobFilename);
-        //Task<List<BlobDto>> ListAsync();
+        Task UploadAsync(IFormFile file);
+        Task<BlobDto> DownloadAsync(string blobFilename);
+        Task DeleteAsync(string blobFilename);
+        Task<List<BlobDto>> ListAsync();
     }
     
     public class AzureStorage : IAzureStorage
@@ -21,14 +21,13 @@ namespace BricksAndHearts.Services
 
         public AzureStorage(IConfiguration configuration, ILogger<AzureStorage> logger)
         {
-            _storageConnectionString = "DefaultEndpointsProtocol=https;AccountName=bnhpropertyimages;AccountKey=6kjyiLjh7FBBr/G+vCf9mWiGDdbsAuHjCXfj7mrsl06ai5H7uRMhPMHlxqx6JxknsBfqY8pMyKI4+AStAOwVHQ==;EndpointSuffix=core.windows.net";
-            _storageContainerName = "test";
+            _storageConnectionString = configuration.GetValue<string>("BlobConnectionString");
+            _storageContainerName = configuration.GetValue<string>("BlobContainerName");
             _logger = logger;
         }
         
-        public async Task<BlobResponseDto> UploadAsync(IFormFile blob)
+        public async Task UploadAsync(IFormFile blob)
         {
-            BlobResponseDto response = new();
             BlobContainerClient container = new BlobContainerClient(_storageConnectionString, _storageContainerName);
             try
             {
@@ -44,9 +43,67 @@ namespace BricksAndHearts.Services
             {
                 //response.Status = $"File with name {blob.FileName} already exists. Please use another name to store your file.";
                 //response.Error = true;
-                return response;
             }
-            return response;
+        }
+        
+        public async Task<BlobDto> DownloadAsync(string blobFilename)
+        {
+            BlobContainerClient client = new BlobContainerClient(_storageConnectionString, _storageContainerName);
+            try
+            {
+                BlobClient file = client.GetBlobClient(blobFilename);
+                if (await file.ExistsAsync())
+                {
+                    var data = await file.OpenReadAsync();
+                    Stream blobContent = data;
+                    var content = await file.DownloadContentAsync();
+                    string name = blobFilename;
+                    string contentType = content.Value.Details.ContentType;
+                    return new BlobDto { Content = blobContent, Name = name, ContentType = contentType };
+                }
+            }
+            catch (RequestFailedException ex)
+                when(ex.ErrorCode == BlobErrorCode.BlobNotFound)
+            {
+                // Log error to console
+                _logger.LogError($"File {blobFilename} was not found.");
+            }
+            // File does not exist, return null and handle that in requesting method
+            return null;
+        }
+        
+        public async Task DeleteAsync(string blobFilename)
+        {
+            BlobContainerClient client = new BlobContainerClient(_storageConnectionString, _storageContainerName);
+            BlobClient file = client.GetBlobClient(blobFilename);
+            try
+            {
+                await file.DeleteAsync();
+                //message confirming successful deletion
+            }
+            catch (RequestFailedException ex)
+                when (ex.ErrorCode == BlobErrorCode.BlobNotFound)
+            {
+                // File did not exist, log to console and return new response to requesting method
+            }
+        }
+        
+        public async Task<List<BlobDto>> ListAsync()
+        {
+            BlobContainerClient container = new BlobContainerClient(_storageConnectionString, _storageContainerName);
+            List<BlobDto> files = new List<BlobDto>();
+            await foreach (BlobItem file in container.GetBlobsAsync())
+            {
+                string uri = container.Uri.ToString();
+                var name = file.Name;
+                var fullUri = $"{uri}/{name}";
+                files.Add(new BlobDto {
+                    Uri = fullUri,
+                    Name = name,
+                    ContentType = file.Properties.ContentType
+                });
+            }
+            return files;
         }
     }
 }
