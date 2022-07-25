@@ -25,18 +25,17 @@ public class LandlordProfileModel
     [DisplayName("Company")]
     public string? CompanyName { get; set; }
 
-    [Required]
-    [EmailAddress]
-    public string Email { get; set; } = string.Empty;
+    [Required] [EmailAddress] public string Email { get; set; } = string.Empty;
 
-    [Phone]
-    public string Phone { get; set; } = string.Empty;
+    [Phone] public string Phone { get; set; } = string.Empty;
 
     public string LandlordStatus { get; set; } = string.Empty;
 
     public bool LandlordProvidedCharterStatus { get; set; } = false;
 
     public bool CharterApproved { get; set; } = false;
+
+    public bool Unassigned { get; set; } = false;
 
     public static LandlordProfileModel FromDbModel(LandlordDbModel landlord)
     {
@@ -53,5 +52,4 @@ public class LandlordProfileModel
             CharterApproved = landlord.CharterApproved
         };
     }
-    
 }

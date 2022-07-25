@@ -65,7 +65,7 @@ namespace BricksAndHearts.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Landlord");
+                    b.ToTable("Landlord", (string)null);
                 });
 
             modelBuilder.Entity("BricksAndHearts.Database.PropertyDbModel", b =>
@@ -76,53 +76,18 @@ namespace BricksAndHearts.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("AddressLine1")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AddressLine2")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("AddressLine3")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("County")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreationTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
+                    b.Property<string>("Address")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("LandlordId")
                         .HasColumnType("int");
 
-                    b.Property<int>("NumOfBedrooms")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Postcode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PropertyType")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("Rent")
-                        .HasColumnType("int");
-
-                    b.Property<string>("TownOrCity")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("LandlordId");
 
-                    b.ToTable("Property");
+                    b.ToTable("Property", (string)null);
                 });
 
             modelBuilder.Entity("BricksAndHearts.Database.UserDbModel", b =>
@@ -163,7 +128,7 @@ namespace BricksAndHearts.Migrations
                         .IsUnique()
                         .HasFilter("[LandlordId] IS NOT NULL");
 
-                    b.ToTable("User");
+                    b.ToTable("User", (string)null);
                 });
 
             modelBuilder.Entity("BricksAndHearts.Database.PropertyDbModel", b =>

@@ -27,13 +27,19 @@ public class LandlordController : AbstractController
 
     [HttpGet]
     [Route("register")]
-    public ActionResult RegisterGet()
+    public ActionResult RegisterGet(bool createUnassigned = false)
     {
         var currentUser = GetCurrentUser();
-        if (currentUser.LandlordId != null)
+        if (currentUser.LandlordId != null && !currentUser.IsAdmin)
         {
             _logger.LogWarning("User {UserId} is already registered, will redirect to profile", currentUser.Id);
             return Redirect(Url.Action("MyProfile")!);
+        }
+
+        // If user is an admin, and there was a true createUnassigned param passed
+        if (currentUser.IsAdmin && createUnassigned)
+        {
+            return View("Register", new LandlordProfileModel { Unassigned = true });
         }
 
         return View("Register", new LandlordProfileModel
@@ -53,15 +59,25 @@ public class LandlordController : AbstractController
         }
 
         var user = GetCurrentUser();
+        var result = ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord;
 
-        var result =
-            await _landlordService.RegisterLandlordWithUser(createModel,
-                user); //TODO: CHANGE THIS TO NOT REQUIRE A USER TO LINK TO
+        if (createModel.Unassigned)
+        {
+            result =
+                await _landlordService.RegisterLandlord(createModel);
+        }
+        else
+        {
+            result =
+                await _landlordService.RegisterLandlord(createModel,
+                    user);
+        }
+
 
         switch (result)
         {
             case ILandlordService.LandlordRegistrationResult.Success:
-                _logger.LogInformation("Successfully created landlord for user {UserId}", user.Id);
+                _logger.LogInformation("Successfully created landlord for user");
                 return Redirect(Url.Action("MyProfile")!);
 
             case ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered:

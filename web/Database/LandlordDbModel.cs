@@ -14,12 +14,16 @@ public class LandlordDbModel
     public string Phone { get; set; } = null!;
 
     //Type of landlord
-    public string LandlordStatus { get; set; } = null!; 
+    public string LandlordStatus { get; set; } = null!;
+
     //Whether the landlord claims to have signed the charter
     public bool LandlordProvidedCharterStatus { get; set; } = false;
+
     //Whether the charter has been approved by an admin
     public bool CharterApproved { get; set; } = false;
 
     public virtual UserDbModel? User { get; set; }
     public virtual List<PropertyDbModel> Properties { get; set; } = new();
+
+    public Guid? InviteLink { get; set; } = null; //Nullable & initialised as null as it should be the default value
 }
