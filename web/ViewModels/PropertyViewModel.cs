@@ -6,6 +6,7 @@ namespace BricksAndHearts.ViewModels;
 
 public class PropertyViewModel
 {
+    public int PropertyId;
     public PropertyAddress Address { get; set; } = new();
 
     [StringLength(10000)] public string? PropertyType { get; set; }
@@ -25,6 +26,7 @@ public class PropertyViewModel
     {
         return new PropertyViewModel
         {
+            PropertyId =  property.Id,
             PropertyType = property.PropertyType,
             NumOfBedrooms = property.NumOfBedrooms,
             CreationTime = property.CreationTime,

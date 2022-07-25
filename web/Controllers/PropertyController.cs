@@ -1,4 +1,5 @@
-﻿using BricksAndHearts.Services;
+﻿using BricksAndHearts.Database;
+using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -122,5 +123,22 @@ public class PropertyController : AbstractController
 
         // Go to View Properties page
         return RedirectToAction("ViewProperties", "Landlord");
+    }
+
+    [HttpGet]
+    [Route("/property/view")]
+    public ActionResult ViewProperty(int propertyId)
+    {
+        PropertyDbModel? model = _propertyService.GetPropertyByPropertyId(propertyId);
+        if (model == null)
+        {
+            _logger.LogWarning("View property did not return the property as expected");
+            return RedirectToAction(nameof(LandlordController.ViewProperties), "Landlord");
+        }
+        else
+        {
+            PropertyViewModel propertyViewModel = PropertyViewModel.FromDbModel(model);
+            return View(propertyViewModel);
+        }
     }
 }
