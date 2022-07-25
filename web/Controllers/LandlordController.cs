@@ -54,7 +54,9 @@ public class LandlordController : AbstractController
 
         var user = GetCurrentUser();
 
-        var result = await _landlordService.RegisterLandlordWithUser(createModel, user);
+        var result =
+            await _landlordService.RegisterLandlordWithUser(createModel,
+                user); //TODO: CHANGE THIS TO NOT REQUIRE A USER TO LINK TO
 
         switch (result)
         {
@@ -82,6 +84,7 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> Profile([FromRoute] int id)
     {
         var user = GetCurrentUser();
+
         if (user.LandlordId != id && !user.IsAdmin)
         {
             return StatusCode(403);
