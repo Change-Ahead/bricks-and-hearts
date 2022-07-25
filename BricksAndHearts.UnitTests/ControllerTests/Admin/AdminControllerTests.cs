@@ -1,4 +1,6 @@
-﻿using BricksAndHearts.ViewModels;
+﻿using BricksAndHearts.Controllers;
+using BricksAndHearts.Services;
+using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -9,6 +11,9 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Admin;
 
 public class AdminControllerTests : AdminControllerTestsBase
 {
+    private static readonly IAdminService adminService = A.Fake<IAdminService>();
+    private readonly AdminController _underTest = new(null!, adminService);
+    
     [Fact]
     public void Index_WhenCalledByAnonymousUser_ReturnsViewWithLoginLink()
     {

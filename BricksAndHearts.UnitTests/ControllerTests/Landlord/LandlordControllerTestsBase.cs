@@ -1,4 +1,4 @@
-﻿using BricksAndHearts.Controllers;
+using BricksAndHearts.Controllers;
 using BricksAndHearts.Services;
 using FakeItEasy;
 
