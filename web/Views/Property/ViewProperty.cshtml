@@ -4,6 +4,37 @@
     ViewData["Title"] = "View Property";
 }
 
-<h2>View property</h2>
-@Model.PropertyId
-@Model.Address.AddressLine1
+<div class="container">
+    <div class="row mb-3">
+        <h3>View property</h3>
+    </div>
+    <div class="row mb-3">
+        <div class="col-7 border ml-3">
+            <p>@Model.Address.AddressLine1</p>
+            <p>Current rental: TODO</p>
+            <p>Looking for tenant: TODO</p>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-4">
+            <h4>Property details</h4>
+        </div>
+        <div class="col-4">
+            <h4>Letting Profile</h4>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-4">
+            <table class="table table-bordered">
+                <tr>
+                    <td>Address</td>
+                    <td>@Model.Address.AddressLine1</td>
+                </tr>
+            </table>
+            
+        </div>
+        <div class="col-4">
+            TBC...
+        </div>
+    </div>
+</div>
