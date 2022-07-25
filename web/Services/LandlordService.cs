@@ -15,9 +15,8 @@ public interface ILandlordService
         Success
     }
 
-    public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel, BricksAndHeartsUser user);
-    public List<PropertyDbModel> GetListOfProperties(int landlordId);
-
+    public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel,
+        BricksAndHeartsUser user);
 }
 
 public class LandlordService : ILandlordService
@@ -56,7 +55,10 @@ public class LandlordService : ILandlordService
 
             // Check the user doesn't already have a landlord associated
             var userRecord = _dbContext.Users.Single(u => u.Id == user.Id);
-            if (userRecord.LandlordId != null) return ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord;
+            if (userRecord.LandlordId != null)
+            {
+                return ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord;
+            }
 
             // Insert the landlord and call SaveChanges
             // Entity Framework will insert the record and populate dbModel.Id with the new record's id
@@ -74,11 +76,5 @@ public class LandlordService : ILandlordService
         user.LandlordId = dbModel.Id;
 
         return ILandlordService.LandlordRegistrationResult.Success;
-    }
-
-    public List<PropertyDbModel> GetListOfProperties(int landlordId)
-    {
-        return _dbContext.Properties
-            .Where(p => p.LandlordId == landlordId).ToList();
     }
 }

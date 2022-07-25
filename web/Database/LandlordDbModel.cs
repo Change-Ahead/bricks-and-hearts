@@ -21,5 +21,5 @@ public class LandlordDbModel
     public bool CharterApproved { get; set; } = false;
 
     public virtual UserDbModel? User { get; set; }
-    public virtual List<PropertyDbModel>? Properties { get; set; }
+    public virtual List<PropertyDbModel> Properties { get; set; } = new();
 }

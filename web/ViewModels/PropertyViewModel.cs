@@ -1,17 +1,61 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using BricksAndHearts.Database;
 
 namespace BricksAndHearts.ViewModels;
 
 public class PropertyViewModel
 {
-    [Required] public string Address { get; set; } = string.Empty;
+    [Required] public PropertyAddress Address { get; set; } = new();
+
+    [Required] [StringLength(10000)] public string PropertyType { get; set; } = string.Empty;
+
+    [Required]
+    [Range(0, 1000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
+    [DisplayName("Number of Bedrooms")]
+    public int NumOfBedrooms { get; set; }
+
+    public DateTime CreationTime { get; set; } = DateTime.Now;
+
+    [Required]
+    [Range(0, 100000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
+    public int Rent { get; set; }
+
+    [Required] [StringLength(20000)] public string Description { get; set; } = string.Empty;
 
     public static PropertyViewModel FromDbModel(PropertyDbModel property)
     {
         return new PropertyViewModel
         {
-            Address = property.Address,
+            PropertyType = property.PropertyType ?? string.Empty,
+            NumOfBedrooms = property.NumOfBedrooms.GetValueOrDefault(0),
+            CreationTime = property.CreationTime.GetValueOrDefault(DateTime.Now),
+            Rent = property.Rent.GetValueOrDefault(0),
+            Description = property.Description ?? string.Empty,
+            Address = new PropertyAddress
+            {
+                AddressLine1 = property.AddressLine1!,
+                AddressLine2 = property.AddressLine2 ?? string.Empty,
+                AddressLine3 = property.AddressLine3 ?? string.Empty,
+                TownOrCity = property.TownOrCity!,
+                County = property.County!,
+                Postcode = property.Postcode!
+            }
         };
     }
+}
+
+public class PropertyAddress
+{
+    [Required] [StringLength(10000)] public string AddressLine1 { get; set; } = string.Empty;
+
+    [StringLength(10000)] public string? AddressLine2 { get; set; }
+
+    [StringLength(10000)] public string? AddressLine3 { get; set; }
+
+    [Required] [StringLength(10000)] public string TownOrCity { get; set; } = string.Empty;
+
+    [Required] [StringLength(10000)] public string County { get; set; } = string.Empty;
+
+    [Required] [StringLength(100)] public string Postcode { get; set; } = string.Empty;
 }

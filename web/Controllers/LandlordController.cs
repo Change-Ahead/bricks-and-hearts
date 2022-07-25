@@ -13,14 +13,16 @@ public class LandlordController : AbstractController
 {
     private readonly BricksAndHeartsDbContext _dbContext;
     private readonly ILandlordService _landlordService;
+    private readonly IPropertyService _propertyService;
     private readonly ILogger<LandlordController> _logger;
 
     public LandlordController(ILogger<LandlordController> logger, BricksAndHeartsDbContext dbContext,
-        ILandlordService landlordService)
+        ILandlordService landlordService, IPropertyService propertyService)
     {
         _dbContext = dbContext;
         _logger = logger;
         _landlordService = landlordService;
+        _propertyService = propertyService;
     }
 
     [HttpGet]
@@ -108,6 +110,8 @@ public class LandlordController : AbstractController
         return await Profile(landlordId.Value);
     }
 
+    [HttpGet]
+    [Route("/properties")]
     public IActionResult ViewProperties()
     {
         var landlordId = GetCurrentUser().LandlordId;
@@ -116,8 +120,37 @@ public class LandlordController : AbstractController
             return StatusCode(403);
         }
 
-        var databaseResult = _landlordService.GetListOfProperties(landlordId.Value);
+        var databaseResult = _propertyService.GetPropertiesByLandlord(landlordId.Value);
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
         return View("Properties", new PropertiesDashboardViewModel(listOfProperties));
+    }
+
+    [HttpGet]
+    [Route("/add-property")]
+    public IActionResult AddNewProperty()
+    {
+        return View();
+    }
+
+    [HttpPost]
+    [Route("/add-property")]
+    public ActionResult AddNewProperty([FromForm] PropertyViewModel newPropertyModel)
+    {
+        var landlordId = GetCurrentUser().LandlordId;
+        if (!landlordId.HasValue)
+        {
+            return StatusCode(403);
+        }
+
+        // This does checks based on the annotations (e.g. [Required]) on PropertyViewModel
+        if (!ModelState.IsValid)
+        {
+            return View(newPropertyModel);
+        }
+
+        // add property to database
+        _propertyService.AddNewProperty(newPropertyModel, landlordId.Value);
+
+        return RedirectToAction("ViewProperties");
     }
 }
