@@ -8,13 +8,15 @@ public class PropertyDbModel
     public int Id { get; set; }
     public int LandlordId { get; set; }
     public virtual LandlordDbModel Landlord { get; set; } = null!;
+    public bool IsIncomplete { get; set; }
 
-    public string? AddressLine1 { get; set; } // Will be fixed properly by BNH-34
+    // Address line 1 and postcode are always required
+    public string AddressLine1 { get; set; } = string.Empty;
     public string? AddressLine2 { get; set; }
     public string? AddressLine3 { get; set; }
     public string? TownOrCity { get; set; }
     public string? County { get; set; }
-    public string? Postcode { get; set; }
+    public string Postcode { get; set; } = string.Empty;
 
     public string? PropertyType { get; set; }
     public int? NumOfBedrooms { get; set; }
