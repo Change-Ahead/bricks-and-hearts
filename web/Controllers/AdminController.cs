@@ -86,7 +86,7 @@ public class AdminController : AbstractController
 
     [Authorize(Roles="Admin")]
     [HttpPost]
-    public async Task<ActionResult> AcceptAdminRequest(int userToAcceptId)
+    public ActionResult AcceptAdminRequest(int userToAcceptId)
     {
         _adminService.ApproveAdminAccessRequest(userToAcceptId);
 

@@ -54,7 +54,7 @@ public class AdminService : IAdminService
         return (await GetCurrentAdmins(), await GetPendingAdmins());
     }
 
-    public async void ApproveAdminAccessRequest(int userId)
+    public void ApproveAdminAccessRequest(int userId)
     {
         var userToAdmin = _dbContext.Users.SingleOrDefault(u => u.Id == userId);
         userToAdmin.IsAdmin = true;
