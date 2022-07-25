@@ -59,8 +59,8 @@ input.invalid {
 }
 
 .tables{
-  display:inline-block;
-  clear:both;
+  display: inline-block;
+  clear: both;
 }
 
 .tables .table{
