@@ -41,7 +41,19 @@ public class AdminService : IAdminService
         userRecord.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
     }
-    
+
+    private async Task<List<UserDbModel>> GetCurrentAdmins()
+    {
+        List<UserDbModel> CurrentAdmins = await _dbContext.Users.Where(u => u.IsAdmin == true).ToListAsync();
+        return CurrentAdmins;
+    }
+
+    private async Task<List<UserDbModel>> GetPendingAdmins()
+    {
+        List<UserDbModel> PendingAdmins = await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
+        return PendingAdmins;
+    }
+
     public async Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists()
     {
         return (await GetCurrentAdmins(), await GetPendingAdmins());
@@ -114,9 +126,10 @@ public class AdminService : IAdminService
             await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
         return pendingAdmins;
     }
-    public async void ApproveAdminAccessRequest(int userId)
+    
+    public void ApproveAdminAccessRequest(int userId)
     {
-        var userToAdmin = _dbContext.Users.SingleOrDefault(u => u.Id == userId);
+        var userToAdmin = _dbContext.Users.SingleOrDefault(u => u.Id == userId)!;
         userToAdmin.IsAdmin = true;
         userToAdmin.HasRequestedAdmin = false;
         _dbContext.SaveChanges();

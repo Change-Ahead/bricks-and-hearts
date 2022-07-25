@@ -56,4 +56,29 @@ public class AdminControllerTests : AdminControllerTestsBase
         A.CallTo(() => AdminService.GetLandlordDisplayList("")).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<LandlordListModel?>();
     }
+
+    [Fact]
+    public void GetAdminList_ReturnsViewWithAdminListModel()
+    {
+        // Arrange
+        
+        // Act
+        var result = _underTest.GetAdminList().Result as ViewResult;
+
+        // Assert
+        result!.Model.Should().BeOfType<AdminListModel>();
+    }
+
+    [Fact]
+    public void AcceptAdminRequest_Calls_ApproveAdminAccessRequest()
+    {
+        // Arrange
+        var dummyId = 1;
+
+        // Act
+        var result = _underTest.AcceptAdminRequest(dummyId);
+        
+        // Assert
+        A.CallTo(() => _underTestService.ApproveAdminAccessRequest(dummyId)).MustHaveHappened();
+    }
 }
