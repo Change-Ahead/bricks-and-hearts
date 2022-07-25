@@ -1,3 +1,4 @@
+using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
@@ -35,31 +36,32 @@ public class AdminController : AbstractController
         var user = GetCurrentUser();
         if (user.IsAdmin)
         {
-            LoggerAlreadyAdminWarning(user);
+            LoggerAlreadyAdminWarning(_logger, user);
 
             return RedirectToAction(nameof(Index));
         }
 
         _adminService.RequestAdminAccess(user);
         
-        FlashRequestSuccess(user, "requested admin access");
+        FlashRequestSuccess(_logger, user, "requested admin access");
         
         return RedirectToAction(nameof(Index));
     }
     
+
     public IActionResult CancelAdminAccessRequest()
     {
         var user = GetCurrentUser();
         if (user.IsAdmin)
         {
-            LoggerAlreadyAdminWarning(user);
+            LoggerAlreadyAdminWarning(_logger, user);
 
             return RedirectToAction(nameof(Index));
         }
 
         _adminService.CancelAdminAccessRequest(user);
         
-        FlashRequestSuccess(user, "cancelled admin access request");
+        FlashRequestSuccess(_logger, user, "cancelled admin access request");
         
         return RedirectToAction(nameof(Index));
     }
