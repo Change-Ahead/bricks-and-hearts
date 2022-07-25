@@ -29,7 +29,7 @@ public class ControllerTestsBase
             GoogleUserName = "John Doe",
             GoogleEmail = "test.email@gmail.com",
             IsAdmin = false,
-            LandlordId = null,
+            LandlordId = null
         };
 
         var unregisteredUser = new BricksAndHeartsUser(userDbModel, new List<Claim>(), "google");
@@ -44,7 +44,7 @@ public class ControllerTestsBase
             GoogleUserName = "John Doe",
             GoogleEmail = "test.email@gmail.com",
             IsAdmin = true,
-            LandlordId = null,
+            LandlordId = null
         };
 
         var adminUser = new BricksAndHeartsUser(userDbModel, new List<Claim>(), "google");
@@ -59,7 +59,7 @@ public class ControllerTestsBase
             GoogleUserName = "John Doe",
             GoogleEmail = "test.email@gmail.com",
             IsAdmin = false,
-            LandlordId = 1,
+            LandlordId = 1
         };
 
         var landlordDbModel = new LandlordDbModel()

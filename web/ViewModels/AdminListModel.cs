@@ -9,7 +9,6 @@ public class AdminListModel
         CurrentAdmins = currentAdmins;
         PendingAdmins = pendingAdmins;
     }
-    
     public List<UserDbModel> CurrentAdmins { get; set; }
     public List<UserDbModel> PendingAdmins { get; set; }
 }
