@@ -11,11 +11,11 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
 
 public class LandlordControllerTestsBase : ControllerTestsBase
 {
-    protected readonly IPropertyService PropertyService;
+    protected readonly LandlordController UnderTest;
     protected readonly ILandlordService LandlordService;
     protected readonly Logger<LandlordController> Logger;
     protected readonly MailService MailService;
-    protected readonly LandlordController UnderTest;
+    protected readonly IPropertyService PropertyService;
 
     protected LandlordControllerTestsBase()
     {

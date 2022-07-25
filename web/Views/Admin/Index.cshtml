@@ -20,6 +20,7 @@
             <p>
                 Logged in as @Model.CurrentUser.GoogleName
             </p>
+            <a asp-action="RegisterGet" asp-controller="Landlord" asp-route-createUnassigned="true">Create Unassigned Landlord</a>
             if (Model.CurrentUser.IsAdmin)
             {
                 <p>You are an admin :)</p>
