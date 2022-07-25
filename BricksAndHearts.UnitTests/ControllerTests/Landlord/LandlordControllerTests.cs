@@ -60,16 +60,13 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     public void AddNewPropertyPost_WithValidModel_CallsPropertyServiceMethod_AndRedirects()
     {
         // Arrange
-        var propertyService = A.Fake<IPropertyService>();
-
-        var controller = new LandlordController(null!, null!, new LandlordService(null!), propertyService);
         var landlordUser = CreateLandlordUser();
         MakeUserPrincipalInController(landlordUser, _underTest);
 
         var formResultModel = A.Fake<PropertyViewModel>();
 
         // Act
-        var result = controller.AddNewProperty(formResultModel);
+        var result = _underTest.AddNewProperty(formResultModel);
 
         // Assert
         A.CallTo(() => propertyService.AddNewProperty(formResultModel, 1)).MustHaveHappened();

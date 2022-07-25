@@ -2,13 +2,14 @@
 using BricksAndHearts.Controllers;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
+using FakeItEasy;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
 
 public class LandlordControllerTestsBase : ControllerTestsBase
 {
-    protected readonly LandlordController _underTest = new(null!, null!, new LandlordService(null!),
-        new PropertyService(null!));
+    public static readonly IPropertyService propertyService = A.Fake<IPropertyService>();
+    protected readonly LandlordController _underTest = new(null!, null!, new LandlordService(null!), propertyService);
 
     protected PropertyViewModel CreateExamplePropertyViewModel()
     {
