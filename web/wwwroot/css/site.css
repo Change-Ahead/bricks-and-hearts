@@ -58,11 +58,11 @@ input.invalid {
   background-color: #04AA6D;
 }
 
-.tables{
+.tables {
   display: inline-block;
   clear: both;
 }
 
-.tables .table{
+.tables .table {
   width: 100%;
 }
