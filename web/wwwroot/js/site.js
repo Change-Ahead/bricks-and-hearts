@@ -50,6 +50,7 @@ function validateForm() {
         {
             // add an "invalid" class to the field:
             tabInputList[tabInputIterator].className += " invalid";
+            tabInputList[tabInputIterator].value =""
             // and set the current valid status to false:
             valid = false;
         }
