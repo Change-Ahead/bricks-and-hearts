@@ -1,6 +1,9 @@
 ﻿using System.Security.Claims;
 using System.Threading.Tasks;
+using BricksAndHearts.Controllers;
+using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
+using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -42,5 +45,35 @@ public class AdminControllerTests : AdminControllerTestsBase
 
         // Assert
         result!.ViewData.Model.Should().BeOfType<AdminListModel>() ;
+    }
+
+    [Fact]
+    public void GetAdminList_ReturnsViewWith_AdminListModel()
+    {
+        // Arrange
+        var fakeAdminService = A.Fake<IAdminService>();
+        var fakeAdminController = new AdminController(null!, null!, fakeAdminService);
+        
+        // Act
+        var result = fakeAdminController.GetAdminList().Result as ViewResult;
+
+        // Assert
+        result!.Model.Should().BeOfType<AdminListModel>();
+    }
+
+    [Fact]
+    public void AcceptAdminRequest_Calls_ApproveAdminAccessRequest()
+    {
+        // Arrange
+        var fakeAdminService = A.Fake<IAdminService>();
+        var fakeAdminController = new AdminController(null!, null!, fakeAdminService);
+        var adminListModel = CreateTestAdminListModel();
+        var dummyId = A.Dummy<int>();
+
+        // Act
+        var result = fakeAdminController.AcceptAdminRequest(adminListModel, dummyId);
+        
+        // Assert
+        A.CallTo(() => fakeAdminService.ApproveAdminAccessRequest(dummyId)).MustHaveHappened();
     }
 }
