@@ -74,7 +74,6 @@ public class LandlordService : ILandlordService
         }
 
         user.LandlordId = dbModel.Id;
-
         return ILandlordService.LandlordRegistrationResult.Success;
     }
 }

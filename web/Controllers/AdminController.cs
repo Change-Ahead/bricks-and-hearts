@@ -11,14 +11,12 @@ public class AdminController : AbstractController
     private readonly BricksAndHeartsDbContext _dbContext;
     private readonly IAdminService _adminService;
     private readonly ILogger<HomeController> _logger;
-    private readonly IAzureStorage _azureStorage;
 
-    public AdminController(ILogger<HomeController> logger, BricksAndHeartsDbContext dbContext, IAdminService adminService, IAzureStorage azureStorage)
+    public AdminController(ILogger<HomeController> logger, BricksAndHeartsDbContext dbContext, IAdminService adminService)
     {
         _logger = logger;
         _adminService = adminService;
         _dbContext = dbContext;
-        _azureStorage = azureStorage;
     }
     
     public IActionResult Index()
@@ -81,18 +79,5 @@ public class AdminController : AbstractController
         var adminLists = await _adminService.GetAdminLists();
         AdminListModel adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
         return View(adminListModel);
-    }
-    
-    [HttpPost("UploadFiles")]
-    public async Task<IActionResult> ImageUpload(List<IFormFile> images)
-    {
-        foreach (var image in images)
-        {
-            if (image.Length > 0)
-            {
-                await _azureStorage.UploadAsync(image);
-            }
-        }
-        return RedirectToAction(nameof(Index));
     }
 }

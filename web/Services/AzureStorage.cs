@@ -25,7 +25,14 @@ namespace BricksAndHearts.Services
             _storageContainerName = configuration.GetValue<string>("BlobContainerName");
             _logger = logger;
         }
-        
+
+        private async Task CreateContainerAsync(int id)
+        {
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_storageConnectionString);
+            string containerName = id.ToString(); // + Guid.NewGuid();
+            await blobServiceClient.CreateBlobContainerAsync(containerName);
+        }
+
         public async Task UploadAsync(IFormFile blob)
         {
             BlobContainerClient container = new BlobContainerClient(_storageConnectionString, _storageContainerName);
