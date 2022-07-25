@@ -36,14 +36,14 @@ public class AdminController : AbstractController
         var user = GetCurrentUser();
         if (user.IsAdmin)
         {
-            LoggerAlreadyAdminWarning(user);
+            LoggerAlreadyAdminWarning(_logger, user);
 
             return RedirectToAction(nameof(Index));
         }
 
         _adminService.RequestAdminAccess(user);
         
-        FlashRequestSuccess(user, "requested admin access");
+        FlashRequestSuccess(_logger, user, "requested admin access");
         
         return RedirectToAction(nameof(Index));
     }
@@ -54,14 +54,14 @@ public class AdminController : AbstractController
         var user = GetCurrentUser();
         if (user.IsAdmin)
         {
-            LoggerAlreadyAdminWarning(user);
+            LoggerAlreadyAdminWarning(_logger, user);
 
             return RedirectToAction(nameof(Index));
         }
 
         _adminService.CancelAdminAccessRequest(user);
         
-        FlashRequestSuccess(user, "cancelled admin access request");
+        FlashRequestSuccess(_logger, user, "cancelled admin access request");
         
         return RedirectToAction(nameof(Index));
     }
@@ -75,26 +75,4 @@ public class AdminController : AbstractController
         return View(adminListModel);
     }
     
-    private void FlashRequestSuccess(BricksAndHeartsUser user, string requestType)
-    {
-        FlashMessage(
-            ($"Successfully {requestType} for user {user.Id}",
-                "success",
-                $"Successfully {requestType}"));
-    }
-
-    private void LoggerAlreadyAdminWarning(BricksAndHeartsUser user)
-    {
-        FlashMessage(
-            ($"User {user.Id} already an admin", 
-                "danger", 
-                "Already an admin"));
-    }
-
-    private void FlashMessage((string logInfo,string flashtype, string flashmessage) flash)
-    {
-        _logger.LogInformation(flash.logInfo);
-        TempData["FlashType"] = flash.flashtype;
-        TempData["FlashMessage"] = flash.flashmessage;
-    }
 }
