@@ -9,7 +9,7 @@ public interface IApiService
 {
     public Task<string> MakeApiRequestToAzureMaps(string postalCode);
     public Task<PropertyViewModel> AutofillAddress(PropertyViewModel model);
-
+    public PostcodeApiResponseViewModel TurnResponseBodyToModel(string responseBody);
 }
 
 public class ApiService : IApiService
@@ -43,6 +43,7 @@ public class ApiService : IApiService
         }
         return responseBody;
     }
+    
     public PostcodeApiResponseViewModel TurnResponseBodyToModel(string responseBody)
     {
         if (string.IsNullOrEmpty(responseBody))
