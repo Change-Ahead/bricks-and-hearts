@@ -29,23 +29,6 @@ public class AdminControllerTests : AdminControllerTestsBase
         result!.ViewData.Model.Should().BeOfType<AdminViewModel>()
             .Which.CurrentUser.Should().BeNull();
     }
-    
-    [Fact]
-    public async Task GetAdminList_WhenCalledByAdmin_ReturnsViewWithAdminList()
-    {
-        // Arrange 
-        var adminUser = CreateAdminUserInController(_underTest);
-        _underTest.ControllerContext = new ControllerContext
-        {
-            HttpContext = new DefaultHttpContext { User = new ClaimsPrincipal(adminUser) }
-        };
-
-        // Act
-        var result = await _underTest.GetAdminList() as ViewResult;
-
-        // Assert
-        result!.ViewData.Model.Should().BeOfType<AdminListModel>() ;
-    }
 
     [Fact]
     public void GetAdminList_ReturnsViewWith_AdminListModel()
@@ -67,11 +50,10 @@ public class AdminControllerTests : AdminControllerTestsBase
         // Arrange
         var fakeAdminService = A.Fake<IAdminService>();
         var fakeAdminController = new AdminController(null!, null!, fakeAdminService);
-        var adminListModel = CreateTestAdminListModel();
         var dummyId = A.Dummy<int>();
 
         // Act
-        var result = fakeAdminController.AcceptAdminRequest(adminListModel, dummyId);
+        var result = fakeAdminController.AcceptAdminRequest(dummyId);
         
         // Assert
         A.CallTo(() => fakeAdminService.ApproveAdminAccessRequest(dummyId)).MustHaveHappened();

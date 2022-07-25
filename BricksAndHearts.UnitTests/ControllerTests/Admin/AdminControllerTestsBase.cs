@@ -9,10 +9,6 @@ public class AdminControllerTestsBase: ControllerTestsBase
 
     protected AdminListModel CreateTestAdminListModel()
     {
-        return new AdminListModel()
-        {
-            CurrentAdmins = null!,
-            PendingAdmins = null!
-        };
+        return new AdminListModel(null!, null!);
     }
 }

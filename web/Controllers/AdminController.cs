@@ -77,19 +77,16 @@ public class AdminController : AbstractController
     [Route("AdminList")]
     public async Task<IActionResult> GetAdminList()
     {
-        AdminListModel adminListModel = new AdminListModel();
-        
         var adminLists = await _adminService.GetAdminLists();
         
-        adminListModel.CurrentAdmins = adminLists.CurrentAdmins;
-        adminListModel.PendingAdmins = adminLists.PendingAdmins;
+        AdminListModel adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
         
         return View("AdminList", adminListModel);
     }
 
     [Authorize(Roles="Admin")]
     [HttpPost]
-    public async Task<ActionResult> AcceptAdminRequest(AdminListModel userToAcceptList, int userToAcceptId)
+    public async Task<ActionResult> AcceptAdminRequest(int userToAcceptId)
     {
         _adminService.ApproveAdminAccessRequest(userToAcceptId);
 
