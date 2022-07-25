@@ -12,6 +12,7 @@ public class PropertyViewModel : IValidatableObject
 
 
     // Address
+    public int LandlordId { get; set; }
     public PropertyAddress Address { get; set; } = new();
 
 
@@ -50,6 +51,8 @@ public class PropertyViewModel : IValidatableObject
         return new PropertyViewModel
         {
             PropertyId = property.Id,
+            PropertyId =  property.Id,
+            LandlordId = property.LandlordId,
             PropertyType = property.PropertyType,
             NumOfBedrooms = property.NumOfBedrooms,
             CreationTime = property.CreationTime,

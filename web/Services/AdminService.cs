@@ -9,7 +9,8 @@ public interface IAdminService
     public void RequestAdminAccess(BricksAndHeartsUser user);
     public void CancelAdminAccessRequest(BricksAndHeartsUser user);
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
-
+    public Task<List<PropertyDbModel>> GetPropertyList();
+    public Task<LandlordDbModel> GetLandlordDbModelFromId(int landlordId);
     public Task<List<LandlordDbModel>> GetLandlordDisplayList(string approvalStatus);
     public UserDbModel? FindUserByLandlordId(int landlordId);
     public string? FindExistingInviteLink(int landlordId);
@@ -148,5 +149,15 @@ public class AdminService : IAdminService
     {
         List<LandlordDbModel> UnapprovedLandlords = await _dbContext.Landlords.Where(u => u.CharterApproved == false).ToListAsync();
         return UnapprovedLandlords;
+    }
+
+    public async Task<List<PropertyDbModel>> GetPropertyList()
+    {
+        return await _dbContext.Properties.ToListAsync();
+    }
+
+    public async Task<LandlordDbModel> GetLandlordDbModelFromId(int landlordId)
+    {
+        return await _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == landlordId);
     }
 }
