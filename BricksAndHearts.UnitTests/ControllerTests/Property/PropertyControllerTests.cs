@@ -93,7 +93,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         result!.ViewName.Should().Be("AddNewProperty");
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).MustHaveHappened();
         result.Model.Should().BeOfType<AddNewPropertyViewModel>().Which.Step.Should().Be(2);
-        result.Model.Should().BeOfType<AddNewPropertyViewModel>().Which.Property!.Description.Should().BeEmpty();
+        result.Model.Should().BeOfType<AddNewPropertyViewModel>().Which.Property!.Description.Should().BeNull();
     }
 
     [Fact]
@@ -118,6 +118,31 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
+    public void AddNewPropertyContinuePost_AtStep1_WithoutAddress1AndPostcode_ReturnsViewWithModel()
+    {
+        // Arrange
+        var propertyService = A.Fake<IPropertyService>();
+        A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(null);
+
+        var controller = new PropertyController(propertyService, null!);
+        CreateRegisteredUserInController(controller);
+
+        var formResultModel = new PropertyViewModel
+        {
+            Address = new PropertyAddress()
+        };
+
+        // Act
+        var result = controller.AddNewProperty_Continue(1, formResultModel) as ViewResult;
+
+        // Assert
+        A.CallTo(() => propertyService.AddNewProperty(1, formResultModel, true)).MustNotHaveHappened();
+        A.CallTo(() => propertyService.UpdateProperty(1, formResultModel, true)).MustNotHaveHappened();
+        result!.ViewData.Model.Should().BeOfType<AddNewPropertyViewModel>().Which.Property.Should()
+            .BeOfType<PropertyViewModel>().And.Be(formResultModel);
+    }
+
+    [Fact]
     public void AddNewPropertyContinuePost_AtStep1_CreatesNewRecord_AndRedirectsToNextStep()
     {
         // Arrange
@@ -127,7 +152,14 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var controller = new PropertyController(propertyService, null!);
         CreateRegisteredUserInController(controller);
 
-        var formResultModel = A.Fake<PropertyViewModel>();
+        var formResultModel = new PropertyViewModel
+        {
+            Address = new PropertyAddress
+            {
+                AddressLine1 = "Line 1",
+                Postcode = "Postcode"
+            }
+        };
 
         // Act
         var result = controller.AddNewProperty_Continue(1, formResultModel);
