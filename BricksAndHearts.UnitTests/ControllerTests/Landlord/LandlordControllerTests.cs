@@ -72,4 +72,19 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         A.CallTo(() => propertyService.AddNewProperty(formResultModel, 1)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
     }
+    
+    [Fact]
+    public async void ApproveCharter_CallsApproveLandlord()
+    {
+        // Arrange 
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, _underTest);
+        var landlord = CreateLandlordUser();
+
+        // Act
+        var result = await _underTest.ApproveCharter(landlord.Id) as ViewResult;
+
+        // Assert
+        A.CallTo(() => landlordService.ApproveLandlord(landlord.Id, adminUser)).MustHaveHappened();
+    }
 }
