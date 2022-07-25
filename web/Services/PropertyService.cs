@@ -36,12 +36,13 @@ public class PropertyService : IPropertyService
             CreationTime = DateTime.Now,
             IsIncomplete = isIncomplete,
 
-            AddressLine1 = createModel.Address!.AddressLine1,
+            // Address line 1 and postcode should not be null by this point
+            AddressLine1 = createModel.Address.AddressLine1!,
             AddressLine2 = createModel.Address.AddressLine2,
             AddressLine3 = createModel.Address.AddressLine3,
             TownOrCity = createModel.Address.TownOrCity,
             County = createModel.Address.County,
-            Postcode = createModel.Address.Postcode,
+            Postcode = createModel.Address.Postcode!,
 
             PropertyType = createModel.PropertyType,
             NumOfBedrooms = createModel.NumOfBedrooms,
@@ -61,15 +62,14 @@ public class PropertyService : IPropertyService
     {
         var dbModel = _dbContext.Properties.Single(p => p.Id == propertyId);
 
-        if (updateModel.Address != null)
-        {
-            dbModel.AddressLine1 = updateModel.Address.AddressLine1;
-            dbModel.AddressLine2 = updateModel.Address.AddressLine2;
-            dbModel.AddressLine3 = updateModel.Address.AddressLine3;
-            dbModel.TownOrCity = updateModel.Address.TownOrCity;
-            dbModel.County = updateModel.Address.County;
-            dbModel.Postcode = updateModel.Address.Postcode;
-        }
+        // Update fields if they have been set (i.e. not null) in updateModel
+        // Otherwise use the value we currently have in the database
+        dbModel.AddressLine1 = updateModel.Address.AddressLine1 ?? dbModel.AddressLine1;
+        dbModel.AddressLine2 = updateModel.Address.AddressLine2 ?? dbModel.AddressLine2;
+        dbModel.AddressLine3 = updateModel.Address.AddressLine3 ?? dbModel.AddressLine3;
+        dbModel.TownOrCity = updateModel.Address.TownOrCity ?? dbModel.TownOrCity;
+        dbModel.County = updateModel.Address.County ?? dbModel.County;
+        dbModel.Postcode = updateModel.Address.Postcode ?? dbModel.Postcode;
 
         dbModel.PropertyType = updateModel.PropertyType ?? dbModel.PropertyType;
         dbModel.NumOfBedrooms = updateModel.NumOfBedrooms ?? dbModel.NumOfBedrooms;
@@ -88,6 +88,7 @@ public class PropertyService : IPropertyService
 
     public PropertyDbModel? GetIncompleteProperty(int landlordId)
     {
+        // Only one property for each landlord is allowed to be incomplete at a time
         return _dbContext.Properties.SingleOrDefault(p => p.LandlordId == landlordId && p.IsIncomplete == true);
     }
 }

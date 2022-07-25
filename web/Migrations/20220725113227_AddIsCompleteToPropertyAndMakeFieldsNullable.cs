@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BricksAndHearts.Migrations
 {
-    public partial class AddIsIncompleteToPropertyAndMakeFieldsNullable : Migration
+    public partial class AddIsCompleteToPropertyAndMakeFieldsNullable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -27,14 +27,6 @@ namespace BricksAndHearts.Migrations
 
             migrationBuilder.AlterColumn<string>(
                 name: "PropertyType",
-                table: "Property",
-                type: "nvarchar(max)",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "Postcode",
                 table: "Property",
                 type: "nvarchar(max)",
                 nullable: true,
@@ -67,14 +59,6 @@ namespace BricksAndHearts.Migrations
 
             migrationBuilder.AlterColumn<string>(
                 name: "County",
-                table: "Property",
-                type: "nvarchar(max)",
-                nullable: true,
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)");
-
-            migrationBuilder.AlterColumn<string>(
-                name: "AddressLine1",
                 table: "Property",
                 type: "nvarchar(max)",
                 nullable: true,
@@ -125,16 +109,6 @@ namespace BricksAndHearts.Migrations
                 oldType: "nvarchar(max)",
                 oldNullable: true);
 
-            migrationBuilder.AlterColumn<string>(
-                name: "Postcode",
-                table: "Property",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)",
-                oldNullable: true);
-
             migrationBuilder.AlterColumn<int>(
                 name: "NumOfBedrooms",
                 table: "Property",
@@ -167,16 +141,6 @@ namespace BricksAndHearts.Migrations
 
             migrationBuilder.AlterColumn<string>(
                 name: "County",
-                table: "Property",
-                type: "nvarchar(max)",
-                nullable: false,
-                defaultValue: "",
-                oldClrType: typeof(string),
-                oldType: "nvarchar(max)",
-                oldNullable: true);
-
-            migrationBuilder.AlterColumn<string>(
-                name: "AddressLine1",
                 table: "Property",
                 type: "nvarchar(max)",
                 nullable: false,
