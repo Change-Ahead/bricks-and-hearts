@@ -1,3 +1,4 @@
+using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
@@ -10,9 +11,9 @@ public class AdminController : AbstractController
 {
     private readonly BricksAndHeartsDbContext _dbContext;
     private readonly IAdminService _adminService;
-    private readonly ILogger<HomeController> _logger;
+    private readonly ILogger<AdminController> _logger;
 
-    public AdminController(ILogger<HomeController> logger, BricksAndHeartsDbContext dbContext, IAdminService adminService)
+    public AdminController(ILogger<AdminController> logger, BricksAndHeartsDbContext dbContext, IAdminService adminService)
     {
         _logger = logger;
         _adminService = adminService;
@@ -35,40 +36,33 @@ public class AdminController : AbstractController
         var user = GetCurrentUser();
         if (user.IsAdmin)
         {
-            _logger.LogWarning("User {UserId} already an admin",user.Id);
-            TempData["FlashType"] = "danger";
-            TempData["FlashMessage"] = "Already an admin";
+            LoggerAlreadyAdminWarning(_logger, user);
 
             return RedirectToAction(nameof(Index));
         }
 
         _adminService.RequestAdminAccess(user);
-
-        _logger.LogInformation("Successfully requested admin access for user {UserId}",user.Id);
-        TempData["FlashType"] = "success";
-        TempData["FlashMessage"] = "Successfully requested admin access";
-
+        
+        FlashRequestSuccess(_logger, user, "requested admin access");
+        
         return RedirectToAction(nameof(Index));
     }
+    
 
     public IActionResult CancelAdminAccessRequest()
     {
         var user = GetCurrentUser();
         if (user.IsAdmin)
         {
-            _logger.LogWarning("User {UserId} already an admin",user.Id);
-            TempData["FlashType"] = "danger";
-            TempData["FlashMessage"] = "Already an admin";
+            LoggerAlreadyAdminWarning(_logger, user);
 
             return RedirectToAction(nameof(Index));
         }
 
         _adminService.CancelAdminAccessRequest(user);
-
-        _logger.LogInformation("Successfully cancelled admin access request for user {UserId}",user.Id);
-        TempData["FlashType"] = "success";
-        TempData["FlashMessage"] = "Successfully cancelled admin access request";
-
+        
+        FlashRequestSuccess(_logger, user, "cancelled admin access request");
+        
         return RedirectToAction(nameof(Index));
     }
 
@@ -80,4 +74,5 @@ public class AdminController : AbstractController
         AdminListModel adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
         return View(adminListModel);
     }
+    
 }
