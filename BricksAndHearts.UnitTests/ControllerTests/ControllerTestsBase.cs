@@ -12,38 +12,54 @@ public class ControllerTestsBase
 {
     protected readonly ClaimsPrincipal _anonUser = A.Fake<ClaimsPrincipal>();
 
-    protected BricksAndHeartsUser CreateUnregisteredUserInController(Controller _underTest)
+    protected void MakeUserPrincipalInController(BricksAndHeartsUser user, Controller _underTest)
     {
-        // Arrange
+        var userPrincipal = new ClaimsPrincipal(user);
+        _underTest.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = userPrincipal }
+        };
+    }
+    
+    protected BricksAndHeartsUser CreateUnregisteredUser()
+    {
         var userDbModel = new UserDbModel()
         {
             Id = 1,
             GoogleUserName = "John Doe",
             GoogleEmail = "test.email@gmail.com",
             IsAdmin = false,
-            LandlordId = null,
+            LandlordId = null
         };
 
         var unregisteredUser = new BricksAndHeartsUser(userDbModel, new List<Claim>(), "google");
-        var unregisteredUserPrincipal = new ClaimsPrincipal(unregisteredUser);
-
-        _underTest.ControllerContext = new ControllerContext
-        {
-            HttpContext = new DefaultHttpContext { User = unregisteredUserPrincipal }
-        };
         return unregisteredUser;
     }
-
-    protected BricksAndHeartsUser CreateRegisteredUserInController(Controller _underTest)
+    
+    protected BricksAndHeartsUser CreateAdminUser()
     {
-        // Arrange
+        var userDbModel = new UserDbModel()
+        {
+            Id = 1,
+            GoogleUserName = "John Doe",
+            GoogleEmail = "test.email@gmail.com",
+            IsAdmin = true,
+            LandlordId = null
+        };
+
+        var adminUser = new BricksAndHeartsUser(userDbModel, new List<Claim>(), "google");
+        return adminUser;
+    }
+    
+    protected BricksAndHeartsUser CreateLandlordUser()
+    {
         var userDbModel = new UserDbModel()
         {
             Id = 1,
             GoogleUserName = "John Doe",
             GoogleEmail = "test.email@gmail.com",
             IsAdmin = false,
-            LandlordId = 1,
+            LandlordId = 1
         };
 
         var landlordDbModel = new LandlordDbModel()
@@ -53,14 +69,8 @@ public class ControllerTestsBase
             LastName = "Doe",
             User = userDbModel
         };
-
-        var registeredUser = new BricksAndHeartsUser(userDbModel, new List<Claim>(), "google");
-        var registeredUserPrincipal = new ClaimsPrincipal(registeredUser);
-
-        _underTest.ControllerContext = new ControllerContext
-        {
-            HttpContext = new DefaultHttpContext { User = registeredUserPrincipal }
-        };
-        return registeredUser;
+        
+        var landlordUser = new BricksAndHeartsUser(userDbModel, new List<Claim>(), "google");
+        return landlordUser;
     }
 }

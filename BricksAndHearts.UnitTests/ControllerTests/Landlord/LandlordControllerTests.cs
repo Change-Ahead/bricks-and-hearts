@@ -14,7 +14,8 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     public void RegisterGet_CalledByUnregisteredUser_ReturnsRegisterViewWithEmail()
     {
         // Arrange 
-        var unregisteredUser = CreateUnregisteredUserInController(_underTest);
+        var unregisteredUser = CreateUnregisteredUser();
+        MakeUserPrincipalInController(unregisteredUser, _underTest);
 
         // Act
         var result = _underTest.RegisterGet() as ViewResult;
@@ -28,7 +29,8 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     public void AddNewPropertyPost_CalledByUnregisteredUser_Returns403()
     {
         // Arrange 
-        CreateUnregisteredUserInController(_underTest);
+        var unregisteredUser = CreateUnregisteredUser();
+        MakeUserPrincipalInController(unregisteredUser, _underTest);
         var formResultModel = A.Fake<PropertyViewModel>();
 
         // Act
@@ -42,7 +44,8 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     public void AddNewPropertyPost_WithInvalidModel_ReturnsViewWithModel()
     {
         // Arrange 
-        CreateRegisteredUserInController(_underTest);
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, _underTest);
         var formResultModel = CreateExamplePropertyViewModel();
         _underTest.ViewData.ModelState.AddModelError("Key", "ErrorMessage");
 
@@ -57,15 +60,13 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     public void AddNewPropertyPost_WithValidModel_CallsPropertyServiceMethod_AndRedirects()
     {
         // Arrange
-        var propertyService = A.Fake<IPropertyService>();
-
-        var controller = new LandlordController(null!, null!, new LandlordService(null!), propertyService);
-        CreateRegisteredUserInController(controller);
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, _underTest);
 
         var formResultModel = A.Fake<PropertyViewModel>();
 
         // Act
-        var result = controller.AddNewProperty(formResultModel);
+        var result = _underTest.AddNewProperty(formResultModel);
 
         // Assert
         A.CallTo(() => propertyService.AddNewProperty(formResultModel, 1)).MustHaveHappened();

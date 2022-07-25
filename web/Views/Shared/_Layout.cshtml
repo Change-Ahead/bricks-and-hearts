@@ -26,8 +26,14 @@
                         </li>
                         @if (User.IsInRole("Admin"))
                         {
-                            <li>
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Admin" asp-action="AdminList">Admin List</a>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link active dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-bs-toggle="dropdown">
+                                    Admins
+                                </a>
+                                <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                                    <a class="dropdown-item text-dark" asp-area="" asp-controller="Admin" asp-action="AdminList">Admin List</a>
+                                    <a class="dropdown-item text-dark" asp-area="" asp-controller="Admin" asp-action="LandlordList">Landlord List</a>
+                                </div>
                             </li>
                         }
                         <li class="nav-item">

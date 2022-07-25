@@ -1,4 +1,5 @@
 ﻿using BricksAndHearts.ViewModels;
+using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -23,5 +24,20 @@ public class AdminControllerTests : AdminControllerTestsBase
         // Assert
         result!.ViewData.Model.Should().BeOfType<AdminViewModel>()
             .Which.CurrentUser.Should().BeNull();
+    }
+
+    [Fact]
+    public async void LandlordList_WhenCalled_CallsGetUnapprovedLandlordsAndReturnsLandlordListView()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, _underTest);
+
+        // Act
+        var result = await _underTest.LandlordList() as ViewResult;
+
+        // Assert
+        A.CallTo(() => adminService.GetUnapprovedLandlords()).MustHaveHappened();
+        result!.ViewData.Model.Should().BeOfType<LandlordListModel?>();
     }
 }
