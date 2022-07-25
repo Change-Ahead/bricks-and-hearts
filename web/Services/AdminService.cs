@@ -1,5 +1,6 @@
 ﻿using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
+using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,6 +11,7 @@ public interface IAdminService
     public void RequestAdminAccess(BricksAndHeartsUser user);
     public void CancelAdminAccessRequest(BricksAndHeartsUser user);
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
+    public void ApproveAdminAccessRequest(int userId);
 }
 
 public class AdminService : IAdminService
@@ -50,5 +52,15 @@ public class AdminService : IAdminService
     public async Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists()
     {
         return (await GetCurrentAdmins(), await GetPendingAdmins());
+    }
+
+    public void ApproveAdminAccessRequest(int userId)
+    {
+        if (_dbContext.Users.SingleOrDefault(u => u.Id == userId) is { } userToAdmin)
+        {
+            userToAdmin.IsAdmin = true;
+            userToAdmin.HasRequestedAdmin = false;
+            _dbContext.SaveChanges();
+        }
     }
 }
