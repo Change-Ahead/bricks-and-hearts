@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BricksAndHearts.Migrations
 {
     [DbContext(typeof(BricksAndHeartsDbContext))]
-    [Migration("20220722084503_AddIsIncompleteToPropertyAndMakeFieldsNullable")]
-    partial class AddIsIncompleteToPropertyAndMakeFieldsNullable
+    [Migration("20220725113227_AddIsCompleteToPropertyAndMakeFieldsNullable")]
+    partial class AddIsCompleteToPropertyAndMakeFieldsNullable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -79,6 +79,7 @@ namespace BricksAndHearts.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("AddressLine1")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AddressLine2")
@@ -106,6 +107,7 @@ namespace BricksAndHearts.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Postcode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PropertyType")

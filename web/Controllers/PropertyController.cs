@@ -65,8 +65,17 @@ public class PropertyController : AbstractController
         {
             if (step == 1)
             {
-                // Create new record in the database for this property
-                _propertyService.AddNewProperty(landlordId.Value, newPropertyModel, isIncomplete: true);
+                if (newPropertyModel.Address.AddressLine1 == null || newPropertyModel.Address.Postcode == null)
+                {
+                    // Address line 1 and postcode are the minimum information we need to create a new record
+                    return View("AddNewProperty",
+                        new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
+                }
+                else
+                {
+                    // Create new record in the database for this property
+                    _propertyService.AddNewProperty(landlordId.Value, newPropertyModel, isIncomplete: true);
+                }
 
                 // Go to step 2
                 return RedirectToAction("AddNewProperty_Continue", new { step = 2 });
