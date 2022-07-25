@@ -1,5 +1,7 @@
 ﻿let currentTab = 0;
-showTab(currentTab);
+if (window.location.pathname == "/landlord/register"){
+    showTab(currentTab);
+}
 
 function showTab(currentTab) {
     let tabList = document.getElementsByClassName("registerTab");
