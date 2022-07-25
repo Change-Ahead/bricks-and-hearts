@@ -7,6 +7,7 @@ namespace BricksAndHearts.Services
 {
     public interface IAzureStorage
     {
+        Task CreateContainerAsync(int id);
         Task UploadAsync(IFormFile file);
         Task<BlobDto> DownloadAsync(string blobFilename);
         Task DeleteAsync(string blobFilename);
@@ -26,7 +27,7 @@ namespace BricksAndHearts.Services
             _logger = logger;
         }
 
-        private async Task CreateContainerAsync(int id)
+        public async Task CreateContainerAsync(int id)
         {
             BlobServiceClient blobServiceClient = new BlobServiceClient(_storageConnectionString);
             string containerName = id.ToString(); // + Guid.NewGuid();

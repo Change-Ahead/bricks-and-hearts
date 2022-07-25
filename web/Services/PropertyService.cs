@@ -23,8 +23,7 @@ public class PropertyService : IPropertyService
         return _dbContext.Properties
             .Where(p => p.LandlordId == landlordId).ToList();
     }
-
-    // Create a new property record and associate it with a landlord
+    
     public void AddNewProperty(PropertyViewModel createModel, int landlordId)
     {
         var dbModel = new PropertyDbModel

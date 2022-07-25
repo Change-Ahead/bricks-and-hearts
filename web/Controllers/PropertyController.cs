@@ -7,23 +7,41 @@ using Microsoft.EntityFrameworkCore;
 
 namespace BricksAndHearts.Controllers;
 
-public class PropertyController : Controller
+public class PropertyController : AbstractController
 {
     private readonly BricksAndHeartsDbContext _dbContext;
-    private readonly ILandlordService _landlordService;
+    private readonly IPropertyService _propertyService;
     private readonly ILogger<LandlordController> _logger;
     private readonly IAzureStorage _azureStorage;
     
     public PropertyController(ILogger<PropertyController> logger, BricksAndHeartsDbContext dbContext,
-        ILandlordService landlordService, IAzureStorage azureStorage)
+        IPropertyService propertyService, IAzureStorage azureStorage)
     {
         _dbContext = dbContext;
         //_logger = logger;
-        _landlordService = landlordService;
+        _propertyService = propertyService;
         _azureStorage = azureStorage;
     }
     
-        
+    [HttpPost]
+    [Route("/add-property")]
+    public ActionResult AddNewProperty([FromForm] PropertyViewModel newPropertyModel)
+    {
+        var landlordId = GetCurrentUser().LandlordId;
+        if (!landlordId.HasValue)
+        {
+            return StatusCode(403);
+        }
+        if (!ModelState.IsValid)
+        {
+            return View(newPropertyModel);
+        }
+        _propertyService.AddNewProperty(newPropertyModel, landlordId.Value);
+        _azureStorage.CreateContainerAsync(newPropertyModel.Id);
+
+        return RedirectToAction("ViewProperties", "Landlord");
+    }
+    
     [HttpPost("UploadFiles")]
     public async Task<IActionResult> UploadImage(List<IFormFile> images)
     {
