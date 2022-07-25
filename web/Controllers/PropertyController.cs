@@ -13,7 +13,7 @@ public class PropertyController : AbstractController
     private readonly IApiService _apiService;
     private readonly ILogger<PropertyController> _logger;
 
-    public PropertyController(IPropertyService propertyService, ILogger<PropertyController> logger, IApiService apiService)
+    public PropertyController(IPropertyService propertyService, IApiService apiService, ILogger<PropertyController> logger)
     {
         _propertyService = propertyService;
         _apiService = apiService;

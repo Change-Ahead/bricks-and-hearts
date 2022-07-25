@@ -1,4 +1,5 @@
-﻿using BricksAndHearts.Controllers;
+﻿using System.Threading.Tasks;
+using BricksAndHearts.Controllers;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
@@ -61,9 +62,10 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         fakePropertyDbModel.Description = "hello";
 
         var propertyService = A.Fake<IPropertyService>();
+        var apiService = A.Fake<IApiService>();
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(fakePropertyDbModel);
 
-        var controller = new PropertyController(propertyService, null!);
+        var controller = new PropertyController(propertyService, apiService,null!);
         CreateRegisteredUserInController(controller);
 
         // Act
@@ -82,8 +84,9 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Arrange
         var propertyService = A.Fake<IPropertyService>();
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(null);
+        var apiService = A.Fake<IApiService>();
 
-        var controller = new PropertyController(propertyService, null!);
+        var controller = new PropertyController(propertyService, apiService, null!);
         CreateRegisteredUserInController(controller);
 
         // Act
@@ -97,7 +100,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public void AddNewPropertyContinuePost_WithInvalidModel_ReturnsViewWithModel()
+    public async void AddNewPropertyContinuePost_WithInvalidModel_ReturnsViewWithModel()
     {
         // Arrange 
         var propertyService = A.Fake<IPropertyService>();
@@ -108,7 +111,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         _underTest.ViewData.ModelState.AddModelError("Key", "ErrorMessage");
 
         // Act
-        var result = _underTest.AddNewProperty_Continue(2, formResultModel) as ViewResult;
+        var result = await _underTest.AddNewProperty_Continue(2, formResultModel) as ViewResult;
 
         // Assert
         A.CallTo(() => propertyService.UpdateProperty(1, formResultModel, true)).MustNotHaveHappened();
@@ -143,13 +146,14 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public void AddNewPropertyContinuePost_AtStep1_CreatesNewRecord_AndRedirectsToNextStep()
+    public async void AddNewPropertyContinuePost_AtStep1_CreatesNewRecord_AndRedirectsToNextStep()
     {
         // Arrange
         var propertyService = A.Fake<IPropertyService>();
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(null);
+        var apiService = A.Fake<IApiService>();
 
-        var controller = new PropertyController(propertyService, null!);
+        var controller = new PropertyController(propertyService, apiService,null!);
         CreateRegisteredUserInController(controller);
 
         var formResultModel = new PropertyViewModel
@@ -160,9 +164,11 @@ public class PropertyControllerTests : PropertyControllerTestsBase
                 Postcode = "Postcode"
             }
         };
+        A.CallTo(() => apiService.AutofillAddress(formResultModel))
+            .Returns(Task.Run(() => formResultModel));
 
         // Act
-        var result = controller.AddNewProperty_Continue(1, formResultModel);
+        var result = await controller.AddNewProperty_Continue(1, formResultModel);
 
         // Assert
         A.CallTo(() => propertyService.AddNewProperty(1, formResultModel, true)).MustHaveHappened();
@@ -173,19 +179,20 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public void AddNewPropertyContinuePost_AtMiddleSteps_WithNoAddInProgress_RedirectsToViewProperties()
+    public async void AddNewPropertyContinuePost_AtMiddleSteps_WithNoAddInProgress_RedirectsToViewProperties()
     {
         // Arrange
         var propertyService = A.Fake<IPropertyService>();
+        var apiService = A.Fake<IApiService>();
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(null);
 
-        var controller = new PropertyController(propertyService, null!);
+        var controller = new PropertyController(propertyService, apiService,null!);
         CreateRegisteredUserInController(controller);
 
         var formResultModel = A.Fake<PropertyViewModel>();
 
         // Act
-        var result = controller.AddNewProperty_Continue(2, formResultModel);
+        var result = await controller.AddNewProperty_Continue(2, formResultModel);
 
         // Assert
         A.CallTo(() => propertyService.UpdateProperty(1, formResultModel, true)).MustNotHaveHappened();
@@ -193,22 +200,23 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public void AddNewPropertyContinuePost_AtMiddleSteps_UpdatesRecord_AndRedirectsToNextStep()
+    public async void AddNewPropertyContinuePost_AtMiddleSteps_UpdatesRecord_AndRedirectsToNextStep()
     {
         // Arrange
         var fakePropertyDbModel = A.Fake<PropertyDbModel>();
         fakePropertyDbModel.Id = 1;
 
         var propertyService = A.Fake<IPropertyService>();
+        var apiService = A.Fake<IApiService>();
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(fakePropertyDbModel);
 
-        var controller = new PropertyController(propertyService, null!);
+        var controller = new PropertyController(propertyService, apiService,null!);
         CreateRegisteredUserInController(controller);
 
         var formResultModel = A.Fake<PropertyViewModel>();
 
         // Act
-        var result = controller.AddNewProperty_Continue(2, formResultModel);
+        var result = await controller.AddNewProperty_Continue(2, formResultModel);
 
         // Assert
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).MustHaveHappened();
@@ -219,18 +227,19 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public void AddNewPropertyContinuePost_AtFinalStep_UpdatesRecord_AndRedirectsToViewProperties()
+    public async void AddNewPropertyContinuePost_AtFinalStep_UpdatesRecord_AndRedirectsToViewProperties()
     {
         // Arrange
         var propertyService = A.Fake<IPropertyService>();
+        var apiService = A.Fake<IApiService>();
 
-        var controller = new PropertyController(propertyService, null!);
+        var controller = new PropertyController(propertyService, apiService,null!);
         CreateRegisteredUserInController(controller);
 
         var formResultModel = A.Fake<PropertyViewModel>();
 
         // Act
-        var result = controller.AddNewProperty_Continue(AddNewPropertyViewModel.MaximumStep, formResultModel);
+        var result = await controller.AddNewProperty_Continue(AddNewPropertyViewModel.MaximumStep, formResultModel);
 
         // Assert
         A.CallTo(() => propertyService.UpdateProperty(0, formResultModel, false)).MustHaveHappened();
@@ -245,9 +254,11 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         fakePropertyDbModel.Id = 1;
 
         var propertyService = A.Fake<IPropertyService>();
+        var apiService = A.Fake<IApiService>();
+
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(fakePropertyDbModel);
 
-        var controller = new PropertyController(propertyService, null!);
+        var controller = new PropertyController(propertyService, apiService,null!);
         CreateRegisteredUserInController(controller);
 
         // Act
@@ -267,9 +278,11 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         fakePropertyDbModel.Id = 1;
 
         var propertyService = A.Fake<IPropertyService>();
+        var apiService = A.Fake<IApiService>();
+
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(null);
 
-        var controller = new PropertyController(propertyService, null!);
+        var controller = new PropertyController(propertyService, apiService,null!);
         CreateRegisteredUserInController(controller);
 
         // Act
