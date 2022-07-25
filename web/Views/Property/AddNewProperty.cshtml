@@ -8,9 +8,9 @@
 
 <hr/>
 
-@using (Html.BeginForm("AddNewProperty_Continue", "Property", new { step = Model.Step }, FormMethod.Post, null, new { @class = "w-50" }))
-{
-    @Html.Partial("_AddFormStep" + Model.Step, Model.Property)
+<form method="post" class="w-50" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@Model.Step">
+
+    <partial name=@("_AddFormStep" + Model.Step) model="Model.Property"/>
 
     <div class="mt-4">
         <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">
@@ -25,7 +25,7 @@
             <input type="submit" value="Submit" class="btn btn-success"/>
         }
     </div>
-}
+</form>
 
 <!-- Modal -->
 <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
@@ -40,10 +40,9 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                @using (Html.BeginForm("AddNewProperty_Cancel", "Property", FormMethod.Post))
-                {
+                <form method="post" asp-controller="Property" asp-action="AddNewProperty_Cancel">
                     <input type="submit" value="Cancel" class="btn btn-danger"/>
-                }
+                </form>
             </div>
         </div>
     </div>
