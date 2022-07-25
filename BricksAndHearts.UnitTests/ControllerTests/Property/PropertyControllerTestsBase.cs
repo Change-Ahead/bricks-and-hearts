@@ -9,7 +9,8 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Property;
 public class PropertyControllerTestsBase : ControllerTestsBase
 {
     public static readonly IPropertyService fakePropertyService = A.Fake<IPropertyService>();
-    protected readonly PropertyController _underTest = new(fakePropertyService, null!);
+    public static IApiService fakeApiService = A.Fake<IApiService>();
+    protected readonly PropertyController _underTest = new(fakePropertyService, fakeApiService,null!);
 
     protected PropertyViewModel CreateExamplePropertyViewModel()
     {
