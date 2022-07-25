@@ -39,8 +39,16 @@ public class ApiTests : ApiServiceTestsBase
         
         // Assert
         postcodeApiResponseViewModel.ListOfResults.Should().NotBeNull("should not be null");
+        if (postcodeApiResponseViewModel.ListOfResults == null)
+        {
+            return;
+        }
         BricksAndHearts.ViewModels.Results results = postcodeApiResponseViewModel.ListOfResults[0];
         results.Address.Should().NotBeNull("Address should not be null");
+        if (results.Address == null)
+        {
+            return;
+        }
         results.Address.Keys.ToList().Should().Contain("streetName");
         results.Address["streetName"].Should().Be("Adam & Eve Street");
     }

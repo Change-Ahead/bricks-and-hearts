@@ -121,13 +121,14 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public void AddNewPropertyContinuePost_AtStep1_WithoutAddress1AndPostcode_ReturnsViewWithModel()
+    public async void AddNewPropertyContinuePost_AtStep1_WithoutAddress1AndPostcode_ReturnsViewWithModel()
     {
         // Arrange
         var propertyService = A.Fake<IPropertyService>();
+        var apiService = A.Fake<IApiService>();
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(null);
 
-        var controller = new PropertyController(propertyService, null!);
+        var controller = new PropertyController(propertyService, apiService,null!);
         CreateRegisteredUserInController(controller);
 
         var formResultModel = new PropertyViewModel
@@ -136,7 +137,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         };
 
         // Act
-        var result = controller.AddNewProperty_Continue(1, formResultModel) as ViewResult;
+        var result = await controller.AddNewProperty_Continue(1, formResultModel) as ViewResult;
 
         // Assert
         A.CallTo(() => propertyService.AddNewProperty(1, formResultModel, true)).MustNotHaveHappened();
