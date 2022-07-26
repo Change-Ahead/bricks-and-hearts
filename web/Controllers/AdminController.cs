@@ -52,7 +52,6 @@ public class AdminController : AbstractController
         return RedirectToAction(nameof(Index));
     }
 
-
     public IActionResult CancelAdminAccessRequest()
     {
         var user = GetCurrentUser();
