@@ -7,7 +7,7 @@
 <h2>Landlord List</h2>
 
 <div class="mb-3">
-    @using (Html.BeginForm("LandlordList", "Admin", FormMethod.Post))
+    @using (Html.BeginForm("LandlordList", "Admin", FormMethod.Get))
     {
         <select class="form-select" id="approvalStatus" name="approvalStatus">
             <option disabled selected>Filter by approval status</option>
