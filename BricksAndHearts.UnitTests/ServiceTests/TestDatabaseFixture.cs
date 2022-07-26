@@ -1,4 +1,5 @@
 ﻿using BricksAndHearts.Database;
+using Microsoft.Extensions.Configuration;
 
 namespace BricksAndHearts.UnitTests.ServiceTests;
 
@@ -12,7 +13,7 @@ public class TestDatabaseFixture
         lock (Lock)
         {
             if (_databaseInitialised) return;
-            using (var context = new TestDbContext())
+            using (var context = CreateContext())
             {
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
@@ -28,14 +29,21 @@ public class TestDatabaseFixture
         }
     }
 
+    private BricksAndHeartsDbContext CreateContext()
+    {
+        var config = new ConfigurationManager();
+        config.AddJsonFile("appsettings.Development.json");
+        return new TestDbContext(config);
+    }
+
     public BricksAndHeartsDbContext CreateReadContext()
     {
-        return new TestDbContext();
+        return CreateContext();
     }
 
     public BricksAndHeartsDbContext CreateWriteContext()
     {
-        var context = new TestDbContext();
+        var context = CreateContext();
         // Begin a transaction so the test's writes don't interfere with other tests running in parallel (provides test isolation)
         // Transaction is never committed so is automatically rolled back at the end of the test
         context.Database.BeginTransaction();
