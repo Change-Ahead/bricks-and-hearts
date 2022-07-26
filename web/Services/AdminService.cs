@@ -13,6 +13,8 @@ public interface IAdminService
     public UserDbModel? FindUserByLandlordId(int landlordId);
     public string FindExistingInviteLink(int landlordId);
     public string CreateNewInviteLink(int landlordId);
+    public void DeleteExistingInviteLink(int landlordId);
+
 }
 
 public class AdminService : IAdminService
@@ -84,7 +86,7 @@ public class AdminService : IAdminService
     {
         // Find landlord in db (assumes existence)
         var landlord = _dbContext.Landlords.Single(u => u.Id == landlordId);
-        // Get existing invite link (if exists)
+        // Should not have existing link
         if (!string.IsNullOrEmpty(landlord.InviteLink))
         {
             throw new Exception("Landlord should not have existing invite link!");
@@ -94,5 +96,20 @@ public class AdminService : IAdminService
         landlord.InviteLink = inviteLink;
         _dbContext.SaveChanges();
         return inviteLink;
+    }
+
+    public void DeleteExistingInviteLink(int landlordId)
+    {
+        // Find landlord in db (assumes existence)
+        var landlord = _dbContext.Landlords.Single(u => u.Id == landlordId);
+        // Should have existing link
+        if (string.IsNullOrEmpty(landlord.InviteLink))
+        {
+            throw new Exception("Landlord should have existing invite link!");
+        }
+        
+        // Delete
+        landlord.InviteLink = null;
+        _dbContext.SaveChanges();
     }
 }

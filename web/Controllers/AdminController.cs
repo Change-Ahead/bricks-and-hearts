@@ -115,6 +115,27 @@ public class AdminController : AbstractController
     [HttpPost]
     public Task<ActionResult> RenewInviteLink(int landlordId)
     {
+        var user = _adminService.FindUserByLandlordId(landlordId);
+        if (user != null) // If landlord already linked to user
+        {
+            TempData["ToastMessage"] = $"Landlord already linked to user {user.GoogleUserName}";
+        }
+        else
+        {
+            string? inviteLink = _adminService.FindExistingInviteLink(landlordId);
+            if (string.IsNullOrEmpty(inviteLink))
+            {
+                TempData["ToastMessage"] = $"No existing invite link. Succefully created a new invite link :)";
+                inviteLink = _adminService.CreateNewInviteLink(landlordId);
+            }
+            else
+            {
+                _adminService.DeleteExistingInviteLink(landlordId);
+                inviteLink = _adminService.CreateNewInviteLink(landlordId);
+                TempData["ToastMessage"] = $"Succefully created a new invite link :)";
+            }
+            TempData["InviteLink"] = $"{inviteLink}";
+        }
         return Task.FromResult<ActionResult>(RedirectToAction("Profile","Landlord", new {id=landlordId}));
     }
 
