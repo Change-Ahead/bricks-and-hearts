@@ -1,8 +1,6 @@
 ﻿using BricksAndHearts.Controllers;
 using BricksAndHearts.Services;
-using BricksAndHearts.Controllers;
 using BricksAndHearts.Database;
-using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
