@@ -1,4 +1,5 @@
-using BricksAndHearts.Auth;
+#region
+
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
@@ -50,7 +51,7 @@ public class AdminController : AbstractController
 
         return RedirectToAction(nameof(Index));
     }
-    
+
 
     public IActionResult CancelAdminAccessRequest()
     {
@@ -77,8 +78,8 @@ public class AdminController : AbstractController
         var adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
         return View(adminListModel);
     }
-    
-    [Authorize(Roles="Admin")]
+
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> LandlordList()
     {
