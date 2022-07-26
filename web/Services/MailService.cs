@@ -9,7 +9,6 @@ public interface IMailService
 {
     public void SendMsg(
         string msgBody = "Hi",
-        string msgFromAddress = "tech@changeahead.org.uk",
         string msgToAddress = "alice.luo@softwire.com",
         string subject = "From Softwire Intern Alice",
         string msgFromName = "",
@@ -28,13 +27,13 @@ public class MailService: IMailService
     
     public void SendMsg(
         string msgBody = "Hi",
-        string msgFromAddress = "tech@changeahead.org.uk",
         string msgToAddress = "alice.luo@softwire.com",
         string subject = "From Softwire Intern Alice",
         string msgFromName = "",
         string msgToName = ""
     )
     {
+        string msgFromAddress = _config.Value.FromAddress; 
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(msgFromName, msgFromAddress));
         message.To.Add(new MailboxAddress(msgToName, msgToAddress));
@@ -45,7 +44,7 @@ public class MailService: IMailService
         };
         using (var client = new SmtpClient())
         {
-            client.Connect("mail.epclients.co.uk", 465, true);
+            client.Connect(_config.Value.Host, _config.Value.Port, true);
 
             // Note: only needed if the SMTP server requires authentication
             client.Authenticate(_config.Value.UserName, _config.Value.Password);
