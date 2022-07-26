@@ -1,6 +1,8 @@
-﻿using System.Security.Claims;
+﻿using System.Collections.Generic;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using BricksAndHearts.Controllers;
+using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
@@ -35,13 +37,17 @@ public class AdminControllerTests : AdminControllerTestsBase
     {
         // Arrange
         var fakeAdminService = A.Fake<IAdminService>();
+        var fakeListOfAdmins = A.Dummy<Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)>>();
         var fakeAdminController = new AdminController(null!, null!, fakeAdminService);
-        
+        A.CallTo(() => fakeAdminService.GetAdminLists()).Returns(fakeListOfAdmins);
+
         // Act
         var result = fakeAdminController.GetAdminList().Result as ViewResult;
+        var resultService = fakeAdminService.GetAdminLists();
 
         // Assert
         result!.Model.Should().BeOfType<AdminListModel>();
+        resultService.Should().Be(fakeListOfAdmins);
     }
 
     [Fact]
