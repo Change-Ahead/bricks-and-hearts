@@ -9,7 +9,7 @@ public interface IAdminService
     public void RequestAdminAccess(BricksAndHeartsUser user);
     public void CancelAdminAccessRequest(BricksAndHeartsUser user);
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
-    public Task<List<LandlordDbModel>> GetUnapprovedLandlords();
+    public Task<List<LandlordDbModel>> GetLandlordDisplayList(string approvalStatus);
     public UserDbModel? FindUserByLandlordId(int landlordId);
     public string? FindExistingInviteLink(int landlordId);
     public string CreateNewInviteLink(int landlordId);
@@ -48,9 +48,8 @@ public class AdminService : IAdminService
 
     private async Task<List<UserDbModel>> GetPendingAdmins()
     {
-        var pendingAdmins =
-            await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
-        return pendingAdmins;
+        List<UserDbModel> PendingAdmins = await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
+        return PendingAdmins;
     }
 
     public async Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists()
@@ -58,11 +57,14 @@ public class AdminService : IAdminService
         return (await GetCurrentAdmins(), await GetPendingAdmins());
     }
 
-    public async Task<List<LandlordDbModel>> GetUnapprovedLandlords()
+    public async Task<List<LandlordDbModel>> GetLandlordDisplayList(string approvalStatus)
     {
-        var unapprovedLandlords =
-            await _dbContext.Landlords.Where(u => u.CharterApproved == false).ToListAsync();
-        return unapprovedLandlords;
+        return approvalStatus switch
+        {
+            "Unapproved" => await _dbContext.Landlords.Where(u => u.CharterApproved == false).ToListAsync(),
+            "Approved" => await _dbContext.Landlords.Where(u => u.CharterApproved == true).ToListAsync(),
+            _ => await _dbContext.Landlords.ToListAsync(),
+        };
     }
 
     public UserDbModel? FindUserByLandlordId(int landlordId)

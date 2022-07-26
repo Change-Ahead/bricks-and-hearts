@@ -1,7 +1,6 @@
 #region
 
 using BricksAndHearts.Auth;
-using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -14,14 +13,12 @@ namespace BricksAndHearts.Controllers;
 public class AdminController : AbstractController
 {
     private readonly IAdminService _adminService;
-    private readonly BricksAndHeartsDbContext _dbContext;
     private readonly ILogger<AdminController> _logger;
 
-    public AdminController(ILogger<AdminController> logger, BricksAndHeartsDbContext dbContext, IAdminService adminService)
+    public AdminController(ILogger<AdminController> logger, IAdminService adminService)
     {
         _logger = logger;
         _adminService = adminService;
-        _dbContext = dbContext;
     }
 
     public IActionResult Index()
@@ -82,8 +79,17 @@ public class AdminController : AbstractController
     [HttpGet]
     public async Task<IActionResult> LandlordList()
     {
-        var landlordListModel = new LandlordListModel();
-        landlordListModel.UnapprovedLandlords = await _adminService.GetUnapprovedLandlords();
+        LandlordListModel landlordListModel = new LandlordListModel();
+        landlordListModel.LandlordDisplayList = await _adminService.GetLandlordDisplayList("All");
+        return View(landlordListModel);
+    }
+    
+    [Authorize(Roles="Admin")]
+    [HttpPost]
+    public async Task<IActionResult> LandlordList(string? approvalStatus)
+    {
+        LandlordListModel landlordListModel = new LandlordListModel();
+        landlordListModel.LandlordDisplayList = await _adminService.GetLandlordDisplayList(approvalStatus);
         return View(landlordListModel);
     }
 
