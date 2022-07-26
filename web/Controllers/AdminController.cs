@@ -85,6 +85,28 @@ public class AdminController : AbstractController
         return View(landlordListModel);
     }
 
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    public async Task<ActionResult> GetInviteLink(int landlordId)
+    {
+        var user = _adminService.FindUserByLandlordId(landlordId);
+        if (user != null) // If landlord already linked to user
+        {
+            TempData["ToastMessage"] = $"Landlord already linked to user {user.GoogleUserName}";
+        }
+        else
+        {
+            string? inviteLink = _adminService.FindExistingInviteLink(landlordId);
+            if (string.IsNullOrEmpty(inviteLink))
+            {
+                TempData["ToastMessage"] = $"Landlord already has an invite link!";
+                inviteLink = _adminService.CreateNewInviteLink(landlordId);
+            }
+            TempData["InviteLink"] = $"{inviteLink}";
+        }
+        return RedirectToAction("Profile","Landlord", new {id=landlordId});
+    }
+
     private void LoggerAlreadyAdminWarning(ILogger logger, BricksAndHeartsUser user)
     {
         FlashMessage(logger,

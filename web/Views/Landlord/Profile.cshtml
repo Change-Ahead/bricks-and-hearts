@@ -15,6 +15,14 @@
             </div>
         }
     }
+    @{
+        if (TempData["ToastMessage"] != null)
+        {
+            <div class="alert alert-warning" role="alert">
+                @TempData["ToastMessage"]
+            </div>
+        }
+    }
     <h4>Landlord</h4>
     
     <hr/>
@@ -78,5 +86,10 @@
                 <button type="submit" class="btn-primary">Approve Landlord</button>
             }
         }
+    }
+    
+    @using (Html.BeginForm("GetInviteLink", "Admin", new { landlordId = Model.LandlordId }, FormMethod.Post))
+    {
+        <button type="submit" class="btn btn-danger">Get Invite Link</button>
     }
 </div>
