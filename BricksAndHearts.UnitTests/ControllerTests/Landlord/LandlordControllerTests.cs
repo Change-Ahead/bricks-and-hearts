@@ -104,7 +104,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
         // Act
         A.CallTo(() => fakeLandlordService.GetLandlordFromEmail(dummyEmail)).Returns(landlordDbModel);
-        var result = fakeLandlordController.EditProfilePage(dummyEmail,0) as ViewResult;
+        var result = fakeLandlordController.EditProfilePage(dummyEmail) as ViewResult;
 
         // Assert   
         result!.Model.Should().BeOfType<LandlordDbModel>();

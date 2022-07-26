@@ -155,7 +155,8 @@ public class LandlordController : AbstractController
     }
 
     [HttpGet]
-    public ActionResult EditProfilePage(string userEmail, int tabNum)
+    [Route("edit")]
+    public ActionResult EditProfilePage(string userEmail)
     {
         var landlord = _landlordService.GetLandlordFromEmail(userEmail);
         return View("EditProfilePage", landlord);
