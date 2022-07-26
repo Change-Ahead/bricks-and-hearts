@@ -87,7 +87,7 @@ public class AdminController : AbstractController
 
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    public async Task<ActionResult> GetInviteLink(int landlordId)
+    public Task<ActionResult> GetInviteLink(int landlordId)
     {
         var user = _adminService.FindUserByLandlordId(landlordId);
         if (user != null) // If landlord already linked to user
@@ -99,12 +99,23 @@ public class AdminController : AbstractController
             string? inviteLink = _adminService.FindExistingInviteLink(landlordId);
             if (string.IsNullOrEmpty(inviteLink))
             {
-                TempData["ToastMessage"] = $"Landlord already has an invite link!";
+                TempData["ToastMessage"] = $"Succefully created a new invite link :)";
                 inviteLink = _adminService.CreateNewInviteLink(landlordId);
+            }
+            else
+            {
+                TempData["ToastMessage"] = $"Landlord already has an invite link!";
             }
             TempData["InviteLink"] = $"{inviteLink}";
         }
-        return RedirectToAction("Profile","Landlord", new {id=landlordId});
+        return Task.FromResult<ActionResult>(RedirectToAction("Profile","Landlord", new {id=landlordId}));
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    public Task<ActionResult> RenewInviteLink(int landlordId)
+    {
+        return Task.FromResult<ActionResult>(RedirectToAction("Profile","Landlord", new {id=landlordId}));
     }
 
     private void LoggerAlreadyAdminWarning(ILogger logger, BricksAndHeartsUser user)

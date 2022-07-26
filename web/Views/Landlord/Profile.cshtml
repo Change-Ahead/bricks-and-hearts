@@ -20,6 +20,17 @@
         {
             <div class="alert alert-warning" role="alert">
                 @TempData["ToastMessage"]
+                @if (TempData["InviteLink"] != null)
+                {
+                    <br/>
+                    @TempData["InviteLink"]
+                    <br>
+                    <br>
+                    @using (Html.BeginForm("RenewInviteLink", "Admin", new { landlordId = Model.LandlordId }, FormMethod.Post))
+                    {
+                        <button type="submit" class="btn btn-primary">Get New Link</button>
+                    }
+                }
             </div>
         }
     }
@@ -90,6 +101,6 @@
     
     @using (Html.BeginForm("GetInviteLink", "Admin", new { landlordId = Model.LandlordId }, FormMethod.Post))
     {
-        <button type="submit" class="btn btn-danger">Get Invite Link</button>
+        <button type="submit" class="btn btn-primary">Get Invite Link</button>
     }
 </div>
