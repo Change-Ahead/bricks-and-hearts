@@ -35,7 +35,10 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
         // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
-        result.ActionName.Should().BeEquivalentTo("LandlordList");
-        result.ControllerName.Should().BeEquivalentTo("Admin");
+        if (result != null)
+        {
+            result.ActionName.Should().BeEquivalentTo("LandlordList");
+            result.ControllerName.Should().BeEquivalentTo("Admin");
+        }
     }
 }
