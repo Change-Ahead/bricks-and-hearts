@@ -15,8 +15,8 @@ public interface ILandlordService
         Success
     }
 
-    public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel,
-        BricksAndHeartsUser user);
+    public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel, BricksAndHeartsUser user);
+    public Task ApproveLandlord(int landlordId, BricksAndHeartsUser user);
 }
 
 public class LandlordService : ILandlordService
@@ -76,5 +76,21 @@ public class LandlordService : ILandlordService
         user.LandlordId = dbModel.Id;
 
         return ILandlordService.LandlordRegistrationResult.Success;
+    }
+
+    public async Task ApproveLandlord(int landlordId,  BricksAndHeartsUser user)
+    {
+        var landlord = _dbContext.Landlords.Single(l =>l.Id == landlordId);
+        if (!landlord.CharterApproved)
+        {
+            landlord.CharterApproved = true;
+            landlord.ApprovalTime = DateTime.Now;
+            landlord.ApprovalAdminId = user.Id;
+            await _dbContext.SaveChangesAsync();
+        }
+        else
+        {
+            throw new Exception("Landlord already approved");
+        }
     }
 }

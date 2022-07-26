@@ -19,6 +19,8 @@ public class LandlordDbModel
     public bool LandlordProvidedCharterStatus { get; set; } = false;
     //Whether the charter has been approved by an admin
     public bool CharterApproved { get; set; } = false;
+    public DateTime? ApprovalTime { get; set; }
+    public int? ApprovalAdminId { get; set; }
 
     public virtual UserDbModel? User { get; set; }
     public virtual List<PropertyDbModel> Properties { get; set; } = new();

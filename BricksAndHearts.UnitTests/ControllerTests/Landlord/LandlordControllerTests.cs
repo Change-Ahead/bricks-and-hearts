@@ -10,6 +10,10 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
 
 public class LandlordControllerTests : LandlordControllerTestsBase
 {
+    private static readonly IPropertyService propertyService = A.Fake<IPropertyService>();
+    private static readonly ILandlordService landlordService = A.Fake<ILandlordService>();
+    private readonly LandlordController _underTest = new(null!, null!, landlordService, propertyService);
+
     [Fact]
     public void RegisterGet_CalledByUnregisteredUser_ReturnsRegisterViewWithEmail()
     {
@@ -71,5 +75,20 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Assert
         A.CallTo(() => propertyService.AddNewProperty(formResultModel, 1)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
+    }
+    
+    [Fact]
+    public async void ApproveCharter_CallsApproveLandlord()
+    {
+        // Arrange 
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, _underTest);
+        var landlord = CreateLandlordUser();
+
+        // Act
+        var result = await _underTest.ApproveCharter(landlord.Id) as ViewResult;
+
+        // Assert
+        A.CallTo(() => landlordService.ApproveLandlord(landlord.Id, adminUser)).MustHaveHappened();
     }
 }
