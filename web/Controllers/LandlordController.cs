@@ -78,17 +78,31 @@ public class LandlordController : AbstractController
         {
             case ILandlordService.LandlordRegistrationResult.Success:
                 _logger.LogInformation("Successfully created landlord for user");
-                return Redirect(Url.Action("MyProfile")!);
+                if (!createModel.Unassigned)
+                {
+                    return Redirect(Url.Action("MyProfile")!);
+                }
+                else
+                {
+                    return RedirectToAction("LandlordList", "Admin");
+                }
 
             case ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered:
                 _logger.LogWarning("Email already registered {Email}", createModel.Email);
                 ModelState.AddModelError("Email", "Email already registered");
-                return View("Register");
+                return View("Register", createModel);
 
             case ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord:
                 _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
                 TempData["FlashMessage"] = "Already registered!"; // This will be displayed on the Profile page
-                return Redirect(Url.Action("MyProfile")!);
+                if (!createModel.Unassigned)
+                {
+                    return Redirect(Url.Action("MyProfile")!);
+                }
+                else
+                {
+                    return RedirectToAction("LandlordList", "Admin");
+                }
 
             default:
                 throw new Exception($"Unknown landlord registration error ${result}");

@@ -24,6 +24,4 @@ public class LandlordDbModel
 
     public virtual UserDbModel? User { get; set; }
     public virtual List<PropertyDbModel> Properties { get; set; } = new();
-
-    public Guid? InviteLink { get; set; } = null; //Nullable & initialised as null as it should be the default value
 }
