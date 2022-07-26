@@ -28,7 +28,6 @@ body {
 
 /* Mark input boxes that gets an error on validation: */
 input.invalid {
-  
   background-color: #ffdddd;
 }
 
