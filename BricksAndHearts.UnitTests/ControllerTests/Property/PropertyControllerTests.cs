@@ -15,7 +15,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     public void AddNewPropertyBeginGet_ReturnsView_AtStep1()
     {
         // Arrange
-        CreateRegisteredUserInController(_underTest);
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, _underTest);
 
         // Act
         var result = _underTest.AddNewProperty_Begin() as ViewResult;
@@ -33,7 +34,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     public void AddNewPropertyContinueGet_ReturnsViewAtStep(int step)
     {
         // Arrange
-        CreateRegisteredUserInController(_underTest);
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, _underTest);
 
         // Act
         var result = _underTest.AddNewProperty_Continue(step) as ViewResult;
@@ -58,7 +60,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(fakePropertyDbModel);
 
         var controller = new PropertyController(propertyService, null!);
-        CreateRegisteredUserInController(controller);
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, controller);
 
         // Act
         var result = controller.AddNewProperty_Continue(step) as ViewResult;
@@ -81,7 +84,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(null);
 
         var controller = new PropertyController(propertyService, null!);
-        CreateRegisteredUserInController(controller);
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, controller);
 
         // Act
         var result = controller.AddNewProperty_Continue(step) as ViewResult;
@@ -102,7 +106,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Arrange 
         var propertyService = A.Fake<IPropertyService>();
 
-        CreateRegisteredUserInController(_underTest);
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, _underTest);
 
         var formResultModel = CreateExamplePropertyViewModel();
         _underTest.ViewData.ModelState.AddModelError("Key", "ErrorMessage");
@@ -125,7 +130,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(null);
 
         var controller = new PropertyController(propertyService, null!);
-        CreateRegisteredUserInController(controller);
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, controller);
 
         var formResultModel = new PropertyViewModel
         {
@@ -150,7 +156,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(null);
 
         var controller = new PropertyController(propertyService, null!);
-        CreateRegisteredUserInController(controller);
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, controller);
 
         var formResultModel = new PropertyViewModel
         {
@@ -183,7 +190,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(null);
 
         var controller = new PropertyController(propertyService, null!);
-        CreateRegisteredUserInController(controller);
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, controller);
 
         var formResultModel = A.Fake<PropertyViewModel>();
 
@@ -208,7 +216,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(fakePropertyDbModel);
 
         var controller = new PropertyController(propertyService, null!);
-        CreateRegisteredUserInController(controller);
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, controller);
 
         var formResultModel = A.Fake<PropertyViewModel>();
 
@@ -230,7 +239,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var propertyService = A.Fake<IPropertyService>();
 
         var controller = new PropertyController(propertyService, null!);
-        CreateRegisteredUserInController(controller);
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, controller);
 
         var formResultModel = A.Fake<PropertyViewModel>();
 
@@ -253,7 +263,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(fakePropertyDbModel);
 
         var controller = new PropertyController(propertyService, null!);
-        CreateRegisteredUserInController(controller);
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, controller);
 
         // Act
         var result = controller.AddNewProperty_Cancel();
@@ -275,7 +286,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(null);
 
         var controller = new PropertyController(propertyService, null!);
-        CreateRegisteredUserInController(controller);
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, controller);
 
         // Act
         var result = controller.AddNewProperty_Cancel();
