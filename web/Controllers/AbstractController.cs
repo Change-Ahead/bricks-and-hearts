@@ -24,14 +24,6 @@ public abstract class AbstractController : Controller
                 $"Successfully {requestAction}"));
     }
 
-    protected void LoggerAlreadyAdminWarning(ILogger logger, BricksAndHeartsUser user)
-    {
-        FlashMessage(logger,
-            ($"User {user.Id} already an admin",
-                "danger",
-                "Already an admin"));
-    }
-
     protected void FlashMessage(ILogger logger, (string logInfo, string flashtype, string flashmessage) flash)
     {
         logger.LogInformation(flash.logInfo);

@@ -1,5 +1,6 @@
 #region
 
+using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
@@ -82,8 +83,16 @@ public class AdminController : AbstractController
     [HttpGet]
     public async Task<IActionResult> LandlordList()
     {
-        LandlordListModel landlordListModel = new LandlordListModel();
+        var landlordListModel = new LandlordListModel();
         landlordListModel.UnapprovedLandlords = await _adminService.GetUnapprovedLandlords();
         return View(landlordListModel);
+    }
+
+    private void LoggerAlreadyAdminWarning(ILogger logger, BricksAndHeartsUser user)
+    {
+        FlashMessage(logger,
+            ($"User {user.Id} already an admin",
+                "danger",
+                "Already an admin"));
     }
 }
