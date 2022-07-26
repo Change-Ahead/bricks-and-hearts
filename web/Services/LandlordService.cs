@@ -15,8 +15,10 @@ public interface ILandlordService
         Success
     }
 
-    public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel,
+    public Task<LandlordRegistrationResult> RegisterLandlord(LandlordProfileModel createModel,
         BricksAndHeartsUser user);
+
+    public Task<LandlordRegistrationResult> RegisterLandlord(LandlordProfileModel createModel);
 }
 
 public class LandlordService : ILandlordService
@@ -29,8 +31,7 @@ public class LandlordService : ILandlordService
     }
 
     // Create a new landlord record and associate it with a user
-    public async Task<ILandlordService.LandlordRegistrationResult> RegisterLandlordWithUser(
-        LandlordProfileModel createModel,
+    public async Task<ILandlordService.LandlordRegistrationResult> RegisterLandlord(LandlordProfileModel createModel,
         BricksAndHeartsUser user)
     {
         var dbModel = new LandlordDbModel
@@ -74,6 +75,33 @@ public class LandlordService : ILandlordService
         }
 
         user.LandlordId = dbModel.Id;
+
+        return ILandlordService.LandlordRegistrationResult.Success;
+    }
+
+    public async Task<ILandlordService.LandlordRegistrationResult> RegisterLandlord(LandlordProfileModel createModel)
+    {
+        var dbModel = new LandlordDbModel
+        {
+            Title = createModel.Title,
+            FirstName = createModel.FirstName,
+            LastName = createModel.LastName,
+            CompanyName = createModel.CompanyName,
+            Email = createModel.Email,
+            Phone = createModel.Phone,
+            LandlordStatus = createModel.LandlordStatus,
+            LandlordProvidedCharterStatus = createModel.LandlordProvidedCharterStatus
+        };
+
+        // Check there isn't already a Landlord with that email. Nothing depends on this currently, but it would probably mean the landlord is a duplicate
+        // This requires Serializable isolation, otherwise it will not lock any rows, and two racing registrations could create duplicate records
+        if (await _dbContext.Landlords.AnyAsync(l => l.Email == createModel.Email))
+            return ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered;
+
+        // Insert the landlord and call SaveChanges
+        // Entity Framework will insert the record and populate dbModel.Id with the new record's id
+        _dbContext.Landlords.Add(dbModel);
+        await _dbContext.SaveChangesAsync();
 
         return ILandlordService.LandlordRegistrationResult.Success;
     }

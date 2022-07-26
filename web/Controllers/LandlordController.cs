@@ -27,13 +27,19 @@ public class LandlordController : AbstractController
 
     [HttpGet]
     [Route("register")]
-    public ActionResult RegisterGet()
+    public ActionResult RegisterGet(bool createUnassigned = false)
     {
         var currentUser = GetCurrentUser();
-        if (currentUser.LandlordId != null)
+        if (currentUser.LandlordId != null && !currentUser.IsAdmin)
         {
             _logger.LogWarning("User {UserId} is already registered, will redirect to profile", currentUser.Id);
             return Redirect(Url.Action("MyProfile")!);
+        }
+
+        // If user is an admin, and there was a true createUnassigned param passed
+        if (currentUser.IsAdmin && createUnassigned)
+        {
+            return View("Register", new LandlordProfileModel { Unassigned = true });
         }
 
         return View("Register", new LandlordProfileModel
@@ -53,24 +59,50 @@ public class LandlordController : AbstractController
         }
 
         var user = GetCurrentUser();
+        var result = ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord;
 
-        var result = await _landlordService.RegisterLandlordWithUser(createModel, user);
+        if (createModel.Unassigned)
+        {
+            result =
+                await _landlordService.RegisterLandlord(createModel);
+        }
+        else
+        {
+            result =
+                await _landlordService.RegisterLandlord(createModel,
+                    user);
+        }
+
 
         switch (result)
         {
             case ILandlordService.LandlordRegistrationResult.Success:
-                _logger.LogInformation("Successfully created landlord for user {UserId}", user.Id);
-                return Redirect(Url.Action("MyProfile")!);
+                _logger.LogInformation("Successfully created landlord for user");
+                if (!createModel.Unassigned)
+                {
+                    return Redirect(Url.Action("MyProfile")!);
+                }
+                else
+                {
+                    return RedirectToAction("LandlordList", "Admin");
+                }
 
             case ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered:
                 _logger.LogWarning("Email already registered {Email}", createModel.Email);
                 ModelState.AddModelError("Email", "Email already registered");
-                return View("Register");
+                return View("Register", createModel);
 
             case ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord:
                 _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
                 TempData["FlashMessage"] = "Already registered!"; // This will be displayed on the Profile page
-                return Redirect(Url.Action("MyProfile")!);
+                if (!createModel.Unassigned)
+                {
+                    return Redirect(Url.Action("MyProfile")!);
+                }
+                else
+                {
+                    return RedirectToAction("LandlordList", "Admin");
+                }
 
             default:
                 throw new Exception($"Unknown landlord registration error ${result}");
@@ -82,6 +114,7 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> Profile([FromRoute] int id)
     {
         var user = GetCurrentUser();
+
         if (user.LandlordId != id && !user.IsAdmin)
         {
             return StatusCode(403);
