@@ -18,6 +18,7 @@ public class PropertyController : AbstractController
         _logger = logger;
     }
 
+    [Authorize(Roles = "Landlord")]
     [HttpGet("add")]
     public ActionResult AddNewProperty_Begin()
     {
@@ -25,18 +26,14 @@ public class PropertyController : AbstractController
         return AddNewProperty_Continue(1);
     }
 
+    [Authorize(Roles = "Landlord")]
     [HttpGet("add/step/{step:int}")]
     public ActionResult AddNewProperty_Continue([FromRoute] int step)
     {
-        // Can replace with Role in future
-        var landlordId = GetCurrentUser().LandlordId;
-        if (!landlordId.HasValue)
-        {
-            return StatusCode(403);
-        }
+        var landlordId = GetCurrentUser().LandlordId!.Value;
 
         // See if we're already adding a property
-        var dbModel = _propertyService.GetIncompleteProperty(landlordId.Value);
+        var dbModel = _propertyService.GetIncompleteProperty(landlordId);
         var property = dbModel == null
             ? new PropertyViewModel { Address = new PropertyAddress() }
             : PropertyViewModel.FromDbModel(dbModel);
@@ -45,14 +42,11 @@ public class PropertyController : AbstractController
         return View("AddNewProperty", new AddNewPropertyViewModel { Step = step, Property = property });
     }
 
+    [Authorize(Roles = "Landlord")]
     [HttpPost("add/step/{step:int}")]
     public ActionResult AddNewProperty_Continue([FromRoute] int step, [FromForm] PropertyViewModel newPropertyModel)
     {
-        var landlordId = GetCurrentUser().LandlordId;
-        if (!landlordId.HasValue)
-        {
-            return StatusCode(403);
-        }
+        var landlordId = GetCurrentUser().LandlordId!.Value;
 
         if (!ModelState.IsValid)
         {
@@ -60,7 +54,7 @@ public class PropertyController : AbstractController
         }
 
         // Get the property we're currently adding
-        var property = _propertyService.GetIncompleteProperty(landlordId.Value);
+        var property = _propertyService.GetIncompleteProperty(landlordId);
         if (property == null)
         {
             if (step == 1)
@@ -74,7 +68,7 @@ public class PropertyController : AbstractController
                 else
                 {
                     // Create new record in the database for this property
-                    _propertyService.AddNewProperty(landlordId.Value, newPropertyModel, isIncomplete: true);
+                    _propertyService.AddNewProperty(landlordId, newPropertyModel, isIncomplete: true);
                 }
 
                 // Go to step 2
@@ -104,17 +98,14 @@ public class PropertyController : AbstractController
         }
     }
 
+    [Authorize(Roles = "Landlord")]
     [HttpPost("add/cancel")]
     public ActionResult AddNewProperty_Cancel()
     {
-        var landlordId = GetCurrentUser().LandlordId;
-        if (!landlordId.HasValue)
-        {
-            return StatusCode(403);
-        }
+        var landlordId = GetCurrentUser().LandlordId!.Value;
 
         // Get the property we're currently adding
-        var property = _propertyService.GetIncompleteProperty(landlordId.Value);
+        var property = _propertyService.GetIncompleteProperty(landlordId);
         if (property == null)
         {
             // No property in progress
