@@ -50,6 +50,7 @@ function validateForm() {
         {
             // add an "invalid" class to the field:
             tabInputList[tabInputIterator].className += " invalid";
+            tabInputList[tabInputIterator].value = ""
             // and set the current valid status to false:
             valid = false;
         }
@@ -69,4 +70,22 @@ function fixStepIndicator(currentStep) {
     }
     //... and adds the "active" class to the current step:
     stepList[currentStep].className += " active";
+}
+
+// Get the input field
+let inputs, currentInput 
+inputs = document.getElementsByTagName('input');
+// Execute a function when the user presses a key on the keyboard
+for (currentInput = 0; currentInput < inputs.length; currentInput++){
+    inputs[currentInput].addEventListener("keypress", function(event) {
+        // If the user presses the "Enter" key on the keyboard
+        if (event.key === "Enter") {
+            // Cancel the default action, if needed
+            event.preventDefault();
+            // Trigger the button element with a click
+            document.getElementById("nextBtn").click();
+            // Deselects all input boxes
+            this.blur();
+        }
+    });
 }
