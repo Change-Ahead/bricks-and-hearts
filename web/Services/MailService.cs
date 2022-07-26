@@ -1,7 +1,9 @@
-﻿using BricksAndHearts.Auth;
+﻿using System.Net.Mail;
+using BricksAndHearts.Auth;
 using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
+using SmtpClient = MailKit.Net.Smtp.SmtpClient;
 
 namespace BricksAndHearts.Services;
 

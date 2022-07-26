@@ -60,7 +60,7 @@ public class PropertyViewModel : IValidatableObject
             NumOfBedrooms = property.NumOfBedrooms,
             CreationTime = property.CreationTime,
             Rent = property.Rent,
-            UserWhoRented = property.UserWhoRented,
+            UserWhoRented = property.RenterUserId,
             Description = property.Description,
             Lat = property.Lat,
             Lon = property.Lon,

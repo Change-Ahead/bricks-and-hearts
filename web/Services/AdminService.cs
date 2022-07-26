@@ -11,6 +11,7 @@ public interface IAdminService
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
     public Task<List<PropertyDbModel>> GetPropertyList();
     public Task<LandlordDbModel> GetLandlordDbModelFromId(int landlordId);
+    public List<PropertyDbModel> SortProperties(string by);
     public Task<List<LandlordDbModel>> GetLandlordDisplayList(string approvalStatus);
     public UserDbModel? FindUserByLandlordId(int landlordId);
     public string? FindExistingInviteLink(int landlordId);
@@ -158,6 +159,19 @@ public class AdminService : IAdminService
 
     public async Task<LandlordDbModel> GetLandlordDbModelFromId(int landlordId)
     {
-        return await _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == landlordId);
+        return (await _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == landlordId))!;
+    }
+    
+    public List<PropertyDbModel> SortProperties(string by)
+    {
+        List<PropertyDbModel> properties;
+        if (by == "Availability")
+        {
+            properties = _dbContext.Properties.OrderBy(m => m.RenterUserId).ToList();
+        }
+        else {
+            properties = _dbContext.Properties.OrderBy(m => m.Rent).ToList();
+        }
+        return properties;
     }
 }

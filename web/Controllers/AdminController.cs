@@ -1,6 +1,7 @@
 #region
 
 using BricksAndHearts.Auth;
+using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -172,7 +173,7 @@ public class AdminController : AbstractController
     {
         var propertyList = await _adminService.GetPropertyList();
         var listOfProperties = propertyList.Select(PropertyViewModel.FromDbModel).ToList();
-        return View("AllProperties", new PropertiesDashboardViewModel(listOfProperties));
+        return View(new PropertiesDashboardViewModel(listOfProperties));
     }
 
     public async Task<IActionResult> ViewLandlord(int landlordId)
@@ -183,34 +184,7 @@ public class AdminController : AbstractController
             return StatusCode(404);
         }
 
-        var LandlordViewModel = LandlordProfileModel.FromDbModel(landlord);
-        return View("Profile", LandlordViewModel);
-    }
-    
-    public IActionResult SortProperties(string by, bool descending = false)
-    {
-        List<PropertyDbModel> properties;
-        if (by == "Availability")
-        {
-            
-            properties = _dbContext.Properties.OrderBy(m => m.UserWhoRented).ToList();
-            
-            
-        }
-        else if (by == "Rent")
-        {
-            properties = _dbContext.Properties.OrderBy(m => m.Rent).ToList();
-            
-        }
-        else
-        {
-            return View("Error", new ErrorViewModel());
-        }
-        if (descending)
-        {
-            properties.Reverse();
-        }
-        var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).ToList();
-        return View("AllProperties", new PropertiesDashboardViewModel(listOfProperties));
+        var LandlordViewModel = LandlordProfileModel.FromDbModel(landlord, GetCurrentUser());
+        return View("~/Views/Landlord/Profile.cshtml", LandlordViewModel);
     }
 }

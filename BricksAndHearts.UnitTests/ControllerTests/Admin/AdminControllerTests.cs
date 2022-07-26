@@ -47,7 +47,7 @@ public class AdminControllerTests : AdminControllerTestsBase
     {
         // Arrange
         MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
-        
+
         // Act
         var result = UnderTest.GetAdminList().Result as ViewResult;
 
@@ -56,29 +56,37 @@ public class AdminControllerTests : AdminControllerTestsBase
     }
 
     [Fact]
-    public void AcceptAdminRequest_WhenCalled_ApprovesAdminAccessRequest()
+    public void PropertyList_ReturnsViewWith_PropertiesDashboardViewModel()
+    {
+        // Act
+        var result = UnderTest.PropertyList().Result as ViewResult;
+
+        // Assert
+        result!.Model.Should().BeOfType<PropertiesDashboardViewModel>();
+    }
+
+    [Fact]
+    public void ViewLandlord_ReturnsViewWith_LandlordProfileModel()
     {
         // Arrange
-        MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, UnderTest);
         var dummyId = 1;
 
         // Act
-        var result = UnderTest.AcceptAdminRequest(dummyId);
-        
+        var result = UnderTest.ViewLandlord(dummyId).Result as ViewResult;
+
         // Assert
-        A.CallTo(() => AdminService.ApproveAdminAccessRequest(dummyId)).MustHaveHappened();
+        result!.Model.Should().BeOfType<LandlordProfileModel>();
     }
-    
+
     [Fact]
-    public void RejectAdminRequest_WhenCalled_RejectsAdminAccessRequest()
+    public void SortProperties_ReturnsViewWith_PropertiesDashboardViewModel()
     {
         // Arrange
-        MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
+        var dummyString = A.Dummy<string>();
 
         // Act
-        var result = UnderTest.RejectAdminRequest(1);
-        
-        // Assert
-        A.CallTo(() => AdminService.RejectAdminAccessRequest(1)).MustHaveHappened();
+        var result = UnderTest.SortProperties(dummyString) as ViewResult;
     }
 }

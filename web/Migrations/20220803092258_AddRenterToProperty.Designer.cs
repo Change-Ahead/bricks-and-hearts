@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BricksAndHearts.Migrations
 {
     [DbContext(typeof(BricksAndHeartsDbContext))]
-    [Migration("20220726082722_PropertyContainsUserWhoRented")]
-    partial class PropertyContainsUserWhoRented
+    [Migration("20220803092258_AddRenterToProperty")]
+    partial class AddRenterToProperty
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,6 +32,12 @@ namespace BricksAndHearts.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<int?>("ApprovalAdminId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime?>("ApprovalTime")
+                        .HasColumnType("datetime2");
+
                     b.Property<bool>("CharterApproved")
                         .HasColumnType("bit");
 
@@ -45,6 +51,12 @@ namespace BricksAndHearts.Migrations
                     b.Property<string>("FirstName")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("InviteLink")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsLandlordForProfit")
+                        .HasColumnType("bit");
 
                     b.Property<bool>("LandlordProvidedCharterStatus")
                         .HasColumnType("bit");
@@ -79,6 +91,7 @@ namespace BricksAndHearts.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("AddressLine1")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AddressLine2")
@@ -96,6 +109,9 @@ namespace BricksAndHearts.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsIncomplete")
+                        .HasColumnType("bit");
+
                     b.Property<int>("LandlordId")
                         .HasColumnType("int");
 
@@ -103,6 +119,7 @@ namespace BricksAndHearts.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Postcode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PropertyType")
@@ -111,11 +128,11 @@ namespace BricksAndHearts.Migrations
                     b.Property<int?>("Rent")
                         .HasColumnType("int");
 
+                    b.Property<int?>("RenterUserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("TownOrCity")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<int?>("userWhoRented")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
