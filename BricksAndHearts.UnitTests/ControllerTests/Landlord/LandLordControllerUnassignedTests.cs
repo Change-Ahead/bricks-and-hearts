@@ -1,9 +1,11 @@
-﻿using BricksAndHearts.Services;
+using BricksAndHearts.Controllers;
+using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Castle.Core.Internal;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;

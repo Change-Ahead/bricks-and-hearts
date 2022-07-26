@@ -104,7 +104,7 @@ public class LandlordService : ILandlordService
                     await GetLandlordIdIfExistsFromModel(dbModel) ?? 0);
 
             // Insert the landlord and call SaveChanges
-            // Entity Framework will insert the record and populate dbModel.Id with the new record's id
+        // Entity Framework will insert the record and populate dbModel.Id with the new record's id
             _dbContext.Landlords.Add(dbModel);
             await _dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
