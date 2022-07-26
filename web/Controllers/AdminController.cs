@@ -5,21 +5,24 @@ using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
+#endregion
+
 namespace BricksAndHearts.Controllers;
 
 public class AdminController : AbstractController
 {
-    private readonly BricksAndHeartsDbContext _dbContext;
     private readonly IAdminService _adminService;
+    private readonly BricksAndHeartsDbContext _dbContext;
     private readonly ILogger<AdminController> _logger;
 
-    public AdminController(ILogger<AdminController> logger, BricksAndHeartsDbContext dbContext, IAdminService adminService)
+    public AdminController(ILogger<AdminController> logger, BricksAndHeartsDbContext dbContext,
+        IAdminService adminService)
     {
         _logger = logger;
         _adminService = adminService;
         _dbContext = dbContext;
     }
-    
+
     public IActionResult Index()
     {
         var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
@@ -42,9 +45,9 @@ public class AdminController : AbstractController
         }
 
         _adminService.RequestAdminAccess(user);
-        
+
         FlashRequestSuccess(_logger, user, "requested admin access");
-        
+
         return RedirectToAction(nameof(Index));
     }
     
@@ -60,18 +63,18 @@ public class AdminController : AbstractController
         }
 
         _adminService.CancelAdminAccessRequest(user);
-        
+
         FlashRequestSuccess(_logger, user, "cancelled admin access request");
-        
+
         return RedirectToAction(nameof(Index));
     }
 
-    [Authorize(Roles="Admin")]
+    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> AdminList()
     {
         var adminLists = await _adminService.GetAdminLists();
-        AdminListModel adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
+        var adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
         return View(adminListModel);
     }
     

@@ -1,5 +1,9 @@
-﻿using BricksAndHearts.Auth;
+﻿#region
+
+using BricksAndHearts.Auth;
 using Microsoft.AspNetCore.Mvc;
+
+#endregion
 
 namespace BricksAndHearts.Controllers;
 
@@ -11,24 +15,24 @@ public abstract class AbstractController : Controller
 
         return (BricksAndHeartsUser)User.Identity;
     }
-    
-    protected void FlashRequestSuccess(ILogger logger, BricksAndHeartsUser user, string requestType)
+
+    protected void FlashRequestSuccess(ILogger logger, BricksAndHeartsUser user, string requestAction)
     {
         FlashMessage(logger,
-            ($"Successfully {requestType} for user {user.Id}",
+            ($"Successfully {requestAction} for user {user.Id}",
                 "success",
-                $"Successfully {requestType}"));
+                $"Successfully {requestAction}"));
     }
 
     protected void LoggerAlreadyAdminWarning(ILogger logger, BricksAndHeartsUser user)
     {
         FlashMessage(logger,
-            ($"User {user.Id} already an admin", 
-                "danger", 
+            ($"User {user.Id} already an admin",
+                "danger",
                 "Already an admin"));
     }
 
-    protected void FlashMessage(ILogger logger, (string logInfo,string flashtype, string flashmessage) flash)
+    protected void FlashMessage(ILogger logger, (string logInfo, string flashtype, string flashmessage) flash)
     {
         logger.LogInformation(flash.logInfo);
         TempData["FlashType"] = flash.flashtype;
