@@ -10,10 +10,10 @@ namespace BricksAndHearts.Controllers;
 [Route("/landlord")]
 public class LandlordController : AbstractController
 {
-    private readonly ILandlordService _landlordService;
     private readonly ILogger<LandlordController> _logger;
-    private readonly IMailService _mailService;
+    private readonly ILandlordService _landlordService;
     private readonly IPropertyService _propertyService;
+    private readonly IMailService _mailService;
 
     public LandlordController(ILogger<LandlordController> logger,
         ILandlordService landlordService, IPropertyService propertyService, IMailService mailService)

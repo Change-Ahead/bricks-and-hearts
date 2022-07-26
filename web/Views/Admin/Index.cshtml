@@ -50,10 +50,4 @@
             <a href="@Url.Action("Google", "Login")">Login</a>
         }
     }
-    @using (Html.BeginForm("ImageUpload", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
-    { 
-        <div>Please select an image to upload</div>
-        <input name="images" type="file">
-        <input type="submit" value="Upload Image" />
-    }
 </div>

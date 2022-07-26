@@ -6,7 +6,7 @@
 
 <h2>My properties</h2>
 
-<table class="table">
+<table class="table table-hover">
     <thead>
     <tr>
         <th scope="col">#</th>
@@ -24,7 +24,8 @@
     }
     @foreach (var prop in Model.Properties)
     {
-        <tr>
+        <tr class ="clickable"
+            onclick="location.href = '@Url.Action("AddPropertyImages", "Property", new { propertyId = prop!.PropertyId })'">
             <th scope="row">@i</th>
             <td>
                 @prop.Address.AddressLine1,
@@ -45,4 +46,4 @@
     </tbody>
 </table>
 
-@Html.ActionLink("Add new property", "AddNewProperty_Begin", "Property", null, new { @class = "btn btn-primary" })
+@*@Html.ActionLink("Add new property", "AddNewProperty_Begin", "Property", null, new { @class = "btn btn-primary" })*@
