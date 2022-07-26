@@ -86,7 +86,16 @@ public class AdminController : AbstractController
     public async Task<IActionResult> LandlordList()
     {
         LandlordListModel landlordListModel = new LandlordListModel();
-        landlordListModel.UnapprovedLandlords = await _adminService.GetUnapprovedLandlords();
+        landlordListModel.LandlordDisplayList = await _adminService.GetLandlordDisplayList("All");
+        return View(landlordListModel);
+    }
+    
+    [Authorize(Roles="Admin")]
+    [HttpPost]
+    public async Task<IActionResult> LandlordList(string? approvalStatus)
+    {
+        LandlordListModel landlordListModel = new LandlordListModel();
+        landlordListModel.LandlordDisplayList = await _adminService.GetLandlordDisplayList(approvalStatus);
         return View(landlordListModel);
     }
 }
