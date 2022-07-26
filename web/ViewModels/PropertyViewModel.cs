@@ -46,6 +46,9 @@ public class PropertyViewModel : IValidatableObject
     // Latitude and Longitude
     public decimal? Lat { get; set; }
     public decimal? Lon { get; set; }
+    
+    public int? UserWhoRented { get; set; }
+
     public static PropertyViewModel FromDbModel(PropertyDbModel property)
     {
         return new PropertyViewModel
@@ -57,6 +60,7 @@ public class PropertyViewModel : IValidatableObject
             NumOfBedrooms = property.NumOfBedrooms,
             CreationTime = property.CreationTime,
             Rent = property.Rent,
+            UserWhoRented = property.UserWhoRented,
             Description = property.Description,
             Lat = property.Lat,
             Lon = property.Lon,

@@ -186,4 +186,31 @@ public class AdminController : AbstractController
         var LandlordViewModel = LandlordProfileModel.FromDbModel(landlord);
         return View("Profile", LandlordViewModel);
     }
+    
+    public IActionResult SortProperties(string by, bool descending = false)
+    {
+        List<PropertyDbModel> properties;
+        if (by == "Availability")
+        {
+            
+            properties = _dbContext.Properties.OrderBy(m => m.UserWhoRented).ToList();
+            
+            
+        }
+        else if (by == "Rent")
+        {
+            properties = _dbContext.Properties.OrderBy(m => m.Rent).ToList();
+            
+        }
+        else
+        {
+            return View("Error", new ErrorViewModel());
+        }
+        if (descending)
+        {
+            properties.Reverse();
+        }
+        var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).ToList();
+        return View("AllProperties", new PropertiesDashboardViewModel(listOfProperties));
+    }
 }

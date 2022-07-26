@@ -113,7 +113,6 @@ namespace BricksAndHearts.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("AddressLine1")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AddressLine2")
@@ -149,7 +148,6 @@ namespace BricksAndHearts.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Postcode")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PropertyType")
@@ -160,6 +158,9 @@ namespace BricksAndHearts.Migrations
 
                     b.Property<string>("TownOrCity")
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("userWhoRented")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
 
