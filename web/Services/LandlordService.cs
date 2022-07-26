@@ -94,8 +94,11 @@ public class LandlordService : ILandlordService
         editedLandlord.FirstName = createModel.FirstName;
         editedLandlord.LastName = createModel.LastName;
         editedLandlord.CompanyName = createModel.CompanyName;
-        /*TODO: check that the new email input is not currently registered*/
-        editedLandlord.Email = createModel.Email;      
+        if (_dbContext.Landlords.SingleOrDefault(l => l.Email == createModel.Email)==null)
+        {
+            editedLandlord.Email = createModel.Email;
+        }
+        /*TODO: display an error saying email is already registered, currently it wont accept a currently registered email but will not notify the user*/
         editedLandlord.Phone = createModel.Phone;
 
         _dbContext.Update(editedLandlord);
