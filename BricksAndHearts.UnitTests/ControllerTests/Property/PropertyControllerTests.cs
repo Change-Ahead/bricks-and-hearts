@@ -6,6 +6,7 @@ using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Property;
@@ -271,5 +272,48 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => PropertyService.GetIncompleteProperty(1)).MustHaveHappened();
         A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustNotHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
+    }
+
+    [Fact]
+    public void ViewProperty_WithNonExistingProperty_RedirectToDashboard()
+    {
+        // Arrange
+        var propertyService = A.Fake<IPropertyService>();
+        A.CallTo(() => propertyService.GetPropertyByPropertyId(1)).Returns(null);
+        
+        var logger = A.Fake<ILogger<PropertyController>>();
+
+        var controller = new PropertyController(propertyService, null!, logger);
+        CreateRegisteredUserInController(controller);
+        
+        // Act
+        var result = controller.ViewProperty(1);
+        
+        // Assert
+        A.CallTo(() => propertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
+    }
+    
+    [Fact]
+    public void ViewProperty_WithExistingProperty_ReturnViewPropertyView()
+    {
+        // Arrange
+        var propertyService = A.Fake<IPropertyService>();
+        var model = A.Fake<PropertyDbModel>();
+        model.Id = 1;
+        A.CallTo(() => propertyService.GetPropertyByPropertyId(1)).Returns(model);
+        
+        var logger = A.Fake<ILogger<PropertyController>>();
+
+        var controller = new PropertyController(propertyService, null!, logger);
+        CreateRegisteredUserInController(controller);
+        
+        // Act
+        var result = controller.ViewProperty(1) as ViewResult;
+        
+        
+        // Assert
+        A.CallTo(() => propertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
+        result!.ViewData.Model.Should().BeOfType<PropertyViewModel>();
     }
 }
