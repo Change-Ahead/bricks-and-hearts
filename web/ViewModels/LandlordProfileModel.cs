@@ -53,5 +53,4 @@ public class LandlordProfileModel
             CharterApproved = landlord.CharterApproved
         };
     }
-    
 }

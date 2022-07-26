@@ -1,5 +1,16 @@
-﻿let currentTab = 0;
-showTab(currentTab);
+﻿var currentTab = 0;
+
+function setCurrentTab(inputTab){
+    currentTab = inputTab
+    localStorage.setItem("someVarKey", currentTab);
+}
+
+if (window.location.pathname == "/landlord/register" || window.location.pathname == "/landlord/edit"){
+    if(localStorage.getItem("someVarKey")!=null){
+        currentTab = parseInt(localStorage.getItem("someVarKey"));
+    }
+    showTab(currentTab);
+}
 
 function showTab(currentTab) {
     let tabList = document.getElementsByClassName("registerTab");

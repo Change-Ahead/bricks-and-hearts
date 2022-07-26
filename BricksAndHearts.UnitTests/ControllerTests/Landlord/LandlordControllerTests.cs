@@ -1,5 +1,6 @@
 ﻿using BricksAndHearts.Controllers;
 using BricksAndHearts.Services;
+using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
@@ -71,5 +72,39 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Assert
         A.CallTo(() => propertyService.AddNewProperty(formResultModel, 1)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
+    }
+    
+    [Fact]
+    public void EditProfileUpdate_CalledUsingLandlordDatabaseModel_ReturnsProfileViewWithLandlordProfile()
+    {
+        // Arrange 
+        var landlordDbModel = CreateTestLandlordDbModel();
+        var fakeLandlordService = A.Fake<ILandlordService>();
+        var fakeLandlordController = new LandlordController(null!, null!, fakeLandlordService, propertyService);
+
+        // Act
+        A.CallTo(() => fakeLandlordService.UpdateEditedLandlord(landlordDbModel)).Returns(landlordDbModel);
+        var result = fakeLandlordController.EditProfileUpdate(landlordDbModel) as ViewResult;
+
+        // Assert   
+        A.CallTo(() => fakeLandlordService.UpdateEditedLandlord(landlordDbModel)).MustHaveHappened();
+        result!.Model.Should().BeOfType<LandlordProfileModel>();
+    }
+    
+    [Fact]
+    public void EditProfilePage_CalledUsingUserEmail_ReturnsEditProfileViewWithLandlordProfile()
+    {
+        // Arrange 
+        var landlordDbModel = CreateTestLandlordDbModel();
+        var fakeLandlordService = A.Fake<ILandlordService>();
+        var dummyEmail = A.Dummy<string>();
+        var fakeLandlordController = new LandlordController(null!, null!, fakeLandlordService, null!);
+
+        // Act
+        A.CallTo(() => fakeLandlordService.GetLandlordFromEmail(dummyEmail)).Returns(landlordDbModel);
+        var result = fakeLandlordController.EditProfilePage(dummyEmail) as ViewResult;
+
+        // Assert   
+        result!.Model.Should().BeOfType<LandlordDbModel>();
     }
 }

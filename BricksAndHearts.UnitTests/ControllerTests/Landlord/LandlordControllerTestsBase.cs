@@ -1,5 +1,6 @@
-﻿using System;
+using System;
 using BricksAndHearts.Controllers;
+using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
@@ -29,6 +30,22 @@ public class LandlordControllerTestsBase : ControllerTestsBase
             Rent = 1200,
             Description = "Description",
             CreationTime = DateTime.Now
+        };
+    }
+
+    protected LandlordDbModel CreateTestLandlordDbModel()
+    {
+        return new LandlordDbModel()
+        {
+            Id = 1,
+            Title = "Mr",
+            FirstName = "John",
+            LastName = "Doe",
+            CompanyName = "John Doe",
+            Email = "test.email@gmail.com",
+            CharterApproved = false,
+            LandlordStatus = "some data",
+            LandlordProvidedCharterStatus = false
         };
     }
 }

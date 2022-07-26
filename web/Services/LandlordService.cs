@@ -17,6 +17,9 @@ public interface ILandlordService
 
     public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel,
         BricksAndHeartsUser user);
+    public LandlordDbModel UpdateEditedLandlord(LandlordDbModel createModel);
+    public LandlordDbModel? GetLandlordFromEmail(string userEmail);
+
 }
 
 public class LandlordService : ILandlordService
@@ -76,5 +79,36 @@ public class LandlordService : ILandlordService
         user.LandlordId = dbModel.Id;
 
         return ILandlordService.LandlordRegistrationResult.Success;
+    }
+
+    public List<PropertyDbModel> GetListOfProperties(int landlordId)
+    {
+        return _dbContext.Properties
+            .Where(p => p.LandlordId == landlordId).ToList();
+    }
+
+    public LandlordDbModel UpdateEditedLandlord(LandlordDbModel createModel)
+    {
+        var editedLandlord = _dbContext.Landlords.SingleOrDefault(l => l.Id == createModel.Id);
+        editedLandlord!.Title = createModel.Title;
+        editedLandlord.FirstName = createModel.FirstName;
+        editedLandlord.LastName = createModel.LastName;
+        editedLandlord.CompanyName = createModel.CompanyName;
+        if (_dbContext.Landlords.SingleOrDefault(l => l.Email == createModel.Email)==null)
+        {
+            editedLandlord.Email = createModel.Email;
+        }
+        /*TODO: display an error saying email is already registered, currently it wont accept a currently registered email but will not notify the user*/
+        editedLandlord.Phone = createModel.Phone;
+
+        _dbContext.Update(editedLandlord);
+        _dbContext.SaveChanges();
+        return editedLandlord;
+    }
+    
+    public LandlordDbModel? GetLandlordFromEmail(string userEmail)
+    {
+        var foundLandlord = _dbContext.Landlords.SingleOrDefault(l => l.Email == userEmail);
+        return foundLandlord;
     }
 }

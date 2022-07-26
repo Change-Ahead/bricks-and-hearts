@@ -153,4 +153,20 @@ public class LandlordController : AbstractController
 
         return RedirectToAction("ViewProperties");
     }
+
+    [HttpGet]
+    [Route("edit")]
+    public ActionResult EditProfilePage(string userEmail)
+    {
+        var landlord = _landlordService.GetLandlordFromEmail(userEmail);
+        return View("EditProfilePage", landlord);
+    }
+
+    [HttpPost]
+    public ActionResult EditProfileUpdate([FromForm] LandlordDbModel createModel)
+    {
+        var editedLandlord = _landlordService.UpdateEditedLandlord(createModel);
+
+        return View("Profile", LandlordProfileModel.FromDbModel(editedLandlord));
+    }
 }
