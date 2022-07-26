@@ -57,35 +57,3 @@ input.invalid {
 .step.finish {
   background-color: blue;
 }
-
-.setWidth{
-  width: 50%;
-}
-
-.ProfileStyling{
-  white-space: nowrap;
-}
-
-.ProfileStyling .button .h4 {
-  display: inline;
-}
-
-.ProfileStyling button {
-  float: right;
-  text-align: right;
-  margin-left: 80%;
-}
-
-.bg-primary p-2 rounded-1 {
-  position: fixed;
-  right: 70%;
-}
-
-.tables {
-  display: inline-block;
-  clear: both;
-}
-
-.tables .table {
-  width: 100%;
-}

@@ -1,23 +1,27 @@
 using System;
 using BricksAndHearts.Controllers;
-using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
 
 public class LandlordControllerTestsBase : ControllerTestsBase
 {
-    protected readonly IPropertyService PropertyService;
-    protected readonly ILandlordService LandlordService;
-    protected readonly LandlordController UnderTest;
+    protected readonly IPropertyService propertyService;
+    protected readonly ILandlordService landlordService;
+    protected readonly Logger<LandlordController> logger;
+    protected readonly MailService mailService;
+    protected readonly LandlordController _underTest;
 
     protected LandlordControllerTestsBase()
     {
-        LandlordService = A.Fake<ILandlordService>();
-        PropertyService = A.Fake<IPropertyService>();
-        UnderTest = new LandlordController(null!, LandlordService, PropertyService, null!);
+        propertyService = A.Fake<IPropertyService>();
+        landlordService = A.Fake<ILandlordService>();
+        logger = A.Fake<Logger<LandlordController>>();
+        mailService = A.Fake<MailService>();
+        _underTest = new LandlordController(logger, landlordService, propertyService, mailService);
     }
     
     protected PropertyViewModel CreateExamplePropertyViewModel()
@@ -41,9 +45,9 @@ public class LandlordControllerTestsBase : ControllerTestsBase
         };
     }
 
-    protected LandlordDbModel CreateTestLandlordDbModel()
+    protected LandlordProfileModel CreateTestLandlordProfileModel()
     {
-        return new LandlordDbModel()
+        return new LandlordProfileModel()
         {
             Id = 1,
             Title = "Mr",

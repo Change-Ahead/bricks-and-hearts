@@ -5,7 +5,7 @@ function setCurrentTab(inputTab){
     localStorage.setItem("someVarKey", currentTab);
 }
 
-if (window.location.pathname == "/landlord/register" || window.location.pathname == "/landlord/edit"){
+if (window.location.pathname === "/landlord/register" || window.location.pathname === "/landlord/edit"){
     if(localStorage.getItem("someVarKey")!=null){
         currentTab = parseInt(localStorage.getItem("someVarKey"));
     }
@@ -15,12 +15,12 @@ if (window.location.pathname == "/landlord/register" || window.location.pathname
 function showTab(currentTab) {
     let tabList = document.getElementsByClassName("registerTab");
     tabList[currentTab].style.display = "block";
-    if (currentTab == 0) {
+    if (currentTab === 0) {
         document.getElementById("prevBtn").style.display = "none";
     } else {
         document.getElementById("prevBtn").style.display = "inline";
     }
-    if (currentTab == (tabList.length - 1)) {
+    if (currentTab === (tabList.length - 1)) {
         document.getElementById("nextBtn").innerHTML = "Submit";
     } else {
         document.getElementById("nextBtn").innerHTML = "Next";
@@ -31,7 +31,7 @@ function showTab(currentTab) {
 function nextPrev(tabChange) {
     let tabList = document.getElementsByClassName("registerTab");
     // Exit the function if any field in the current tab is invalid:
-    if (tabChange == 1 && !validateForm()) return false;
+    if (tabChange === 1 && !validateForm()) return false;
     // Hide the current tab:
     tabList[currentTab].style.display = "none";
     // Increase or decrease the current tab by 1:
@@ -55,9 +55,9 @@ function validateForm() {
     for (tabInputIterator = 0; tabInputIterator < tabInputList.length; tabInputIterator++) {
         // Validation checks for the form
         let currentField = tabInputList[tabInputIterator]
-        if ((currentField.value == "" && currentField.className!=="form-control empty")
-        || (currentField.type == "email" && (currentField.value.indexOf("@") == -1))
-        || (currentField.type == "tel" && !Number.isInteger(Number(currentField.value.replace(/\+/g,"")))))
+        if ((currentField.value === "" && currentField.className!=="form-control empty")
+        || (currentField.type === "email" && (currentField.value.indexOf("@") === -1))
+        || (currentField.type === "tel" && !Number.isInteger(Number(currentField.value.replace(/\+/g,"")))))
         {
             // add an "invalid" class to the field:
             tabInputList[tabInputIterator].className += " invalid";

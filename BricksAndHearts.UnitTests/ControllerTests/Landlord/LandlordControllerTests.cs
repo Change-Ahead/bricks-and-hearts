@@ -1,11 +1,9 @@
-using BricksAndHearts.Controllers;
+using System.Threading.Tasks;
 using BricksAndHearts.Services;
-using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
@@ -46,50 +44,46 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     public void EditProfileUpdate_CalledUsingLandlordDatabaseModel_ReturnsProfileViewWithLandlordProfile()
     {
         // Arrange 
-        var landlordDbModel = CreateTestLandlordDbModel();
-        var fakeLandlordService = A.Fake<ILandlordService>();
-        var fakeLandlordController = new LandlordController(null!, null!, fakeLandlordService, null!);
+        var landlordProfileModel = CreateTestLandlordProfileModel();
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, _underTest);
 
         // Act
-        A.CallTo(() => fakeLandlordService.UpdateEditedLandlord(landlordDbModel)).Returns(landlordDbModel);
-        var result = fakeLandlordController.EditProfileUpdate(landlordDbModel) as ViewResult;
+        A.CallTo(() => landlordService.CheckForDuplicateEmail(landlordProfileModel, 1)).Returns(false);
+        A.CallTo(() => landlordService.EditLandlordDetails(landlordProfileModel, 1)).Returns(ILandlordService.LandlordRegistrationResult.Success);
+        var result = _underTest.EditProfileUpdate(landlordProfileModel).Result;
 
         // Assert   
-        A.CallTo(() => fakeLandlordService.UpdateEditedLandlord(landlordDbModel)).MustHaveHappened();
-        result!.Model.Should().BeOfType<LandlordProfileModel>();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().BeEquivalentTo("MyProfile");
     }
     
     [Fact]
     public void EditProfileUpdate_CalledUsingLandlordDatabaseModelWithDuplicateEmail_ReturnsEditProfileViewWithLandlordProfile()
     {
         // Arrange 
-        var landlordDbModel = CreateTestLandlordDbModel();
-        var fakeLandlordService = A.Fake<ILandlordService>();
-        var fakeLogger = A.Fake<Logger<LandlordController>>();
-        var fakeLandlordController = new LandlordController(fakeLogger, null!, fakeLandlordService, null!);
+        var landlordProfileModel = CreateTestLandlordProfileModel();
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, _underTest);
 
         // Act
-        A.CallTo(() => fakeLandlordService.CheckForDuplicateEmail(landlordDbModel)).Returns(true);
-        var result = fakeLandlordController.EditProfileUpdate(landlordDbModel) as ViewResult;
+        A.CallTo(() => landlordService.CheckForDuplicateEmail(landlordProfileModel, 1)).Returns(true);
+        var result = _underTest.EditProfileUpdate(landlordProfileModel).Result as ViewResult;
 
         // Assert   
-        result!.Model.Should().BeOfType<LandlordDbModel>();
+        result!.Model.Should().BeOfType<LandlordProfileModel>();
+        result.Should().BeOfType<ViewResult>().Which.ViewName!.Should().BeEquivalentTo("EditProfilePage");
     }
     
     [Fact]
     public void EditProfilePage_CalledUsingUserEmail_ReturnsEditProfileViewWithLandlordProfile()
     {
         // Arrange 
-        var landlordDbModel = CreateTestLandlordDbModel();
-        var fakeLandlordService = A.Fake<ILandlordService>();
-        var dummyEmail = A.Dummy<string>();
-        var fakeLandlordController = new LandlordController(null!, null!, fakeLandlordService, null!);
+        var landlordProfileModel = CreateTestLandlordProfileModel();
 
         // Act
-        A.CallTo(() => fakeLandlordService.GetLandlordFromEmail(dummyEmail)).Returns(landlordDbModel);
-        var result = fakeLandlordController.EditProfilePage(dummyEmail) as ViewResult;
+        var result = _underTest.EditProfilePage(landlordProfileModel) as ViewResult;
 
         // Assert   
-        result!.Model.Should().BeOfType<LandlordDbModel>();
+        result!.Model.Should().BeOfType<LandlordProfileModel>();
     }
 }

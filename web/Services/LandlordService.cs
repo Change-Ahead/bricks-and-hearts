@@ -17,10 +17,9 @@ public interface ILandlordService
 
     public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel, BricksAndHeartsUser user);
     public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int id);
+    public Task<LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel createModel, int? selectedUserId);
+    public bool CheckForDuplicateEmail(LandlordProfileModel createModel, int? selectedUserId);
     public Task ApproveLandlord(int landlordId, BricksAndHeartsUser user);
-    public LandlordDbModel UpdateEditedLandlord(LandlordDbModel createModel);
-    public bool CheckForDuplicateEmail(LandlordDbModel createModel);
-    public LandlordDbModel? GetLandlordFromEmail(string userEmail);
 
 }
 
@@ -78,12 +77,18 @@ public class LandlordService : ILandlordService
 
         return ILandlordService.LandlordRegistrationResult.Success;
     }
-
+    
     public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int id)
     {
         return _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id);
     }
 
+    public List<PropertyDbModel> GetListOfProperties(int landlordId)
+    {
+        return _dbContext.Properties
+            .Where(p => p.LandlordId == landlordId).ToList();
+    }
+    
     public async Task ApproveLandlord(int landlordId,  BricksAndHeartsUser user)
     {
         var landlord = await GetLandlordIfExistsFromId(landlordId);
@@ -100,35 +105,26 @@ public class LandlordService : ILandlordService
         landlord.ApprovalAdminId = user.Id;
         await _dbContext.SaveChangesAsync();
     }
-
-    public LandlordDbModel UpdateEditedLandlord(LandlordDbModel createModel)
-    {
-        var editedLandlord = _dbContext.Landlords.SingleOrDefault(l => l.Id == createModel.Id);
-        editedLandlord!.Title = createModel.Title;
-        editedLandlord.FirstName = createModel.FirstName;
-        editedLandlord.LastName = createModel.LastName;
-        editedLandlord.CompanyName = createModel.CompanyName;
-        editedLandlord.Email = createModel.Email;
-        editedLandlord.Phone = createModel.Phone;
-
-        _dbContext.Update(editedLandlord);
-        _dbContext.SaveChanges();
-        return editedLandlord;
-    }
     
-    public LandlordDbModel? GetLandlordFromEmail(string userEmail)
+    public async Task<ILandlordService.LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel createModel, int? selectedUserId)
     {
-        var foundLandlord = _dbContext.Landlords.SingleOrDefault(l => l.Email == userEmail);
-        return foundLandlord;
+        var landlordToEdit = await _dbContext.Landlords.SingleAsync(l => l.Id == selectedUserId);
+        landlordToEdit.Title = createModel.Title;
+        landlordToEdit.FirstName = createModel.FirstName;
+        landlordToEdit.LastName = createModel.LastName;
+        landlordToEdit.CompanyName = createModel.CompanyName;
+        landlordToEdit.Email = createModel.Email;
+        landlordToEdit.Phone = createModel.Phone;
+
+        _dbContext.Update(landlordToEdit);
+        await _dbContext.SaveChangesAsync();
+        return ILandlordService.LandlordRegistrationResult.Success;
     }
 
-    public bool CheckForDuplicateEmail(LandlordDbModel createModel)
+    public bool CheckForDuplicateEmail(LandlordProfileModel createModel, int? selectedUserId)
     {
-        var editedLandlord = _dbContext.Landlords.SingleOrDefault(l => l.Id == createModel.Id);
-        if (editedLandlord != null && (_dbContext.Landlords.SingleOrDefault(l => l.Email == createModel.Email)==null || editedLandlord.Email==createModel.Email))
-        {
-            return false;
-        }
-        return true;
+        var editedLandlord = _dbContext.Landlords.Single(l => l.Id == selectedUserId);
+        return _dbContext.Landlords.SingleOrDefault(l => l.Email == createModel.Email) != null 
+               && editedLandlord.Email != createModel.Email;
     }
 }

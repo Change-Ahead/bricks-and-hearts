@@ -1,5 +1,4 @@
-﻿using BricksAndHearts.Database;
-using BricksAndHearts.Services;
+﻿using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +14,8 @@ public class LandlordController : AbstractController
     private readonly IMailService _mailService;
     private readonly ILogger<LandlordController> _logger;
 
-    public LandlordController(ILogger<LandlordController> logger, ILandlordService landlordService, IPropertyService propertyService, IMailService mailService)
+    public LandlordController(ILogger<LandlordController> logger,
+        ILandlordService landlordService, IPropertyService propertyService, IMailService mailService)
     {
         _logger = logger;
         _landlordService = landlordService;
@@ -141,56 +141,29 @@ public class LandlordController : AbstractController
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
         return View("Properties", new PropertiesDashboardViewModel(listOfProperties));
     }
-
-    [HttpGet]
-    [Route("/add-property")]
-    public IActionResult AddNewProperty()
-    {
-        return View();
-    }
-
-    [HttpPost]
-    [Route("/add-property")]
-    public ActionResult AddNewProperty([FromForm] PropertyViewModel newPropertyModel)
-    {
-        var landlordId = GetCurrentUser().LandlordId;
-        if (!landlordId.HasValue)
-        {
-            return StatusCode(403);
-        }
-
-        // This does checks based on the annotations (e.g. [Required]) on PropertyViewModel
-        if (!ModelState.IsValid)
-        {
-            return View(newPropertyModel);
-        }
-
-        // add property to database
-        _propertyService.AddNewProperty(newPropertyModel, landlordId.Value);
-
-        return RedirectToAction("ViewProperties");
-    }
-
+    
     [HttpGet]
     [Route("edit")]
-    public ActionResult EditProfilePage(string userEmail)
+    public ActionResult EditProfilePage(LandlordProfileModel currentProfileModel)
     {
-        var landlord = _landlordService.GetLandlordFromEmail(userEmail);
-        return View("EditProfilePage", landlord);
+        return View("EditProfilePage", currentProfileModel);
     }
 
     [HttpPost]
     [Route("edit")]
-    public ActionResult EditProfileUpdate([FromForm] LandlordDbModel createModel)
+    public async Task<ActionResult> EditProfileUpdate([FromForm] LandlordProfileModel createModel)
     {
-        bool isEmailDuplicated = _landlordService.CheckForDuplicateEmail(createModel);
+        var user = GetCurrentUser();
+        var isEmailDuplicated = _landlordService.CheckForDuplicateEmail(createModel, user.LandlordId);
         if (isEmailDuplicated)
         {
             _logger.LogWarning("Email already registered {Email}", createModel.Email);
             ModelState.AddModelError("Email", "Email already registered");
             return View("EditProfilePage", createModel);
         }
-        var editedLandlord = _landlordService.UpdateEditedLandlord(createModel);
-        return View("Profile", LandlordProfileModel.FromDbModel(editedLandlord));
+
+        await _landlordService.EditLandlordDetails(createModel, user.LandlordId);
+        _logger.LogInformation("Successfully created landlord for user {UserId}", user.LandlordId);
+        return RedirectToAction("MyProfile");
     }
 }
