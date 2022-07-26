@@ -32,7 +32,7 @@ public class TestDatabaseFixture
     private BricksAndHeartsDbContext CreateContext()
     {
         var config = new ConfigurationManager();
-        config.AddJsonFile("appsettings.Development.json");
+        config.AddJsonFile("appsettings.json");
         return new TestDbContext(config);
     }
 

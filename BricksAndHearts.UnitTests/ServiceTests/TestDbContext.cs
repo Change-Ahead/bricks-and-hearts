@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
-namespace BricksAndHearts.UnitTests;
+namespace BricksAndHearts.UnitTests.ServiceTests;
 
 public class TestDbContext : BricksAndHeartsDbContext
 {

@@ -12,6 +12,21 @@ jobs:
   build:
     name: Build and run tests
     runs-on: ubuntu-latest
+    
+    services:
+      sqlserver:
+        image: mcr.microsoft.com/mssql/server:2019-latest
+        env:
+          ACCEPT_EULA: Y
+          SA_PASSWORD: JdMsKZPBBA8kVFXVrj8d
+        ports:
+          - 1433:1433
+        options: >-
+          --health-cmd "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 'JdMsKZPBBA8kVFXVrj8d' -Q 'SELECT 1' || exit 1"
+          --health-interval 10s
+          --health-timeout 3s
+          --health-retries 10
+          --health-start-period 10s
 
     steps:
       - uses: actions/checkout@v2
@@ -24,6 +39,14 @@ jobs:
 
       - name: Build with dotnet
         run: dotnet build -warnaserror
+        
+      # Substitute entries in appsettings.json for CI
+      - name: App Settings variable substitution
+        uses: microsoft/variable-substitution@v1
+        with:
+          files: 'web/appsettings.json'
+        env:
+          TestDBConnectionString: 'Server=localhost,1433;Database=BricksAndHeartsTest;User Id=SA;Password=JdMsKZPBBA8kVFXVrj8d;'
 
       - name: Test with dotnet
         run: dotnet test
