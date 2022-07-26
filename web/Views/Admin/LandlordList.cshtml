@@ -4,7 +4,20 @@
     ViewData["Title"] = "Landlord List";
 }
 
-<h2>Unapproved Landlords</h2>
+<h2>Landlord List</h2>
+
+<div class="mb-3">
+    @using (Html.BeginForm("LandlordList", "Admin", FormMethod.Get))
+    {
+        <select class="form-select" id="approvalStatus" name="approvalStatus">
+            <option disabled selected>Filter by approval status</option>
+            <option value="">Display all landlords</option>
+            <option value="Unapproved">Display unapproved landlords</option>
+            <option value="Approved">Display approved landlords</option>
+        </select>
+        <button type="submit" class="btn custom-btn-primary">Display results</button>
+    }
+</div>
 
 <table class="table table-hover">
     <thead>
@@ -17,7 +30,7 @@
     </tr>
     </thead>
     <tbody>
-    @foreach (var landlord in Model.UnapprovedLandlords!)
+    @foreach (var landlord in Model.LandlordDisplayList!)
     {
         <tr class ="clickable"
             onclick="location.href = '@Url.Action("Profile", "Landlord", new { id = landlord!.Id })'">

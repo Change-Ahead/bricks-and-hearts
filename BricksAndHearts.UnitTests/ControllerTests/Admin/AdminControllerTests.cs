@@ -27,7 +27,7 @@ public class AdminControllerTests : AdminControllerTestsBase
     }
 
     [Fact]
-    public async void LandlordList_WhenCalled_CallsGetUnapprovedLandlordsAndReturnsLandlordListView()
+    public async void LandlordList_WhenCalled_CallsGetLandlordListAndReturnsLandlordListView()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -37,7 +37,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         var result = await _underTest.LandlordList() as ViewResult;
 
         // Assert
-        A.CallTo(() => adminService.GetUnapprovedLandlords()).MustHaveHappened();
+        A.CallTo(() => adminService.GetLandlordDisplayList("")).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<LandlordListModel?>();
     }
 }
