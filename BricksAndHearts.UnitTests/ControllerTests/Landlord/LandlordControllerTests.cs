@@ -10,6 +10,10 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
 
 public class LandlordControllerTests : LandlordControllerTestsBase
 {
+    private static readonly IPropertyService propertyService = A.Fake<IPropertyService>();
+    private static readonly ILandlordService landlordService = A.Fake<ILandlordService>();
+    private readonly LandlordController _underTest = new(null!, null!, landlordService, propertyService);
+
     [Fact]
     public void RegisterGet_CalledByUnregisteredUser_ReturnsRegisterViewWithEmail()
     {

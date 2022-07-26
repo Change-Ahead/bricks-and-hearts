@@ -88,10 +88,4 @@ public class AdminController : AbstractController
         landlordListModel.UnapprovedLandlords = await _adminService.GetUnapprovedLandlords();
         return View(landlordListModel);
     }
-    
-    [HttpPost]
-    public ActionResult ApproveCharter()
-    {
-        return RedirectToAction("Profile", "Landlord", new { Id = 1 });
-    }
 }

@@ -8,10 +8,6 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
 
 public class LandlordControllerTestsBase : ControllerTestsBase
 {
-    protected static readonly IPropertyService propertyService = A.Fake<IPropertyService>();
-    protected static readonly ILandlordService landlordService = A.Fake<ILandlordService>();
-    protected readonly LandlordController _underTest = new(null!, null!, landlordService, propertyService);
-
     protected PropertyViewModel CreateExamplePropertyViewModel()
     {
         return new PropertyViewModel
