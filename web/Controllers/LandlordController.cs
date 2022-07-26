@@ -51,10 +51,7 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> RegisterPost([FromForm] LandlordProfileModel createModel)
     {
         // This does checks based on the annotations (e.g. [Required]) on LandlordProfileModel
-        if (!ModelState.IsValid)
-        {
-            return View("Register");
-        }
+        if (!ModelState.IsValid) return View("Register");
 
         var user = GetCurrentUser();
         ILandlordService.LandlordRegistrationResult result;
@@ -114,16 +111,10 @@ public class LandlordController : AbstractController
     {
         var user = GetCurrentUser();
 
-        if (user.LandlordId != id && !user.IsAdmin)
-        {
-            return StatusCode(403);
-        }
+        if (user.LandlordId != id && !user.IsAdmin) return StatusCode(403);
 
         var landlord = await _landlordService.GetLandlordIfExistsFromId(id);
-        if (landlord == null)
-        {
-            return StatusCode(404);
-        }
+        if (landlord == null) return StatusCode(404);
 
         var viewModel = LandlordProfileModel.FromDbModel(landlord, user);
         return View("Profile", viewModel);
@@ -134,10 +125,7 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> MyProfile()
     {
         var landlordId = GetCurrentUser().LandlordId;
-        if (landlordId == null)
-        {
-            return StatusCode(404);
-        }
+        if (landlordId == null) return StatusCode(404);
 
         return await Profile(landlordId.Value);
     }
@@ -152,16 +140,22 @@ public class LandlordController : AbstractController
     }
 
     [HttpGet]
-    [Route("/properties")]
-    public IActionResult ViewProperties()
+    [Route("properties")]
+    [Route("properties/{id:int}")]
+    public IActionResult ViewProperties(int? id = null)
     {
-        var landlordId = GetCurrentUser().LandlordId;
-        if (!landlordId.HasValue)
+        if (id == null)
+        {
+            id = GetCurrentUser().LandlordId;
+            if (id == null)
+                return StatusCode(500);
+        }
+        else if (!GetCurrentUser().IsAdmin && id != GetCurrentUser().LandlordId)
         {
             return StatusCode(403);
         }
 
-        var databaseResult = _propertyService.GetPropertiesByLandlord(landlordId.Value);
+        var databaseResult = _propertyService.GetPropertiesByLandlord(id.Value);
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
         return View("Properties", new PropertiesDashboardViewModel(listOfProperties));
     }
