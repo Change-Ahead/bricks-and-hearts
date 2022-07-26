@@ -9,7 +9,6 @@ public interface IMailService
 {
     public void SendMsg(
         string msgBody = "Hi",
-        string msgToAddress = "alice.luo@softwire.com",
         string subject = "From Softwire Intern Alice",
         string msgFromName = "",
         string msgToName = ""
@@ -27,13 +26,14 @@ public class MailService: IMailService
     
     public void SendMsg(
         string msgBody = "Hi",
-        string msgToAddress = "alice.luo@softwire.com",
         string subject = "From Softwire Intern Alice",
         string msgFromName = "",
         string msgToName = ""
     )
     {
         string msgFromAddress = _config.Value.FromAddress; 
+        string msgToAddress = _config.Value.ToAddress; 
+        
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(msgFromName, msgFromAddress));
         message.To.Add(new MailboxAddress(msgToName, msgToAddress));

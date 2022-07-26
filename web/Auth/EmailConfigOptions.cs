@@ -9,4 +9,5 @@ public class EmailConfigOptions
     public string UserName { get; set; } = String.Empty;
     public string Password { get; set; } = String.Empty;
     public string FromAddress { get; set; } = String.Empty;
+    public string ToAddress { get; set; } = String.Empty;
 }
