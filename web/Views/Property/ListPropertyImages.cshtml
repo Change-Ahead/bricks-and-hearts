@@ -1,0 +1,17 @@
+﻿@model List<string>
+
+@{
+    ViewData["Title"] = "Image List";
+}
+
+<h2>Images available in container @Model[0]</h2>
+
+@for (int i = 1; i < Model.Count; i++)
+{
+    using (Html.BeginForm("DisplayPropertyImage", "Property", FormMethod.Post))
+    {
+        <input type="hidden" id="containerName" name="containerName" value=@Model[0]>
+        <input type="hidden" id="fileName" name="fileName" value=@Model[i]>
+        <button type="submit" class="btn btn-primary">@Model[i]</button>
+    }
+}

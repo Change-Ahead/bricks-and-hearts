@@ -1,7 +1,6 @@
 ﻿using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using AzureBlobStorage.WebApi.Models;
 
 namespace BricksAndHearts.Services
 {
@@ -9,27 +8,27 @@ namespace BricksAndHearts.Services
     {
         Task CreateContainerAsync(string varType, int id);
         Task UploadFileAsync(IFormFile file, string varType, int id);
-        Task<BlobDto> DownloadFileAsync(string blobFilename);
+        Task<Stream> DownloadFileAsync(string containerName, string blobFilename);
         //Task<BlobResponseDto> DeleteAsync(string blobFilename);
-        //Task<List<BlobDto>> ListAsync();
+        Task<List<string>> ListFilesAsync(string varType, int id);
     }
 
     public class AzureStorage : IAzureStorage
     {
         private readonly string _storageConnectionString;
-        private readonly string _storageContainerName;
+        private readonly string _baseContainerName;
         private readonly ILogger<AzureStorage> _logger;
 
         public AzureStorage(IConfiguration configuration, ILogger<AzureStorage> logger)
         {
             _storageConnectionString = configuration.GetValue<string>("BlobConnectionString");
-            _storageContainerName = configuration.GetValue<string>("BlobContainerName");
+            _baseContainerName = configuration.GetValue<string>("BlobContainerName");
             _logger = logger;
         }
 
         private string GetContainerName(string varType, int id)
         {
-            return varType + id.ToString();
+            return _baseContainerName + varType + id.ToString();
         }
 
         public async Task CreateContainerAsync(string varType, int id)
@@ -59,22 +58,19 @@ namespace BricksAndHearts.Services
                 //response.Status = $"File with name {blob.FileName} already exists. Please use another name to store your file.";
             }
         }
-        
-        public async Task<BlobDto> DownloadFileAsync(string blobFilename)
+
+        public async Task<Stream> DownloadFileAsync(string containerName, string blobFilename)
         {
-            string containerName = GetContainerName("property", 0);
-            BlobContainerClient client = new BlobContainerClient(_storageConnectionString, "test");
+            BlobContainerClient client = new BlobContainerClient(_storageConnectionString, containerName);
             try
             {
-                BlobClient file = client.GetBlobClient("jpegtest.jfif");
+                BlobClient file = client.GetBlobClient(blobFilename);
                 if (await file.ExistsAsync())
                 {
-                    var data = await file.OpenReadAsync();
-                    Stream blobContent = data;
-                    var content = await file.DownloadContentAsync();
-                    string name = blobFilename;
-                    string contentType = content.Value.Details.ContentType;
-                    return new BlobDto { Content = blobContent, Name = name, ContentType = contentType };
+                    Stream data = await file.OpenReadAsync();
+                    return data;
+                    //var content = await file.DownloadContentAsync();
+                    //return new BlobDto { Content = blobContent, Name = name, ContentType = contentType };
                 }
             }
             catch (RequestFailedException ex)
@@ -85,6 +81,19 @@ namespace BricksAndHearts.Services
             }
             // File does not exist, return null and handle that in requesting method
             return null;
+        }
+        
+        public async Task<List<string>> ListFilesAsync(string varType, int id)
+        {
+            string containerName = GetContainerName(varType, id);
+            BlobContainerClient container = new BlobContainerClient(_storageConnectionString, containerName);
+            List<string> fileNames = new List<string>();
+            fileNames.Add(containerName);
+            await foreach (BlobItem file in container.GetBlobsAsync())
+            {
+                fileNames.Add(file.Name);
+            }
+            return fileNames;
         }
     }
 }

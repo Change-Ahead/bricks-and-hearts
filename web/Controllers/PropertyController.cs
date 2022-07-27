@@ -147,14 +147,21 @@ public class PropertyController : AbstractController
         }
         return RedirectToAction("ViewProperties", "Landlord");
     }
-    
-    /*[HttpGet]
-    public async Task<IActionResult> ImageDownload()
-    {
-        var image = await _azureStorage.DownloadFileAsync("test");
-        return View(image);
-    }*/
 
+    [HttpGet]
+    public async Task<IActionResult> ListPropertyImages(int propertyId)
+    {
+        List<string> fileNames = await _azureStorage.ListFilesAsync("property", propertyId);
+        return View(fileNames);
+    }
+    
+    [HttpPost]
+    public async Task<IActionResult> DisplayPropertyImage(string containerName, string fileName)
+    {
+        var image = await _azureStorage.DownloadFileAsync(containerName, fileName);
+        return File(image, "image/jpeg");
+    }
+    
 }
 
     [HttpGet]

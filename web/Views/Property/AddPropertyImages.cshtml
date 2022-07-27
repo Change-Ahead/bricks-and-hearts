@@ -7,9 +7,7 @@
     @using (Html.BeginForm("AddPropertyImages", "Property", FormMethod.Post, new { enctype = "multipart/form-data" }))
     {
         <div>Please upload images of the property</div>
-        <input name="images" type="file">
+        <input name="images" type="file" multiple>
         <input type="submit" value="Upload Image" />
     }
 </div>
-
-@*Html.ActionLink("Download image", "ImageDownload", "Property", null, new { @class = "btn btn-primary" })*@

@@ -25,7 +25,7 @@
     @foreach (var prop in Model.Properties)
     {
         <tr class ="clickable"
-            onclick="location.href = '@Url.Action("AddPropertyImages", "Property", new { propertyId = prop!.PropertyId })'">
+            onclick="location.href = '@Url.Action("ListPropertyImages", "Property", new { propertyId = prop!.PropertyId })'">
             <th scope="row">@i</th>
             <td>
                 @prop.Address.AddressLine1,
@@ -39,6 +39,7 @@
             <td>@prop.NumOfBedrooms</td>
             <td>@prop.Rent</td>
             <td>@prop.Description</td>
+            @Html.ActionLink("Add property images", "AddPropertyImages", "Property", new { propertyId = prop!.PropertyId }, new { @class = "btn btn-primary" })
             <td>@Html.ActionLink("View","ViewProperty","Property", new { propertyId = @prop.PropertyId })</td>
         </tr>
         i++;
@@ -46,4 +47,4 @@
     </tbody>
 </table>
 
-@*@Html.ActionLink("Add new property", "AddNewProperty_Begin", "Property", null, new { @class = "btn btn-primary" })*@
+@Html.ActionLink("Add new property", "AddNewProperty_Begin", "Property", null, new { @class = "btn btn-primary" })
