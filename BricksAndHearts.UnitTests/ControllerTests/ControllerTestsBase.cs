@@ -21,6 +21,7 @@ public class ControllerTestsBase
         };
     }
     
+    // Create a user that is logged into Google but is not a landlord or admin
     protected BricksAndHeartsUser CreateUnregisteredUser()
     {
         var userDbModel = new UserDbModel()
