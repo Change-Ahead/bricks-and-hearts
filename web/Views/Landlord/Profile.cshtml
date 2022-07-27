@@ -99,8 +99,12 @@
         }
     }
     
-    @using (Html.BeginForm("GetInviteLink", "Admin", new { landlordId = Model.LandlordId }, FormMethod.Post))
+    @if (User.IsInRole("Admin"))
     {
-        <button type="submit" class="btn btn-primary">Get Invite Link</button>
+        @using (Html.BeginForm("GetInviteLink", "Admin", new { landlordId = Model.LandlordId }, FormMethod.Post))
+        {
+            <button type="submit" class="btn btn-primary">Get Invite Link</button>
+        }
     }
+    
 </div>
