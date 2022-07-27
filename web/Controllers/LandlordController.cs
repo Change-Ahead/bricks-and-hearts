@@ -139,6 +139,7 @@ public class LandlordController : AbstractController
         return RedirectToAction("Profile", "Landlord", new { Id = landlordId });
     }
 
+
     [HttpGet]
     [Route("properties")]
     [Route("properties/{id:int}")]

@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
 
 namespace BricksAndHearts.ViewModels;
@@ -8,7 +7,7 @@ namespace BricksAndHearts.ViewModels;
 public class LandlordProfileModel
 {
     [DisplayName("Id")]
-    public int LandlordId { get; set; }
+    public int? LandlordId { get; set; }
     
     [Required]
     [StringLength(60)]
