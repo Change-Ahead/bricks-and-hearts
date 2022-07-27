@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BricksAndHearts.Migrations
 {
     [DbContext(typeof(BricksAndHeartsDbContext))]
-    [Migration("20220726103731_AddInviteLinkToLandlord")]
+    [Migration("20220727164935_AddInviteLinkToLandlord")]
     partial class AddInviteLinkToLandlord
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -82,6 +82,7 @@ namespace BricksAndHearts.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("AddressLine1")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("AddressLine2")
@@ -99,6 +100,9 @@ namespace BricksAndHearts.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsIncomplete")
+                        .HasColumnType("bit");
+
                     b.Property<int>("LandlordId")
                         .HasColumnType("int");
 
@@ -106,6 +110,7 @@ namespace BricksAndHearts.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Postcode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("PropertyType")
