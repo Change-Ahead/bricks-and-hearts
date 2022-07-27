@@ -6,6 +6,14 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
 
 public class LandlordControllerTestsBase : ControllerTestsBase
 {
-    public static readonly IPropertyService propertyService = A.Fake<IPropertyService>();
-    protected readonly LandlordController _underTest = new(null!, null!, new LandlordService(null!), propertyService,null!);
+    protected readonly IPropertyService propertyService;
+    protected readonly ILandlordService landlordService;
+    protected readonly LandlordController _underTest;
+
+    protected LandlordControllerTestsBase()
+    {
+        landlordService = A.Fake<ILandlordService>();
+        propertyService = A.Fake<IPropertyService>();
+        _underTest = new(null!, landlordService, propertyService, null!);
+    }
 }

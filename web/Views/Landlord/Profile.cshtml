@@ -74,7 +74,7 @@
         {
             @using (Html.BeginForm("ApproveCharter", "Landlord", FormMethod.Post))
             {
-                <input type="hidden" id="landlordId" name="landlordId" value=@Model.Id>
+                <input type="hidden" id="landlordId" name="landlordId" value=@Model.LandlordId>
                 <button type="submit" class="btn-primary">Approve Landlord</button>
             }
         }

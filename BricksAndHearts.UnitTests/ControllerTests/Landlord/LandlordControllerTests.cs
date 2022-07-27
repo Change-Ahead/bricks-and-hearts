@@ -1,6 +1,4 @@
-﻿using BricksAndHearts.Controllers;
-using BricksAndHearts.Services;
-using BricksAndHearts.ViewModels;
+﻿using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -10,10 +8,6 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
 
 public class LandlordControllerTests : LandlordControllerTestsBase
 {
-    private static readonly IPropertyService propertyService = A.Fake<IPropertyService>();
-    private static readonly ILandlordService landlordService = A.Fake<ILandlordService>();
-    private readonly LandlordController _underTest = new(null!, null!, landlordService, propertyService);
-
     [Fact]
     public void RegisterGet_CalledByUnregisteredUser_ReturnsRegisterViewWithEmail()
     {

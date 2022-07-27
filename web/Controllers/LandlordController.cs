@@ -15,8 +15,7 @@ public class LandlordController : AbstractController
     private readonly IMailService _mailService;
     private readonly ILogger<LandlordController> _logger;
 
-    public LandlordController(ILogger<LandlordController> logger, BricksAndHeartsDbContext dbContext,
-        ILandlordService landlordService, IPropertyService propertyService, IMailService mailService)
+    public LandlordController(ILogger<LandlordController> logger, ILandlordService landlordService, IPropertyService propertyService, IMailService mailService)
     {
         _logger = logger;
         _landlordService = landlordService;

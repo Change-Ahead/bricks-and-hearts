@@ -7,7 +7,7 @@ namespace BricksAndHearts.ViewModels;
 
 public class LandlordProfileModel
 {
-    public int Id { get; set; }
+    public int LandlordId { get; set; }
 
     [Required]
     [StringLength(60)]
@@ -42,13 +42,12 @@ public class LandlordProfileModel
     public bool CharterApproved { get; set; } = false;
 
     public bool CurrentUserIsAdmin { get; set; }
-    public int CurrentUserId { get; set; }
 
     public static LandlordProfileModel FromDbModel(LandlordDbModel landlord, BricksAndHeartsUser user)
     {
         return new LandlordProfileModel
         {
-            Id = landlord.Id,
+            LandlordId = landlord.Id,
             CompanyName = landlord.CompanyName,
             Email = landlord.Email,
             FirstName = landlord.FirstName,
@@ -58,8 +57,7 @@ public class LandlordProfileModel
             LandlordStatus = landlord.LandlordStatus,
             LandlordProvidedCharterStatus = landlord.LandlordProvidedCharterStatus,
             CharterApproved = landlord.CharterApproved,
-            CurrentUserIsAdmin = user.IsAdmin,
-            CurrentUserId = user.Id
+            CurrentUserIsAdmin = user.IsAdmin
         };
     }
     

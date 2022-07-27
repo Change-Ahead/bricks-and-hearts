@@ -81,22 +81,24 @@ public class LandlordService : ILandlordService
 
     public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int id)
     {
-        return _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id);
+        var landlord = _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id);
+        if (landlord is null)
+        {
+            throw new Exception("Landlord does not exist");
+        }
+        return landlord;
     }
 
     public async Task ApproveLandlord(int landlordId,  BricksAndHeartsUser user)
     {
-        var landlord = _dbContext.Landlords.Single(l =>l.Id == landlordId);
-        if (!landlord.CharterApproved)
-        {
-            landlord.CharterApproved = true;
-            landlord.ApprovalTime = DateTime.Now;
-            landlord.ApprovalAdminId = user.Id;
-            await _dbContext.SaveChangesAsync();
-        }
-        else
+        var landlord = await GetLandlordIfExistsFromId(landlordId);
+        if (landlord!.CharterApproved)
         {
             throw new Exception("Landlord already approved");
         }
+        landlord.CharterApproved = true;
+        landlord.ApprovalTime = DateTime.Now;
+        landlord.ApprovalAdminId = user.Id;
+        await _dbContext.SaveChangesAsync();
     }
 }
