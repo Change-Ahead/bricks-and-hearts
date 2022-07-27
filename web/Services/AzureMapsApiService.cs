@@ -30,9 +30,9 @@ public class AzureMapsAzureMapsApiService : IAzureMapsApiService
 
     public async Task<string> MakeApiRequestToAzureMaps(string postalCode)
     {
-        var address =
-            $"https://atlas.microsoft.com/search/address/structured/json?api-version=1.0&countryCode=GB&postalCode={postalCode}&subscription-key={_options.Value.SubscriptionKey}";
-        var uri = Uri.EscapeDataString(address);
+        var escapedPostalCode = Uri.EscapeDataString(postalCode);
+        var uri =
+            $"https://atlas.microsoft.com/search/address/structured/json?api-version=1.0&countryCode=GB&postalCode={escapedPostalCode}&subscription-key={_options.Value.SubscriptionKey}";
         var responseBody = string.Empty;
         _logger.LogInformation("Making API Request to {Uri}",uri);
         try

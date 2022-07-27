@@ -19,7 +19,7 @@ public class ApiTests
     // A fake options
     private static readonly IOptions<AzureMapsOptions> _options = A.Fake<IOptions<AzureMapsOptions>>();
     // A real API service
-    private new readonly AzureMapsAzureMapsApiService _underTest = new(null!, _options);
+    private readonly AzureMapsAzureMapsApiService _underTest = new(null!, _options);
     
     [Fact]
     public async Task MakeApiRequestToAzureMaps_WhenCalled_ReturnsNonEmptyString()
