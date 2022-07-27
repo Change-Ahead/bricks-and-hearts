@@ -16,6 +16,7 @@ public interface IAdminService
     public string CreateNewInviteLink(int landlordId);
     public void DeleteExistingInviteLink(int landlordId);
     public void ApproveAdminAccessRequest(int userId);
+    public UserDbModel GetUserFromId(int userId);
     public Task<List<LandlordDbModel>> GetUnapprovedLandlords();
 }
 
@@ -129,10 +130,18 @@ public class AdminService : IAdminService
     
     public void ApproveAdminAccessRequest(int userId)
     {
-        var userToAdmin = _dbContext.Users.SingleOrDefault(u => u.Id == userId)!;
-        userToAdmin.IsAdmin = true;
-        userToAdmin.HasRequestedAdmin = false;
-        _dbContext.SaveChanges();
+        if (_dbContext.Users.SingleOrDefault(u => u.Id == userId) is { } userToAdmin)
+        {
+            userToAdmin.IsAdmin = true;
+            userToAdmin.HasRequestedAdmin = false;
+            _dbContext.SaveChanges();
+        }
+    }
+
+    public UserDbModel GetUserFromId(int userId)
+    {
+        UserDbModel userFromId = _dbContext.Users.SingleOrDefault(u => u.Id == userId);
+        return userFromId;
     }
     
     public async Task<List<LandlordDbModel>> GetUnapprovedLandlords()

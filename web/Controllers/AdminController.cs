@@ -149,6 +149,11 @@ public class AdminController : AbstractController
     [HttpPost]
     public ActionResult AcceptAdminRequest(int userToAcceptId)
     {
+        if (_adminService.GetUserFromId(userToAcceptId) == null)
+        {
+            return View("Error", new ErrorViewModel());
+        }
+        
         _adminService.ApproveAdminAccessRequest(userToAcceptId);
 
         return RedirectToAction("GetAdminList");

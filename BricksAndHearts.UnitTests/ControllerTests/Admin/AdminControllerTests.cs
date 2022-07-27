@@ -61,24 +61,26 @@ public class AdminControllerTests : AdminControllerTestsBase
     public void GetAdminList_ReturnsViewWithAdminListModel()
     {
         // Arrange
+        CreateAdminUserInController(UnderTest);
         
         // Act
-        var result = _underTest.GetAdminList().Result as ViewResult;
+        var result = UnderTest.GetAdminList().Result as ViewResult;
 
         // Assert
-        result!.Model.Should().BeOfType<AdminListModel>();
+        result!.ViewData.Model.Should().BeOfType<AdminListModel>();
     }
 
     [Fact]
-    public void AcceptAdminRequest_Calls_ApproveAdminAccessRequest()
+    public void AcceptAdminRequest_WhenCalled_ApprovesAdminAccessRequest()
     {
         // Arrange
+        CreateAdminUserInController(UnderTest);
         var dummyId = 1;
 
         // Act
-        var result = _underTest.AcceptAdminRequest(dummyId);
+        var result = UnderTest.AcceptAdminRequest(dummyId);
         
         // Assert
-        A.CallTo(() => _underTestService.ApproveAdminAccessRequest(dummyId)).MustHaveHappened();
+        A.CallTo(() => AdminService.ApproveAdminAccessRequest(dummyId)).MustHaveHappened();
     }
 }
