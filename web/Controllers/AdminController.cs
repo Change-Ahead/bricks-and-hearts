@@ -38,14 +38,11 @@ public class AdminController : AbstractController
         if (user.IsAdmin)
         {
             LoggerAlreadyAdminWarning(_logger, user);
-
             return RedirectToAction(nameof(Index));
         }
 
         _adminService.RequestAdminAccess(user);
-
         FlashRequestSuccess(_logger, user, "requested admin access");
-
         return RedirectToAction(nameof(Index));
     }
 
@@ -55,14 +52,11 @@ public class AdminController : AbstractController
         if (user.IsAdmin)
         {
             LoggerAlreadyAdminWarning(_logger, user);
-
             return RedirectToAction(nameof(Index));
         }
 
         _adminService.CancelAdminAccessRequest(user);
-
         FlashRequestSuccess(_logger, user, "cancelled admin access request");
-
         return RedirectToAction(nameof(Index));
     }
 
