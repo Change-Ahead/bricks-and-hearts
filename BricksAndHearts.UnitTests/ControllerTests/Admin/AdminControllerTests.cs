@@ -37,18 +37,20 @@ public class AdminControllerTests : AdminControllerTestsBase
     public void GetAdminList_ReturnsViewWithAdminListModel()
     {
         // Arrange
+        CreateAdminUserInController(_underTest);
         
         // Act
         var result = _underTest.GetAdminList().Result as ViewResult;
 
         // Assert
-        result!.Model.Should().BeOfType<AdminListModel>();
+        result!.ViewData.Model.Should().BeOfType<AdminListModel>();
     }
 
     [Fact]
     public void AcceptAdminRequest_WhenCalledWithAdminPermissions_ApproveAdminAccessRequest()
     {
         // Arrange
+        CreateAdminUserInController(_underTest);
         var dummyId = 1;
 
         // Act
@@ -58,25 +60,16 @@ public class AdminControllerTests : AdminControllerTestsBase
         A.CallTo(() => _underTestService.ApproveAdminAccessRequest(dummyId)).MustHaveHappened();
     }
     
-    /*
-    [Fact]
+    /*[Fact]
     public void AcceptAdminRequest_WhenCalledWithAdminWithoutPermissions_DoesNotApproveAdminAccessRequest()
     {
         // Arrange 
-        var dummyId = 1;
-        var unregisteredUser = CreateUnregisteredUserInController(_underTest);
-        _underTest.ControllerContext = new ControllerContext
-        {
-            HttpContext = new DefaultHttpContext { User = _anonUser }
-        };
+        CreateUnregisteredUserInController(_underTest);
 
         // Act
-        var result = _underTest.AcceptAdminRequest(dummyId) as ViewResult;
+        var result = _underTest.GetAdminList() as StatusCodeResult;
 
         // Assert
-        catch (Exception)
-        {
-            Assert.Fail();
-        }
+        result!.StatusCode.Should().Be(403);
     }*/
 }

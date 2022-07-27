@@ -77,6 +77,11 @@ public class AdminController : AbstractController
     [Route("AdminList")]
     public async Task<IActionResult> GetAdminList()
     {
+        /*if (User.IsInRole("Admin") != true)
+        {
+            return StatusCode(403);
+        }*/
+        
         var adminLists = await _adminService.GetAdminLists();
         
         AdminListModel adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
