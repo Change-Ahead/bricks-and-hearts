@@ -1,8 +1,8 @@
 ﻿using Newtonsoft.Json;
 
-namespace BricksAndHearts.ViewModels;
+namespace BricksAndHearts.Services;
 
-public class PostcodeApiResponseViewModel
+public class PostcodeApiResponseModel
 {
     [JsonProperty("results")]
     public List<Results>? ListOfResults { get; set; }

@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using BricksAndHearts.Services;
 using FakeItEasy;
 using FluentAssertions;
 using Xunit;
@@ -43,7 +44,7 @@ public class ApiTests : ApiServiceTestsBase
         {
             return;
         }
-        BricksAndHearts.ViewModels.Results results = postcodeApiResponseViewModel.ListOfResults[0];
+        Results results = postcodeApiResponseViewModel.ListOfResults[0];
         results.Address.Should().NotBeNull("Address should not be null");
         if (results.Address == null)
         {

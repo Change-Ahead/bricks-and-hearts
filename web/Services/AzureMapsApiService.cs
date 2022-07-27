@@ -9,12 +9,11 @@ public interface IAzureMapsApiService
 {
     public Task<string> MakeApiRequestToAzureMaps(string postalCode);
     public Task<PropertyViewModel> AutofillAddress(PropertyViewModel model);
-    public PostcodeApiResponseViewModel TurnResponseBodyToModel(string responseBody);
 }
 
 public class AzureMapsAzureMapsApiService : IAzureMapsApiService
 {
-    private readonly HttpClient _client = new HttpClient();
+    private readonly HttpClient _client = new();
     private readonly ILogger<AzureMapsAzureMapsApiService> _logger;
     private readonly IOptions<AzureMapsOptions> _options;
 
@@ -26,33 +25,33 @@ public class AzureMapsAzureMapsApiService : IAzureMapsApiService
 
     public async Task<string> MakeApiRequestToAzureMaps(string postalCode)
     {
-        string uri =
+        var uri =
             $"https://atlas.microsoft.com/search/address/structured/json?api-version=1.0&countryCode=GB&postalCode={postalCode}&subscription-key={_options.Value.SubscriptionKey}";
-        string responseBody = String.Empty;
-        _logger.LogInformation("Making API Request to {0}",uri);
+        var responseBody = string.Empty;
+        _logger.LogInformation("Making API Request to {Uri}",uri);
         try
         {
-            HttpResponseMessage response = await _client.GetAsync(uri);
+            var response = await _client.GetAsync(uri);
             response.EnsureSuccessStatusCode();
             responseBody = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation("Successful API request to {0}",uri);
+            _logger.LogInformation("Successful API request to {Uri}",uri);
         }
         catch(HttpRequestException e)
         {
-            _logger.LogWarning("Message :{0} ",e.Message);	
+            _logger.LogWarning("Message :{Message} ",e.Message);	
         }
         return responseBody;
     }
     
-    public PostcodeApiResponseViewModel TurnResponseBodyToModel(string responseBody)
+    public PostcodeApiResponseModel TurnResponseBodyToModel(string responseBody)
     {
         if (string.IsNullOrEmpty(responseBody))
         {
-            return new PostcodeApiResponseViewModel();
+            return new PostcodeApiResponseModel();
         }
 
-        PostcodeApiResponseViewModel postcodeResponse =
-            JsonConvert.DeserializeObject<PostcodeApiResponseViewModel>(responseBody);
+        var postcodeResponse =
+            JsonConvert.DeserializeObject<PostcodeApiResponseModel>(responseBody);
         return postcodeResponse;
     }
 
@@ -68,29 +67,29 @@ public class AzureMapsAzureMapsApiService : IAzureMapsApiService
             throw new ArgumentException("Model does not has address line 1!");
         }
 
-        string postCode = model.Address.Postcode;
-        string responseBody = await MakeApiRequestToAzureMaps(postCode);
-        PostcodeApiResponseViewModel postcodeResponse = TurnResponseBodyToModel(responseBody);
+        var postCode = model.Address.Postcode;
+        var responseBody = await MakeApiRequestToAzureMaps(postCode);
+        var postcodeResponse = TurnResponseBodyToModel(responseBody);
         if (postcodeResponse.ListOfResults == null)
         {
             return model;
         }
 
-        BricksAndHearts.ViewModels.Results results = postcodeResponse.ListOfResults[0];
+        var results = postcodeResponse.ListOfResults[0];
         if (results.Address == null)
         {
             return model;
         }
         
-        if (results.Address.Keys.ToList().Contains("streetName"))
+        if (results.Address.ContainsKey("streetName"))
         {
             model.Address.AddressLine2 = results.Address["streetName"];
         }
-        if (results.Address.Keys.ToList().Contains("municipality"))
+        if (results.Address.ContainsKey("municipality"))
         {
             model.Address.TownOrCity = results.Address["municipality"];
         }
-        if (results.Address.Keys.ToList().Contains("countrySecondarySubdivision"))
+        if (results.Address.ContainsKey("countrySecondarySubdivision"))
         {
             model.Address.County = results.Address["countrySecondarySubdivision"];
         }
