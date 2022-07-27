@@ -60,17 +60,19 @@ public class AdminControllerTests : AdminControllerTestsBase
         A.CallTo(() => _underTestService.ApproveAdminAccessRequest(dummyId)).MustHaveHappened();
     }
     
-    /*[Fact]
-    public void AcceptAdminRequest_WhenCalledWithAdminWithoutPermissions_DoesNotApproveAdminAccessRequest()
+    [Fact]
+    public void RejectAdminRequest_WhenCalledWithAdminPermissions_RejectAdminAccessRequest()
     {
-        // Arrange 
-        CreateUnregisteredUserInController(_underTest);
+        // Arrange
+        CreateAdminUserInController(_underTest);
         var dummyId = 1;
-        
-        // Act
-        var result = _underTest.AcceptAdminRequest(dummyId);
 
+        // Act
+        var result = _underTest.RejectAdminRequest(dummyId);
+        
         // Assert
-        A.CallTo(() => _underTestService.ApproveAdminAccessRequest(dummyId)).MustNotHaveHappened();
-    }*/
+        A.CallTo(() => _underTestService.RejectAdminAccessRequest(dummyId)).MustHaveHappened();
+    }
+    
+    
 }
