@@ -97,4 +97,13 @@ public class AdminController : AbstractController
 
         return RedirectToAction("GetAdminList");
     }
+    
+    [Authorize(Roles="Admin")]
+    [HttpPost]
+    public ActionResult RejectAdminRequest(int userToAcceptId)
+    {
+        _adminService.RejectAdminAccessRequest(userToAcceptId);
+
+        return RedirectToAction("GetAdminList");
+    }
 }

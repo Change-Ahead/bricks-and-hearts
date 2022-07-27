@@ -12,6 +12,7 @@ public interface IAdminService
     public void CancelAdminAccessRequest(BricksAndHeartsUser user);
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
     public void ApproveAdminAccessRequest(int userId);
+    public void RejectAdminAccessRequest(int userId);
 }
 
 public class AdminService : IAdminService
@@ -58,6 +59,12 @@ public class AdminService : IAdminService
     {
         var userToAdmin = _dbContext.Users.SingleOrDefault(u => u.Id == userId)!;
         userToAdmin.IsAdmin = true;
+        userToAdmin.HasRequestedAdmin = false;
+        _dbContext.SaveChanges();
+    }
+    public void RejectAdminAccessRequest(int userId)
+    {
+        var userToAdmin = _dbContext.Users.SingleOrDefault(u => u.Id == userId)!;
         userToAdmin.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
     }
