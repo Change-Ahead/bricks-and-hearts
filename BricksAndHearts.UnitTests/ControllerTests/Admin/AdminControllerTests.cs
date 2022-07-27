@@ -65,11 +65,12 @@ public class AdminControllerTests : AdminControllerTestsBase
     {
         // Arrange 
         CreateUnregisteredUserInController(_underTest);
-
+        var dummyId = 1;
+        
         // Act
-        var result = _underTest.GetAdminList() as StatusCodeResult;
+        var result = _underTest.AcceptAdminRequest(dummyId);
 
         // Assert
-        result!.StatusCode.Should().Be(403);
+        A.CallTo(() => _underTestService.ApproveAdminAccessRequest(dummyId)).MustNotHaveHappened();
     }*/
 }
