@@ -144,7 +144,8 @@ public class LandlordService : ILandlordService
         BricksAndHeartsUser user)
     {
         // We want to atomically update multiple records (insert a landlord, then set the user's landlord id), so first start a transaction
-        await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
+        var transaction = await _dbContext.Database.BeginTransactionAsync();
+        await using (transaction)
         {
             // Check that the link exists
             var landlord = _dbContext.Landlords.SingleOrDefault(l => l.InviteLink == inviteLink);

@@ -1,8 +1,12 @@
+using BricksAndHearts.Controllers;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
@@ -64,6 +68,42 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         MakeUserPrincipalInController(adminUser, UnderTest);
         var landlordProfileModel = CreateTestLandlordProfileModel();
 
+    [Fact]
+    public async void TieUserWithLandlord_WithNonExistentLink_ReturnDirectToInvite()
+    {
+        // Arrange 
+        var landlordUser = CreateLandlordUser();
+        string inviteLink = "11111";
+        var landlordService = A.Fake<ILandlordService>();
+        var logger = A.Fake<ILogger<LandlordController>>();
+        A.CallTo(() => landlordService.LinkExistingLandlordWithUser(inviteLink,landlordUser))
+            .Returns(ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist);
+        var controller = new LandlordController(logger,landlordService,null!,null!);
+        MakeUserPrincipalInController(landlordUser, controller);
+
+        // Act
+        var result = await controller.TieUserWithLandlord(inviteLink);
+        
+        // Assert
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("Invite");
+        result.Should().BeOfType<RedirectToActionResult>().Which.RouteValues.Should().Contain("InviteLink",inviteLink);
+    }
+    
+    [Fact]
+    public async void TieUserWithLandlord_WithLandlord_ReturnDirectToProfile()
+    {
+        // Arrange 
+        var landlordUser = CreateLandlordUser();
+        string inviteLink = "11111";
+        var landlordService = A.Fake<ILandlordService>();
+        var logger = A.Fake<ILogger<LandlordController>>();
+        var httpContext = new DefaultHttpContext();
+        var tempData = new TempDataDictionary(httpContext, A.Fake<ITempDataProvider>());
+        A.CallTo(() => landlordService.LinkExistingLandlordWithUser(inviteLink,landlordUser))
+            .Returns(ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord);
+        var controller = new LandlordController(logger,landlordService,null!,null!){TempData = tempData};
+        MakeUserPrincipalInController(landlordUser, controller);
+
         // Act
         A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(true);
         var result = UnderTest.EditProfileUpdate(landlordProfileModel).Result as ViewResult;
@@ -86,5 +126,12 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
         // Assert   
         result!.Model.Should().BeOfType<LandlordProfileModel>();
+    }
+}
+        // Act
+        var result = await controller.TieUserWithLandlord(inviteLink);
+        
+        // Assert
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("MyProfile");
     }
 }
