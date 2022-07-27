@@ -203,7 +203,7 @@ public class LandlordController : AbstractController
 
     [HttpGet]
     [Route("/invite/link={inviteLink}")]
-    public ActionResult AcceptInvite(string inviteLink)
+    public ActionResult Invite(string inviteLink)
     {
         var landlord = _landlordService.FindLandlordWithInviteLink(inviteLink);
         if (landlord == null)
@@ -215,9 +215,28 @@ public class LandlordController : AbstractController
     }
 
     [HttpPost]
-    [Route("/invite/link={inviteLink}/accept")]
-    public void TieUserWithLandlord(string inviteLink)
+    [Route("/invite/link={inviteLink}/accepted")]
+    public async Task<IActionResult> TieUserWithLandlord(string inviteLink)
     {
-        return;
+        var user = GetCurrentUser();
+        var result = await _landlordService.LinkExistingLandlordWithUser(inviteLink, user);
+        if (result == ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist)
+        {
+            _logger.LogWarning("Invite Link {Link} does not work", inviteLink);
+            return Redirect(Url.Action("Invite")!);
+        }
+        if (result == ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord)
+        {
+            _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
+            TempData["FlashMessage"] = $"User already registered with landlord (landlordId = {user.LandlordId})"; // This will be displayed on the Profile page
+            return Redirect(Url.Action("MyProfile")!);
+        }
+
+        if (result == ILandlordService.LinkUserWithLandlordResult.Success)
+        {
+            _logger.LogInformation("Successfully registered landlord with user {UserId}", user.Id);
+            return Redirect(Url.Action("MyProfile")!);
+        }
+        throw new Exception($"Unknown landlord registration error ${result}");
     }
 }

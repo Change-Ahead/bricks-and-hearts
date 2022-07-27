@@ -15,12 +15,24 @@ public interface ILandlordService
         Success
     }
 
+    public enum LinkUserWithLandlordResult
+    {
+        ErrorLinkDoesNotExist,
+        ErrorUserAlreadyHasLandlordRecord,
+        Success
+    }
+
     public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel, BricksAndHeartsUser user);
     public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int id);
     public Task<LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel);
     public bool CheckForDuplicateEmail(LandlordProfileModel editModel);
     public Task ApproveLandlord(int landlordId, BricksAndHeartsUser user);
     public LandlordDbModel? FindLandlordWithInviteLink(string inviteLink);
+
+    public Task<ILandlordService.LinkUserWithLandlordResult> LinkExistingLandlordWithUser(
+        string inviteLink,
+        BricksAndHeartsUser user);
+
 }
 
 public class LandlordService : ILandlordService
@@ -124,5 +136,44 @@ public class LandlordService : ILandlordService
         var editedLandlord = _dbContext.Landlords.Single(l => l.Id == editModel.LandlordId);
         return _dbContext.Landlords.SingleOrDefault(l => l.Email == editModel.Email) != null 
                && editedLandlord.Email != editModel.Email;
+    }
+    
+    // Link existing landlord with user
+    public async Task<ILandlordService.LinkUserWithLandlordResult> LinkExistingLandlordWithUser(
+        string inviteLink,
+        BricksAndHeartsUser user)
+    {
+        // We want to atomically update multiple records (insert a landlord, then set the user's landlord id), so first start a transaction
+        await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
+        {
+            // Check that the link exists
+            var landlord = _dbContext.Landlords.SingleOrDefault(l => l.InviteLink == inviteLink);
+            if (landlord == null)
+            {
+                return ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist;
+            }
+
+            // Check the user doesn't already have a landlord associated
+            var userRecord = _dbContext.Users.Single(u => u.Id == user.Id);
+            if (userRecord.LandlordId != null)
+            {
+                return ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord;
+            }
+
+            // Disable invite link
+            landlord.InviteLink = null;
+            landlord.User = userRecord;
+            await _dbContext.SaveChangesAsync();
+
+            // Now we can update the user record too
+            userRecord.LandlordId = landlord.Id;
+            userRecord.Landlord = landlord;
+            user.LandlordId = landlord.Id;
+            await _dbContext.SaveChangesAsync();
+
+            // and finally commit
+            await transaction.CommitAsync();
+        }
+        return ILandlordService.LinkUserWithLandlordResult.Success;
     }
 }
