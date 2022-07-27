@@ -33,35 +33,29 @@ public class AdminControllerTests : AdminControllerTestsBase
     }
 
     [Fact]
-    public void GetAdminList_ReturnsViewWith_AdminListModel()
+    public void GetAdminList_ReturnsViewWithAdminListModel()
     {
         // Arrange
         var fakeAdminService = A.Fake<IAdminService>();
-        var fakeListOfAdmins = A.Dummy<Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)>>();
         var fakeAdminController = new AdminController(null!, null!, fakeAdminService);
-        A.CallTo(() => fakeAdminService.GetAdminLists()).Returns(fakeListOfAdmins);
-
+        
         // Act
-        var result = fakeAdminController.GetAdminList().Result as ViewResult;
-        var resultService = fakeAdminService.GetAdminLists();
+        var result = _underTest.GetAdminList().Result as ViewResult;
 
         // Assert
         result!.Model.Should().BeOfType<AdminListModel>();
-        resultService.Should().Be(fakeListOfAdmins);
     }
 
     [Fact]
-    public void AcceptAdminRequest_Calls_ApproveAdminAccessRequest()
+    public void AcceptAdminRequest_WhenCalledWithAdminPermissions_ApproveAdminAccessRequest()
     {
         // Arrange
-        var fakeAdminService = A.Fake<IAdminService>();
-        var fakeAdminController = new AdminController(null!, null!, fakeAdminService);
-        var dummyId = A.Dummy<int>();
+        var dummyId = 1;
 
         // Act
-        var result = fakeAdminController.AcceptAdminRequest(dummyId);
+        var result = _underTest.AcceptAdminRequest(dummyId);
         
         // Assert
-        A.CallTo(() => fakeAdminService.ApproveAdminAccessRequest(dummyId)).MustHaveHappened();
+        A.CallTo(() => _underTest..ApproveAdminAccessRequest(dummyId)).MustHaveHappened();
     }
 }

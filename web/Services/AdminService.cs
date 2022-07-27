@@ -56,7 +56,7 @@ public class AdminService : IAdminService
 
     public void ApproveAdminAccessRequest(int userId)
     {
-        var userToAdmin = _dbContext.Users.Single(u => u.Id == userId);
+        var userToAdmin = _dbContext.Users.SingleOrDefault(u => u.Id == userId)!;
         userToAdmin.IsAdmin = true;
         userToAdmin.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
