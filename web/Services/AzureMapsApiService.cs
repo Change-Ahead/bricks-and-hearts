@@ -17,10 +17,15 @@ public class AzureMapsAzureMapsApiService : IAzureMapsApiService
     private readonly ILogger<AzureMapsAzureMapsApiService> _logger;
     private readonly IOptions<AzureMapsOptions> _options;
 
-    public AzureMapsAzureMapsApiService(ILogger<AzureMapsAzureMapsApiService> logger, IOptions<AzureMapsOptions> options)
+    public AzureMapsAzureMapsApiService(ILogger<AzureMapsAzureMapsApiService> logger, IOptions<AzureMapsOptions> options,
+    HttpClient? client = null)
     {
         _logger = logger;
         _options = options;
+        if (client != null)
+        {
+            _client = client;
+        }
     }
 
     public async Task<string> MakeApiRequestToAzureMaps(string postalCode)

@@ -1,10 +1,15 @@
 ﻿using System;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
 using System.Threading.Tasks;
+using BricksAndHearts.Auth;
 using BricksAndHearts.Services;
 using FakeItEasy;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ServiceTests.Api;
@@ -14,18 +19,29 @@ public class ApiTests : ApiServiceTestsBase
     [Fact]
     public async Task MakeApiRequestToAzureMaps_WhenCalled_ReturnsNonEmptyString()
     {
+        // Setup
+        var options = A.Fake<IOptions<AzureMapsOptions>>();
+        var logger = A.Fake<ILogger<AzureMapsAzureMapsApiService>>();
+        var fakeMessageHandler = A.Fake<HttpMessageHandler>();
+        var fakeHttpClient = new HttpClient(fakeMessageHandler);
+        var underTest = new AzureMapsAzureMapsApiService(logger, options, fakeHttpClient);
+
         // Arrange
-        string postalCode = "cb11dx";
+        const string postalCode = "cb11dx";
+        var responseBody = await File.ReadAllTextAsync($"{AppDomain.CurrentDomain.BaseDirectory}/../../../ServiceTests/Api/AzureMapsApiResponse.json");
+        var response = new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent(responseBody)
+        };
+        // Slightly icky because "SendAsync" is protected
+        A.CallTo(fakeMessageHandler).Where(c => c.Method.Name == "SendAsync").WithReturnType<Task<HttpResponseMessage>>().Returns(response);
 
         // Act
-        // Uses the fake version of apiService because we don't want to make the API call
-        // Just want to check that the code works
-        string json = "some json string";
-        A.CallTo(() => AzureMapsApiService.MakeApiRequestToAzureMaps(postalCode)).Returns(json);
-        string? responseBody = await AzureMapsApiService.MakeApiRequestToAzureMaps(postalCode);
-        
+        var result = await underTest.MakeApiRequestToAzureMaps(postalCode);
+
         // Assert
-        responseBody.Should().NotBeNullOrEmpty("should not be null or empty");
+        result.Should().Be(responseBody);
     }
     
     [Fact]
@@ -64,7 +80,7 @@ public class ApiTests : ApiServiceTestsBase
         var postcodeApiResponseViewModel = _underTest.TurnResponseBodyToModel(responseBody);
         
         // Assert
-        postcodeApiResponseViewModel.ListOfResults.Should().BeNull("should not be null");
+        postcodeApiResponseViewModel.ListOfResults.Should().BeNull("should be null");
     }
     
     // The AutofillAddress method is getting tested manually via the front-end 
