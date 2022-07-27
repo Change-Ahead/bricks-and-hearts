@@ -20,7 +20,7 @@ public interface ILandlordService
     public Task<LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel);
     public bool CheckForDuplicateEmail(LandlordProfileModel editModel);
     public Task ApproveLandlord(int landlordId, BricksAndHeartsUser user);
-
+    public LandlordDbModel? FindLandlordWithInviteLink(string inviteLink);
 }
 
 public class LandlordService : ILandlordService
@@ -98,6 +98,11 @@ public class LandlordService : ILandlordService
         landlord.ApprovalTime = DateTime.Now;
         landlord.ApprovalAdminId = user.Id;
         await _dbContext.SaveChangesAsync();
+    }
+
+    public LandlordDbModel? FindLandlordWithInviteLink(string inviteLink)
+    {
+        return _dbContext.Landlords.SingleOrDefault(l => l.InviteLink == inviteLink);
     }
     
     public async Task<ILandlordService.LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel)
