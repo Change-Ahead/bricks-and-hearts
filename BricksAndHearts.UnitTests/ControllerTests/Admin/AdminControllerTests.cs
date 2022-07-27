@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using BricksAndHearts.Controllers;
@@ -36,8 +37,6 @@ public class AdminControllerTests : AdminControllerTestsBase
     public void GetAdminList_ReturnsViewWithAdminListModel()
     {
         // Arrange
-        var fakeAdminService = A.Fake<IAdminService>();
-        var fakeAdminController = new AdminController(null!, null!, fakeAdminService);
         
         // Act
         var result = _underTest.GetAdminList().Result as ViewResult;
@@ -56,6 +55,28 @@ public class AdminControllerTests : AdminControllerTestsBase
         var result = _underTest.AcceptAdminRequest(dummyId);
         
         // Assert
-        A.CallTo(() => _underTest..ApproveAdminAccessRequest(dummyId)).MustHaveHappened();
+        A.CallTo(() => _underTestService.ApproveAdminAccessRequest(dummyId)).MustHaveHappened();
     }
+    
+    /*
+    [Fact]
+    public void AcceptAdminRequest_WhenCalledWithAdminWithoutPermissions_DoesNotApproveAdminAccessRequest()
+    {
+        // Arrange 
+        var dummyId = 1;
+        var unregisteredUser = CreateUnregisteredUserInController(_underTest);
+        _underTest.ControllerContext = new ControllerContext
+        {
+            HttpContext = new DefaultHttpContext { User = _anonUser }
+        };
+
+        // Act
+        var result = _underTest.AcceptAdminRequest(dummyId) as ViewResult;
+
+        // Assert
+        catch (Exception)
+        {
+            Assert.Fail();
+        }
+    }*/
 }

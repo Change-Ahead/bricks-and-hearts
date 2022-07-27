@@ -9,9 +9,9 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Admin;
 
 public class AdminControllerTestsBase: ControllerTestsBase
 {
-    protected readonly IAdminService _underTestService = A.Fake<IAdminService>();
+    protected readonly static IAdminService _underTestService = A.Fake<IAdminService>();
     
-    protected readonly AdminController _underTest = new(null!, null!, A.Fake<IAdminService>());
+    protected readonly AdminController _underTest = new(null!, null!, _underTestService);
 
     protected AdminListModel CreateTestAdminListModel()
     {
