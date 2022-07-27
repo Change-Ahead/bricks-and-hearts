@@ -16,10 +16,10 @@
         }
     }
     @{
-        if (TempData["ToastMessage"] != null)
+        if (TempData["InviteLinkMessage"] != null)
         {
             <div class="alert alert-warning" role="alert">
-                @TempData["ToastMessage"]
+                @TempData["InviteLinkMessage"]
                 @if (TempData["InviteLink"] != null)
                 {
                     <br/>

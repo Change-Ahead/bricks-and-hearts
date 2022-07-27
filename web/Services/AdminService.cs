@@ -11,7 +11,7 @@ public interface IAdminService
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
     public Task<List<LandlordDbModel>> GetUnapprovedLandlords();
     public UserDbModel? FindUserByLandlordId(int landlordId);
-    public string FindExistingInviteLink(int landlordId);
+    public string? FindExistingInviteLink(int landlordId);
     public string CreateNewInviteLink(int landlordId);
     public void DeleteExistingInviteLink(int landlordId);
 
@@ -42,15 +42,15 @@ public class AdminService : IAdminService
 
     private async Task<List<UserDbModel>> GetCurrentAdmins()
     {
-        List<UserDbModel> CurrentAdmins = await _dbContext.Users.Where(u => u.IsAdmin == true).ToListAsync();
-        return CurrentAdmins;
+        var currentAdmins = await _dbContext.Users.Where(u => u.IsAdmin == true).ToListAsync();
+        return currentAdmins;
     }
 
     private async Task<List<UserDbModel>> GetPendingAdmins()
     {
-        List<UserDbModel> PendingAdmins =
+        var pendingAdmins =
             await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
-        return PendingAdmins;
+        return pendingAdmins;
     }
 
     public async Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists()
@@ -60,9 +60,9 @@ public class AdminService : IAdminService
 
     public async Task<List<LandlordDbModel>> GetUnapprovedLandlords()
     {
-        List<LandlordDbModel> UnapprovedLandlords =
+        var unapprovedLandlords =
             await _dbContext.Landlords.Where(u => u.CharterApproved == false).ToListAsync();
-        return UnapprovedLandlords;
+        return unapprovedLandlords;
     }
 
     public UserDbModel? FindUserByLandlordId(int landlordId)
@@ -70,16 +70,12 @@ public class AdminService : IAdminService
         return _dbContext.Users.SingleOrDefault(u => u.LandlordId == landlordId);
     }
     
-    public string FindExistingInviteLink(int landlordId)
+    public string? FindExistingInviteLink(int landlordId)
     {
         // Find landlord in db (assumes existence)
         var landlord = _dbContext.Landlords.Single(u => u.Id == landlordId);
         // Get existing invite link (if exists)
-        if (!string.IsNullOrEmpty(landlord.InviteLink))
-        {
-            return landlord.InviteLink;
-        }
-        return string.Empty;
+        return !string.IsNullOrEmpty(landlord.InviteLink) ? landlord.InviteLink : null;
     }
 
     public string CreateNewInviteLink(int landlordId)
@@ -91,8 +87,8 @@ public class AdminService : IAdminService
         {
             throw new Exception("Landlord should not have existing invite link!");
         }
-        Guid g = Guid.NewGuid();
-        string inviteLink = g.ToString();
+        var g = Guid.NewGuid();
+        var inviteLink = g.ToString();
         landlord.InviteLink = inviteLink;
         _dbContext.SaveChanges();
         return inviteLink;
