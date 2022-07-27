@@ -4,6 +4,7 @@ using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
@@ -173,5 +174,66 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
         // Assert   
         result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(404);
+    }
+
+    [Fact]
+    public void ViewProperties_CalledByAdmin_CanReturnOtherUsersPropertyList()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        var fakeLandlordService = A.Fake<ILandlordService>();
+        var fakePropertyService = A.Fake<IPropertyService>();
+        var _underTest =
+            new LandlordController(A.Fake<ILogger<LandlordController>>(), null!, fakeLandlordService,
+                fakePropertyService, null!);
+        MakeUserPrincipalInController(adminUser, _underTest);
+
+        // Act
+        var results = new List<ViewResult?>();
+        A.CallTo(() => fakePropertyService.GetPropertiesByLandlord(1))
+            .Returns(A.CollectionOfFake<PropertyDbModel>(10).ToList());
+        results.Add(_underTest.ViewProperties(1) as ViewResult);
+        A.CallTo(() => fakePropertyService.GetPropertiesByLandlord(2))
+            .Returns(A.CollectionOfFake<PropertyDbModel>(10).ToList());
+        results.Add(_underTest.ViewProperties(2) as ViewResult);
+
+        // Assert
+        foreach (var result in results)
+        {
+            result.Should().BeOfType<ViewResult>();
+            result.Should().NotBeNull();
+            result!.Model.Should().BeOfType<PropertiesDashboardViewModel>();
+            result.Model.As<PropertiesDashboardViewModel>().Properties.Count.Should()
+                .Be(10); //Properties.Count.Should().Be(10);
+        }
+    }
+
+    [Fact]
+    public void ViewProperties_CalledByNonAdmin_CannotReturnOtherUsersPropertyList()
+    {
+        // Arrange
+        var unregisteredUser = CreateUnregisteredUser();
+        var fakeLandlordService = A.Fake<ILandlordService>();
+        var fakePropertyService = A.Fake<IPropertyService>();
+        var underTest =
+            new LandlordController(A.Fake<ILogger<LandlordController>>(), null!, fakeLandlordService, null!, null!);
+        MakeUserPrincipalInController(unregisteredUser, underTest);
+
+        // Act
+        var results = new List<StatusCodeResult?>();
+        A.CallTo(() => fakePropertyService.GetPropertiesByLandlord(1))
+            .Returns(A.CollectionOfFake<PropertyDbModel>(10).ToList());
+        results.Add(underTest.ViewProperties(1) as StatusCodeResult);
+        A.CallTo(() => fakePropertyService.GetPropertiesByLandlord(2))
+            .Returns(A.CollectionOfFake<PropertyDbModel>(10).ToList());
+        results.Add(underTest.ViewProperties(2) as StatusCodeResult);
+
+        // Assert
+        foreach (var result in results)
+        {
+            result.Should().BeOfType<StatusCodeResult>();
+            result.Should().NotBeNull();
+            result!.StatusCode.Should().Be(403);
+        }
     }
 }
