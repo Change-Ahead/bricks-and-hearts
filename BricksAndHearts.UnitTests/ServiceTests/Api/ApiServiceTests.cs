@@ -14,8 +14,13 @@ using Xunit;
 
 namespace BricksAndHearts.UnitTests.ServiceTests.Api;
 
-public class ApiTests : ApiServiceTestsBase
+public class ApiTests
 {
+    // A fake options
+    private static readonly IOptions<AzureMapsOptions> _options = A.Fake<IOptions<AzureMapsOptions>>();
+    // A real API service
+    private new readonly AzureMapsAzureMapsApiService _underTest = new(null!, _options);
+    
     [Fact]
     public async Task MakeApiRequestToAzureMaps_WhenCalled_ReturnsNonEmptyString()
     {
@@ -48,8 +53,8 @@ public class ApiTests : ApiServiceTestsBase
     public void TurnResponseBodyToModel_WhenCalledWithNonEmptyString_ReturnsNonEmptyPostcodeApiResponseViewModel()
     {
         // Arrange
-        string path = System.AppDomain.CurrentDomain.BaseDirectory;
-        string responseBody =  File.ReadAllText($"{path}/../../../ServiceTests/Api/AzureMapsApiResponse.json");
+        var path = AppDomain.CurrentDomain.BaseDirectory;
+        var responseBody =  File.ReadAllText($"{path}/../../../ServiceTests/Api/AzureMapsApiResponse.json");
 
         // Act
         var postcodeApiResponseViewModel = _underTest.TurnResponseBodyToModel(responseBody);
@@ -60,7 +65,7 @@ public class ApiTests : ApiServiceTestsBase
         {
             return;
         }
-        Results results = postcodeApiResponseViewModel.ListOfResults[0];
+        var results = postcodeApiResponseViewModel.ListOfResults[0];
         results.Address.Should().NotBeNull("Address should not be null");
         if (results.Address == null)
         {
@@ -74,7 +79,7 @@ public class ApiTests : ApiServiceTestsBase
     public void TurnResponseBodyToModel_WhenCalledWithEmptyString_ReturnsEmptyPostcodeApiResponseViewModel()
     {
         // Arrange
-        string responseBody =  String.Empty;
+        var responseBody =  string.Empty;
         
         // Act
         var postcodeApiResponseViewModel = _underTest.TurnResponseBodyToModel(responseBody);
