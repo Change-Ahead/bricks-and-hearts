@@ -9,7 +9,7 @@ public class ApiServiceTestsBase
 {
     static readonly IOptions<AzureMapsOptions> options = A.Fake<IOptions<AzureMapsOptions>>();
     // A fake API service
-    protected readonly IApiService _apiService = A.Fake<IApiService>();
+    protected readonly IAzureMapsApiService AzureMapsApiService = A.Fake<IAzureMapsApiService>();
     // A real API service
-    protected readonly ApiService _underTest = new(null!, options);
+    protected readonly AzureMapsAzureMapsApiService _underTest = new(null!, options);
 }

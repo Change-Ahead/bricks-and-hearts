@@ -5,20 +5,20 @@ using Newtonsoft.Json;
 
 namespace BricksAndHearts.Services;
 
-public interface IApiService
+public interface IAzureMapsApiService
 {
     public Task<string> MakeApiRequestToAzureMaps(string postalCode);
     public Task<PropertyViewModel> AutofillAddress(PropertyViewModel model);
     public PostcodeApiResponseViewModel TurnResponseBodyToModel(string responseBody);
 }
 
-public class ApiService : IApiService
+public class AzureMapsAzureMapsApiService : IAzureMapsApiService
 {
     private readonly HttpClient _client = new HttpClient();
-    private readonly ILogger<ApiService> _logger;
+    private readonly ILogger<AzureMapsAzureMapsApiService> _logger;
     private readonly IOptions<AzureMapsOptions> _options;
 
-    public ApiService(ILogger<ApiService> logger, IOptions<AzureMapsOptions> options)
+    public AzureMapsAzureMapsApiService(ILogger<AzureMapsAzureMapsApiService> logger, IOptions<AzureMapsOptions> options)
     {
         _logger = logger;
         _options = options;

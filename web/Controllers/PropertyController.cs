@@ -10,13 +10,13 @@ namespace BricksAndHearts.Controllers;
 public class PropertyController : AbstractController
 {
     private readonly IPropertyService _propertyService;
-    private readonly IApiService _apiService;
+    private readonly IAzureMapsApiService _azureMapsApiService;
     private readonly ILogger<PropertyController> _logger;
 
-    public PropertyController(IPropertyService propertyService, IApiService apiService, ILogger<PropertyController> logger)
+    public PropertyController(IPropertyService propertyService, IAzureMapsApiService azureMapsApiService, ILogger<PropertyController> logger)
     {
         _propertyService = propertyService;
-        _apiService = apiService;
+        _azureMapsApiService = azureMapsApiService;
         _logger = logger;
     }
 
@@ -69,7 +69,7 @@ public class PropertyController : AbstractController
                 }
                 else
                 {
-                    PropertyViewModel resultModel = await _apiService.AutofillAddress(newPropertyModel);
+                    PropertyViewModel resultModel = await _azureMapsApiService.AutofillAddress(newPropertyModel);
                     newPropertyModel = resultModel;
 
                     // Create new record in the database for this property

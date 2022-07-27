@@ -58,7 +58,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         fakePropertyDbModel.Description = "hello";
 
         var propertyService = A.Fake<IPropertyService>();
-        var apiService = A.Fake<IApiService>();
+        var apiService = A.Fake<IAzureMapsApiService>();
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(fakePropertyDbModel);
 
         var controller = new PropertyController(propertyService, apiService,null!);
@@ -84,7 +84,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Arrange
         var propertyService = A.Fake<IPropertyService>();
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(null);
-        var apiService = A.Fake<IApiService>();
+        var apiService = A.Fake<IAzureMapsApiService>();
 
         var controller = new PropertyController(propertyService, apiService,null!);
         var landlordUser = CreateLandlordUser();
@@ -130,7 +130,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     {
         // Arrange
         var propertyService = A.Fake<IPropertyService>();
-        var apiService = A.Fake<IApiService>();
+        var apiService = A.Fake<IAzureMapsApiService>();
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(null);
 
         var controller = new PropertyController(propertyService, apiService,null!);
@@ -158,7 +158,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Arrange
         var propertyService = A.Fake<IPropertyService>();
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(null);
-        var apiService = A.Fake<IApiService>();
+        var apiService = A.Fake<IAzureMapsApiService>();
 
         var controller = new PropertyController(propertyService,apiService, null!);
         var landlordUser = CreateLandlordUser();
@@ -194,7 +194,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     {
         // Arrange
         var propertyService = A.Fake<IPropertyService>();
-        var apiService = A.Fake<IApiService>();
+        var apiService = A.Fake<IAzureMapsApiService>();
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(null);
 
         var controller = new PropertyController(propertyService, apiService, null!);
@@ -221,7 +221,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         fakePropertyDbModel.Id = 1;
 
         var propertyService = A.Fake<IPropertyService>();
-        var apiService = A.Fake<IApiService>();
+        var apiService = A.Fake<IAzureMapsApiService>();
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(fakePropertyDbModel);
 
         var controller = new PropertyController(propertyService, apiService,null!);
@@ -246,7 +246,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     {
         // Arrange
         var propertyService = A.Fake<IPropertyService>();
-        var apiService = A.Fake<IApiService>();
+        var apiService = A.Fake<IAzureMapsApiService>();
 
         var controller = new PropertyController(propertyService, apiService,null!);
         var landlordUser = CreateLandlordUser();
@@ -270,7 +270,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         fakePropertyDbModel.Id = 1;
 
         var propertyService = A.Fake<IPropertyService>();
-        var apiService = A.Fake<IApiService>();
+        var apiService = A.Fake<IAzureMapsApiService>();
 
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(fakePropertyDbModel);
 
@@ -295,7 +295,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         fakePropertyDbModel.Id = 1;
 
         var propertyService = A.Fake<IPropertyService>();
-        var apiService = A.Fake<IApiService>();
+        var apiService = A.Fake<IAzureMapsApiService>();
 
         A.CallTo(() => propertyService.GetIncompleteProperty(1)).Returns(null);
 

@@ -39,7 +39,7 @@ builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IPropertyService, PropertyService>();
 builder.Services.AddScoped<IMailService, MailService>();
 
-builder.Services.AddScoped<IApiService, ApiService>();
+builder.Services.AddScoped<IAzureMapsApiService, AzureMapsAzureMapsApiService>();
 builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddOptions<AzureMapsOptions>()
     .Bind(builder.Configuration.GetSection(AzureMapsOptions.AzureMaps));

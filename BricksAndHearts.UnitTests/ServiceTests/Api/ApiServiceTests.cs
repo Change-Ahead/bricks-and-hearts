@@ -20,8 +20,8 @@ public class ApiTests : ApiServiceTestsBase
         // Uses the fake version of apiService because we don't want to make the API call
         // Just want to check that the code works
         string json = "some json string";
-        A.CallTo(() => _apiService.MakeApiRequestToAzureMaps(postalCode)).Returns(json);
-        string? responseBody = await _apiService.MakeApiRequestToAzureMaps(postalCode);
+        A.CallTo(() => AzureMapsApiService.MakeApiRequestToAzureMaps(postalCode)).Returns(json);
+        string? responseBody = await AzureMapsApiService.MakeApiRequestToAzureMaps(postalCode);
         
         // Assert
         responseBody.Should().NotBeNullOrEmpty("should not be null or empty");
