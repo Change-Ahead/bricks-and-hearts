@@ -47,7 +47,7 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord")]
     [HttpPost("add/step/{step:int}")]
-    public async Task<IActionResult> AddNewProperty_Continue([FromRoute] int step, [FromForm] PropertyViewModel newPropertyModel)
+    public ActionResult AddNewProperty_Continue([FromRoute] int step, [FromForm] PropertyViewModel newPropertyModel)
     {
         var landlordId = GetCurrentUser().LandlordId!.Value;
 
@@ -123,12 +123,27 @@ public class PropertyController : AbstractController
         {
             return RedirectToAction("ViewProperties", "Landlord");
         }
+
+        // Delete partially complete property
         _propertyService.DeleteProperty(property);
         await _azureStorage.DeleteContainer("property", property.Id);
         
         return RedirectToAction("ViewProperties", "Landlord");
     }
     
+    [Authorize(Roles = "Landlord")]
+    public ActionResult DeleteProperty(PropertyViewModel prop)
+    {
+        var propDb = _propertyService.GetDbModelFromViewModel(prop);
+
+        // Delete property
+        _propertyService.DeleteProperty(propDb);
+
+        // Go to View Properties page
+        return RedirectToAction("ViewProperties", "Landlord");
+    }
+}
+
     [HttpGet]
     [Route("/property/{propertyId:int}/view")]
     public ActionResult ViewProperty(int propertyId)

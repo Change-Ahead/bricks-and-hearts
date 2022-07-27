@@ -11,6 +11,7 @@ public interface IPropertyService
     public void UpdateProperty(int propertyId, PropertyViewModel updateModel, bool isIncomplete = true);
     public void DeleteProperty(PropertyDbModel property);
     public PropertyDbModel? GetIncompleteProperty(int landlordId);
+    public PropertyDbModel GetDbModelFromViewModel(PropertyViewModel prop);
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId);
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId);
 
@@ -94,6 +95,11 @@ public class PropertyService : IPropertyService
     {
         // Only one property for each landlord is allowed to be incomplete at a time
         return _dbContext.Properties.SingleOrDefault(p => p.LandlordId == landlordId && p.IsIncomplete == true);
+    }
+
+    public PropertyDbModel GetDbModelFromViewModel(PropertyViewModel prop)
+    {
+        return _dbContext.Properties.SingleOrDefault(p => p.Id == prop.Id);
     }
 
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId)
