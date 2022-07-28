@@ -284,7 +284,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var logger = A.Fake<ILogger<PropertyController>>();
 
         var controller = new PropertyController(propertyService, null!, logger);
-        CreateRegisteredUserInController(controller);
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, controller);
         
         // Act
         var result = controller.ViewProperty(1);
@@ -306,7 +307,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var logger = A.Fake<ILogger<PropertyController>>();
 
         var controller = new PropertyController(propertyService, null!, logger);
-        CreateRegisteredUserInController(controller);
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, controller);
         
         // Act
         var result = controller.ViewProperty(1) as ViewResult;
