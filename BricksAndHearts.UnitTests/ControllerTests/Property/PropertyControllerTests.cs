@@ -275,7 +275,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public void ViewProperty_WithNonExistingProperty_RedirectToDashboard()
+    public void ViewProperty_WithNonExistingProperty_Returns404ErrorPage()
     {
         // Arrange
         var propertyService = A.Fake<IPropertyService>();
@@ -292,7 +292,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         
         // Assert
         A.CallTo(() => propertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
-        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
+        result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(404);
     }
     
     [Fact]

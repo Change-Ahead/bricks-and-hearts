@@ -126,19 +126,16 @@ public class PropertyController : AbstractController
     }
 
     [HttpGet]
-    [Route("/property/view")]
+    [Route("/property/{propertyId:int}/view")]
     public ActionResult ViewProperty(int propertyId)
     {
         PropertyDbModel? model = _propertyService.GetPropertyByPropertyId(propertyId);
         if (model == null)
         {
-            _logger.LogWarning("View property did not return the property as expected");
-            return RedirectToAction(nameof(LandlordController.ViewProperties), "Landlord");
+            _logger.LogWarning("Property with ID {PropertyId} does not exist", propertyId);
+            return StatusCode(404);
         }
-        else
-        {
-            PropertyViewModel propertyViewModel = PropertyViewModel.FromDbModel(model);
-            return View(propertyViewModel);
-        }
+        PropertyViewModel propertyViewModel = PropertyViewModel.FromDbModel(model);
+        return View(propertyViewModel);
     }
 }
