@@ -2,13 +2,14 @@
 <div class="registerTab" id="Name">
     <div class="form-group my-3">
         <label>Title:</label>
+        @Html.HiddenFor(m => m.Unassigned, new { value = Model.Unassigned })
         @Html.DropDownList("Title", new List<SelectListItem>
         {
-            new SelectListItem { Text = "Mr", Value = "Mr", Selected = true },
-            new SelectListItem { Text = "Mrs", Value = "Mrs" },
-            new SelectListItem { Text = "Miss", Value = "Miss" },
-            new SelectListItem { Text = "Ms", Value = "Ms" },
-            new SelectListItem { Text = "Dr", Value = "Dr" }
+            new() { Text = "Mr", Value = "Mr", Selected = true },
+            new() { Text = "Mrs", Value = "Mrs" },
+            new() { Text = "Miss", Value = "Miss" },
+            new() { Text = "Ms", Value = "Ms" },
+            new() { Text = "Dr", Value = "Dr" }
         })
     </div>
     <div class="form-group my-3">
@@ -28,9 +29,9 @@
         <label>Landlord type:</label>
         @Html.DropDownList("LandlordStatus", new List<SelectListItem>
         {
-            new SelectListItem { Text = "Private Residential Sector", Value = "Private Residential Sector", Selected = true },
-            new SelectListItem { Text = "Housing association", Value = "Housing association" },
-            new SelectListItem { Text = "Private landlord", Value = "Private landlord" },
+            new() { Text = "Private Residential Sector", Value = "Private Residential Sector", Selected = true },
+            new() { Text = "Housing association", Value = "Housing association" },
+            new() { Text = "Private landlord", Value = "Private landlord" }
         })
     </div>
     <div class="form-group my-3">
@@ -59,8 +60,8 @@
 
     @Html.DropDownList("CharterStatus", new List<SelectListItem>
     {
-        new SelectListItem { Text = "Already approved", Value = "true", Selected = true },
-        new SelectListItem { Text = "Not yet approved", Value = "false" },
+        new() { Text = "Already approved", Value = "true", Selected = true },
+        new() { Text = "Not yet approved", Value = "false" }
     })
 </div>
 
@@ -79,5 +80,5 @@
     <span class="step"></span>
     <span class="step"></span>
     <span class="step"></span>
-</div>    
+</div>
 <script src="~/js/registerPageScript.js" asp-append-version="true"></script>

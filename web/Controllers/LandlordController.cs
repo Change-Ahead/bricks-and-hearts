@@ -11,8 +11,8 @@ namespace BricksAndHearts.Controllers;
 public class LandlordController : AbstractController
 {
     private readonly ILandlordService _landlordService;
-    private readonly IMailService _mailService;
     private readonly ILogger<LandlordController> _logger;
+    private readonly IMailService _mailService;
     private readonly IPropertyService _propertyService;
 
     public LandlordController(ILogger<LandlordController> logger,
@@ -35,7 +35,6 @@ public class LandlordController : AbstractController
             return Redirect(Url.Action("MyProfile")!);
         }
 
-        // If user is an admin, and there was a true createUnassigned param passed
         if (currentUser.IsAdmin && createUnassigned)
         {
             return View("Register", new LandlordProfileModel { Unassigned = true });
@@ -52,34 +51,48 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> RegisterPost([FromForm] LandlordProfileModel createModel)
     {
         // This does checks based on the annotations (e.g. [Required]) on LandlordProfileModel
-        if (!ModelState.IsValid) return View("Register");
+        if (!ModelState.IsValid)
+        {
+            return View("Register");
+        }
 
         var user = GetCurrentUser();
         ILandlordService.LandlordRegistrationResult result;
-        int? id = null;
+        LandlordDbModel? landlord = null;
 
         if (createModel.Unassigned && user.IsAdmin)
-            (result, id) = await _landlordService.RegisterLandlord(createModel);
+        {
+            (result, landlord) = await _landlordService.RegisterLandlord(createModel);
+        }
         else
-            result = await _landlordService.RegisterLandlord(createModel, user);
+        {
+            (result, landlord) = await _landlordService.RegisterLandlord(createModel, user);
+        }
 
         switch (result)
         {
             case ILandlordService.LandlordRegistrationResult.Success:
                 _logger.LogInformation("Successfully created landlord for user {UserId}", user.Id);
-                string msgBody = $"A Landlord has just registered\n"
-                                 + "\n"
-                                 + $"Title: {createModel.Title}\n"
-                                 + $"First Name: {createModel.FirstName}" + "\n"
-                                 + $"Last Name: {createModel.LastName}" + "\n"
-                                 + $"Company Name: {createModel.CompanyName}" + "\n"
-                                 + $"Email: {createModel.Email}" + "\n"
-                                 + $"Phone: {createModel.Phone}" + "\n";
+                var msgBody = "A Landlord has just registered\n"
+                              + "\n"
+                              + $"Title: {createModel.Title}\n"
+                              + $"First Name: {createModel.FirstName}" + "\n"
+                              + $"Last Name: {createModel.LastName}" + "\n"
+                              + $"Company Name: {createModel.CompanyName}" + "\n"
+                              + $"Email: {createModel.Email}" + "\n"
+                              + $"Phone: {createModel.Phone}" + "\n";
                 _mailService.SendMsg(msgBody);
                 if (!createModel.Unassigned)
+                {
                     return Redirect(Url.Action("MyProfile")!);
-                //return RedirectToAction("LandlordList", "Admin");
-                return RedirectToAction("Profile", "Landlord", new { id });
+                }
+
+                if (landlord == null)
+                {
+                    return StatusCode(500);
+                }
+
+                return RedirectToAction("Profile", "Landlord", new { landlord!.Id });
 
             case ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered:
                 _logger.LogWarning("Email already registered {Email}", createModel.Email);
@@ -102,10 +115,16 @@ public class LandlordController : AbstractController
     {
         var user = GetCurrentUser();
 
-        if (user.LandlordId != id && !user.IsAdmin) return StatusCode(403);
+        if (user.LandlordId != id && !user.IsAdmin)
+        {
+            return StatusCode(403);
+        }
 
         var landlord = await _landlordService.GetLandlordIfExistsFromId(id);
-        if (landlord == null) return StatusCode(404);
+        if (landlord == null)
+        {
+            return StatusCode(404);
+        }
 
         var viewModel = LandlordProfileModel.FromDbModel(landlord, user);
         return View("Profile", viewModel);
@@ -116,12 +135,15 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> MyProfile()
     {
         var landlordId = GetCurrentUser().LandlordId;
-        if (landlordId == null) return StatusCode(404);
+        if (landlordId == null)
+        {
+            return StatusCode(404);
+        }
 
         return await Profile(landlordId.Value);
     }
-    
-    [Authorize(Roles="Admin")]
+
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult> ApproveCharter(int landlordId)
     {
@@ -135,7 +157,10 @@ public class LandlordController : AbstractController
     public IActionResult ViewProperties()
     {
         var landlordId = GetCurrentUser().LandlordId;
-        if (!landlordId.HasValue) return StatusCode(403);
+        if (!landlordId.HasValue)
+        {
+            return StatusCode(403);
+        }
 
         var databaseResult = _propertyService.GetPropertiesByLandlord(landlordId.Value);
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();

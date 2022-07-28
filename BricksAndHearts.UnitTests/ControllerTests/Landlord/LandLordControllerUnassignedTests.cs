@@ -1,11 +1,10 @@
-using BricksAndHearts.Controllers;
+using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Castle.Core.Internal;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
@@ -23,8 +22,11 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
         var formResultModel = A.Fake<LandlordProfileModel>();
         formResultModel.Unassigned = true;
         // Act
+        A.CallTo(() => MailService.SendMsg(
+            A<string>._, A<string>._, A<string>._, A<string>._
+        )).DoesNothing();
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel))
-            .Returns((ILandlordService.LandlordRegistrationResult.Success, 0));
+            .Returns((ILandlordService.LandlordRegistrationResult.Success, A.Fake<LandlordDbModel>()));
         var result = await UnderTest.RegisterPost(formResultModel) as RedirectToActionResult;
 
         // Assert
@@ -40,16 +42,17 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
     }
 
     [Fact]
-    public async void RegisterLandlordWithNoAssignedUser_WhenAttemptedByNonAdmin_Fails()
+    public async void RegisterLandlordWithNoAssignedUser_WhenAttemptedByLandlord_Fails()
     {
         // Arrange
-        var nonAdminUser = CreateLandlordUser();
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, UnderTest);
 
         var formResultModel = A.Fake<LandlordProfileModel>();
         formResultModel.Unassigned = true;
         // Act
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel))
-            .Returns((ILandlordService.LandlordRegistrationResult.Success, 0));
+            .Returns((ILandlordService.LandlordRegistrationResult.Success, A.Fake<LandlordDbModel>()));
         var result = await UnderTest.RegisterPost(formResultModel) as RedirectToActionResult;
 
         // Assert

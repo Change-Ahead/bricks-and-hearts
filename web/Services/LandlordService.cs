@@ -15,11 +15,13 @@ public interface ILandlordService
         Success
     }
 
-    public Task<LandlordRegistrationResult> RegisterLandlord(LandlordProfileModel createModel,
+    public Task<(LandlordRegistrationResult result, LandlordDbModel? dbModel)> RegisterLandlord(
+        LandlordProfileModel createModel,
         BricksAndHeartsUser user);
 
-    public Task<(LandlordRegistrationResult result, int id)> RegisterLandlord(LandlordProfileModel createModel);
-    public List<PropertyDbModel> GetListOfProperties(int landlordId);
+    public Task<(LandlordRegistrationResult result, LandlordDbModel? landlord)> RegisterLandlord(
+        LandlordProfileModel createModel);
+
     public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int id);
     public Task<LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel);
     public bool CheckForDuplicateEmail(LandlordProfileModel editModel);
@@ -37,7 +39,8 @@ public class LandlordService : ILandlordService
     }
 
     // Create a new landlord record and associate it with a user
-    public async Task<ILandlordService.LandlordRegistrationResult> RegisterLandlord(LandlordProfileModel createModel,
+    public async Task<(ILandlordService.LandlordRegistrationResult result, LandlordDbModel? dbModel)> RegisterLandlord(
+        LandlordProfileModel createModel,
         BricksAndHeartsUser user)
     {
         var dbModel = new LandlordDbModel
@@ -57,13 +60,15 @@ public class LandlordService : ILandlordService
             // Check there isn't already a Landlord with that email. Nothing depends on this currently, but it would probably mean the landlord is a duplicate
             // This requires Serializable isolation, otherwise it will not lock any rows, and two racing registrations could create duplicate records
             if (await _dbContext.Landlords.AnyAsync(l => l.Email == createModel.Email))
-                return ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered;
+            {
+                return (ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered, null);
+            }
 
             // Check the user doesn't already have a landlord associated
             var userRecord = _dbContext.Users.Single(u => u.Id == user.Id);
             if (userRecord.LandlordId != null)
             {
-                return ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord;
+                return (ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord, null);
             }
 
             // Insert the landlord and call SaveChanges
@@ -78,10 +83,15 @@ public class LandlordService : ILandlordService
 
         user.LandlordId = dbModel.Id;
 
-        return ILandlordService.LandlordRegistrationResult.Success;
+        return (ILandlordService.LandlordRegistrationResult.Success, dbModel);
+    }
+    
+    public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int id)
+    {
+        return _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id);
     }
 
-    public async Task<(ILandlordService.LandlordRegistrationResult result, int id)> RegisterLandlord(
+    public async Task<(ILandlordService.LandlordRegistrationResult result, LandlordDbModel? landlord)> RegisterLandlord(
         LandlordProfileModel createModel)
     {
         var dbModel = new LandlordDbModel
@@ -100,23 +110,18 @@ public class LandlordService : ILandlordService
             // Check there isn't already a Landlord with that email. Nothing depends on this currently, but it would probably mean the landlord is a duplicate
             // This requires Serializable isolation, otherwise it will not lock any rows, and two racing registrations could create duplicate records
             if (await _dbContext.Landlords.AnyAsync(l => l.Email == createModel.Email))
-                return (ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered,
-                    await GetLandlordIdIfExistsFromModel(dbModel) ?? 0);
+            {
+                return (ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered, dbModel);
+            }
 
             // Insert the landlord and call SaveChanges
-        // Entity Framework will insert the record and populate dbModel.Id with the new record's id
+            // Entity Framework will insert the record and populate dbModel.Id with the new record's id
             _dbContext.Landlords.Add(dbModel);
             await _dbContext.SaveChangesAsync();
             await transaction.CommitAsync();
         }
 
-        var id = await GetLandlordIdIfExistsFromModel(dbModel) ?? 0;
-        return (ILandlordService.LandlordRegistrationResult.Success, id);
-    }
-    
-    public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int id)
-    {
-        return _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id);
+        return (ILandlordService.LandlordRegistrationResult.Success, dbModel);
     }
 
     public async Task<string> ApproveLandlord(int landlordId,  BricksAndHeartsUser user)
@@ -138,10 +143,10 @@ public class LandlordService : ILandlordService
         return $"Successfully approved Landlord Charter for {landlord.FirstName} {landlord.LastName}.";
     }
 
-    private async Task<int?> GetLandlordIdIfExistsFromModel(LandlordDbModel model)
+    private async Task<LandlordDbModel?> GetLandlordIfExistsFromModel(LandlordDbModel model)
     {
         var landlord = await _dbContext.Landlords.SingleOrDefaultAsync(l => l.Email == model.Email);
-        return landlord?.Id;
+        return landlord;
     }
     
     public async Task<ILandlordService.LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel)
