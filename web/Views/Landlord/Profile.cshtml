@@ -70,6 +70,13 @@
     else
     {
         <p>Charter status: Pending</p>
+        @if (Model.CurrentUserIsAdmin)
+        {
+            @using (Html.BeginForm("ApproveCharter", "Landlord", FormMethod.Post))
+            {
+                <input type="hidden" id="landlordId" name="landlordId" value=@Model.LandlordId>
+                <button type="submit" class="btn-primary">Approve Landlord</button>
+            }
+        }
     }
-    
 </div>

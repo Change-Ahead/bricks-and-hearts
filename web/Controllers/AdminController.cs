@@ -14,15 +14,12 @@ namespace BricksAndHearts.Controllers;
 public class AdminController : AbstractController
 {
     private readonly IAdminService _adminService;
-    private readonly BricksAndHeartsDbContext _dbContext;
     private readonly ILogger<AdminController> _logger;
 
-    public AdminController(ILogger<AdminController> logger, BricksAndHeartsDbContext dbContext,
-        IAdminService adminService)
+    public AdminController(ILogger<AdminController> logger, IAdminService adminService)
     {
         _logger = logger;
         _adminService = adminService;
-        _dbContext = dbContext;
     }
 
     public IActionResult Index()

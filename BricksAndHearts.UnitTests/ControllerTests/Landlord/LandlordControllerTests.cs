@@ -1,4 +1,5 @@
 ﻿using BricksAndHearts.ViewModels;
+using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
@@ -20,5 +21,20 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Assert
         result!.Model.Should().BeOfType<LandlordProfileModel>()
             .Which.Email.Should().Be(unregisteredUser.GoogleEmail);
+    }
+
+    [Fact]
+    public async void ApproveCharter_CallsApproveLandlord()
+    {
+        // Arrange 
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, _underTest);
+        var landlord = CreateLandlordUser();
+
+        // Act
+        var result = await _underTest.ApproveCharter(landlord.Id) as ViewResult;
+
+        // Assert
+        A.CallTo(() => landlordService.ApproveLandlord(landlord.Id, adminUser)).MustHaveHappened();
     }
 }

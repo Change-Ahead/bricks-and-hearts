@@ -15,8 +15,7 @@ public class LandlordController : AbstractController
     private readonly IMailService _mailService;
     private readonly ILogger<LandlordController> _logger;
 
-    public LandlordController(ILogger<LandlordController> logger, BricksAndHeartsDbContext dbContext,
-        ILandlordService landlordService, IPropertyService propertyService, IMailService mailService)
+    public LandlordController(ILogger<LandlordController> logger, ILandlordService landlordService, IPropertyService propertyService, IMailService mailService)
     {
         _logger = logger;
         _landlordService = landlordService;
@@ -102,7 +101,7 @@ public class LandlordController : AbstractController
             return StatusCode(404);
         }
 
-        var viewModel = LandlordProfileModel.FromDbModel(landlord);
+        var viewModel = LandlordProfileModel.FromDbModel(landlord, user);
         return View("Profile", viewModel);
     }
 
@@ -117,6 +116,15 @@ public class LandlordController : AbstractController
         }
 
         return await Profile(landlordId.Value);
+    }
+    
+    [Authorize(Roles="Admin")]
+    [HttpPost]
+    public async Task<ActionResult> ApproveCharter(int landlordId)
+    {
+        var user = GetCurrentUser();
+        await _landlordService.ApproveLandlord(landlordId, user);
+        return RedirectToAction("Profile", "Landlord", new { Id = landlordId });
     }
 
     [HttpGet]

@@ -6,6 +6,12 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Admin;
 
 public class AdminControllerTestsBase: ControllerTestsBase
 {
-    public static readonly IAdminService adminService = A.Fake<IAdminService>();
-    protected readonly AdminController _underTest = new(null!, null!, adminService);
+    protected readonly IAdminService adminService;
+    protected readonly AdminController _underTest;
+
+    protected AdminControllerTestsBase()
+    {
+        adminService = A.Fake<IAdminService>();
+        _underTest = new(null!, adminService);
+    }
 }
