@@ -1,0 +1,46 @@
+{
+  "summary": {
+    "query": "cb11dx",
+    "queryType": "NON_NEAR",
+    "queryTime": 14,
+    "numResults": 1,
+    "offset": 0,
+    "totalResults": 1,
+    "fuzzyLevel": 1
+  },
+  "results": [
+    {
+      "type": "Street",
+      "id": "GB/STR/p0/33409",
+      "score": 2.3055999279,
+      "address": {
+        "streetName": "Adam & Eve Street",
+        "municipality": "Cambridge",
+        "countrySecondarySubdivision": "Cambridgeshire",
+        "countrySubdivision": "ENG",
+        "countrySubdivisionName": "England",
+        "postalCode": "CB1",
+        "extendedPostalCode": "CB1 1DW, CB1 1DX",
+        "countryCode": "GB",
+        "country": "United Kingdom",
+        "countryCodeISO3": "GBR",
+        "freeformAddress": "Adam & Eve Street, Cambridge, CB1",
+        "localName": "Cambridge"
+      },
+      "position": {
+        "lat": 52.2046,
+        "lon": 0.13244
+      },
+      "viewport": {
+        "topLeftPoint": {
+          "lat": 52.20536,
+          "lon": 0.13157
+        },
+        "btmRightPoint": {
+          "lat": 52.20386,
+          "lon": 0.13317
+        }
+      }
+    }
+  ]
+}

@@ -10,11 +10,13 @@ namespace BricksAndHearts.Controllers;
 public class PropertyController : AbstractController
 {
     private readonly IPropertyService _propertyService;
+    private readonly IAzureMapsApiService _azureMapsApiService;
     private readonly ILogger<PropertyController> _logger;
 
-    public PropertyController(IPropertyService propertyService, ILogger<PropertyController> logger)
+    public PropertyController(IPropertyService propertyService, IAzureMapsApiService azureMapsApiService, ILogger<PropertyController> logger)
     {
         _propertyService = propertyService;
+        _azureMapsApiService = azureMapsApiService;
         _logger = logger;
     }
 
@@ -44,7 +46,7 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord")]
     [HttpPost("add/step/{step:int}")]
-    public ActionResult AddNewProperty_Continue([FromRoute] int step, [FromForm] PropertyViewModel newPropertyModel)
+    public async Task<IActionResult> AddNewProperty_Continue([FromRoute] int step, [FromForm] PropertyViewModel newPropertyModel)
     {
         var landlordId = GetCurrentUser().LandlordId!.Value;
 
@@ -67,6 +69,9 @@ public class PropertyController : AbstractController
                 }
                 else
                 {
+                    PropertyViewModel resultModel = await _azureMapsApiService.AutofillAddress(newPropertyModel);
+                    newPropertyModel = resultModel;
+
                     // Create new record in the database for this property
                     _propertyService.AddNewProperty(landlordId, newPropertyModel, isIncomplete: true);
                 }
