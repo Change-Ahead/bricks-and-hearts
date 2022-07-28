@@ -13,13 +13,13 @@ public class AdminControllerTests : AdminControllerTestsBase
     public void Index_WhenCalledByAnonymousUser_ReturnsViewWithLoginLink()
     {
         // Arrange
-        _underTest.ControllerContext = new ControllerContext
+        UnderTest.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext { User = _anonUser }
         };
 
         // Act
-        var result = _underTest.Index() as ViewResult;
+        var result = UnderTest.Index() as ViewResult;
 
         // Assert
         result!.ViewData.Model.Should().BeOfType<AdminViewModel>()
@@ -31,13 +31,13 @@ public class AdminControllerTests : AdminControllerTestsBase
     {
         // Arrange
         var adminUser = CreateAdminUser();
-        MakeUserPrincipalInController(adminUser, _underTest);
+        MakeUserPrincipalInController(adminUser, UnderTest);
 
         // Act
-        var result = await _underTest.LandlordList() as ViewResult;
+        var result = await UnderTest.LandlordList() as ViewResult;
 
         // Assert
-        A.CallTo(() => adminService.GetUnapprovedLandlords()).MustHaveHappened();
+        A.CallTo(() => AdminService.GetUnapprovedLandlords()).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<LandlordListModel?>();
     }
 }
