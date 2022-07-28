@@ -4,6 +4,7 @@ using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
+using Microsoft.Extensions.Logging;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Property;
 
@@ -12,12 +13,14 @@ public class PropertyControllerTestsBase : ControllerTestsBase
     protected readonly IPropertyService PropertyService;
     protected readonly IAzureMapsApiService AzureMapsApiService;
     protected readonly PropertyController UnderTest;
+    protected readonly ILogger<PropertyController> Logger;
 
     protected PropertyControllerTestsBase()
     {
         PropertyService = A.Fake<IPropertyService>();
         AzureMapsApiService = A.Fake<IAzureMapsApiService>();
-        UnderTest = new PropertyController(PropertyService, AzureMapsApiService, null!);
+        Logger = A.Fake<ILogger<PropertyController>>();
+        UnderTest = new PropertyController(PropertyService, AzureMapsApiService, Logger);
     }
 
     protected PropertyViewModel CreateExamplePropertyViewModel()

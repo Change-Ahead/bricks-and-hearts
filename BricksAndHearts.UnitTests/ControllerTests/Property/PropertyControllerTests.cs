@@ -1,12 +1,8 @@
 ﻿using System.Threading.Tasks;
-using BricksAndHearts.Controllers;
-using BricksAndHearts.Database;
-using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Property;
@@ -183,7 +179,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var landlordUser = CreateLandlordUser();
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
-        var formResultModel = A.Fake<PropertyViewModel>();
+        var formResultModel = CreateExamplePropertyViewModel();
 
         // Act
         var result = await UnderTest.AddNewProperty_Continue(step, formResultModel);
@@ -206,7 +202,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var landlordUser = CreateLandlordUser();
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
-        var formResultModel = A.Fake<PropertyViewModel>();
+        var formResultModel = CreateExamplePropertyViewModel();
 
         // Act
         var result = await UnderTest.AddNewProperty_Continue(step, formResultModel);
@@ -226,7 +222,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var landlordUser = CreateLandlordUser();
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
-        var formResultModel = A.Fake<PropertyViewModel>();
+        var formResultModel = CreateExamplePropertyViewModel();
 
         // Act
         var result = await UnderTest.AddNewProperty_Continue(AddNewPropertyViewModel.MaximumStep, formResultModel);
@@ -278,44 +274,35 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     public void ViewProperty_WithNonExistingProperty_Returns404ErrorPage()
     {
         // Arrange
-        var propertyService = A.Fake<IPropertyService>();
-        A.CallTo(() => propertyService.GetPropertyByPropertyId(1)).Returns(null);
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(null);
         
-        var logger = A.Fake<ILogger<PropertyController>>();
-
-        var controller = new PropertyController(propertyService, null!, logger);
         var landlordUser = CreateLandlordUser();
-        MakeUserPrincipalInController(landlordUser, controller);
+        MakeUserPrincipalInController(landlordUser, UnderTest);
         
         // Act
-        var result = controller.ViewProperty(1);
+        var result = UnderTest.ViewProperty(1);
         
         // Assert
-        A.CallTo(() => propertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
-        result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(404);
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("Error");
+        result.As<RedirectToActionResult>().RouteValues.Should().Contain("status",404);
     }
     
     [Fact]
     public void ViewProperty_WithExistingProperty_ReturnViewPropertyView()
     {
         // Arrange
-        var propertyService = A.Fake<IPropertyService>();
-        var model = A.Fake<PropertyDbModel>();
-        model.Id = 1;
-        A.CallTo(() => propertyService.GetPropertyByPropertyId(1)).Returns(model);
+        var model = CreateExamplePropertyDbModel();
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(model);
         
-        var logger = A.Fake<ILogger<PropertyController>>();
-
-        var controller = new PropertyController(propertyService, null!, logger);
         var landlordUser = CreateLandlordUser();
-        MakeUserPrincipalInController(landlordUser, controller);
+        MakeUserPrincipalInController(landlordUser, UnderTest);
         
         // Act
-        var result = controller.ViewProperty(1) as ViewResult;
-        
+        var result = UnderTest.ViewProperty(1) as ViewResult;
         
         // Assert
-        A.CallTo(() => propertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<PropertyViewModel>();
     }
 }

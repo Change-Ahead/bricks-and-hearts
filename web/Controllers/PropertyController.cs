@@ -133,7 +133,7 @@ public class PropertyController : AbstractController
         if (model == null)
         {
             _logger.LogWarning("Property with ID {PropertyId} does not exist", propertyId);
-            return StatusCode(404);
+            return RedirectToAction("Error", "Home", new { status = 404 });
         }
         PropertyViewModel propertyViewModel = PropertyViewModel.FromDbModel(model);
         return View(propertyViewModel);
