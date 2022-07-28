@@ -7,7 +7,6 @@ namespace BricksAndHearts.Services;
 
 public interface IAzureMapsApiService
 {
-    public Task<string> MakeApiRequestToAzureMaps(string postalCode);
     public Task<PropertyViewModel> AutofillAddress(PropertyViewModel model);
 }
 
@@ -34,21 +33,21 @@ public class AzureMapsAzureMapsApiService : IAzureMapsApiService
         var uri =
             $"https://atlas.microsoft.com/search/address/structured/json?api-version=1.0&countryCode=GB&postalCode={escapedPostalCode}&subscription-key={_options.Value.SubscriptionKey}";
         var responseBody = string.Empty;
-        _logger.LogInformation("Making API Request to {Uri}",uri);
+        _logger.LogInformation("Making API Request to {Uri}", uri);
         try
         {
             var response = await _client.GetAsync(uri);
             response.EnsureSuccessStatusCode();
             responseBody = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation("Successful API request to {Uri}",uri);
+            _logger.LogInformation("Successful API request to {Uri}", uri);
         }
         catch(Exception e)
         {
-            _logger.LogWarning("Message :{Message} ",e.Message);	
+            _logger.LogWarning("Message :{Message} ",e.Message);
         }
         return responseBody;
     }
-    
+
     public PostcodeApiResponseModel TurnResponseBodyToModel(string responseBody)
     {
         if (string.IsNullOrEmpty(responseBody))
@@ -58,19 +57,19 @@ public class AzureMapsAzureMapsApiService : IAzureMapsApiService
 
         var postcodeResponse =
             JsonConvert.DeserializeObject<PostcodeApiResponseModel>(responseBody);
-        return postcodeResponse;
+        return postcodeResponse!;
     }
 
     public async Task<PropertyViewModel> AutofillAddress(PropertyViewModel model)
     {
         if (string.IsNullOrEmpty(model.Address.Postcode))
         {
-            throw new ArgumentException("Model does not has a postcode!");
+            throw new ArgumentException("Model does not have a postcode");
         }
 
         if (string.IsNullOrEmpty(model.Address.AddressLine1))
         {
-            throw new ArgumentException("Model does not has address line 1!");
+            throw new ArgumentException("Model does not have address line 1");
         }
 
         var postCode = model.Address.Postcode;
@@ -86,7 +85,7 @@ public class AzureMapsAzureMapsApiService : IAzureMapsApiService
         {
             return model;
         }
-        
+
         if (results.Address.ContainsKey("streetName"))
         {
             model.Address.AddressLine2 = results.Address["streetName"];
