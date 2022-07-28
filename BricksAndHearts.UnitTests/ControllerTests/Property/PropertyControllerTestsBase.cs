@@ -20,7 +20,7 @@ public class PropertyControllerTestsBase : ControllerTestsBase
         PropertyService = A.Fake<IPropertyService>();
         AzureMapsApiService = A.Fake<IAzureMapsApiService>();
         Logger = A.Fake<ILogger<PropertyController>>();
-        UnderTest = new PropertyController(PropertyService, AzureMapsApiService, Logger);
+        UnderTest = new PropertyController(PropertyService, AzureMapsApiService, Logger, null!);
     }
 
     protected PropertyViewModel CreateExamplePropertyViewModel()

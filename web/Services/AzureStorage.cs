@@ -8,9 +8,9 @@ namespace BricksAndHearts.Services
     {
         Task CreateContainerAsync(string varType, int id);
         Task UploadFileAsync(IFormFile file, string varType, int id);
-        Task<Stream> DownloadFileAsync(string containerName, string blobFilename);
-        //Task<BlobResponseDto> DeleteAsync(string blobFilename);
         Task<List<string>> ListFilesAsync(string varType, int id);
+        Task<Stream> DownloadFileAsync(string varType, int id, string blobFilename);
+        Task DeleteFileAsync(string varType, int id, string blobFilename);
     }
 
     public class AzureStorage : IAzureStorage
@@ -59,8 +59,23 @@ namespace BricksAndHearts.Services
             }
         }
 
-        public async Task<Stream> DownloadFileAsync(string containerName, string blobFilename)
+        public async Task<List<string>> ListFilesAsync(string varType, int id)
         {
+            string containerName = GetContainerName(varType, id);
+            BlobContainerClient container = new BlobContainerClient(_storageConnectionString, containerName);
+            List<string> fileNames = new List<string>();
+            fileNames.Add(id.ToString());
+            await foreach (BlobItem file in container.GetBlobsAsync())
+            {
+                fileNames.Add(file.Name);
+            }
+
+            return fileNames;
+        }
+
+        public async Task<Stream> DownloadFileAsync(string varType, int id, string blobFilename)
+        {
+            string containerName = GetContainerName(varType, id);
             BlobContainerClient client = new BlobContainerClient(_storageConnectionString, containerName);
             try
             {
@@ -74,26 +89,34 @@ namespace BricksAndHearts.Services
                 }
             }
             catch (RequestFailedException ex)
-                when(ex.ErrorCode == BlobErrorCode.BlobNotFound)
+                when (ex.ErrorCode == BlobErrorCode.BlobNotFound)
             {
                 // Log error to console
                 //_logger.LogError($"File {blobFilename} was not found.");
             }
+
             // File does not exist, return null and handle that in requesting method
             return null;
         }
-        
-        public async Task<List<string>> ListFilesAsync(string varType, int id)
+
+        public async Task DeleteFileAsync(string varType, int id, string blobFilename)
         {
             string containerName = GetContainerName(varType, id);
-            BlobContainerClient container = new BlobContainerClient(_storageConnectionString, containerName);
-            List<string> fileNames = new List<string>();
-            fileNames.Add(containerName);
-            await foreach (BlobItem file in container.GetBlobsAsync())
+            BlobContainerClient client = new BlobContainerClient(_storageConnectionString, containerName);
+            BlobClient file = client.GetBlobClient(blobFilename);
+            try
             {
-                fileNames.Add(file.Name);
+                await file.DeleteAsync();
             }
-            return fileNames;
+            catch (RequestFailedException ex)
+                when (ex.ErrorCode == BlobErrorCode.BlobNotFound)
+            {
+                // File did not exist, log to console and return new response to requesting method
+                _logger.LogError($"File {blobFilename} was not found.");
+                //return new BlobResponseDto { Error = true, Status = $"File with name {blobFilename} not found." };
+            }
+            // Return a new BlobResponseDto to the requesting method
+            //return new BlobResponseDto { Error = false, Status = $"File: {blobFilename} has been successfully deleted." };
         }
     }
 }

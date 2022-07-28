@@ -1,7 +1,7 @@
+using System.Threading.Tasks;
 using BricksAndHearts.Controllers;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
-using System.Threading.Tasks;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;

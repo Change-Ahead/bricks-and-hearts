@@ -10,8 +10,15 @@
 {
     using (Html.BeginForm("DisplayPropertyImage", "Property", FormMethod.Post))
     {
-        <input type="hidden" id="containerName" name="containerName" value=@Model[0]>
+        <input type="hidden" id="propertyId" name="propertyId" value=@Model[0]>
         <input type="hidden" id="fileName" name="fileName" value=@Model[i]>
-        <button type="submit" class="btn btn-primary">@Model[i]</button>
+        <button type="submit" class="btn btn-primary">Display @Model[i]</button>
+    }
+    
+    using (Html.BeginForm("DeletePropertyImage", "Property", FormMethod.Post))
+    {
+        <input type="hidden" id="propertyId" name="propertyId" value=@Model[0]>
+        <input type="hidden" id="fileName" name="fileName" value=@Model[i]>
+        <button type="submit" class="btn btn-primary">Delete @Model[i]</button>
     }
 }

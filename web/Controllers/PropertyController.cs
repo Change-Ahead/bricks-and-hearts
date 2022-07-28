@@ -147,7 +147,7 @@ public class PropertyController : AbstractController
         }
         return RedirectToAction("ViewProperties", "Landlord");
     }
-
+    
     [HttpGet]
     public async Task<IActionResult> ListPropertyImages(int propertyId)
     {
@@ -155,15 +155,20 @@ public class PropertyController : AbstractController
         return View(fileNames);
     }
     
-    [HttpPost]
-    public async Task<IActionResult> DisplayPropertyImage(string containerName, string fileName)
+    [HttpPost("displayImage")]
+    public async Task<IActionResult> DisplayPropertyImage(int propertyId, string fileName)
     {
-        var image = await _azureStorage.DownloadFileAsync(containerName, fileName);
+        var image = await _azureStorage.DownloadFileAsync("property", propertyId, fileName);
         return File(image, "image/jpeg");
     }
     
-}
-
+    [HttpPost("deleteImage")]
+    public async Task<IActionResult> DeletePropertyImage(int propertyId, string fileName)
+    {
+        await _azureStorage.DeleteFileAsync("property", propertyId, fileName);
+        return RedirectToAction("ListPropertyImages", "Property", new{propertyId});
+    }
+    
     [HttpGet]
     [Route("/property/{propertyId:int}/view")]
     public ActionResult ViewProperty(int propertyId)
