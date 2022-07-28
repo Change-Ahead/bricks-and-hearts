@@ -65,7 +65,7 @@ public class AdminController : AbstractController
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
-    public async Task<AdminListModel> GetAdminList()
+    public async Task<ActionResult> GetAdminList()
     {
         var adminLists = await _adminService.GetAdminLists();
         

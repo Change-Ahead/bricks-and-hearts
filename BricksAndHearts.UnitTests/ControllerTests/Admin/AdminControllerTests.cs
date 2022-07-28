@@ -12,13 +12,13 @@ public class AdminControllerTests : AdminControllerTestsBase
     public void Index_WhenCalledByAnonymousUser_ReturnsViewWithLoginLink()
     {
         // Arrange
-        UnderTest.ControllerContext = new ControllerContext
+        _underTest.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext { User = _anonUser }
         };
 
         // Act
-        var result = UnderTest.Index() as ViewResult;
+        var result = _underTest.Index() as ViewResult;
 
         // Assert
         result!.ViewData.Model.Should().BeOfType<AdminViewModel>()
@@ -61,10 +61,10 @@ public class AdminControllerTests : AdminControllerTestsBase
     public void GetAdminList_ReturnsViewWithAdminListModel()
     {
         // Arrange
-        CreateAdminUserInController(UnderTest);
+        MakeUserPrincipalInController(CreateAdminUser(), _underTest);
         
         // Act
-        var result = UnderTest.GetAdminList().Result as ViewResult;
+        var result = _underTest.GetAdminList().Result as ViewResult;
 
         // Assert
         result!.ViewData.Model.Should().BeOfType<AdminListModel>();
@@ -74,13 +74,13 @@ public class AdminControllerTests : AdminControllerTestsBase
     public void AcceptAdminRequest_WhenCalled_ApprovesAdminAccessRequest()
     {
         // Arrange
-        CreateAdminUserInController(UnderTest);
+        MakeUserPrincipalInController(CreateAdminUser(), _underTest);
         var dummyId = 1;
 
         // Act
-        var result = UnderTest.AcceptAdminRequest(dummyId);
+        var result = _underTest.AcceptAdminRequest(dummyId);
         
         // Assert
-        A.CallTo(() => AdminService.ApproveAdminAccessRequest(dummyId)).MustHaveHappened();
+        A.CallTo(() => adminService.ApproveAdminAccessRequest(dummyId)).MustHaveHappened();
     }
 }
