@@ -1,4 +1,5 @@
-﻿using BricksAndHearts.Database;
+using BricksAndHearts.Database;
+using System.Text.RegularExpressions;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -58,7 +59,13 @@ public class PropertyController : AbstractController
 
         // Get the property we're currently adding
         var property = _propertyService.GetIncompleteProperty(landlordId);
-        
+        if (newPropertyModel.Address.Postcode != null)
+        {
+            newPropertyModel.Address.Postcode =
+                Regex.Replace(newPropertyModel.Address.Postcode, @"^(\S+?)\s*?(\d\w\w)$", "$1 $2");
+            newPropertyModel.Address.Postcode = newPropertyModel.Address.Postcode.ToUpper();
+        }
+
         if (step == 1)
         {
             if (newPropertyModel.Address.AddressLine1 == null || newPropertyModel.Address.Postcode == null)
