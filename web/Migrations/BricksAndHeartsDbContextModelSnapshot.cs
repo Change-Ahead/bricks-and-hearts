@@ -50,6 +50,9 @@ namespace BricksAndHearts.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("InviteLink")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("LandlordProvidedCharterStatus")
                         .HasColumnType("bit");
 

@@ -1,6 +1,5 @@
 ﻿using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
-using Microsoft.AspNetCore.Components.Web;
 using Microsoft.EntityFrameworkCore;
 
 namespace BricksAndHearts.Services;
@@ -11,6 +10,11 @@ public interface IAdminService
     public void CancelAdminAccessRequest(BricksAndHeartsUser user);
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
     public Task<List<LandlordDbModel>> GetUnapprovedLandlords();
+    public UserDbModel? FindUserByLandlordId(int landlordId);
+    public string? FindExistingInviteLink(int landlordId);
+    public string CreateNewInviteLink(int landlordId);
+    public void DeleteExistingInviteLink(int landlordId);
+
 }
 
 public class AdminService : IAdminService
@@ -38,24 +42,70 @@ public class AdminService : IAdminService
 
     private async Task<List<UserDbModel>> GetCurrentAdmins()
     {
-        List<UserDbModel> CurrentAdmins = await _dbContext.Users.Where(u => u.IsAdmin == true).ToListAsync();
-        return CurrentAdmins;
+        var currentAdmins = await _dbContext.Users.Where(u => u.IsAdmin == true).ToListAsync();
+        return currentAdmins;
     }
 
     private async Task<List<UserDbModel>> GetPendingAdmins()
     {
-        List<UserDbModel> PendingAdmins = await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
-        return PendingAdmins;
+        var pendingAdmins =
+            await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
+        return pendingAdmins;
     }
 
     public async Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists()
     {
         return (await GetCurrentAdmins(), await GetPendingAdmins());
     }
-    
+
     public async Task<List<LandlordDbModel>> GetUnapprovedLandlords()
     {
-        List<LandlordDbModel> UnapprovedLandlords = await _dbContext.Landlords.Where(u => u.CharterApproved == false).ToListAsync();
-        return UnapprovedLandlords;
+        var unapprovedLandlords =
+            await _dbContext.Landlords.Where(u => u.CharterApproved == false).ToListAsync();
+        return unapprovedLandlords;
+    }
+
+    public UserDbModel? FindUserByLandlordId(int landlordId)
+    {
+        return _dbContext.Users.SingleOrDefault(u => u.LandlordId == landlordId);
+    }
+    
+    public string? FindExistingInviteLink(int landlordId)
+    {
+        // Find landlord in db (assumes existence)
+        var landlord = _dbContext.Landlords.Single(u => u.Id == landlordId);
+        // Get existing invite link (if exists)
+        return !string.IsNullOrEmpty(landlord.InviteLink) ? landlord.InviteLink : null;
+    }
+
+    public string CreateNewInviteLink(int landlordId)
+    {
+        // Find landlord in db (assumes existence)
+        var landlord = _dbContext.Landlords.Single(u => u.Id == landlordId);
+        // Should not have existing link
+        if (!string.IsNullOrEmpty(landlord.InviteLink))
+        {
+            throw new Exception("Landlord should not have existing invite link!");
+        }
+        var g = Guid.NewGuid();
+        var inviteLink = g.ToString();
+        landlord.InviteLink = inviteLink;
+        _dbContext.SaveChanges();
+        return inviteLink;
+    }
+
+    public void DeleteExistingInviteLink(int landlordId)
+    {
+        // Find landlord in db (assumes existence)
+        var landlord = _dbContext.Landlords.Single(u => u.Id == landlordId);
+        // Should have existing link
+        if (string.IsNullOrEmpty(landlord.InviteLink))
+        {
+            throw new Exception("Landlord should have existing invite link!");
+        }
+        
+        // Delete
+        landlord.InviteLink = null;
+        _dbContext.SaveChanges();
     }
 }
