@@ -12,6 +12,6 @@ public class AdminControllerTestsBase: ControllerTestsBase
     protected AdminControllerTestsBase()
     {
         adminService = A.Fake<IAdminService>();
-        _underTest = new(null!, adminService);
+        _underTest = new(null!, null!,adminService);
     }
 }
