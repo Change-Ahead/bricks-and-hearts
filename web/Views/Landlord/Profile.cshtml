@@ -37,10 +37,10 @@
     <h4>Landlord</h4>
     
     <hr/>
-    <div class="container-md">
+    <div class="col-lg-5">
         <div class="d-flex p-2 justify-content-between">
             <h4>Personal details</h4>
-            <td><input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", Model)'; setCurrentTab(0);" /></td>
+            <td><input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new{landlordId = Model.LandlordId})'; setCurrentTab(0);" /></td>
         </div>
     
         <div class="tables">
@@ -58,10 +58,10 @@
         </div>
     </div>
 
-    <div class="container-md">
+    <div class="col-lg-5">
         <div class="d-flex p-2 justify-content-between">
             <h4>Landlord details</h4>
-            <td><input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", Model)'; setCurrentTab(1);" /></td>
+            <td><input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", new{landlordId = Model.LandlordId})'; setCurrentTab(1);" /></td>
         </div>
     
         <div class="tables">
@@ -75,10 +75,10 @@
         </div>
     </div>
 
-    <div class="container-md">
+    <div class="col-lg-5">
         <div class="d-flex p-2 justify-content-between">
             <h4>Contact details</h4>
-            <td><input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", Model)'; setCurrentTab(2);" /></td>
+            <td><input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", new{landlordId = Model.LandlordId})'; setCurrentTab(2);" /></td>
         </div>
         <div class="tables">
             <table class="table table-bordered">
@@ -109,7 +109,7 @@
                 @using (Html.BeginForm("ApproveCharter", "Landlord", FormMethod.Post))
                 {
                     <input type="hidden" id="landlordId" name="landlordId" value=@Model.LandlordId>
-                    <button type="submit" class="btn-primary">Approve Landlord</button>
+                    <button type="submit" class="btn btn-outline-primary">Approve Landlord</button>
                 }
             }
         }
@@ -118,7 +118,7 @@
         {
             @using (Html.BeginForm("GetInviteLink", "Admin", new { landlordId = Model.LandlordId }, FormMethod.Post))
             {
-                <button type="submit" class="btn btn-primary">Get Invite Link</button>
+                <button type="submit" class="btn btn-outline-primary">Get Invite Link</button>
             }
         }
     </div>

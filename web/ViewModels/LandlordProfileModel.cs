@@ -7,8 +7,9 @@ namespace BricksAndHearts.ViewModels;
 
 public class LandlordProfileModel
 {
+    [DisplayName("Id")]
     public int LandlordId { get; set; }
-
+    
     [Required]
     [StringLength(60)]
     [DisplayName("Title")]

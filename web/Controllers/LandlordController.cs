@@ -1,4 +1,5 @@
-﻿using BricksAndHearts.Services;
+﻿using BricksAndHearts.Database;
+using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -141,29 +142,32 @@ public class LandlordController : AbstractController
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
         return View("Properties", new PropertiesDashboardViewModel(listOfProperties));
     }
-    
+
     [HttpGet]
     [Route("edit")]
-    public ActionResult EditProfilePage(LandlordProfileModel currentProfileModel)
+    public async Task<ActionResult> EditProfilePage(int landlordId)
     {
-        return View("EditProfilePage", currentProfileModel);
+        var user = GetCurrentUser();
+        var landlordFromDb =  await _landlordService.GetLandlordIfExistsFromId(landlordId);
+        if (landlordFromDb == null) return StatusCode(404);
+        if (user.LandlordId != landlordFromDb.Id && !user.IsAdmin) return StatusCode(403);
+        return View("EditProfilePage", LandlordProfileModel.FromDbModel(landlordFromDb, user));
     }
 
     [HttpPost]
     [Route("edit")]
-    public async Task<ActionResult> EditProfileUpdate([FromForm] LandlordProfileModel createModel)
+    public async Task<ActionResult> EditProfileUpdate([FromForm] LandlordProfileModel editModel)
     {
-        var user = GetCurrentUser();
-        var isEmailDuplicated = _landlordService.CheckForDuplicateEmail(createModel, user.LandlordId);
+        var isEmailDuplicated = _landlordService.CheckForDuplicateEmail(editModel);
         if (isEmailDuplicated)
         {
-            _logger.LogWarning("Email already registered {Email}", createModel.Email);
+            _logger.LogWarning("Email already registered {Email}", editModel.Email);
             ModelState.AddModelError("Email", "Email already registered");
-            return View("EditProfilePage", createModel);
+            return View("EditProfilePage", editModel);
         }
 
-        await _landlordService.EditLandlordDetails(createModel, user.LandlordId);
-        _logger.LogInformation("Successfully created landlord for user {UserId}", user.LandlordId);
-        return RedirectToAction("MyProfile");
+        await _landlordService.EditLandlordDetails(editModel);
+        _logger.LogInformation("Successfully edited landlord for landlord {LandlordId}", editModel.LandlordId);
+        return RedirectToAction("Profile", new{id = editModel.LandlordId});
     }
 }

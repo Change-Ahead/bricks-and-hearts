@@ -9,19 +9,19 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
 
 public class LandlordControllerTestsBase : ControllerTestsBase
 {
-    protected readonly IPropertyService propertyService;
-    protected readonly ILandlordService landlordService;
-    protected readonly Logger<LandlordController> logger;
-    protected readonly MailService mailService;
-    protected readonly LandlordController _underTest;
+    protected readonly IPropertyService PropertyService;
+    protected readonly ILandlordService LandlordService;
+    protected readonly Logger<LandlordController> Logger;
+    protected readonly MailService MailService;
+    protected readonly LandlordController UnderTest;
 
     protected LandlordControllerTestsBase()
     {
-        propertyService = A.Fake<IPropertyService>();
-        landlordService = A.Fake<ILandlordService>();
-        logger = A.Fake<Logger<LandlordController>>();
-        mailService = A.Fake<MailService>();
-        _underTest = new LandlordController(logger, landlordService, propertyService, mailService);
+        PropertyService = A.Fake<IPropertyService>();
+        LandlordService = A.Fake<ILandlordService>();
+        Logger = A.Fake<Logger<LandlordController>>();
+        MailService = A.Fake<MailService>();
+        UnderTest = new LandlordController(Logger, LandlordService, PropertyService, MailService);
     }
     
     protected PropertyViewModel CreateExamplePropertyViewModel()
@@ -49,7 +49,7 @@ public class LandlordControllerTestsBase : ControllerTestsBase
     {
         return new LandlordProfileModel()
         {
-            Id = 1,
+            LandlordId = 1,
             Title = "Mr",
             FirstName = "John",
             LastName = "Doe",

@@ -1,4 +1,3 @@
-using System.Threading.Tasks;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
@@ -45,16 +44,14 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     {
         // Arrange 
         var landlordProfileModel = CreateTestLandlordProfileModel();
-        var landlordUser = CreateLandlordUser();
-        MakeUserPrincipalInController(landlordUser, _underTest);
 
         // Act
-        A.CallTo(() => landlordService.CheckForDuplicateEmail(landlordProfileModel, 1)).Returns(false);
-        A.CallTo(() => landlordService.EditLandlordDetails(landlordProfileModel, 1)).Returns(ILandlordService.LandlordRegistrationResult.Success);
-        var result = _underTest.EditProfileUpdate(landlordProfileModel).Result;
+        A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(false);
+        A.CallTo(() => LandlordService.EditLandlordDetails(landlordProfileModel)).Returns(ILandlordService.LandlordRegistrationResult.Success);
+        var result = UnderTest.EditProfileUpdate(landlordProfileModel).Result;
 
         // Assert   
-        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().BeEquivalentTo("MyProfile");
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().BeEquivalentTo("Profile");
     }
     
     [Fact]
@@ -62,12 +59,10 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     {
         // Arrange 
         var landlordProfileModel = CreateTestLandlordProfileModel();
-        var landlordUser = CreateLandlordUser();
-        MakeUserPrincipalInController(landlordUser, _underTest);
 
         // Act
-        A.CallTo(() => landlordService.CheckForDuplicateEmail(landlordProfileModel, 1)).Returns(true);
-        var result = _underTest.EditProfileUpdate(landlordProfileModel).Result as ViewResult;
+        A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(true);
+        var result = UnderTest.EditProfileUpdate(landlordProfileModel).Result as ViewResult;
 
         // Assert   
         result!.Model.Should().BeOfType<LandlordProfileModel>();
@@ -78,10 +73,12 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     public void EditProfilePage_CalledUsingUserEmail_ReturnsEditProfileViewWithLandlordProfile()
     {
         // Arrange 
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
         var landlordProfileModel = CreateTestLandlordProfileModel();
 
         // Act
-        var result = _underTest.EditProfilePage(landlordProfileModel) as ViewResult;
+        var result = UnderTest.EditProfilePage(landlordProfileModel.LandlordId).Result as ViewResult;
 
         // Assert   
         result!.Model.Should().BeOfType<LandlordProfileModel>();
