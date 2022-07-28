@@ -11,12 +11,12 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     [Fact]
     public void RegisterGet_CalledByUnregisteredUser_ReturnsRegisterViewWithEmail()
     {
-        // Arrange 
+        // Arrange
         var unregisteredUser = CreateUnregisteredUser();
-        MakeUserPrincipalInController(unregisteredUser, _underTest);
+        MakeUserPrincipalInController(unregisteredUser, UnderTest);
 
         // Act
-        var result = _underTest.RegisterGet() as ViewResult;
+        var result = UnderTest.RegisterGet() as ViewResult;
 
         // Assert
         result!.Model.Should().BeOfType<LandlordProfileModel>()
@@ -26,15 +26,15 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     [Fact]
     public async void ApproveCharter_CallsApproveLandlord()
     {
-        // Arrange 
+        // Arrange
         var adminUser = CreateAdminUser();
-        MakeUserPrincipalInController(adminUser, _underTest);
+        MakeUserPrincipalInController(adminUser, UnderTest);
         var landlord = CreateLandlordUser();
 
         // Act
-        var result = await _underTest.ApproveCharter(landlord.Id) as ViewResult;
+        var result = await UnderTest.ApproveCharter(landlord.Id) as ViewResult;
 
         // Assert
-        A.CallTo(() => landlordService.ApproveLandlord(landlord.Id, adminUser)).MustHaveHappened();
+        A.CallTo(() => LandlordService.ApproveLandlord(landlord.Id, adminUser)).MustHaveHappened();
     }
 }

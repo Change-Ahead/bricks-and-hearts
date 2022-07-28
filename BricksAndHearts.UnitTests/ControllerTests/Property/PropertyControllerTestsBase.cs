@@ -1,5 +1,6 @@
 ﻿using System;
 using BricksAndHearts.Controllers;
+using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
@@ -8,9 +9,16 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Property;
 
 public class PropertyControllerTestsBase : ControllerTestsBase
 {
-    public static readonly IPropertyService fakePropertyService = A.Fake<IPropertyService>();
-    public static IAzureMapsApiService FakeAzureMapsApiService = A.Fake<IAzureMapsApiService>();
-    protected readonly PropertyController _underTest = new(fakePropertyService, FakeAzureMapsApiService,null!);
+    protected readonly IPropertyService PropertyService;
+    protected readonly IAzureMapsApiService AzureMapsApiService;
+    protected readonly PropertyController UnderTest;
+
+    protected PropertyControllerTestsBase()
+    {
+        PropertyService = A.Fake<IPropertyService>();
+        AzureMapsApiService = A.Fake<IAzureMapsApiService>();
+        UnderTest = new PropertyController(PropertyService, AzureMapsApiService, null!);
+    }
 
     protected PropertyViewModel CreateExamplePropertyViewModel()
     {
@@ -30,6 +38,19 @@ public class PropertyControllerTestsBase : ControllerTestsBase
             Rent = 1200,
             Description = "Description",
             CreationTime = DateTime.Now
+        };
+    }
+
+    protected PropertyDbModel CreateExamplePropertyDbModel()
+    {
+        return new PropertyDbModel
+        {
+            Id = 1,
+            AddressLine1 = "10 Downing Street",
+            Postcode = "SW1A 2AA",
+            NumOfBedrooms = 2,
+            Rent = 750,
+            Description = "Property description"
         };
     }
 }
