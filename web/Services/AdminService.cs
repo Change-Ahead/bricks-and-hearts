@@ -48,8 +48,8 @@ public class AdminService : IAdminService
 
     private async Task<List<UserDbModel>> GetPendingAdmins()
     {
-        List<UserDbModel> PendingAdmins = await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
-        return PendingAdmins;
+        List<UserDbModel> pendingAdmins = await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
+        return pendingAdmins;
     }
 
     public async Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists()
