@@ -75,7 +75,7 @@ public class AzureMapsAzureMapsApiService : IAzureMapsApiService
         var postCode = model.Address.Postcode;
         var responseBody = await MakeApiRequestToAzureMaps(postCode);
         var postcodeResponse = TurnResponseBodyToModel(responseBody);
-        if (postcodeResponse.ListOfResults == null)
+        if (postcodeResponse.ListOfResults == null || postcodeResponse.ListOfResults.Count < 1)
         {
             return model;
         }
