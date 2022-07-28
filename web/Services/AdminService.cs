@@ -140,7 +140,7 @@ public class AdminService : IAdminService
 
     public UserDbModel GetUserFromId(int userId)
     {
-        UserDbModel userFromId = _dbContext.Users.SingleOrDefault(u => u.Id == userId);
+        UserDbModel userFromId = _dbContext.Users.SingleOrDefault(u => u.Id == userId)!;
         return userFromId;
     }
     
