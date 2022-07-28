@@ -21,4 +21,32 @@
         <input type="hidden" id="fileName" name="fileName" value=@Model[i]>
         <button type="submit" class="btn btn-primary">Delete @Model[i]</button>
     }
+    
+    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
+            onclick="setValue('deleteFileName', '@Model[i]'); setValue('deletePropertyId', '@Model[0]')">
+        Delete @Model[i]
+    </button>
 }
+
+<!-- Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Delete image</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this image?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <form method="post" asp-controller="Property" asp-action="DeletePropertyImage">
+                    <input type="hidden" id="deletePropertyId" name="propertyId" value="">
+                    <input type="hidden" id="deleteFileName" name="fileName" value="">
+                    <input type="submit" value="Delete" class="btn btn-danger"/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

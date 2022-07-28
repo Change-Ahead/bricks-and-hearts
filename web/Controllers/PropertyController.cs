@@ -116,7 +116,7 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord")]
     [HttpPost("add/cancel")]
-    public ActionResult AddNewProperty_Cancel()
+    public async Task<ActionResult> AddNewProperty_Cancel()
     {
         var landlordId = GetCurrentUser().LandlordId!.Value;
         var property = _propertyService.GetIncompleteProperty(landlordId);
@@ -125,6 +125,7 @@ public class PropertyController : AbstractController
             return RedirectToAction("ViewProperties", "Landlord");
         }
         _propertyService.DeleteProperty(property);
+        await _azureStorage.DeleteContainerAsync("property", property.Id);
         
         return RedirectToAction("ViewProperties", "Landlord");
     }

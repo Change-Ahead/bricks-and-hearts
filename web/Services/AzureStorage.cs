@@ -7,6 +7,7 @@ namespace BricksAndHearts.Services
     public interface IAzureStorage
     {
         Task CreateContainerAsync(string varType, int id);
+        Task DeleteContainerAsync(string varType, int id);
         Task UploadFileAsync(IFormFile file, string varType, int id);
         Task<List<string>> ListFilesAsync(string varType, int id);
         Task<Stream> DownloadFileAsync(string varType, int id, string blobFilename);
@@ -31,92 +32,101 @@ namespace BricksAndHearts.Services
             return _baseContainerName + varType + id.ToString();
         }
 
+        private BlobContainerClient GetContainerClient(string containerName)
+        {
+            BlobContainerClient containerClient = new BlobContainerClient(_storageConnectionString, containerName);
+            if (!containerClient.Exists())
+            {
+                throw new Exception($"Container {containerName} does not exist");
+            }
+            return containerClient;
+        }
+
+        private BlobClient GetBlobClient(BlobContainerClient containerClient, string blobName)
+        {
+            BlobClient blobClient = containerClient.GetBlobClient(blobName);
+            if (!blobClient.Exists())
+            {
+                throw new Exception($"Blob {blobName} does not exist");
+            }
+            return blobClient;
+        }
+        
         public async Task CreateContainerAsync(string varType, int id)
         {
+            string containerName = GetContainerName(varType, id);
             BlobServiceClient blobServiceClient = new BlobServiceClient(_storageConnectionString);
-            string containerName = GetContainerName(varType, id); // + Guid.NewGuid();
+            var container = blobServiceClient.GetBlobContainerClient(containerName);
+            if (container.Exists())
+            {
+                await DeleteContainerAsync(varType, id);
+            }
             await blobServiceClient.CreateBlobContainerAsync(containerName);
+        }
+        
+        public async Task DeleteContainerAsync(string varType, int id)
+        {
+            string containerName = GetContainerName(varType, id);
+            var containerClient = GetContainerClient(containerName);
+            await containerClient.DeleteAsync();
         }
 
         public async Task UploadFileAsync(IFormFile blob, string varType, int id)
         {
             string containerName = GetContainerName(varType, id);
-            BlobContainerClient container = new BlobContainerClient(_storageConnectionString, containerName);
-            try
+            var containerClient = GetContainerClient(containerName);
+            var blobClient = containerClient.GetBlobClient(blob.FileName);
+            if (blobClient.Exists())
             {
-                BlobClient client = container.GetBlobClient(blob.FileName);
-                await using (Stream? data = blob.OpenReadStream())
-                {
-                    await client.UploadAsync(data);
-                }
+                await DeleteFileAsync(varType, id, blob.FileName);
             }
-            // If the file already exists, we catch the exception and do not upload it
-            //TODO deal with duplicate file names
-            catch (RequestFailedException ex)
-                when (ex.ErrorCode == BlobErrorCode.BlobAlreadyExists)
+            /*while (blobClient.Exists())
             {
-                //response.Status = $"File with name {blob.FileName} already exists. Please use another name to store your file.";
+                await using (var stream = File.OpenRead(blob.FileName))
+                {
+                    FormFile newBlob = new FormFile(stream, 0, stream.Length, null, blob.FileName + "0")
+                    {
+                        Headers = new HeaderDictionary(),
+                        ContentType = "image/jpeg"
+                    };
+                    blob = newBlob;
+                    blobClient = containerClient.GetBlobClient(newBlob.FileName);
+                }
+            }*/
+            await using (Stream? data = blob.OpenReadStream())
+            {
+                await blobClient.UploadAsync(data);
             }
         }
 
         public async Task<List<string>> ListFilesAsync(string varType, int id)
         {
             string containerName = GetContainerName(varType, id);
-            BlobContainerClient container = new BlobContainerClient(_storageConnectionString, containerName);
+            var containerClient = GetContainerClient(containerName);
             List<string> fileNames = new List<string>();
             fileNames.Add(id.ToString());
-            await foreach (BlobItem file in container.GetBlobsAsync())
+            await foreach (BlobItem file in containerClient.GetBlobsAsync())
             {
                 fileNames.Add(file.Name);
             }
-
             return fileNames;
         }
 
-        public async Task<Stream> DownloadFileAsync(string varType, int id, string blobFilename)
+        public async Task<Stream> DownloadFileAsync(string varType, int id, string blobName)
         {
             string containerName = GetContainerName(varType, id);
-            BlobContainerClient client = new BlobContainerClient(_storageConnectionString, containerName);
-            try
-            {
-                BlobClient file = client.GetBlobClient(blobFilename);
-                if (await file.ExistsAsync())
-                {
-                    Stream data = await file.OpenReadAsync();
-                    return data;
-                    //var content = await file.DownloadContentAsync();
-                    //return new BlobDto { Content = blobContent, Name = name, ContentType = contentType };
-                }
-            }
-            catch (RequestFailedException ex)
-                when (ex.ErrorCode == BlobErrorCode.BlobNotFound)
-            {
-                // Log error to console
-                //_logger.LogError($"File {blobFilename} was not found.");
-            }
-
-            // File does not exist, return null and handle that in requesting method
-            return null;
+            var containerClient = GetContainerClient(containerName);
+            var blobClient = GetBlobClient(containerClient, blobName);
+            Stream data = await blobClient.OpenReadAsync();
+            return data;
         }
 
-        public async Task DeleteFileAsync(string varType, int id, string blobFilename)
+        public async Task DeleteFileAsync(string varType, int id, string blobName)
         {
             string containerName = GetContainerName(varType, id);
-            BlobContainerClient client = new BlobContainerClient(_storageConnectionString, containerName);
-            BlobClient file = client.GetBlobClient(blobFilename);
-            try
-            {
-                await file.DeleteAsync();
-            }
-            catch (RequestFailedException ex)
-                when (ex.ErrorCode == BlobErrorCode.BlobNotFound)
-            {
-                // File did not exist, log to console and return new response to requesting method
-                _logger.LogError($"File {blobFilename} was not found.");
-                //return new BlobResponseDto { Error = true, Status = $"File with name {blobFilename} not found." };
-            }
-            // Return a new BlobResponseDto to the requesting method
-            //return new BlobResponseDto { Error = false, Status = $"File: {blobFilename} has been successfully deleted." };
+            var containerClient = GetContainerClient(containerName);
+            var blobClient = GetBlobClient(containerClient, blobName);
+            await blobClient.DeleteAsync();
         }
     }
 }

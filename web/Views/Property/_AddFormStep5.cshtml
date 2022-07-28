@@ -1,1 +1,10 @@
-﻿
+﻿@model PropertyViewModel
+
+<h2>Description</h2>
+
+<div asp-validation-summary="All" class="text-danger"></div>
+<div class="my-3">
+    <label asp-for="Description" class="form-label">Description</label>
+    <textarea asp-for="Description" class="form-control" rows="5" required></textarea>
+    <span asp-validation-for="Description" class="text-danger"></span>
+</div>
