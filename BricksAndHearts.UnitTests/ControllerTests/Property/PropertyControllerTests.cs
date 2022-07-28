@@ -1,7 +1,4 @@
 ﻿using System.Threading.Tasks;
-using BricksAndHearts.Controllers;
-using BricksAndHearts.Database;
-using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
@@ -182,7 +179,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var landlordUser = CreateLandlordUser();
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
-        var formResultModel = A.Fake<PropertyViewModel>();
+        var formResultModel = CreateExamplePropertyViewModel();
 
         // Act
         var result = await UnderTest.AddNewProperty_Continue(step, formResultModel);
@@ -205,7 +202,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var landlordUser = CreateLandlordUser();
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
-        var formResultModel = A.Fake<PropertyViewModel>();
+        var formResultModel = CreateExamplePropertyViewModel();
 
         // Act
         var result = await UnderTest.AddNewProperty_Continue(step, formResultModel);
@@ -225,7 +222,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var landlordUser = CreateLandlordUser();
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
-        var formResultModel = A.Fake<PropertyViewModel>();
+        var formResultModel = CreateExamplePropertyViewModel();
 
         // Act
         var result = await UnderTest.AddNewProperty_Continue(AddNewPropertyViewModel.MaximumStep, formResultModel);
@@ -271,5 +268,41 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => PropertyService.GetIncompleteProperty(1)).MustHaveHappened();
         A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustNotHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
+    }
+
+    [Fact]
+    public void ViewProperty_WithNonExistingProperty_Returns404ErrorPage()
+    {
+        // Arrange
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(null);
+        
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, UnderTest);
+        
+        // Act
+        var result = UnderTest.ViewProperty(1);
+        
+        // Assert
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("Error");
+        result.As<RedirectToActionResult>().RouteValues.Should().Contain("status",404);
+    }
+    
+    [Fact]
+    public void ViewProperty_WithExistingProperty_ReturnViewPropertyView()
+    {
+        // Arrange
+        var model = CreateExamplePropertyDbModel();
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(model);
+        
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, UnderTest);
+        
+        // Act
+        var result = UnderTest.ViewProperty(1) as ViewResult;
+        
+        // Assert
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
+        result!.ViewData.Model.Should().BeOfType<PropertyViewModel>();
     }
 }

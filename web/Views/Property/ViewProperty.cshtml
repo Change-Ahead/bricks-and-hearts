@@ -1,0 +1,56 @@
+﻿@model PropertyViewModel
+
+@{
+    ViewData["Title"] = "View Property";
+}
+
+<div class="container">
+    <div class="row mb-3">
+        <h3>View property</h3>
+    </div>
+    <div class="row mb-3 ms-0">
+        <div class="col-7 border p-2">
+            <p>@Model.Address.AddressLine1</p>
+            <p>Current rental: </p>
+            <p>Looking for tenant: </p>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-4">
+            <h4>Property details</h4>
+        </div>
+        <div class="col-4">
+            <h4>Letting Profile</h4>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-4">
+            <table class="table table-bordered">
+                <tr>
+                    <td>Address</td>
+                    <td>@Model.Address.AddressLine1</td>
+                </tr>
+                <tr>
+                    <td>Type</td>
+                    <td>@Model.PropertyType</td>
+                </tr>
+                <tr>
+                    <td>Bedrooms</td>
+                    <td>@Model.NumOfBedrooms</td>
+                </tr>
+                <tr>
+                    <td>Rent</td>
+                    <td>@Model.Rent</td>
+                </tr>
+                <tr>
+                    <td>Lease duration</td>
+                    <td> </td>
+                </tr>
+            </table>
+            
+        </div>
+        <div class="col-4">
+            
+        </div>
+    </div>
+</div>
