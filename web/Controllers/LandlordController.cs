@@ -51,7 +51,10 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> RegisterPost([FromForm] LandlordProfileModel createModel)
     {
         // This does checks based on the annotations (e.g. [Required]) on LandlordProfileModel
-        if (!ModelState.IsValid) return View("Register");
+        if (!ModelState.IsValid)
+        {
+            return View("Register");
+        }
 
         var user = GetCurrentUser();
         ILandlordService.LandlordRegistrationResult result;
@@ -111,10 +114,16 @@ public class LandlordController : AbstractController
     {
         var user = GetCurrentUser();
 
-        if (user.LandlordId != id && !user.IsAdmin) return StatusCode(403);
+        if (user.LandlordId != id && !user.IsAdmin)
+        {
+            return StatusCode(403);
+        }
 
         var landlord = await _landlordService.GetLandlordIfExistsFromId(id);
-        if (landlord == null) return StatusCode(404);
+        if (landlord == null)
+        {
+            return StatusCode(404);
+        }
 
         var viewModel = LandlordProfileModel.FromDbModel(landlord, user);
         return View("Profile", viewModel);
@@ -125,7 +134,10 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> MyProfile()
     {
         var landlordId = GetCurrentUser().LandlordId;
-        if (landlordId == null) return StatusCode(404);
+        if (landlordId == null)
+        {
+            return StatusCode(404);
+        }
 
         return await Profile(landlordId.Value);
     }
@@ -139,17 +151,18 @@ public class LandlordController : AbstractController
         return RedirectToAction("Profile", "Landlord", new { Id = landlordId });
     }
 
-
     [HttpGet]
-    [Route("properties")]
-    [Route("properties/{id:int}")]
+    [Route("me/properties")]
+    [Route("{id:int}/properties")]
     public IActionResult ViewProperties(int? id = null)
     {
         if (id == null)
         {
             id = GetCurrentUser().LandlordId;
             if (id == null)
-                return StatusCode(500);
+            {
+                return StatusCode(404);
+            }
         }
         else if (!GetCurrentUser().IsAdmin && id != GetCurrentUser().LandlordId)
         {
@@ -163,7 +176,7 @@ public class LandlordController : AbstractController
 
     [HttpGet]
     [Route("{landlordId:int}/edit")]
-    public async Task<ActionResult> EditProfilePage(int landlordId)
+    public async Task<ActionResult> EditProfilePage(int? landlordId)
     {
         var user = GetCurrentUser();
         var landlordFromDb = await _landlordService.GetLandlordIfExistsFromId(landlordId);
@@ -185,11 +198,16 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> EditProfileUpdate([FromForm] LandlordProfileModel editModel)
     {
         var user = GetCurrentUser();
-        if (!ModelState.IsValid) return StatusCode(404);
+        if (!ModelState.IsValid)
+        {
+            return StatusCode(404);
+        }
+
         if (user.LandlordId != editModel.LandlordId && !user.IsAdmin)
         {
             return StatusCode(403);
         }
+
         var isEmailDuplicated = _landlordService.CheckForDuplicateEmail(editModel);
         if (isEmailDuplicated)
         {

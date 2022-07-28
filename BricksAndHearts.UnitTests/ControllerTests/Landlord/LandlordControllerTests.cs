@@ -1,3 +1,5 @@
+using System.Linq;
+using BricksAndHearts.Controllers;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
@@ -86,9 +88,9 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var adminUser = CreateAdminUser();
         LandlordDbModel? fakeNullLandlord = null;
         MakeUserPrincipalInController(adminUser, UnderTest);
+        A.CallTo(() => LandlordService.GetLandlordIfExistsFromId(A<int>._)).Returns(fakeNullLandlord);
 
         // Act
-        A.CallTo(() => LandlordService.GetLandlordIfExistsFromId(A<int>._)).Returns(fakeNullLandlord);
         var result = UnderTest.EditProfilePage(1000).Result;
 
         // Assert   
@@ -116,11 +118,11 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
         var landlordProfileModel = CreateTestLandlordProfileModel();
-
-        // Act
         A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(false);
         A.CallTo(() => LandlordService.EditLandlordDetails(landlordProfileModel))
             .Returns(ILandlordService.LandlordRegistrationResult.Success);
+
+        // Act
         var result = UnderTest.EditProfileUpdate(landlordProfileModel).Result;
 
         // Assert   
@@ -135,9 +137,9 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
         var landlordProfileModel = CreateTestLandlordProfileModel();
+        A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(true);
 
         // Act
-        A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(true);
         var result = UnderTest.EditProfileUpdate(landlordProfileModel).Result as ViewResult;
 
         // Assert   
@@ -181,30 +183,22 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     {
         // Arrange
         var adminUser = CreateAdminUser();
-        var fakeLandlordService = A.Fake<ILandlordService>();
-        var fakePropertyService = A.Fake<IPropertyService>();
-        var _underTest =
-            new LandlordController(A.Fake<ILogger<LandlordController>>(), null!, fakeLandlordService,
-                fakePropertyService, null!);
-        MakeUserPrincipalInController(adminUser, _underTest);
+        adminUser.Id = 1;
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        A.CallTo(() => PropertyService.GetPropertiesByLandlord(2))
+            .Returns(A.CollectionOfFake<PropertyDbModel>(10).ToList());
 
         // Act
-        var results = new List<ViewResult?>();
-        A.CallTo(() => fakePropertyService.GetPropertiesByLandlord(1))
-            .Returns(A.CollectionOfFake<PropertyDbModel>(10).ToList());
-        results.Add(_underTest.ViewProperties(1) as ViewResult);
-        A.CallTo(() => fakePropertyService.GetPropertiesByLandlord(2))
-            .Returns(A.CollectionOfFake<PropertyDbModel>(10).ToList());
-        results.Add(_underTest.ViewProperties(2) as ViewResult);
+        var result = UnderTest.ViewProperties(2) as ViewResult;
 
         // Assert
-        foreach (var result in results)
+        result.Should().BeOfType<ViewResult>();
+        result.Should().NotBeNull();
+        if (result != null)
         {
-            result.Should().BeOfType<ViewResult>();
-            result.Should().NotBeNull();
             result!.Model.Should().BeOfType<PropertiesDashboardViewModel>();
             result.Model.As<PropertiesDashboardViewModel>().Properties.Count.Should()
-                .Be(10); //Properties.Count.Should().Be(10);
+                .Be(10);
         }
     }
 
@@ -213,26 +207,21 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     {
         // Arrange
         var unregisteredUser = CreateUnregisteredUser();
+        unregisteredUser.Id = 1;
         var fakeLandlordService = A.Fake<ILandlordService>();
         var fakePropertyService = A.Fake<IPropertyService>();
         var underTest =
-            new LandlordController(A.Fake<ILogger<LandlordController>>(), null!, fakeLandlordService, null!, null!);
+            new LandlordController(A.Fake<ILogger<LandlordController>>(), fakeLandlordService, null!, null!);
         MakeUserPrincipalInController(unregisteredUser, underTest);
-
-        // Act
-        var results = new List<StatusCodeResult?>();
-        A.CallTo(() => fakePropertyService.GetPropertiesByLandlord(1))
-            .Returns(A.CollectionOfFake<PropertyDbModel>(10).ToList());
-        results.Add(underTest.ViewProperties(1) as StatusCodeResult);
         A.CallTo(() => fakePropertyService.GetPropertiesByLandlord(2))
             .Returns(A.CollectionOfFake<PropertyDbModel>(10).ToList());
-        results.Add(underTest.ViewProperties(2) as StatusCodeResult);
 
-        // Assert
-        foreach (var result in results)
+        // Act
+        var result = underTest.ViewProperties(2) as StatusCodeResult;
+        result.Should().BeOfType<StatusCodeResult>();
+        result.Should().NotBeNull();
+        if (result != null)
         {
-            result.Should().BeOfType<StatusCodeResult>();
-            result.Should().NotBeNull();
             result!.StatusCode.Should().Be(403);
         }
     }

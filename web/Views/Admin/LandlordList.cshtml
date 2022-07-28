@@ -35,8 +35,6 @@
     @foreach (var landlord in Model.LandlordDisplayList!)
     {
         <tr>
-            @*class="clickable"
-            onclick="location.href = '@Url.Action("Profile", "Landlord", new { id = landlord!.Id })'">*@
             <td>@landlord.FirstName</td>
             <td>@landlord.LastName</td>
             <td>@landlord.CompanyName</td>
@@ -56,18 +54,16 @@
             {
                 <td>Pending</td>
             }
+
             <td>
-                <label>
-                    <input type="button" value="@landlord.Id" class="hidden-button" onclick="location.href = '@Url.Action("Profile", "Landlord", new { id = landlord.Id })'"/>
+                <a type="button" value="@landlord.Id" href="@Url.Action("Profile", "Landlord", new { id = landlord.Id })">
                     <i class="bi bi-person"></i>
-                </label>
+                </a>
             </td>
             <td>
-                <label>
-                    @*<input type="button" value="@landlord.Id" class="hidden-button" onclick="location.href='@('/'+ landlord.Id.ToString() + Url.Action("ViewProperties", "Landlord"))"/>*@
-                    <input type="button" value="@landlord.Id" class="hidden-button" onclick="location.href = '@Url.Action("ViewProperties", "Landlord", new { id = landlord.Id })'"/>
+                <a type="button" href="@Url.Action("ViewProperties", "Landlord", new { id = landlord.Id })">
                     <i class="bi bi-house"></i>
-                </label>
+                </a>
             </td>
         </tr>
     }

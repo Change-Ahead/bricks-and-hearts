@@ -106,7 +106,7 @@
     @if (User.IsInRole("Admin"))
     {
         <h4>Landlord Properties</h4>
-        <button class="btn" onclick="location.href = '@Url.Action("ViewProperties", "Landlord", new { id = Model.LandLordId })'"><i class="bi bi-house"></i> View Properties</button>
+        <button class="btn" onclick="location.href = '@Url.Action("ViewProperties", "Landlord", new { id = Model.LandlordId })'"><i class="bi bi-house"></i> View Properties</button>
         <br/>
     }
     </div>

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
 
 namespace BricksAndHearts.ViewModels;
@@ -8,7 +9,7 @@ public class LandlordProfileModel
 {
     [DisplayName("Id")]
     public int? LandlordId { get; set; }
-    
+
     [Required]
     [StringLength(60)]
     [DisplayName("Title")]
@@ -28,15 +29,18 @@ public class LandlordProfileModel
     [DisplayName("Company")]
     public string? CompanyName { get; set; }
 
-    [Required] [EmailAddress] public string Email { get; set; } = string.Empty;
+    [Required]
+    [EmailAddress]
+    public string Email { get; set; } = string.Empty;
 
-    [Phone] public string Phone { get; set; } = string.Empty;
+    [Phone]
+    public string Phone { get; set; } = string.Empty;
 
     public string LandlordStatus { get; set; } = string.Empty;
 
-    public bool LandlordProvidedCharterStatus { get; set; } = false;
+    public bool LandlordProvidedCharterStatus { get; set; }
 
-    public bool CharterApproved { get; set; } = false;
+    public bool CharterApproved { get; set; }
 
     public bool CurrentUserIsAdmin { get; set; }
 
