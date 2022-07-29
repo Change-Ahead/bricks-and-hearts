@@ -1,4 +1,5 @@
-﻿using BricksAndHearts.Database;
+using System.Text.RegularExpressions;
+using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -58,36 +59,45 @@ public class PropertyController : AbstractController
 
         // Get the property we're currently adding
         var property = _propertyService.GetIncompleteProperty(landlordId);
-        if (property == null)
+        if (newPropertyModel.Address.Postcode != null)
         {
-            if (step == 1)
+            newPropertyModel.Address.Postcode =
+                Regex.Replace(newPropertyModel.Address.Postcode, @"^(\S+?)\s*?(\d\w\w)$", "$1 $2");
+            newPropertyModel.Address.Postcode = newPropertyModel.Address.Postcode.ToUpper();
+        }
+
+        if (step == 1)
+        {
+            if (newPropertyModel.Address.AddressLine1 == null || newPropertyModel.Address.Postcode == null)
             {
-                if (newPropertyModel.Address.AddressLine1 == null || newPropertyModel.Address.Postcode == null)
-                {
-                    // Address line 1 and postcode are the minimum information we need to create a new record
-                    return View("AddNewProperty",
-                        new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
-                }
-                else
-                {
-                    PropertyViewModel resultModel = await _azureMapsApiService.AutofillAddress(newPropertyModel);
-                    newPropertyModel = resultModel;
+                // Address line 1 and postcode are the minimum information we need to create a new record
+                return View("AddNewProperty",
+                    new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
+            }
 
-                    // Create new record in the database for this property
-                    _propertyService.AddNewProperty(landlordId, newPropertyModel, isIncomplete: true);
-                }
+            await _azureMapsApiService.AutofillAddress(newPropertyModel);
 
-                // Go to step 2
-                return RedirectToAction("AddNewProperty_Continue", new { step = 2 });
+            if (property == null)
+            {
+                // Create new record in the database for this property
+                _propertyService.AddNewProperty(landlordId, newPropertyModel, isIncomplete: true);
             }
             else
+            {
+                _propertyService.UpdateProperty(property.Id, newPropertyModel, isIncomplete: true);
+            }
+
+            // Go to step 2
+            return RedirectToAction("AddNewProperty_Continue", new { step = 2 });
+        }
+        else if (step < AddNewPropertyViewModel.MaximumStep)
+        {
+            if (property == null)
             {
                 // No property in progress
                 return RedirectToAction("ViewProperties", "Landlord");
             }
-        }
-        else if (step < AddNewPropertyViewModel.MaximumStep)
-        {
+            
             // Update the property's record with the values entered at this step
             _propertyService.UpdateProperty(property.Id, newPropertyModel, isIncomplete: true);
 
@@ -96,6 +106,12 @@ public class PropertyController : AbstractController
         }
         else
         {
+            if (property == null)
+            {
+                // No property in progress
+                return RedirectToAction("ViewProperties", "Landlord");
+            }
+            
             // Update the property's record with the final set of values
             _propertyService.UpdateProperty(property.Id, newPropertyModel, isIncomplete: false);
 
@@ -135,7 +151,7 @@ public class PropertyController : AbstractController
             _logger.LogWarning("Property with ID {PropertyId} does not exist", propertyId);
             return RedirectToAction("Error", "Home", new { status = 404 });
         }
-        PropertyViewModel propertyViewModel = PropertyViewModel.FromDbModel(model);
+        var propertyViewModel = PropertyViewModel.FromDbModel(model);
         return View(propertyViewModel);
     }
 }
