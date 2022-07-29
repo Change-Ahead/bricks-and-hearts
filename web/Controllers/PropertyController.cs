@@ -130,14 +130,35 @@ public class PropertyController : AbstractController
         return RedirectToAction("ViewProperties", "Landlord");
     }
     
-    [HttpGet("addImages/{propertyId:int}")]
+    [HttpGet]
+    [Route("/property/{propertyId:int}/view")]
+    public ActionResult ViewProperty(int propertyId)
+    {
+        PropertyDbModel? model = _propertyService.GetPropertyByPropertyId(propertyId);
+        if (model == null)
+        {
+            _logger.LogWarning("Property with ID {PropertyId} does not exist", propertyId);
+            return RedirectToAction("Error", "Home", new { status = 404 });
+        }
+        PropertyViewModel propertyViewModel = PropertyViewModel.FromDbModel(model);
+        return View(propertyViewModel);
+    }
+    
+    /*[HttpGet("addImages/{propertyId:int}")]
     public IActionResult AddPropertyImages(int propertyId)
     {
         return View(propertyId);
-    }
+    }*/
 
-    [HttpPost("addImages/{propertyId:int}")]
-    public async Task<IActionResult> AddPropertyImages([FromForm] List<IFormFile> images, [FromRoute] int propertyId)
+    [HttpGet]
+    public async Task<IActionResult> ListPropertyImages(int propertyId)
+    {
+        List<string> fileNames = await _azureStorage.ListFilesAsync("property", propertyId);
+        return View(fileNames);
+    }
+    
+    [HttpPost("addImage")]
+    public async Task<IActionResult> AddPropertyImages(List<IFormFile> images, int propertyId)
     {
         foreach (var image in images)
         {
@@ -146,14 +167,7 @@ public class PropertyController : AbstractController
                 await _azureStorage.UploadFileAsync(image, "property", propertyId);
             }
         }
-        return RedirectToAction("ViewProperties", "Landlord");
-    }
-    
-    [HttpGet]
-    public async Task<IActionResult> ListPropertyImages(int propertyId)
-    {
-        List<string> fileNames = await _azureStorage.ListFilesAsync("property", propertyId);
-        return View(fileNames);
+        return RedirectToAction("ListPropertyImages", "Property", new{propertyId});
     }
     
     [HttpPost("displayImage")]

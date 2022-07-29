@@ -6,26 +6,34 @@
 
 <h2>Images available in container @Model[0]</h2>
 
-@for (int i = 1; i < Model.Count; i++)
+<table>
+    @for (int i = 1; i < Model.Count; i++)
+    {
+        <tr>
+            <td>
+                @using (Html.BeginForm("DisplayPropertyImage", "Property", FormMethod.Post))
+                {
+                    <input type="hidden" id="propertyId" name="propertyId" value=@Model[0]>
+                    <input type="hidden" id="fileName" name="fileName" value=@Model[i]>
+                    <button type="submit" class="btn btn-primary">Display @Model[i]</button>
+                }
+            </td>
+            <td>
+                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
+                    onclick="setValue('deleteFileName', '@Model[i]'); setValue('deletePropertyId', '@Model[0]')">
+                Delete @Model[i]
+                </button>
+            </td>
+        </tr>
+    }
+</table>
+
+@using (Html.BeginForm("AddPropertyImages", "Property", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
-    using (Html.BeginForm("DisplayPropertyImage", "Property", FormMethod.Post))
-    {
-        <input type="hidden" id="propertyId" name="propertyId" value=@Model[0]>
-        <input type="hidden" id="fileName" name="fileName" value=@Model[i]>
-        <button type="submit" class="btn btn-primary">Display @Model[i]</button>
-    }
-    
-    using (Html.BeginForm("DeletePropertyImage", "Property", FormMethod.Post))
-    {
-        <input type="hidden" id="propertyId" name="propertyId" value=@Model[0]>
-        <input type="hidden" id="fileName" name="fileName" value=@Model[i]>
-        <button type="submit" class="btn btn-primary">Delete @Model[i]</button>
-    }
-    
-    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
-            onclick="setValue('deleteFileName', '@Model[i]'); setValue('deletePropertyId', '@Model[0]')">
-        Delete @Model[i]
-    </button>
+    <div>Please upload images of the property</div>
+    <input type="hidden" id="propertyId" name="propertyId" value=@Model[0]>
+    <input name="images" type="file" multiple>
+    <input type="submit" value="Upload Image" />
 }
 
 <!-- Modal -->
