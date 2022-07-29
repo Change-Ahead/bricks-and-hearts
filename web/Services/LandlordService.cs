@@ -46,7 +46,6 @@ public class LandlordService : ILandlordService
             LandlordProvidedCharterStatus = createModel.LandlordProvidedCharterStatus
         };
 
-        // We want to atomically update multiple records (insert a landlord, then set the user's landlord id), so first start a transaction
         await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
         {
             // Check there isn't already a Landlord with that email. Nothing depends on this currently, but it would probably mean the landlord is a duplicate
@@ -62,12 +61,9 @@ public class LandlordService : ILandlordService
             }
 
             // Insert the landlord and call SaveChanges
-            // Entity Framework will insert the record and populate dbModel.Id with the new record's id
+            // Entity Framework will insert the record, update the user LandlordId and populate dbModel.Id with the new record's id
             _dbContext.Landlords.Add(dbModel);
-            await _dbContext.SaveChangesAsync();
-
-            // Now we can update the user record too
-            userRecord.LandlordId = dbModel.Id;
+            userRecord.Landlord = dbModel;
             await _dbContext.SaveChangesAsync();
 
             // and finally commit
