@@ -1,5 +1,5 @@
-using BricksAndHearts.Database;
 using System.Text.RegularExpressions;
+using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -75,8 +75,7 @@ public class PropertyController : AbstractController
                     new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
             }
 
-            PropertyViewModel resultModel = await _azureMapsApiService.AutofillAddress(newPropertyModel);
-            newPropertyModel = resultModel;
+            await _azureMapsApiService.AutofillAddress(newPropertyModel);
 
             if (property == null)
             {
@@ -152,7 +151,7 @@ public class PropertyController : AbstractController
             _logger.LogWarning("Property with ID {PropertyId} does not exist", propertyId);
             return RedirectToAction("Error", "Home", new { status = 404 });
         }
-        PropertyViewModel propertyViewModel = PropertyViewModel.FromDbModel(model);
+        var propertyViewModel = PropertyViewModel.FromDbModel(model);
         return View(propertyViewModel);
     }
 }
