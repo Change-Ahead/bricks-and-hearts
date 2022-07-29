@@ -1,10 +1,11 @@
+@model InviteViewModel
 @{
     ViewData["Title"] = "Accept Invite";
 }
 
-@if (TempData["InviteLinkToAccept"] != null)
+@if (@Model.InviteLinkToAccept != null)
 {
-    @using (Html.BeginForm("TieUserWithLandlord", "Landlord", new { inviteLink = TempData["InviteLinkToAccept"] }))
+    @using (Html.BeginForm("TieUserWithLandlord", "Landlord", new { inviteLink = @Model.InviteLinkToAccept }))
     {
         <h3>Welcome! You've been invited...</h3>
         <br/>

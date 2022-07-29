@@ -205,13 +205,15 @@ public class LandlordController : AbstractController
     [Route("/invite/link={inviteLink}")]
     public ActionResult Invite(string inviteLink)
     {
+        InviteViewModel model = new();
         var landlord = _landlordService.FindLandlordWithInviteLink(inviteLink);
         if (landlord == null)
         {
-            return View();
+            return View(model);
         }
-        TempData["InviteLinkToAccept"] = inviteLink;
-        return View();
+
+        model.InviteLinkToAccept = inviteLink;
+        return View(model);
     }
 
     [HttpPost]
@@ -223,7 +225,7 @@ public class LandlordController : AbstractController
         if (result == ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist)
         {
             _logger.LogWarning("Invite Link {Link} does not work", inviteLink);
-            return RedirectToAction(nameof(Invite),new {inviteLink = inviteLink});
+            return RedirectToAction(nameof(Invite),new InviteViewModel(inviteLink));
         }
         if (result == ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord)
         {
