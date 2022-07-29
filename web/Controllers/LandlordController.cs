@@ -202,7 +202,7 @@ public class LandlordController : AbstractController
     }
 
     [HttpGet]
-    [Route("/invite/link={inviteLink}")]
+    [Route("/invite/{inviteLink}")]
     public ActionResult Invite(string inviteLink)
     {
         InviteViewModel model = new();
@@ -217,7 +217,7 @@ public class LandlordController : AbstractController
     }
 
     [HttpPost]
-    [Route("/invite/link={inviteLink}/accepted")]
+    [Route("/invite/{inviteLink}/accepted")]
     public async Task<IActionResult> TieUserWithLandlord(string inviteLink)
     {
         var user = GetCurrentUser();
@@ -225,7 +225,7 @@ public class LandlordController : AbstractController
         if (result == ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist)
         {
             _logger.LogWarning("Invite Link {Link} does not work", inviteLink);
-            return RedirectToAction(nameof(Invite),new InviteViewModel(inviteLink));
+            return RedirectToAction(nameof(Invite),new {inviteLink});
         }
         if (result == ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord)
         {

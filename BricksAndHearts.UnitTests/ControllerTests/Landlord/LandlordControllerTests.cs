@@ -1,12 +1,8 @@
-using BricksAndHearts.Controllers;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.ViewFeatures;
-using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
@@ -37,7 +33,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var landlord = CreateLandlordUser();
 
         // Act
-        var result = await UnderTest.ApproveCharter(landlord.Id) as ViewResult;
+        _ = await UnderTest.ApproveCharter(landlord.Id) as ViewResult;
 
         // Assert
         A.CallTo(() => LandlordService.ApproveLandlord(landlord.Id, adminUser)).MustHaveHappened();
@@ -74,19 +70,17 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Arrange 
         var landlordUser = CreateLandlordUser();
         string inviteLink = "11111";
-        var landlordService = A.Fake<ILandlordService>();
-        var logger = A.Fake<ILogger<LandlordController>>();
-        A.CallTo(() => landlordService.LinkExistingLandlordWithUser(inviteLink,landlordUser))
+        A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink,landlordUser))
             .Returns(ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist);
-        var controller = new LandlordController(logger,landlordService,null!,null!);
-        MakeUserPrincipalInController(landlordUser, controller);
+        MakeUserPrincipalInController(landlordUser, UnderTest);
 
         // Act
-        var result = await controller.TieUserWithLandlord(inviteLink);
+        var result = await UnderTest.TieUserWithLandlord(inviteLink);
         
         // Assert
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("Invite");
-        result.Should().BeOfType<RedirectToActionResult>().Which.RouteValues.Should().Contain("InviteLink",inviteLink);
+        result.Should().BeOfType<RedirectToActionResult>().Which.RouteValues.Should()
+            .Contain("inviteLink",inviteLink);
     }
     
     [Fact]
@@ -94,15 +88,11 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     {
         // Arrange 
         var landlordUser = CreateLandlordUser();
-        string inviteLink = "11111";
-        var landlordService = A.Fake<ILandlordService>();
-        var logger = A.Fake<ILogger<LandlordController>>();
-        var httpContext = new DefaultHttpContext();
-        var tempData = new TempDataDictionary(httpContext, A.Fake<ITempDataProvider>());
-        A.CallTo(() => landlordService.LinkExistingLandlordWithUser(inviteLink,landlordUser))
+        var inviteLink = "11111";
+        
+        A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink,landlordUser))
             .Returns(ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord);
-        var controller = new LandlordController(logger,landlordService,null!,null!){TempData = tempData};
-        MakeUserPrincipalInController(landlordUser, controller);
+        MakeUserPrincipalInController(landlordUser, UnderTest);
 
         // Act
         A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(true);
@@ -129,7 +119,25 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     }
 }
         // Act
-        var result = await controller.TieUserWithLandlord(inviteLink);
+        var result = await UnderTest.TieUserWithLandlord(inviteLink);
+        
+        // Assert
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("MyProfile");
+    }
+    
+    [Fact]
+    public async void TieUserWithLandlord_WithNonLandlordUser_ReturnDirectToProfile()
+    {
+        // Arrange 
+        var nonLandlordUser = CreateUnregisteredUser();
+        var inviteLink = "11111";
+        
+        A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink,nonLandlordUser))
+            .Returns(ILandlordService.LinkUserWithLandlordResult.Success);
+        MakeUserPrincipalInController(nonLandlordUser, UnderTest);
+
+        // Act
+        var result = await UnderTest.TieUserWithLandlord(inviteLink);
         
         // Assert
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("MyProfile");

@@ -3,25 +3,29 @@ using BricksAndHearts.Controllers;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
 
 public class LandlordControllerTestsBase : ControllerTestsBase
 {
+    protected readonly ILogger<LandlordController> Logger;
     protected readonly IPropertyService PropertyService;
     protected readonly ILandlordService LandlordService;
-    protected readonly Logger<LandlordController> Logger;
-    protected readonly MailService MailService;
+    protected readonly IMailService MailService;
     protected readonly LandlordController UnderTest;
 
     protected LandlordControllerTestsBase()
     {
-        PropertyService = A.Fake<IPropertyService>();
+        Logger = A.Fake<ILogger<LandlordController>>();
         LandlordService = A.Fake<ILandlordService>();
-        Logger = A.Fake<Logger<LandlordController>>();
-        MailService = A.Fake<MailService>();
-        UnderTest = new LandlordController(Logger, LandlordService, PropertyService, MailService);
+        PropertyService = A.Fake<IPropertyService>();
+        MailService = A.Fake<IMailService>();
+        var httpContext = new DefaultHttpContext();
+        var tempData = new TempDataDictionary(httpContext, A.Fake<ITempDataProvider>());
+        UnderTest = new LandlordController(Logger, LandlordService, PropertyService, MailService){TempData = tempData};
     }
     
     protected PropertyViewModel CreateExamplePropertyViewModel()
