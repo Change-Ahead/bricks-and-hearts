@@ -425,7 +425,6 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Assert
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
         A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustNotHaveHappened();
-        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("Error");
-        result.As<RedirectToActionResult>().RouteValues.Should().Contain("status",404);
+        result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(404);
     }
 }
