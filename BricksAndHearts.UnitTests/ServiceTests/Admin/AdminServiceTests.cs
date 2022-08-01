@@ -23,7 +23,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context);
+        var service = new AdminService(context, null!);
 
         var adminUser = context.Users.Single(u => u.GoogleUserName == "AdminUser");
 
@@ -39,7 +39,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new AdminService(context);
+        var service = new AdminService(context, null!);
 
         var nonAdminUser = context.Users.Single(u => u.GoogleUserName == "NonAdminUser");
         var adminUser = context.Users.Single(u => u.GoogleUserName == "AdminUser");
@@ -61,7 +61,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new AdminService(context);
+        var service = new AdminService(context, null!);
 
         var requestedAdminUser = context.Users.Single(u => u.GoogleUserName == "NonAdminUser");
 
