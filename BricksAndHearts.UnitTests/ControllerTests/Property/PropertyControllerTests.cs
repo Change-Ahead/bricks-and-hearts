@@ -313,6 +313,26 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
     // This is not working
     /*[Fact]
+    public async void EditProperty_AtFinalStep_UpdatesRecord_AndRedirectsToViewProperties()
+    {
+        // Arrange
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, UnderTest);
+
+        var formResultModel = CreateExamplePropertyViewModel();
+        var model = CreateExamplePropertyDbModel();
+        
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(model);
+
+        // Act
+        var result = UnderTest.EditProperty(1) as ViewResult;
+
+        // Assert
+        A.CallTo(() => PropertyService.ChangePropertyToIncomplete(model)).MustHaveHappened();
+        result.ViewData.Model.Should().BeOfType<AddNewPropertyViewModel>();
+    }
+    
+    [Fact]
     public async void ListPropertyImages_CallsListFilesAsync_AndReturnsViewListPropertyImages()
     {
         // Arrange
