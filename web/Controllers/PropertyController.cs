@@ -154,6 +154,11 @@ public class PropertyController : AbstractController
     [HttpPost("addImage")]
     public async Task<IActionResult> AddPropertyImages(List<IFormFile> images, int propertyId)
     {
+        var user = GetCurrentUser();
+        if (!user.IsAdmin && _propertyService.GetPropertyByPropertyId(propertyId)!.LandlordId != user.LandlordId)
+        {
+            return StatusCode(403);
+        }
         foreach (var image in images)
         {
             if (image.Length > 0)
@@ -177,21 +182,12 @@ public class PropertyController : AbstractController
     [HttpPost("deleteImage")]
     public async Task<IActionResult> DeletePropertyImage(int propertyId, string fileName)
     {
+        var user = GetCurrentUser();
+        if (!user.IsAdmin && _propertyService.GetPropertyByPropertyId(propertyId)!.LandlordId != user.LandlordId)
+        {
+            return StatusCode(403);
+        }
         await _azureStorage.DeleteFileAsync("property", propertyId, fileName);
         return RedirectToAction("ListPropertyImages", "Property", new{propertyId});
-    }
-    
-    [HttpGet]
-    [Route("/property/{propertyId:int}/view")]
-    public ActionResult ViewProperty(int propertyId)
-    {
-        PropertyDbModel? model = _propertyService.GetPropertyByPropertyId(propertyId);
-        if (model == null)
-        {
-            _logger.LogWarning("Property with ID {PropertyId} does not exist", propertyId);
-            return RedirectToAction("Error", "Home", new { status = 404 });
-        }
-        var propertyViewModel = PropertyViewModel.FromDbModel(model);
-        return View(propertyViewModel);
     }
 }

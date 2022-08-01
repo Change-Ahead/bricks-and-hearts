@@ -66,11 +66,10 @@ namespace BricksAndHearts.Services
             var containerClient = await GetContainerClient(varType, id);
             var blobClient = containerClient.GetBlobClient(blob.FileName);
             int i = 0;
-            string fileName = SplitFileName(blob.FileName).name;
             while (blobClient.Exists())
             {
                 i += 1;
-                fileName = SplitFileName(blob.FileName).name + i + "." + SplitFileName(blob.FileName).type;
+                string fileName = SplitFileName(blob.FileName).name + i + "." + SplitFileName(blob.FileName).type;
                 blobClient = containerClient.GetBlobClient(fileName);
             }
             await using (Stream? data = blob.OpenReadStream())
@@ -98,7 +97,8 @@ namespace BricksAndHearts.Services
             if (!blobClient.Exists())
             {
                 var newContainerClient = new BlobContainerClient(_storageConnectionString, "default");
-                blobClient = newContainerClient.GetBlobClient("error.png");
+                blobName = "error.png";
+                blobClient = newContainerClient.GetBlobClient(blobName);
             }
             Stream data = await blobClient.OpenReadAsync();
             string fileType = SplitFileName(blobName).type;
@@ -117,7 +117,6 @@ namespace BricksAndHearts.Services
 
         private (string name, string type) SplitFileName(string fileName)
         {
-            //return Path.GetExtension(fileName);
             int fileTypeIndexStart = fileName.LastIndexOfAny(new char[] {'.'});
             return (fileName.Substring(0, fileTypeIndexStart), fileName.Substring(fileTypeIndexStart + 1));
         }

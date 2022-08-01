@@ -1,10 +1,9 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
-using BricksAndHearts.Controllers;
-using BricksAndHearts.Database;
-using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Xunit;
 
@@ -236,7 +235,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public void AddNewPropertyCancelPost_DeletesRecord_AndRedirectsToViewProperties()
+    public async void AddNewPropertyCancelPost_DeletesRecordAndContainer_AndRedirectsToViewProperties()
     {
         // Arrange
         var fakePropertyDbModel = CreateExamplePropertyDbModel();
@@ -246,16 +245,17 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         // Act
-        var result = UnderTest.AddNewProperty_Cancel();
+        var result = await UnderTest.AddNewProperty_Cancel();
 
         // Assert
         A.CallTo(() => PropertyService.GetIncompleteProperty(1)).MustHaveHappened();
         A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustHaveHappened();
+        A.CallTo(() => AzureStorage.DeleteContainerAsync("property", fakePropertyDbModel.Id)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
     }
 
     [Fact]
-    public void AddNewPropertyCancelPost_WithNoAddInProgress_RedirectsToViewProperties()
+    public async void AddNewPropertyCancelPost_WithNoAddInProgress_RedirectsToViewProperties()
     {
         // Arrange
         var fakePropertyDbModel = CreateExamplePropertyDbModel();
@@ -265,11 +265,12 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         // Act
-        var result = UnderTest.AddNewProperty_Cancel();
+        var result = await UnderTest.AddNewProperty_Cancel();
 
         // Assert
         A.CallTo(() => PropertyService.GetIncompleteProperty(1)).MustHaveHappened();
         A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustNotHaveHappened();
+        A.CallTo(() => AzureStorage.DeleteContainerAsync("property", fakePropertyDbModel.Id)).MustNotHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
     }
 
@@ -307,5 +308,79 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Assert
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<PropertyViewModel>();
+    }
+    
+    [Fact]
+    public async void ListPropertyImages_CallsListFilesAsync_AndReturnsViewListPropertyImages()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+
+        var model = new List<string> { "image1", "image2" };
+        A.CallTo(() => AzureStorage.ListFilesAsync("property", 1)).Returns(model);
+
+        // Act
+        var result = await UnderTest.ListPropertyImages(1) as ViewResult;
+
+        // Assert
+        A.CallTo(() => AzureStorage.ListFilesAsync("property", 1)).MustHaveHappened();
+        result!.ViewData.Model.Should().BeOfType<List<string>>().And.Be(model);
+    }
+    
+    [Fact]
+    public async void AddPropertyImages_CallsUploadImageForEachImage_AndRedirectsToListImages()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+
+        var fakeImage = CreateExampleImage();
+        var fakeImage2 = CreateExampleImage();
+        var fakeImageList = new List<IFormFile>{fakeImage, fakeImage2};
+        
+        // Act
+        var result = await UnderTest.AddPropertyImages(fakeImageList, 1);
+
+        // Assert
+        A.CallTo(() => AzureStorage.UploadFileAsync(fakeImage, "property", 1)).MustHaveHappened();
+        A.CallTo(() => AzureStorage.UploadFileAsync(fakeImage2, "property", 1)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ListPropertyImages");
+    }
+    
+    [Fact]
+    public async void DisplayImage_CallsDownloadFileAsync_AndReturnsFile()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        
+        var fakeImage = CreateExampleImage();
+        var image = (fakeImage.OpenReadStream(), "jpeg");
+        A.CallTo(() => AzureStorage.DownloadFileAsync("property", 1, fakeImage.FileName)).Returns(image);
+
+        // Act
+        var result = await UnderTest.DisplayPropertyImage(1, fakeImage.FileName) as FileStreamResult;
+
+        // Assert
+        A.CallTo(() => AzureStorage.DownloadFileAsync("property", 1, fakeImage.FileName)).MustHaveHappened();
+        result!.ContentType.Should().Be("image/jpeg");
+    }
+    
+    [Fact]
+    public async void DeleteImage_CallsDeleteFileAsync_AndRedirectsToListImages()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        
+        var fakeImage = CreateExampleImage();
+        
+        // Act
+        var result = await UnderTest.DeletePropertyImage(1, fakeImage.FileName);
+
+        // Assert
+        A.CallTo(() => AzureStorage.DeleteFileAsync("property", 1, fakeImage.FileName)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ListPropertyImages");
     }
 }
