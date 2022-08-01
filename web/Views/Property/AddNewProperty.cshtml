@@ -8,14 +8,18 @@
 
 <hr/>
 
+@if (Model.Step > 1)
+{
+    <div class="mb-4">
+        <a asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@(Model.Step - 1)" class="link-secondary">Back</a>
+    </div>
+}
+
 <form method="post" class="w-50" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@Model.Step">
 
     <partial name=@("_AddFormStep" + Model.Step) model="Model.Property"/>
 
     <div class="mt-4">
-        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">
-            Cancel
-        </button>
         @if (Model.Step < AddNewPropertyViewModel.MaximumStep)
         {
             <input type="submit" value="Save and continue" class="btn btn-primary"/>
@@ -24,6 +28,9 @@
         {
             <input type="submit" value="Submit" class="btn btn-success"/>
         }
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">
+            Cancel
+        </button>
     </div>
 </form>
 
