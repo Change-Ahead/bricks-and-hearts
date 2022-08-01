@@ -26,7 +26,6 @@ public interface ILandlordService
     public Task<LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel);
     public bool CheckForDuplicateEmail(LandlordProfileModel editModel);
     public Task<string> ApproveLandlord(int landlordId, BricksAndHeartsUser user);
-
 }
 
 public class LandlordService : ILandlordService
@@ -85,7 +84,7 @@ public class LandlordService : ILandlordService
 
         return (ILandlordService.LandlordRegistrationResult.Success, dbModel);
     }
-    
+
     public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int id)
     {
         return _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id);
@@ -111,7 +110,7 @@ public class LandlordService : ILandlordService
             // This requires Serializable isolation, otherwise it will not lock any rows, and two racing registrations could create duplicate records
             if (await _dbContext.Landlords.AnyAsync(l => l.Email == createModel.Email))
             {
-                return (ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered, dbModel);
+                return (ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered, null);
             }
 
             // Insert the landlord and call SaveChanges
@@ -158,7 +157,7 @@ public class LandlordService : ILandlordService
         landlordToEdit.CompanyName = editModel.CompanyName;
         landlordToEdit.Email = editModel.Email;
         landlordToEdit.Phone = editModel.Phone;
-        
+
         await _dbContext.SaveChangesAsync();
         return ILandlordService.LandlordRegistrationResult.Success;
     }
@@ -166,7 +165,7 @@ public class LandlordService : ILandlordService
     public bool CheckForDuplicateEmail(LandlordProfileModel editModel)
     {
         var editedLandlord = _dbContext.Landlords.Single(l => l.Id == editModel.LandlordId);
-        return _dbContext.Landlords.SingleOrDefault(l => l.Email == editModel.Email) != null 
+        return _dbContext.Landlords.SingleOrDefault(l => l.Email == editModel.Email) != null
                && editedLandlord.Email != editModel.Email;
     }
 }

@@ -60,7 +60,11 @@ public class LandlordController : AbstractController
         ILandlordService.LandlordRegistrationResult result;
         LandlordDbModel? landlord = null;
 
-        if (createModel.Unassigned && user.IsAdmin)
+        if (createModel.Unassigned == false)
+        {
+            (result, landlord) = await _landlordService.RegisterLandlord(createModel, user);
+        }
+        else if (createModel.Unassigned && user.IsAdmin)
         {
             (result, landlord) = await _landlordService.RegisterLandlord(createModel);
         }
@@ -84,12 +88,7 @@ public class LandlordController : AbstractController
                 _mailService.SendMsg(msgBody);
                 if (!createModel.Unassigned)
                 {
-                    return Redirect(Url.Action("MyProfile")!);
-                }
-
-                if (landlord == null)
-                {
-                    return StatusCode(500);
+                    return RedirectToAction("MyProfile");
                 }
 
                 return RedirectToAction("Profile", "Landlord", new { landlord!.Id });

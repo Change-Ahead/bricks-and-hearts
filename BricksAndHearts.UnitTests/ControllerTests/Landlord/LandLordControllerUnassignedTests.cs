@@ -1,7 +1,6 @@
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
-using Castle.Core.Internal;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -18,28 +17,24 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
-        var returnedLandlord = A.Fake<LandlordDbModel>();
-        var formResultModel = A.Fake<LandlordProfileModel>();
-        formResultModel.Unassigned = true;
-
-        // Act
+        var returnedLandlord = new LandlordDbModel
+        {
+            Id = 5
+        };
+        var formResultModel = new LandlordProfileModel
+        {
+            Unassigned = true
+        };
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel))
             .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));
-        A.CallTo(() => MailService.SendMsg(
-            A<string>._, A<string>._, A<string>._, A<string>._
-        )).WithAnyArguments().DoesNothing();
+        // Act
         var result = await UnderTest.RegisterPost(formResultModel) as RedirectToActionResult;
-
         // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
-        if (result != null)
-        {
-            result.ActionName.Should().BeEquivalentTo("Profile");
-            result.ControllerName.Should().BeEquivalentTo("Landlord");
-            Assert.False(result.RouteValues.IsNullOrEmpty());
-            result.RouteValues?["id"].Should().Be(returnedLandlord.Id);
-        }
+        result!.ActionName.Should().BeEquivalentTo("Profile");
+        result.ControllerName.Should().BeEquivalentTo("Landlord");
+        result.RouteValues!["id"].Should().Be(returnedLandlord.Id);
     }
 
     [Fact]
