@@ -32,7 +32,6 @@ public class MailService : IMailService
     )
     {
         var msgFromAddress = _config.Value.FromAddress;
-        var msgToAddress = _config.Value.ToAddress;
 
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(msgFromName, msgFromAddress));
@@ -42,9 +41,7 @@ public class MailService : IMailService
             Text = msgBody
         };
         foreach (var msgToAddress in _config.Value.ToAddress)
-        {
             message.To.Add(new MailboxAddress(msgToName, msgToAddress));
-        }
 
         using var client = new SmtpClient();
         client.Connect(_config.Value.Host, _config.Value.Port, true);

@@ -26,6 +26,27 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     }
 
     [Fact]
+    public async void RegisterPost_CalledByUnregisteredUser_ReturnsProfile()
+    {
+        // Arrange
+        var unregisteredUser = CreateUnregisteredUser();
+        MakeUserPrincipalInController(unregisteredUser, UnderTest);
+        var formResultModel = new LandlordProfileModel();
+        var returnedLandlord = new LandlordDbModel();
+
+        A.CallTo(() => LandlordService.RegisterLandlord(formResultModel, unregisteredUser))
+            .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));
+
+        // Act
+        var result = await UnderTest.RegisterPost(formResultModel) as RedirectToActionResult;
+
+        // Assert
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("MyProfile");
+    }
+
+    [Fact]
     public async void ApproveCharter_CallsApproveLandlord_AndDisplaysSuccessMessage()
     {
         // Arrange
@@ -40,7 +61,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         A.CallTo(() => LandlordService.ApproveLandlord(landlord.Id, adminUser)).MustHaveHappened();
         UnderTest.TempData["ApprovalSuccessMessage"].Should().Be("");
     }
-    
+
     [Fact]
     public void EditProfilePage_CalledUsingUserId_ReturnsEditProfileViewWithLandlordProfile()
     {
@@ -96,15 +117,17 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
         // Act
         A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(false);
-        A.CallTo(() => LandlordService.EditLandlordDetails(landlordProfileModel)).Returns(ILandlordService.LandlordRegistrationResult.Success);
+        A.CallTo(() => LandlordService.EditLandlordDetails(landlordProfileModel))
+            .Returns(ILandlordService.LandlordRegistrationResult.Success);
         var result = UnderTest.EditProfileUpdate(landlordProfileModel).Result;
 
         // Assert   
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().BeEquivalentTo("Profile");
     }
-    
+
     [Fact]
-    public void EditProfileUpdate_CalledUsingLandlordDatabaseModelWithDuplicateEmail_ReturnsEditProfileViewWithLandlordProfile()
+    public void
+        EditProfileUpdate_CalledUsingLandlordDatabaseModelWithDuplicateEmail_ReturnsEditProfileViewWithLandlordProfile()
     {
         // Arrange 
         var adminUser = CreateAdminUser();
@@ -119,7 +142,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         result!.Model.Should().BeOfType<LandlordProfileModel>();
         result.Should().BeOfType<ViewResult>().Which.ViewName!.Should().BeEquivalentTo("EditProfilePage");
     }
-    
+
     [Fact]
     public void EditProfileUpdate_CalledUsingNonAdmin_Returns403Error()
     {
