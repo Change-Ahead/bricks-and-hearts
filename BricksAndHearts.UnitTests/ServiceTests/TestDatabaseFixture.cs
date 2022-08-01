@@ -1,4 +1,5 @@
-﻿using BricksAndHearts.Database;
+﻿using System;
+using BricksAndHearts.Database;
 using Microsoft.Extensions.Configuration;
 
 namespace BricksAndHearts.UnitTests.ServiceTests;
@@ -18,10 +19,20 @@ public class TestDatabaseFixture
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
 
+                context.Landlords.AddRange(
+                    CreateApprovedLandlord(),
+                    CreateUnapprovedLandlord(),
+                    CreateLandlordWithLink()
+                );
+
                 context.Users.AddRange(
                     CreateAdminUser(),
                     CreateNonAdminUser(),
-                    CreateRequestedAdminUser());
+                    CreateRequestedAdminUser(),
+                    CreateUnapprovedLandlordUser(),
+                    CreateApprovedLandlordUser(),
+                    CreateLandlordUserWithLink()
+                );
                 context.SaveChanges();
             }
 
@@ -86,6 +97,85 @@ public class TestDatabaseFixture
             IsAdmin = false,
             LandlordId = null,
             HasRequestedAdmin = true
+        };
+    }
+
+    public LandlordDbModel CreateApprovedLandlord()
+    {
+        return new LandlordDbModel
+        {
+            Email = "test.email4@gmail.com",
+            FirstName = "Ronnie",
+            LastName = "McFace",
+            Title = "Dr",
+            Phone = "01189998819991197253",
+            LandlordStatus = "Non profit",
+            CharterApproved = true
+        };
+    }
+    
+    public LandlordDbModel CreateUnapprovedLandlord()
+    {
+        return new LandlordDbModel
+        {
+            Email = "test.email4@gmail.com",
+            FirstName = "Donnie",
+            LastName = "McCheeks",
+            Title = "Mr",
+            Phone = "01189998819991197253",
+            LandlordStatus = "Non profit",
+            CharterApproved = false
+        };
+    }
+
+    public LandlordDbModel CreateLandlordWithLink()
+    {
+        return new LandlordDbModel
+        {
+            Email = "test.email4@gmail.com",
+            FirstName = "Lonnie",
+            LastName = "McMc",
+            Title = "Sister",
+            Phone = "01189998819991197253",
+            LandlordStatus = "Non profit",
+            CharterApproved = true,
+            InviteLink = "InvitimusLinkimus"
+        };
+    }
+    
+    public UserDbModel CreateApprovedLandlordUser()
+    {
+        return new UserDbModel
+        {
+            GoogleUserName = "ApprovedLandlordUser",
+            GoogleEmail = "test.email4@gmail.com",
+            GoogleAccountId = "4",
+            IsAdmin = false,
+            LandlordId = 1
+        };
+    }
+    
+    public UserDbModel CreateUnapprovedLandlordUser()
+    {
+        return new UserDbModel
+        {
+            GoogleUserName = "UnapprovedLandlordUser",
+            GoogleEmail = "test.email5@gmail.com",
+            GoogleAccountId = "5",
+            IsAdmin = false,
+            LandlordId = 2
+        };
+    }
+
+    public UserDbModel CreateLandlordUserWithLink()
+    {
+        return new UserDbModel()
+        {
+            GoogleUserName = "LinkyLandlordUser",
+            GoogleEmail = "test.email6@gmail.com",
+            GoogleAccountId = "6",
+            IsAdmin = false,
+            LandlordId = 3
         };
     }
 }
