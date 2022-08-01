@@ -144,7 +144,7 @@ public class LandlordService : ILandlordService
         BricksAndHeartsUser user)
     {
         // We want to atomically update multiple records (insert a landlord, then set the user's landlord id), so first start a transaction
-        var transaction = await _dbContext.Database.BeginTransactionAsync();
+        var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead);
         await using (transaction)
         {
             // Check that the link exists
@@ -163,17 +163,16 @@ public class LandlordService : ILandlordService
 
             // Disable invite link
             landlord.InviteLink = null;
-            landlord.User = userRecord;
-            await _dbContext.SaveChangesAsync();
-
+            
             // Now we can update the user record too
-            userRecord.LandlordId = landlord.Id;
-            userRecord.Landlord = landlord;
-            user.LandlordId = landlord.Id;
+            userRecord.LandlordId = landlord.Id; // EF should automatically update the rest of it for us
             await _dbContext.SaveChangesAsync();
 
             // and finally commit
             await transaction.CommitAsync();
+            
+            user.LandlordId = landlord.Id; // Update the in memory user object
+
         }
         return ILandlordService.LinkUserWithLandlordResult.Success;
     }

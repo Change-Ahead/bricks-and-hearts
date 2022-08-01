@@ -65,11 +65,11 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var landlordProfileModel = CreateTestLandlordProfileModel();
 
     [Fact]
-    public async void TieUserWithLandlord_WithNonExistentLink_ReturnDirectToInvite()
+    public async void TieUserWithLandlord_WithNonExistentLink_RedirectToInvite()
     {
         // Arrange 
         var landlordUser = CreateLandlordUser();
-        string inviteLink = "11111";
+        const string inviteLink = "11111";
         A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink,landlordUser))
             .Returns(ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist);
         MakeUserPrincipalInController(landlordUser, UnderTest);
@@ -84,11 +84,11 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     }
     
     [Fact]
-    public async void TieUserWithLandlord_WithLandlord_ReturnDirectToProfile()
+    public async void TieUserWithLandlord_WithLandlord_RedirectToProfile()
     {
         // Arrange 
         var landlordUser = CreateLandlordUser();
-        var inviteLink = "11111";
+        const string inviteLink = "11111";
         
         A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink,landlordUser))
             .Returns(ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord);
@@ -126,11 +126,11 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     }
     
     [Fact]
-    public async void TieUserWithLandlord_WithNonLandlordUser_ReturnDirectToProfile()
+    public async void TieUserWithLandlord_WithNonLandlordUser_RedirectToProfile()
     {
         // Arrange 
         var nonLandlordUser = CreateUnregisteredUser();
-        var inviteLink = "11111";
+        const string inviteLink = "11111";
         
         A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink,nonLandlordUser))
             .Returns(ILandlordService.LinkUserWithLandlordResult.Success);
