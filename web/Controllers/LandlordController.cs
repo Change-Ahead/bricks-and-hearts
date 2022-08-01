@@ -1,5 +1,4 @@
-﻿using BricksAndHearts.Database;
-using BricksAndHearts.Services;
+﻿using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -158,6 +157,8 @@ public class LandlordController : AbstractController
     [Route("edit")]
     public async Task<ActionResult> EditProfileUpdate([FromForm] LandlordProfileModel editModel)
     {
+        var user = GetCurrentUser();
+        if (user.LandlordId != editModel.LandlordId && !user.IsAdmin) return StatusCode(403);
         var isEmailDuplicated = _landlordService.CheckForDuplicateEmail(editModel);
         if (isEmailDuplicated)
         {

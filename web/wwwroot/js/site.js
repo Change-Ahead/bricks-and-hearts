@@ -2,12 +2,12 @@
 
 function setCurrentTab(inputTab){
     currentTab = inputTab
-    localStorage.setItem("someVarKey", currentTab);
+    localStorage.setItem("storedCurrentTab", currentTab);
 }
 
 if (window.location.pathname === "/landlord/register" || window.location.pathname === "/landlord/edit"){
-    if(localStorage.getItem("someVarKey")!=null){
-        currentTab = parseInt(localStorage.getItem("someVarKey"));
+    if(localStorage.getItem("storedCurrentTab")!=null){
+        currentTab = parseInt(localStorage.getItem("storedCurrentTab"));
     }
     showTab(currentTab);
 }

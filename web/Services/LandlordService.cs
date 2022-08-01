@@ -109,8 +109,7 @@ public class LandlordService : ILandlordService
         landlordToEdit.CompanyName = editModel.CompanyName;
         landlordToEdit.Email = editModel.Email;
         landlordToEdit.Phone = editModel.Phone;
-
-        _dbContext.Update(landlordToEdit);
+        
         await _dbContext.SaveChangesAsync();
         return ILandlordService.LandlordRegistrationResult.Success;
     }
