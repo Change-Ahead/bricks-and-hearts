@@ -1,4 +1,4 @@
-﻿@model PropertyViewModel
+@model PropertyViewModel
 
 @{
     ViewData["Title"] = "View Property";
@@ -111,3 +111,8 @@
         </div>
     </div>
 </div>
+
+<form method="get" asp-controller="Property" asp-action="EditProperty">
+    <input type="hidden" name="propertyId" value="@Model.PropertyId"/>
+    <input type="submit" value="Edit" class="btn btn-danger"/>
+</form>
