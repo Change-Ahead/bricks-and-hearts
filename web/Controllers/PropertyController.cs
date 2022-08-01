@@ -31,6 +31,17 @@ public class PropertyController : AbstractController
     {
         return AddNewProperty_Continue(1);
     }
+    
+    [Authorize(Roles = "Landlord")]
+    [HttpGet("edit")]
+    public ActionResult EditProperty(int propertyId)
+    {
+        var property = _propertyService.GetPropertyByPropertyId(propertyId);
+        _propertyService.ChangePropertyToIncomplete(property);
+        var propertyViewModel = PropertyViewModel.FromDbModel(property);
+        // Start at step 1
+        return View("AddNewProperty", new AddNewPropertyViewModel { Step = 1, Property = propertyViewModel });
+    }
 
     [Authorize(Roles = "Landlord")]
     [HttpGet("add/step/{step:int}")]
