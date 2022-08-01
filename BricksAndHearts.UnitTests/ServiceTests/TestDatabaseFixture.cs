@@ -13,7 +13,7 @@ public class TestDatabaseFixture
         lock (Lock)
         {
             if (_databaseInitialised) return;
-            using (var context = CreateContext())
+            using (var context = CreateContext(readOnly: false))
             {
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
@@ -29,21 +29,21 @@ public class TestDatabaseFixture
         }
     }
 
-    private BricksAndHeartsDbContext CreateContext()
+    private BricksAndHeartsDbContext CreateContext(bool readOnly)
     {
         var config = new ConfigurationManager();
         config.AddJsonFile("appsettings.json");
-        return new TestDbContext(config);
+        return new TestDbContext(config, readOnly);
     }
 
     public BricksAndHeartsDbContext CreateReadContext()
     {
-        return CreateContext();
+        return CreateContext(readOnly: true);
     }
 
     public BricksAndHeartsDbContext CreateWriteContext()
     {
-        var context = CreateContext();
+        var context = CreateContext(readOnly: false);
         // Begin a transaction so the test's writes don't interfere with other tests running in parallel (provides test isolation)
         // Transaction is never committed so is automatically rolled back at the end of the test
         context.Database.BeginTransaction();
