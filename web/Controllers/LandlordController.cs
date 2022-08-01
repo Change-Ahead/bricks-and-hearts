@@ -143,7 +143,7 @@ public class LandlordController : AbstractController
     }
 
     [HttpGet]
-    [Route("edit")]
+    [Route("{landlordId:int}/edit")]
     public async Task<ActionResult> EditProfilePage(int landlordId)
     {
         var user = GetCurrentUser();
@@ -158,6 +158,7 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> EditProfileUpdate([FromForm] LandlordProfileModel editModel)
     {
         var user = GetCurrentUser();
+        if (!ModelState.IsValid) return StatusCode(404);
         if (user.LandlordId != editModel.LandlordId && !user.IsAdmin) return StatusCode(403);
         var isEmailDuplicated = _landlordService.CheckForDuplicateEmail(editModel);
         if (isEmailDuplicated)
