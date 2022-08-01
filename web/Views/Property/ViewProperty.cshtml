@@ -73,7 +73,10 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <input type="button" class="btn btn-outline-danger" value="Delete Property" onclick="location.href='@Url.Action("DeleteProperty", "Property", new{ PropertyId = Model.PropertyId})'" />
+                <form method="post" asp-controller="Property" asp-action="DeleteProperty">
+                    <input type="hidden" name="PropertyId" value="@Model.PropertyId"/>
+                    <input type="submit" value="Delete" class="btn btn-danger"/>
+                </form>
             </div>
         </div>
     </div>

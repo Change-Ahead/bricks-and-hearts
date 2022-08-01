@@ -131,14 +131,22 @@ public class PropertyController : AbstractController
         return RedirectToAction("ViewProperties", "Landlord");
     }
     
+    [HttpPost]
     [Authorize(Roles = "Landlord")]
+    [Authorize(Roles = "Admin")]
     public ActionResult DeleteProperty(int propertyId)
     {
         PropertyDbModel? propDB = _propertyService.GetPropertyByPropertyId(propertyId);
         if (propDB == null)
         {
             _logger.LogWarning("Property with ID {PropertyId} does not exist", propertyId);
-            return RedirectToAction("Error", "Home", new { status = 404 });
+            return StatusCode(404);
+        }
+
+        if (GetCurrentUser().IsAdmin == false & GetCurrentUser().LandlordId != propDB.LandlordId)
+        {
+            _logger.LogWarning("Property with ID {PropertyId} is not your property.", propertyId);
+            return StatusCode(405);
         }
 
         // Delete property
