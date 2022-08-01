@@ -268,7 +268,6 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var result = await UnderTest.AddNewProperty_Cancel();
 
         // Assert
-        A.CallTo(() => PropertyService.GetIncompleteProperty(1)).MustHaveHappened();
         A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustNotHaveHappened();
         A.CallTo(() => AzureStorage.DeleteContainer("property", fakePropertyDbModel.Id)).MustNotHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
@@ -448,5 +447,25 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         // Assert
         result!.ViewData.Model.Should().BeOfType<PropertiesDashboardViewModel>();
+    }
+    
+    [Fact]
+    public async void EditProperty_AtFinalStep_UpdatesRecord_AndRedirectsToViewProperties()
+    {
+        // Arrange
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, UnderTest);
+
+        var formResultModel = CreateExamplePropertyViewModel();
+        var model = CreateExamplePropertyDbModel();
+        
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(model);
+
+        // Act
+        var result = UnderTest.EditProperty(1) as ViewResult;
+
+        // Assert
+        A.CallTo(() => PropertyService.ChangePropertyToIncomplete(model)).MustHaveHappened();
+        result.ViewData.Model.Should().BeOfType<AddNewPropertyViewModel>();
     }
 }

@@ -1,6 +1,7 @@
 ﻿namespace BricksAndHearts.ViewModels;
 
-public class AddNewPropertyViewModel{
+public class AddNewPropertyViewModel
+{
     public int Step { get; set; }
     public PropertyViewModel? Property { get; set; }
 

@@ -1,4 +1,5 @@
-﻿using BricksAndHearts.Database;
+﻿using System.Net;
+using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
 
 namespace BricksAndHearts.Services;
@@ -9,12 +10,13 @@ public interface IPropertyService
     public int AddNewProperty(int landlordId, PropertyViewModel createModel, bool isIncomplete = true);
     public void UpdateProperty(int propertyId, PropertyViewModel updateModel, bool isIncomplete = true);
     public void DeleteProperty(PropertyDbModel property);
-    public PropertyDbModel? GetIncompleteProperty(int landlordId);
+    /*public PropertyDbModel? GetIncompleteProperty(int landlordId);*/
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId);
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId);
     public List<PropertyDbModel> SortProperties(string by);
     public PropertyCountModel CountProperties();
     public void ChangePropertyToIncomplete(PropertyDbModel property);
+    public void ChangePropertyToComplete(PropertyDbModel property);
 
 }
 
@@ -116,11 +118,11 @@ public class PropertyService : IPropertyService
         _dbContext.SaveChanges();
     }
 
-    public PropertyDbModel? GetIncompleteProperty(int landlordId)
+    /*public PropertyDbModel? GetIncompleteProperty(int landlordId)
     {
         // Only one property for each landlord is allowed to be incomplete at a time
         return _dbContext.Properties.SingleOrDefault(p => p.LandlordId == landlordId && p.IsIncomplete == true);
-    }
+    }*/
 
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId)
     {
@@ -130,6 +132,12 @@ public class PropertyService : IPropertyService
     public void ChangePropertyToIncomplete(PropertyDbModel property)
     {
         property.IsIncomplete = true;
+        _dbContext.SaveChanges();
+    }
+    
+    public void ChangePropertyToComplete(PropertyDbModel property)
+    {
+        property.IsIncomplete = false;
         _dbContext.SaveChanges();
     }
 

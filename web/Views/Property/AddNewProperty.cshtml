@@ -1,4 +1,5 @@
-﻿@model AddNewPropertyViewModel
+﻿@using Org.BouncyCastle.Asn1.Ocsp
+@model AddNewPropertyViewModel
 
 @{
     ViewData["Title"] = "Add Property";
@@ -15,9 +16,8 @@
     </div>
 }
 
-<form method="post" class="narrow-form" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@Model.Step">
-
-    <partial name=@("_AddFormStep" + Model.Step) model="Model.Property"/>
+<form method="post" class="w-50" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@Model.Step" >
+        <partial name=@("_AddFormStep" + Model.Step) model="Model.Property"/>
 
     <div class="mt-4">
         @if (Model.Step < AddNewPropertyViewModel.MaximumStep)
@@ -47,7 +47,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <form method="post" asp-controller="Property" asp-action="AddNewProperty_Cancel">
+                <form method="post" asp-controller="Property" asp-action="AddNewProperty_Cancel" asp-route-id="@Model.Property.PropertyId">
                     <input type="submit" value="Cancel" class="btn btn-danger"/>
                 </form>
             </div>

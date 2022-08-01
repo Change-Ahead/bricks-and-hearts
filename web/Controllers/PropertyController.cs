@@ -16,7 +16,8 @@ public class PropertyController : AbstractController
     private readonly ILogger<PropertyController> _logger;
     private readonly IAzureStorage _azureStorage;
 
-    public PropertyController(IPropertyService propertyService, IAzureMapsApiService azureMapsApiService, ILogger<PropertyController> logger, IAzureStorage azureStorage)
+    public PropertyController(IPropertyService propertyService, IAzureMapsApiService azureMapsApiService,
+        ILogger<PropertyController> logger, IAzureStorage azureStorage)
     {
         _propertyService = propertyService;
         _azureMapsApiService = azureMapsApiService;
@@ -30,16 +31,16 @@ public class PropertyController : AbstractController
     {
         return AddNewProperty_Continue(1);
     }
-    
+
     [Authorize(Roles = "Landlord")]
     [HttpGet("edit")]
     public ActionResult EditProperty(int propertyId)
     {
         var property = _propertyService.GetPropertyByPropertyId(propertyId);
-        _propertyService.ChangePropertyToIncomplete(property);
+        /*_propertyService.ChangePropertyToIncomplete(property);*/
         var propertyViewModel = PropertyViewModel.FromDbModel(property);
         // Start at step 1
-        return View("AddNewProperty", new AddNewPropertyViewModel { Step = 1, Property = propertyViewModel });
+        return View("EditProperty", new AddNewPropertyViewModel { Step = 1, Property = propertyViewModel });
     }
 
     [Authorize(Roles = "Landlord")]
@@ -47,18 +48,18 @@ public class PropertyController : AbstractController
     public ActionResult AddNewProperty_Continue([FromRoute] int step)
     {
         var landlordId = GetCurrentUser().LandlordId!.Value;
-        
-        var dbModel = _propertyService.GetIncompleteProperty(landlordId);
-        var property = dbModel == null
-            ? new PropertyViewModel { Address = new PropertyAddress() }
-            : PropertyViewModel.FromDbModel(dbModel);
-        
+
+        // See if we're already adding a property
+        /*var dbModel = _propertyService.GetIncompleteProperty(landlordId);*/
+        var property = new PropertyViewModel { Address = new PropertyAddress() };
+
+        // Show the form for this step
         return View("AddNewProperty", new AddNewPropertyViewModel { Step = step, Property = property });
     }
 
     [Authorize(Roles = "Landlord")]
     [HttpPost("add/step/{step:int}")]
-    public async Task<ActionResult> AddNewProperty_Continue([FromRoute] int step, [FromForm] PropertyViewModel newPropertyModel)
+    public async Task<IActionResult> AddNewProperty_Continue([FromRoute] int step, int propertyId, [FromForm] PropertyViewModel newPropertyModel)
     {
         var landlordId = GetCurrentUser().LandlordId!.Value;
 
@@ -66,8 +67,9 @@ public class PropertyController : AbstractController
         {
             return View("AddNewProperty", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
         }
-        
-        var property = _propertyService.GetIncompleteProperty(landlordId);
+
+        // Get the property we're currently adding
+        var property = _propertyService.GetPropertyByPropertyId(propertyId);
         if (newPropertyModel.Address.Postcode != null)
         {
             newPropertyModel.Address.Postcode =
@@ -105,7 +107,7 @@ public class PropertyController : AbstractController
             {
                 return RedirectToAction("ViewProperties", "Landlord");
             }
-            
+                
             // Update the property's record with the values entered at this step
             _propertyService.UpdateProperty(property.Id, newPropertyModel, isIncomplete: true);
             return RedirectToAction("AddNewProperty_Continue", new { step = step + 1 });
@@ -117,31 +119,102 @@ public class PropertyController : AbstractController
                 // No property in progress
                 return RedirectToAction("ViewProperties", "Landlord");
             }
-            
+                
             // Update the property's record with the final set of values
             _propertyService.UpdateProperty(property.Id, newPropertyModel, isIncomplete: false);
+            return RedirectToAction("ViewProperties", "Landlord");
+        }
+    }
+    
+    
+    [Authorize(Roles = "Landlord")]
+    [HttpPost("edit/step/{step:int}")]
+    public async Task<IActionResult> EditProperty_Continue([FromRoute] int step, int propertyId, [FromForm] PropertyViewModel newPropertyModel)
+    {
+        var landlordId = GetCurrentUser().LandlordId!.Value;
+
+        newPropertyModel.PropertyId = propertyId;
+
+        if (!ModelState.IsValid)
+        {
+            return View("EditProperty", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
+        }
+
+        // Get the property we're currently adding
+        var property = _propertyService.GetPropertyByPropertyId(propertyId);
+        if (newPropertyModel.Address.Postcode != null)
+        {
+            newPropertyModel.Address.Postcode =
+                Regex.Replace(newPropertyModel.Address.Postcode, @"^(\S+?)\s*?(\d\w\w)$", "$1 $2");
+            newPropertyModel.Address.Postcode = newPropertyModel.Address.Postcode.ToUpper();
+        }
+
+        if (step == 1)
+        {
+            if (newPropertyModel.Address.AddressLine1 == null || newPropertyModel.Address.Postcode == null)
+            {
+                // Address line 1 and postcode are the minimum information we need to create a new record
+                return View("EditProperty",
+                    new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
+            }
+
+            await _azureMapsApiService.AutofillAddress(newPropertyModel);
+
+            _propertyService.UpdateProperty(propertyId, newPropertyModel, isIncomplete: true);
+                // Go to step 2
+             return View("EditProperty", new AddNewPropertyViewModel { Step = 2, Property = newPropertyModel });
+        }
+        else if (step < AddNewPropertyViewModel.MaximumStep)
+        {
+            if (property == null)
+            {
+                // No property in progress
+                return RedirectToAction("ViewProperties", "Landlord");
+            }
+            
+            // Update the property's record with the values entered at this step
+            _propertyService.UpdateProperty(propertyId, newPropertyModel, isIncomplete: true);
+
+            // Go to next step
+            return View("EditProperty", new AddNewPropertyViewModel { Step = step + 1, Property = newPropertyModel });
+        }
+        else
+        {
+            if (property == null)
+            {
+                // No property in progress
+                return RedirectToAction("ViewProperties", "Landlord");
+            }
+            
+            // Update the property's record with the final set of values
+            _propertyService.UpdateProperty(propertyId, newPropertyModel, isIncomplete: false);
+
+            // Finished adding property, so go to View Properties page
             return RedirectToAction("ViewProperties", "Landlord");
         }
     }
 
     [Authorize(Roles = "Landlord")]
     [HttpPost("add/cancel")]
-    public async Task<ActionResult> AddNewProperty_Cancel()
+    public ActionResult AddNewProperty_Cancel(int id)
     {
         var landlordId = GetCurrentUser().LandlordId!.Value;
-        var property = _propertyService.GetIncompleteProperty(landlordId);
+
+        // Get the property we're currently adding
+        var property = _propertyService.GetPropertyByPropertyId(id);
         if (property == null)
         {
+            // No property in progress
             return RedirectToAction("ViewProperties", "Landlord");
         }
 
         // Delete partially complete property
         _propertyService.DeleteProperty(property);
         await _azureStorage.DeleteContainer("property", property.Id);
-        
+
         return RedirectToAction("ViewProperties", "Landlord");
     }
-    
+
     [HttpPost]
     [Authorize(Roles = "Landlord, Admin")]
     public ActionResult DeleteProperty(int propertyId)
@@ -166,6 +239,27 @@ public class PropertyController : AbstractController
         return RedirectToAction("ViewProperties", "Landlord");
     }
     
+    [Authorize(Roles = "Landlord")]
+    [HttpPost("edit/cancel")]
+    public ActionResult EditProperty_Cancel(int id)
+    {
+        var landlordId = GetCurrentUser().LandlordId!.Value;
+
+        // Get the property we're currently adding
+        var property = _propertyService.GetPropertyByPropertyId(id);
+        if (property == null)
+        {
+            // No property in progress
+            return RedirectToAction("ViewProperties", "Landlord");
+        }
+
+        // Delete partially complete property
+        _propertyService.ChangePropertyToComplete(property);
+
+        // Go to View Properties page
+        return RedirectToAction("ViewProperties", "Landlord");
+    }
+
     [HttpGet]
     [Route("/property/{propertyId:int}/view")]
     public ActionResult ViewProperty(int propertyId)
@@ -176,6 +270,7 @@ public class PropertyController : AbstractController
             _logger.LogWarning("Property with ID {PropertyId} does not exist", propertyId);
             return RedirectToAction("Error", "Home", new { status = 404 });
         }
+
         PropertyViewModel propertyViewModel = PropertyViewModel.FromDbModel(model);
         return View(propertyViewModel);
     }
