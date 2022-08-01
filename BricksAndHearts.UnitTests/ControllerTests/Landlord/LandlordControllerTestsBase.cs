@@ -60,4 +60,18 @@ public class LandlordControllerTestsBase : ControllerTestsBase
             LandlordProvidedCharterStatus = false
         };
     }
+
+    protected LandlordProfileModel CreateInvalidLandlordProfileModel()
+    {
+        return new LandlordProfileModel()
+        {
+            LandlordId = 1000,
+            Title = "MRMRMRMRMRMRMRMRMRMRMRMRMRMRMRMRMRMRMRMRMRMRMRMRMRfiftyMRMRMRMRMRMRMRMRMRMRseventy",
+            LastName = "Doe",
+            CompanyName = "John Doe",
+            CharterApproved = false,
+            LandlordStatus = "some data",
+            LandlordProvidedCharterStatus = false
+        };
+    }
 }
