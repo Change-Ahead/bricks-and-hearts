@@ -57,12 +57,3 @@ input.invalid {
 .step.finish {
   background-color: blue;
 }
-
-.tables {
-  display: inline-block;
-  clear: both;
-}
-
-.tables .table {
-  width: 100%;
-}

@@ -1,0 +1,82 @@
+﻿@model LandlordProfileModel
+<div class="registerTab" id="Name">
+    <div class="form-group my-3">
+        <label>Title:</label>
+        @Html.DropDownList("Title", new List<SelectListItem>
+        {
+            new SelectListItem { Text = "Mr", Value = "Mr", Selected = true },
+            new SelectListItem { Text = "Mrs", Value = "Mrs" },
+            new SelectListItem { Text = "Miss", Value = "Miss" },
+            new SelectListItem { Text = "Ms", Value = "Ms" },
+            new SelectListItem { Text = "Dr", Value = "Dr" }
+        })
+    </div>
+    <div class="form-group my-3">
+        <label asp-for="FirstName" class="control-label"></label>
+        <input asp-for="FirstName" class="form-control"/>
+        <span asp-validation-for="FirstName" class="text-danger"></span>
+    </div>
+    <div class="form-group my-3">
+        <label asp-for="LastName" class="control-label"></label>
+        <input asp-for="LastName" class="form-control"/>
+        <span asp-validation-for="LastName" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="registerTab" id="Landlord details">
+    <div class="form-group my-3">
+        <label>Landlord type:</label>
+        @Html.DropDownList("LandlordStatus", new List<SelectListItem>
+        {
+            new SelectListItem { Text = "Private Residential Sector", Value = "Private Residential Sector", Selected = true },
+            new SelectListItem { Text = "Housing association", Value = "Housing association" },
+            new SelectListItem { Text = "Private landlord", Value = "Private landlord" },
+        })
+    </div>
+    <div class="form-group my-3">
+        <label class="control-label">Company (optional)</label>
+        <input asp-for="CompanyName" class="form-control empty"/>
+        <span asp-validation-for="CompanyName" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="registerTab" id="Contact details">
+    <div class="form-group my-3">
+        <label asp-for="Email" class="control-label"></label>
+        <input type="email" asp-for="Email" class="form-control"/>
+        <span asp-validation-for="Email" class="text-danger"></span>
+    </div>
+    <div class="form-group my-3">
+        <label asp-for="Phone" class="control-label"></label>
+        <input type="tel" asp-for="Phone" class="form-control"/>
+        <span asp-validation-for="Phone" class="text-danger"></span>
+    </div>
+</div>
+
+<div class="registerTab" id="ChangeAhead status">
+    <p>ChangeAhead Charter</p>
+    <p>What is your ChangeAhead Charter status?</p>
+
+    @Html.DropDownList("CharterStatus", new List<SelectListItem>
+    {
+        new SelectListItem { Text = "Already approved", Value = "true", Selected = true },
+        new SelectListItem { Text = "Not yet approved", Value = "false" },
+    })
+</div>
+
+<div class="registerTab" id="Terms and conditions">
+    @*tickbox and submit button*@
+</div>
+
+<hr/>
+<button type="button" class="btn btn-outline-primary" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
+<button type="button" class="btn btn-outline-primary" id="nextBtn" onclick="nextPrev(1)">Next</button>
+<hr/>
+<!-- Circles which indicates the steps of the form: -->
+<div>
+    <span class="step"></span>
+    <span class="step"></span>
+    <span class="step"></span>
+    <span class="step"></span>
+    <span class="step"></span>
+</div>    

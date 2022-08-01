@@ -1,4 +1,5 @@
-﻿using BricksAndHearts.ViewModels;
+using BricksAndHearts.Services;
+using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
@@ -36,5 +37,54 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
         // Assert
         A.CallTo(() => LandlordService.ApproveLandlord(landlord.Id, adminUser)).MustHaveHappened();
+    }
+    
+    [Fact]
+    public void EditProfileUpdate_CalledUsingLandlordDatabaseModel_ReturnsProfileViewWithLandlordProfile()
+    {
+        // Arrange 
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        var landlordProfileModel = CreateTestLandlordProfileModel();
+
+        // Act
+        A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(false);
+        A.CallTo(() => LandlordService.EditLandlordDetails(landlordProfileModel)).Returns(ILandlordService.LandlordRegistrationResult.Success);
+        var result = UnderTest.EditProfileUpdate(landlordProfileModel).Result;
+
+        // Assert   
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().BeEquivalentTo("Profile");
+    }
+    
+    [Fact]
+    public void EditProfileUpdate_CalledUsingLandlordDatabaseModelWithDuplicateEmail_ReturnsEditProfileViewWithLandlordProfile()
+    {
+        // Arrange 
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        var landlordProfileModel = CreateTestLandlordProfileModel();
+
+        // Act
+        A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(true);
+        var result = UnderTest.EditProfileUpdate(landlordProfileModel).Result as ViewResult;
+
+        // Assert   
+        result!.Model.Should().BeOfType<LandlordProfileModel>();
+        result.Should().BeOfType<ViewResult>().Which.ViewName!.Should().BeEquivalentTo("EditProfilePage");
+    }
+    
+    [Fact]
+    public void EditProfilePage_CalledUsingUserEmail_ReturnsEditProfileViewWithLandlordProfile()
+    {
+        // Arrange 
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        var landlordProfileModel = CreateTestLandlordProfileModel();
+
+        // Act
+        var result = UnderTest.EditProfilePage(landlordProfileModel.LandlordId).Result as ViewResult;
+
+        // Assert   
+        result!.Model.Should().BeOfType<LandlordProfileModel>();
     }
 }

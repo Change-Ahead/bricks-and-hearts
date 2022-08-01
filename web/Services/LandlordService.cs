@@ -17,7 +17,10 @@ public interface ILandlordService
 
     public Task<LandlordRegistrationResult> RegisterLandlordWithUser(LandlordProfileModel createModel, BricksAndHeartsUser user);
     public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int id);
+    public Task<LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel);
+    public bool CheckForDuplicateEmail(LandlordProfileModel editModel);
     public Task ApproveLandlord(int landlordId, BricksAndHeartsUser user);
+
 }
 
 public class LandlordService : ILandlordService
@@ -74,7 +77,7 @@ public class LandlordService : ILandlordService
 
         return ILandlordService.LandlordRegistrationResult.Success;
     }
-
+    
     public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int id)
     {
         return _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id);
@@ -87,7 +90,7 @@ public class LandlordService : ILandlordService
         {
             throw new Exception("Landlord does not exist");
         }
-        if (landlord!.CharterApproved)
+        if (landlord.CharterApproved)
         {
             throw new Exception("Landlord already approved");
         }
@@ -95,5 +98,26 @@ public class LandlordService : ILandlordService
         landlord.ApprovalTime = DateTime.Now;
         landlord.ApprovalAdminId = user.Id;
         await _dbContext.SaveChangesAsync();
+    }
+    
+    public async Task<ILandlordService.LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel)
+    {
+        var landlordToEdit = await _dbContext.Landlords.SingleAsync(l => l.Id == editModel.LandlordId);
+        landlordToEdit.Title = editModel.Title;
+        landlordToEdit.FirstName = editModel.FirstName;
+        landlordToEdit.LastName = editModel.LastName;
+        landlordToEdit.CompanyName = editModel.CompanyName;
+        landlordToEdit.Email = editModel.Email;
+        landlordToEdit.Phone = editModel.Phone;
+        
+        await _dbContext.SaveChangesAsync();
+        return ILandlordService.LandlordRegistrationResult.Success;
+    }
+
+    public bool CheckForDuplicateEmail(LandlordProfileModel editModel)
+    {
+        var editedLandlord = _dbContext.Landlords.Single(l => l.Id == editModel.LandlordId);
+        return _dbContext.Landlords.SingleOrDefault(l => l.Email == editModel.Email) != null 
+               && editedLandlord.Email != editModel.Email;
     }
 }

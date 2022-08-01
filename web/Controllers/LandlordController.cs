@@ -1,5 +1,4 @@
-﻿using BricksAndHearts.Database;
-using BricksAndHearts.Services;
+﻿using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -15,7 +14,8 @@ public class LandlordController : AbstractController
     private readonly IMailService _mailService;
     private readonly ILogger<LandlordController> _logger;
 
-    public LandlordController(ILogger<LandlordController> logger, ILandlordService landlordService, IPropertyService propertyService, IMailService mailService)
+    public LandlordController(ILogger<LandlordController> logger,
+        ILandlordService landlordService, IPropertyService propertyService, IMailService mailService)
     {
         _logger = logger;
         _landlordService = landlordService;
@@ -140,5 +140,35 @@ public class LandlordController : AbstractController
         var databaseResult = _propertyService.GetPropertiesByLandlord(landlordId.Value);
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
         return View("Properties", new PropertiesDashboardViewModel(listOfProperties));
+    }
+
+    [HttpGet]
+    [Route("edit")]
+    public async Task<ActionResult> EditProfilePage(int landlordId)
+    {
+        var user = GetCurrentUser();
+        var landlordFromDb =  await _landlordService.GetLandlordIfExistsFromId(landlordId);
+        if (landlordFromDb == null) return StatusCode(404);
+        if (user.LandlordId != landlordFromDb.Id && !user.IsAdmin) return StatusCode(403);
+        return View("EditProfilePage", LandlordProfileModel.FromDbModel(landlordFromDb, user));
+    }
+
+    [HttpPost]
+    [Route("edit")]
+    public async Task<ActionResult> EditProfileUpdate([FromForm] LandlordProfileModel editModel)
+    {
+        var user = GetCurrentUser();
+        if (user.LandlordId != editModel.LandlordId && !user.IsAdmin) return StatusCode(403);
+        var isEmailDuplicated = _landlordService.CheckForDuplicateEmail(editModel);
+        if (isEmailDuplicated)
+        {
+            _logger.LogWarning("Email already registered {Email}", editModel.Email);
+            ModelState.AddModelError("Email", "Email already registered");
+            return View("EditProfilePage", editModel);
+        }
+
+        await _landlordService.EditLandlordDetails(editModel);
+        _logger.LogInformation("Successfully edited landlord for landlord {LandlordId}", editModel.LandlordId);
+        return RedirectToAction("Profile", new{id = editModel.LandlordId});
     }
 }

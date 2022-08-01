@@ -1,0 +1,16 @@
+@model LandlordProfileModel
+
+@{
+    ViewData["Title"] = "Edit Profile";
+}
+<h1>Edit your Landlord Profile</h1>
+
+<div class="row">
+    <div class="col-md-4">
+        <form method="post" asp-controller="Landlord" asp-action="EditProfileUpdate" id="landlordEntry">
+            <div asp-validation-summary="All" class="text-danger"></div>
+            @Html.HiddenFor(l=>l.LandlordId, new{value = Model.LandlordId})
+            @{ await Html.RenderPartialAsync("_RegisterPagePartial", Model); }
+        </form>
+    </div>
+</div>
