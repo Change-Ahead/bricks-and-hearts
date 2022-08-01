@@ -25,7 +25,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     }
 
     [Fact]
-    public async void ApproveCharter_CallsApproveLandlord()
+    public async void ApproveCharter_CallsApproveLandlord_AndDisplaysSuccessMessage()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -37,6 +37,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
         // Assert
         A.CallTo(() => LandlordService.ApproveLandlord(landlord.Id, adminUser)).MustHaveHappened();
+        UnderTest.TempData["ApprovalSuccessMessage"].Should().Be("");
     }
     
     [Fact]
