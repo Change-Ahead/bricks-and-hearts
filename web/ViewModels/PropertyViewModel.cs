@@ -55,6 +55,8 @@ public class PropertyViewModel
             CreationTime = property.CreationTime,
             Rent = property.Rent,
             Description = property.Description,
+            Lat = property.Lat,
+            Lon = property.Lon,
             Address = new PropertyAddress
             {
                 AddressLine1 = property.AddressLine1,
@@ -62,7 +64,7 @@ public class PropertyViewModel
                 AddressLine3 = property.AddressLine3,
                 TownOrCity = property.TownOrCity,
                 County = property.County,
-                Postcode = property.Postcode
+                Postcode = property.Postcode,
             },
             AcceptsSingleTenant = property.AcceptsSingleTenant,
             AcceptsCouple = property.AcceptsCouple,
