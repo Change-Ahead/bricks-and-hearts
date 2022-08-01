@@ -250,7 +250,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Assert
         A.CallTo(() => PropertyService.GetIncompleteProperty(1)).MustHaveHappened();
         A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustHaveHappened();
-        A.CallTo(() => AzureStorage.DeleteContainerAsync("property", fakePropertyDbModel.Id)).MustHaveHappened();
+        A.CallTo(() => AzureStorage.DeleteContainer("property", fakePropertyDbModel.Id)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
     }
 
@@ -270,7 +270,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Assert
         A.CallTo(() => PropertyService.GetIncompleteProperty(1)).MustHaveHappened();
         A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustNotHaveHappened();
-        A.CallTo(() => AzureStorage.DeleteContainerAsync("property", fakePropertyDbModel.Id)).MustNotHaveHappened();
+        A.CallTo(() => AzureStorage.DeleteContainer("property", fakePropertyDbModel.Id)).MustNotHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
     }
 
@@ -318,13 +318,13 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         MakeUserPrincipalInController(adminUser, UnderTest);
 
         var model = new List<string> { "image1", "image2" };
-        A.CallTo(() => AzureStorage.ListFilesAsync("property", 1)).Returns(model);
+        A.CallTo(() => AzureStorage.ListFiles("property", 1)).Returns(model);
 
         // Act
         var result = await UnderTest.ListPropertyImages(1) as ViewResult;
 
         // Assert
-        A.CallTo(() => AzureStorage.ListFilesAsync("property", 1)).MustHaveHappened();
+        A.CallTo(() => AzureStorage.ListFiles("property", 1)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<List<string>>().And.Be(model);
     }
     
@@ -343,8 +343,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var result = await UnderTest.AddPropertyImages(fakeImageList, 1);
 
         // Assert
-        A.CallTo(() => AzureStorage.UploadFileAsync(fakeImage, "property", 1)).MustHaveHappened();
-        A.CallTo(() => AzureStorage.UploadFileAsync(fakeImage2, "property", 1)).MustHaveHappened();
+        A.CallTo(() => AzureStorage.UploadFile(fakeImage, "property", 1)).MustHaveHappened();
+        A.CallTo(() => AzureStorage.UploadFile(fakeImage2, "property", 1)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ListPropertyImages");
     }
     
@@ -357,13 +357,13 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         
         var fakeImage = CreateExampleImage();
         var image = (fakeImage.OpenReadStream(), "jpeg");
-        A.CallTo(() => AzureStorage.DownloadFileAsync("property", 1, fakeImage.FileName)).Returns(image);
+        A.CallTo(() => AzureStorage.DownloadFile("property", 1, fakeImage.FileName)).Returns(image);
 
         // Act
         var result = await UnderTest.DisplayPropertyImage(1, fakeImage.FileName) as FileStreamResult;
 
         // Assert
-        A.CallTo(() => AzureStorage.DownloadFileAsync("property", 1, fakeImage.FileName)).MustHaveHappened();
+        A.CallTo(() => AzureStorage.DownloadFile("property", 1, fakeImage.FileName)).MustHaveHappened();
         result!.ContentType.Should().Be("image/jpeg");
     }
     
@@ -380,7 +380,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var result = await UnderTest.DeletePropertyImage(1, fakeImage.FileName);
 
         // Assert
-        A.CallTo(() => AzureStorage.DeleteFileAsync("property", 1, fakeImage.FileName)).MustHaveHappened();
+        A.CallTo(() => AzureStorage.DeleteFile("property", 1, fakeImage.FileName)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ListPropertyImages");
     }
 }

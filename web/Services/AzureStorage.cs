@@ -5,12 +5,11 @@ namespace BricksAndHearts.Services
 {
     public interface IAzureStorage
     {
-        Task CreateContainerAsync(string varType, int id);
-        Task DeleteContainerAsync(string varType, int id);
-        Task UploadFileAsync(IFormFile file, string varType, int id);
-        Task<List<string>> ListFilesAsync(string varType, int id);
-        Task<(Stream data, string fileType)> DownloadFileAsync(string varType, int id, string blobFilename);
-        Task DeleteFileAsync(string varType, int id, string blobFilename);
+        Task DeleteContainer(string varType, int id);
+        Task UploadFile(IFormFile file, string varType, int id);
+        Task<List<string>> ListFiles(string varType, int id);
+        Task<(Stream? data, string? fileType)> DownloadFile(string varType, int id, string blobFilename);
+        Task DeleteFile(string varType, int id, string blobFilename);
     }
 
     public class AzureStorage : IAzureStorage
@@ -31,39 +30,28 @@ namespace BricksAndHearts.Services
             return _baseContainerName + varType + id.ToString();
         }
 
-        private async Task<BlobContainerClient> GetContainerClient(string varType, int id)
+        private async Task<BlobContainerClient> GetOrCreateContainerClient(string varType, int id)
         {
             string containerName = GetContainerName(varType, id);
-            BlobContainerClient containerClient = new BlobContainerClient(_storageConnectionString, containerName);
+            BlobServiceClient blobServiceClient = new BlobServiceClient(_storageConnectionString);
+            var containerClient = blobServiceClient.GetBlobContainerClient(containerName);
             if (!containerClient.Exists())
             {
-                await CreateContainerAsync(varType, id);
+                await blobServiceClient.CreateBlobContainerAsync(containerName);
                 containerClient = new BlobContainerClient(_storageConnectionString, containerName);
             }
             return containerClient;
         }
 
-        public async Task CreateContainerAsync(string varType, int id)
+        public async Task DeleteContainer(string varType, int id)
         {
-            string containerName = GetContainerName(varType, id);
-            BlobServiceClient blobServiceClient = new BlobServiceClient(_storageConnectionString);
-            var container = blobServiceClient.GetBlobContainerClient(containerName);
-            if (container.Exists())
-            {
-                await DeleteContainerAsync(varType, id);
-            }
-            await blobServiceClient.CreateBlobContainerAsync(containerName);
-        }
-        
-        public async Task DeleteContainerAsync(string varType, int id)
-        {
-            var containerClient = await GetContainerClient(varType, id);
+            var containerClient = await GetOrCreateContainerClient(varType, id);
             await containerClient.DeleteAsync();
         }
 
-        public async Task UploadFileAsync(IFormFile blob, string varType, int id)
+        public async Task UploadFile(IFormFile blob, string varType, int id)
         {
-            var containerClient = await GetContainerClient(varType, id);
+            var containerClient = await GetOrCreateContainerClient(varType, id);
             var blobClient = containerClient.GetBlobClient(blob.FileName);
             int i = 0;
             while (blobClient.Exists())
@@ -78,9 +66,9 @@ namespace BricksAndHearts.Services
             }
         }
 
-        public async Task<List<string>> ListFilesAsync(string varType, int id)
+        public async Task<List<string>> ListFiles(string varType, int id)
         {
-            var containerClient = await GetContainerClient(varType, id);
+            var containerClient = await GetOrCreateContainerClient(varType, id);
             List<string> fileNames = new List<string>();
             fileNames.Add(id.ToString());
             await foreach (BlobItem file in containerClient.GetBlobsAsync())
@@ -90,24 +78,22 @@ namespace BricksAndHearts.Services
             return fileNames;
         }
 
-        public async Task<(Stream, string)> DownloadFileAsync(string varType, int id, string blobName)
+        public async Task<(Stream?, string?)> DownloadFile(string varType, int id, string blobName)
         {
-            var containerClient = await GetContainerClient(varType, id);
+            var containerClient = await GetOrCreateContainerClient(varType, id);
             BlobClient blobClient = containerClient.GetBlobClient(blobName);
             if (!blobClient.Exists())
             {
-                var newContainerClient = new BlobContainerClient(_storageConnectionString, "default");
-                blobName = "error.png";
-                blobClient = newContainerClient.GetBlobClient(blobName);
+                return (null, null);
             }
             Stream data = await blobClient.OpenReadAsync();
             string fileType = SplitFileName(blobName).type;
             return (data, fileType);
         }
 
-        public async Task DeleteFileAsync(string varType, int id, string blobName)
+        public async Task DeleteFile(string varType, int id, string blobName)
         {
-            var containerClient = await GetContainerClient(varType, id);
+            var containerClient = await GetOrCreateContainerClient(varType, id);
             BlobClient blobClient = containerClient.GetBlobClient(blobName);
             if (blobClient.Exists())
             {

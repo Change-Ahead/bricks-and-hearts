@@ -124,7 +124,7 @@ public class PropertyController : AbstractController
             return RedirectToAction("ViewProperties", "Landlord");
         }
         _propertyService.DeleteProperty(property);
-        await _azureStorage.DeleteContainerAsync("property", property.Id);
+        await _azureStorage.DeleteContainer("property", property.Id);
         
         return RedirectToAction("ViewProperties", "Landlord");
     }
@@ -146,7 +146,7 @@ public class PropertyController : AbstractController
     [HttpGet]
     public async Task<IActionResult> ListPropertyImages(int propertyId)
     {
-        List<string> fileNames = await _azureStorage.ListFilesAsync("property", propertyId);
+        List<string> fileNames = await _azureStorage.ListFiles("property", propertyId);
         return View(fileNames);
     }
     
@@ -163,7 +163,7 @@ public class PropertyController : AbstractController
         {
             if (image.Length > 0)
             {
-                await _azureStorage.UploadFileAsync(image, "property", propertyId);
+                await _azureStorage.UploadFile(image, "property", propertyId);
             }
         }
         return RedirectToAction("ListPropertyImages", "Property", new{propertyId});
@@ -172,10 +172,14 @@ public class PropertyController : AbstractController
     [HttpPost("displayImage")]
     public async Task<IActionResult> DisplayPropertyImage(int propertyId, string fileName)
     {
-        var image = await _azureStorage.DownloadFileAsync("property", propertyId, fileName);
+        var image = await _azureStorage.DownloadFile("property", propertyId, fileName);
+        if (image == (null, null))
+        {
+            return StatusCode(404);
+        }
         var data = image.data;
         var fileType = image.fileType;
-        return File(data, $"image/{fileType}");
+        return File(data!, $"image/{fileType}");
     }
     
     [Authorize(Roles = "Landlord, Admin")]
@@ -187,7 +191,7 @@ public class PropertyController : AbstractController
         {
             return StatusCode(403);
         }
-        await _azureStorage.DeleteFileAsync("property", propertyId, fileName);
+        await _azureStorage.DeleteFile("property", propertyId, fileName);
         return RedirectToAction("ListPropertyImages", "Property", new{propertyId});
     }
 }
