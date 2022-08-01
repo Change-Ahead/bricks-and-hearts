@@ -3,7 +3,7 @@ using MailKit.Net.Smtp;
 using Microsoft.Extensions.Options;
 using MimeKit;
 
-namespace BricksAndHearts.Controllers;
+namespace BricksAndHearts.Services;
 
 public interface IMailService
 {
@@ -31,26 +31,27 @@ public class MailService: IMailService
         string msgToName = ""
     )
     {
-        string msgFromAddress = _config.Value.FromAddress; 
-        string msgToAddress = _config.Value.ToAddress; 
+        var msgFromAddress = _config.Value.FromAddress; 
         
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(msgFromName, msgFromAddress));
-        message.To.Add(new MailboxAddress(msgToName, msgToAddress));
         message.Subject = subject;
         message.Body = new TextPart("plain")
         {
             Text = msgBody
         };
-        using (var client = new SmtpClient())
+        foreach (var msgToAddress in _config.Value.ToAddress)
         {
-            client.Connect(_config.Value.Host, _config.Value.Port, true);
-
-            // Note: only needed if the SMTP server requires authentication
-            client.Authenticate(_config.Value.UserName, _config.Value.Password);
-
-            client.Send(message);
-            client.Disconnect(true);
+            message.To.Add(new MailboxAddress(msgToName, msgToAddress));
         }
+
+        using var client = new SmtpClient();
+        client.Connect(_config.Value.Host, _config.Value.Port, true);
+
+        // Note: only needed if the SMTP server requires authentication
+        client.Authenticate(_config.Value.UserName, _config.Value.Password);
+
+        client.Send(message);
+        client.Disconnect(true);
     }
 }
