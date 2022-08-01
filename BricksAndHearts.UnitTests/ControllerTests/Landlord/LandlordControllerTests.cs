@@ -55,7 +55,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Assert   
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().BeEquivalentTo("Profile");
     }
-    
+
     [Fact]
     public void EditProfileUpdate_CalledUsingLandlordDatabaseModelWithDuplicateEmail_ReturnsEditProfileViewWithLandlordProfile()
     {
@@ -63,6 +63,30 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
         var landlordProfileModel = CreateTestLandlordProfileModel();
+
+        // Act
+        A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(true);
+        var result = UnderTest.EditProfileUpdate(landlordProfileModel).Result as ViewResult;
+
+        // Assert   
+        result!.Model.Should().BeOfType<LandlordProfileModel>();
+        result.Should().BeOfType<ViewResult>().Which.ViewName!.Should().BeEquivalentTo("EditProfilePage");
+    }
+    
+    [Fact]
+    public void EditProfilePage_CalledUsingUserEmail_ReturnsEditProfileViewWithLandlordProfile()
+    {
+        // Arrange 
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        var landlordProfileModel = CreateTestLandlordProfileModel();
+
+        // Act
+        var result = UnderTest.EditProfilePage(landlordProfileModel.LandlordId).Result as ViewResult;
+
+        // Assert   
+        result!.Model.Should().BeOfType<LandlordProfileModel>();
+    }
 
     [Fact]
     public async void TieUserWithLandlord_WithNonExistentLink_RedirectToInvite()
@@ -95,36 +119,12 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         // Act
-        A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(true);
-        var result = UnderTest.EditProfileUpdate(landlordProfileModel).Result as ViewResult;
-
-        // Assert   
-        result!.Model.Should().BeOfType<LandlordProfileModel>();
-        result.Should().BeOfType<ViewResult>().Which.ViewName!.Should().BeEquivalentTo("EditProfilePage");
-    }
-    
-    [Fact]
-    public void EditProfilePage_CalledUsingUserEmail_ReturnsEditProfileViewWithLandlordProfile()
-    {
-        // Arrange 
-        var adminUser = CreateAdminUser();
-        MakeUserPrincipalInController(adminUser, UnderTest);
-        var landlordProfileModel = CreateTestLandlordProfileModel();
-
-        // Act
-        var result = UnderTest.EditProfilePage(landlordProfileModel.LandlordId).Result as ViewResult;
-
-        // Assert   
-        result!.Model.Should().BeOfType<LandlordProfileModel>();
-    }
-}
-        // Act
         var result = await UnderTest.TieUserWithLandlord(inviteLink);
-        
-        // Assert
+
+        // Assert   
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("MyProfile");
     }
-    
+
     [Fact]
     public async void TieUserWithLandlord_WithNonLandlordUser_RedirectToProfile()
     {

@@ -172,7 +172,6 @@ public class LandlordService : ILandlordService
             await transaction.CommitAsync();
             
             user.LandlordId = landlord.Id; // Update the in memory user object
-
         }
         return ILandlordService.LinkUserWithLandlordResult.Success;
     }

@@ -1,4 +1,5 @@
-﻿using BricksAndHearts.Database;
+﻿using System.Linq;
+using BricksAndHearts.Database;
 using Microsoft.Extensions.Configuration;
 
 namespace BricksAndHearts.UnitTests.ServiceTests;
@@ -7,7 +8,7 @@ public class TestDatabaseFixture
 {
     private static readonly object Lock = new();
     private static bool _databaseInitialised;
-
+    
     public TestDatabaseFixture()
     {
         lock (Lock)
@@ -17,11 +18,23 @@ public class TestDatabaseFixture
             {
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
-
+                
+                context.Landlords.AddRange(
+                    CreateLandlord(),
+                    CreateUnlinkedLandlordWithInviteLink());
+                
                 context.Users.AddRange(
                     CreateAdminUser(),
                     CreateNonAdminUser(),
-                    CreateRequestedAdminUser());
+                    CreateRequestedAdminUser(),
+                    CreateLandlordUser());
+
+                context.SaveChanges();
+                
+                var landlordId = context.Landlords.Single(l => l.FirstName == "Landlord").Id;
+                var landlordUser = context.Users.Single(u => u.GoogleUserName == "LandlordUser");
+                landlordUser.LandlordId = landlordId;
+
                 context.SaveChanges();
             }
 
@@ -86,6 +99,45 @@ public class TestDatabaseFixture
             IsAdmin = false,
             LandlordId = null,
             HasRequestedAdmin = true
+        };
+    }
+    
+    public UserDbModel CreateLandlordUser()
+    {
+        return new UserDbModel
+        {
+            GoogleUserName = "LandlordUser",
+            GoogleEmail = "test.email4@gmail.com",
+            GoogleAccountId = "4",
+            IsAdmin = false,
+            HasRequestedAdmin = false
+        };
+    }
+
+    public LandlordDbModel CreateLandlord()
+    {
+        return new LandlordDbModel
+        {
+            Title = "Mr",
+            FirstName = "Landlord",
+            LastName = "User",
+            Email = "test.landlord1@gmail.com",
+            Phone = "1",
+            LandlordStatus = "Private Residential Sector",
+        };
+    }
+    
+    public LandlordDbModel CreateUnlinkedLandlordWithInviteLink()
+    {
+        return new LandlordDbModel
+        {
+            Title = "Mr",
+            FirstName = "UnlinkedLandlord",
+            LastName = "User",
+            Email = "test.landlord2@gmail.com",
+            Phone = "2",
+            InviteLink = "001",
+            LandlordStatus = "Private Residential Sector",
         };
     }
 }
