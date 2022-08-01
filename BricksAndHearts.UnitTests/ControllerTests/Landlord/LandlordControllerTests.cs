@@ -43,6 +43,8 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     public void EditProfileUpdate_CalledUsingLandlordDatabaseModel_ReturnsProfileViewWithLandlordProfile()
     {
         // Arrange 
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
         var landlordProfileModel = CreateTestLandlordProfileModel();
 
         // Act
@@ -58,6 +60,8 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     public void EditProfileUpdate_CalledUsingLandlordDatabaseModelWithDuplicateEmail_ReturnsEditProfileViewWithLandlordProfile()
     {
         // Arrange 
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
         var landlordProfileModel = CreateTestLandlordProfileModel();
 
         // Act
