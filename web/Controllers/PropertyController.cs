@@ -4,7 +4,6 @@ using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace BricksAndHearts.Controllers;
 
@@ -143,12 +142,6 @@ public class PropertyController : AbstractController
         PropertyViewModel propertyViewModel = PropertyViewModel.FromDbModel(model);
         return View(propertyViewModel);
     }
-    
-    /*[HttpGet("addImages/{propertyId:int}")]
-    public IActionResult AddPropertyImages(int propertyId)
-    {
-        return View(propertyId);
-    }*/
 
     [HttpGet]
     public async Task<IActionResult> ListPropertyImages(int propertyId)
@@ -157,6 +150,7 @@ public class PropertyController : AbstractController
         return View(fileNames);
     }
     
+    [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("addImage")]
     public async Task<IActionResult> AddPropertyImages(List<IFormFile> images, int propertyId)
     {
@@ -174,9 +168,12 @@ public class PropertyController : AbstractController
     public async Task<IActionResult> DisplayPropertyImage(int propertyId, string fileName)
     {
         var image = await _azureStorage.DownloadFileAsync("property", propertyId, fileName);
-        return File(image, "image/jpeg");
+        var data = image.data;
+        var fileType = image.fileType;
+        return File(data, $"image/{fileType}");
     }
     
+    [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("deleteImage")]
     public async Task<IActionResult> DeletePropertyImage(int propertyId, string fileName)
     {
