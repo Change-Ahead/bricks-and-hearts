@@ -37,6 +37,12 @@ public class BricksAndHeartsDbContext : DbContext
             .WithMany(l => l.Properties)
             .HasForeignKey(p => p.LandlordId)
             .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<PropertyDbModel>()
+            .Property(l => l.Lat)
+            .HasPrecision(12, 9);
+        modelBuilder.Entity<PropertyDbModel>()
+            .Property(l => l.Lon)
+            .HasPrecision(12, 9);
     }
 
     public static void MigrateDatabase(WebApplication app)
