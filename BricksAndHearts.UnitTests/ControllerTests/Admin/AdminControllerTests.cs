@@ -83,4 +83,17 @@ public class AdminControllerTests : AdminControllerTestsBase
         // Assert
         A.CallTo(() => adminService.ApproveAdminAccessRequest(dummyId)).MustHaveHappened();
     }
+    
+    [Fact]
+    public void RejectAdminRequest_WhenCalled_RejectsAdminAccessRequest()
+    {
+        // Arrange
+        MakeUserPrincipalInController(CreateAdminUser(), _underTest);
+
+        // Act
+        var result = _underTest.RejectAdminRequest(1);
+        
+        // Assert
+        A.CallTo(() => adminService.RejectAdminAccessRequest(1)).MustHaveHappened();
+    }
 }
