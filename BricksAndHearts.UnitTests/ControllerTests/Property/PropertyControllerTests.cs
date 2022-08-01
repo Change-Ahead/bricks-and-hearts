@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
@@ -390,5 +389,43 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Assert
         A.CallTo(() => AzureStorage.DeleteFile("property", 1, fakeImage.FileName)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ListPropertyImages");
+    }
+    
+    [Fact]
+    public void DeleteProperty_WithExistingProperty_DeletesAndRedirectsToViewProperties()
+    {
+        // Arrange
+        var fakePropertyDbModel = CreateExamplePropertyDbModel();
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(fakePropertyDbModel);
+
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, UnderTest);
+
+        // Act
+        var result = UnderTest.DeleteProperty(1);
+
+        // Assert
+        A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
+    }
+    
+    [Fact]
+    public void DeleteProperty_WithNonExistingProperty_Returns404ErrorPage()
+    {
+        // Arrange
+        var fakePropertyDbModel = CreateExamplePropertyDbModel();
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(null);
+
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, UnderTest);
+
+        // Act
+        var result = UnderTest.DeleteProperty(1);
+
+        // Assert
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
+        A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustNotHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("Error");
+        result.As<RedirectToActionResult>().RouteValues.Should().Contain("status",404);
     }
 }
