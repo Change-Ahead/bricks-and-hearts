@@ -11,23 +11,23 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
 
 public class LandlordControllerTestsBase : ControllerTestsBase
 {
-    protected readonly LandlordController UnderTest;
     protected readonly ILandlordService LandlordService;
     protected readonly Logger<LandlordController> Logger;
-    protected readonly MailService MailService;
+    protected readonly IMailService MailService;
     protected readonly IPropertyService PropertyService;
+    protected readonly LandlordController UnderTest;
 
     protected LandlordControllerTestsBase()
     {
         PropertyService = A.Fake<IPropertyService>();
         LandlordService = A.Fake<ILandlordService>();
         Logger = A.Fake<Logger<LandlordController>>();
-        MailService = A.Fake<MailService>();
+        MailService = A.Fake<IMailService>();
         var httpContext = new DefaultHttpContext();
         var tempData = new TempDataDictionary(httpContext, A.Fake<ITempDataProvider>());
         UnderTest = new LandlordController(Logger, LandlordService, PropertyService, MailService){TempData = tempData};
     }
-    
+
     protected PropertyViewModel CreateExamplePropertyViewModel()
     {
         return new PropertyViewModel
@@ -51,7 +51,7 @@ public class LandlordControllerTestsBase : ControllerTestsBase
 
     protected LandlordProfileModel CreateTestLandlordProfileModel()
     {
-        return new LandlordProfileModel()
+        return new LandlordProfileModel
         {
             LandlordId = 1,
             Title = "Mr",

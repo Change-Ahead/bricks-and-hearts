@@ -66,7 +66,7 @@ public class LandlordController : AbstractController
         }
         else
         {
-            (result, landlord) = await _landlordService.RegisterLandlord(createModel, user);
+            return StatusCode(403);
         }
 
         switch (result)
@@ -172,9 +172,17 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> EditProfilePage(int landlordId)
     {
         var user = GetCurrentUser();
-        var landlordFromDb =  await _landlordService.GetLandlordIfExistsFromId(landlordId);
-        if (landlordFromDb == null) return StatusCode(404);
-        if (user.LandlordId != landlordFromDb.Id && !user.IsAdmin) return StatusCode(403);
+        var landlordFromDb = await _landlordService.GetLandlordIfExistsFromId(landlordId);
+        if (landlordFromDb == null)
+        {
+            return StatusCode(404);
+        }
+
+        if (user.LandlordId != landlordFromDb.Id && !user.IsAdmin)
+        {
+            return StatusCode(403);
+        }
+
         return View("EditProfilePage", LandlordProfileModel.FromDbModel(landlordFromDb, user));
     }
 
@@ -184,7 +192,10 @@ public class LandlordController : AbstractController
     {
         var user = GetCurrentUser();
         if (!ModelState.IsValid) return StatusCode(404);
-        if (user.LandlordId != editModel.LandlordId && !user.IsAdmin) return StatusCode(403);
+        if (user.LandlordId != editModel.LandlordId && !user.IsAdmin)
+        {
+            return StatusCode(403);
+        }
         var isEmailDuplicated = _landlordService.CheckForDuplicateEmail(editModel);
         if (isEmailDuplicated)
         {
@@ -195,6 +206,6 @@ public class LandlordController : AbstractController
 
         await _landlordService.EditLandlordDetails(editModel);
         _logger.LogInformation("Successfully edited landlord for landlord {LandlordId}", editModel.LandlordId);
-        return RedirectToAction("Profile", new{id = editModel.LandlordId});
+        return RedirectToAction("Profile", new { id = editModel.LandlordId });
     }
 }

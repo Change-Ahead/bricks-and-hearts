@@ -18,15 +18,16 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
-
+        var returnedLandlord = A.Fake<LandlordDbModel>();
         var formResultModel = A.Fake<LandlordProfileModel>();
         formResultModel.Unassigned = true;
+
         // Act
+        A.CallTo(() => LandlordService.RegisterLandlord(formResultModel))
+            .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));
         A.CallTo(() => MailService.SendMsg(
             A<string>._, A<string>._, A<string>._, A<string>._
-        )).DoesNothing();
-        A.CallTo(() => LandlordService.RegisterLandlord(formResultModel))
-            .Returns((ILandlordService.LandlordRegistrationResult.Success, A.Fake<LandlordDbModel>()));
+        )).WithAnyArguments().DoesNothing();
         var result = await UnderTest.RegisterPost(formResultModel) as RedirectToActionResult;
 
         // Assert
@@ -37,33 +38,33 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
             result.ActionName.Should().BeEquivalentTo("Profile");
             result.ControllerName.Should().BeEquivalentTo("Landlord");
             Assert.False(result.RouteValues.IsNullOrEmpty());
-            result.RouteValues?["id"].Should().Be(0);
+            result.RouteValues?["id"].Should().Be(returnedLandlord.Id);
         }
     }
 
     [Fact]
-    public async void RegisterLandlordWithNoAssignedUser_WhenAttemptedByLandlord_Fails()
+    public async void RegisterLandlordWithNoAssignedUser_WhenAttemptedByNonAdmin_ReturnsForbidden()
     {
         // Arrange
         var landlordUser = CreateLandlordUser();
         MakeUserPrincipalInController(landlordUser, UnderTest);
-
+        var returnedLandlord = A.Fake<LandlordDbModel>();
         var formResultModel = A.Fake<LandlordProfileModel>();
         formResultModel.Unassigned = true;
+
         // Act
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel))
-            .Returns((ILandlordService.LandlordRegistrationResult.Success, A.Fake<LandlordDbModel>()));
-        var result = await UnderTest.RegisterPost(formResultModel) as RedirectToActionResult;
+            .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));
+        A.CallTo(() => MailService.SendMsg(
+            "hi", "hi", "hi", "hi"
+        )).WithAnyArguments().DoesNothing();
+        var result = await UnderTest.RegisterPost(formResultModel) as StatusCodeResult;
 
         // Assert
-        result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         if (result != null)
         {
-            result.ActionName.Should().BeEquivalentTo("Profile");
-            result.ControllerName.Should().BeEquivalentTo("Landlord");
-            Assert.False(result.RouteValues.IsNullOrEmpty());
-            result.RouteValues?["id"].Should().Be(0);
+            result.StatusCode.Should().Be(403);
         }
     }
 }
