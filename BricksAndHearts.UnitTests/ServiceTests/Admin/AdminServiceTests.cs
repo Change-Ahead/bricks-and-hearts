@@ -8,12 +8,12 @@ namespace BricksAndHearts.UnitTests.ServiceTests.Admin;
 
 public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
 {
-    private TestDatabaseFixture Fixture { get; }
-
     public AdminServiceTests(TestDatabaseFixture fixture)
     {
         Fixture = fixture;
     }
+
+    private TestDatabaseFixture Fixture { get; }
 
     [Fact]
     public async void GetAdminLists_OnlyGetsAdmins()
@@ -71,5 +71,6 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
 
         // Assert
         context.Users.Single(u => u.Id == requestedAdminUser.Id).HasRequestedAdmin.Should().BeFalse();
+        //
     }
 }
