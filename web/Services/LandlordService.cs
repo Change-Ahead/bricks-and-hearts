@@ -143,7 +143,8 @@ public class LandlordService : ILandlordService
         string inviteLink,
         BricksAndHeartsUser user)
     {
-        // We want to atomically update multiple records (insert a landlord, then set the user's landlord id), so first start a transaction
+        // Use a REPEATABLE READ transaction so that the invite link and user records are locked
+        // while we check that they have not already been used/associated with a landlord respectively.
         var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.RepeatableRead);
         await using (transaction)
         {

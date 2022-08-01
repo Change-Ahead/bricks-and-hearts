@@ -105,6 +105,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("Invite");
         result.Should().BeOfType<RedirectToActionResult>().Which.RouteValues.Should()
             .Contain("inviteLink",inviteLink);
+        UnderTest.TempData["FlashMessage"].Should().BeNull();
     }
     
     [Fact]
@@ -123,6 +124,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
         // Assert   
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("MyProfile");
+        UnderTest.TempData["FlashMessage"].Should().Be($"User already registered with landlord (landlordId = {landlordUser.LandlordId})");
     }
 
     [Fact]
@@ -141,5 +143,6 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         
         // Assert
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("MyProfile");
+        UnderTest.TempData["FlashMessage"].Should().Be($"User {nonLandlordUser.Id} successfully linked with landlord (landlordId = {nonLandlordUser.LandlordId})");
     }
 }
