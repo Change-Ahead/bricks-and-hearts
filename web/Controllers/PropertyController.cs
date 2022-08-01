@@ -47,7 +47,7 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord")]
     [HttpPost("add/step/{step:int}")]
-    public ActionResult AddNewProperty_Continue([FromRoute] int step, [FromForm] PropertyViewModel newPropertyModel)
+    public async Task<ActionResult> AddNewProperty_Continue([FromRoute] int step, [FromForm] PropertyViewModel newPropertyModel)
     {
         var landlordId = GetCurrentUser().LandlordId!.Value;
 
@@ -132,17 +132,22 @@ public class PropertyController : AbstractController
     }
     
     [Authorize(Roles = "Landlord")]
-    public ActionResult DeleteProperty(PropertyViewModel prop)
+    public ActionResult DeleteProperty(int propertyId)
     {
-        var propDb = _propertyService.GetDbModelFromViewModel(prop);
+        PropertyDbModel? propDB = _propertyService.GetPropertyByPropertyId(propertyId);
+        if (propDB == null)
+        {
+            _logger.LogWarning("Property with ID {PropertyId} does not exist", propertyId);
+            return RedirectToAction("Error", "Home", new { status = 404 });
+        }
 
         // Delete property
-        _propertyService.DeleteProperty(propDb);
+        _propertyService.DeleteProperty(propDB);
 
         // Go to View Properties page
         return RedirectToAction("ViewProperties", "Landlord");
     }
-}
+
 
     [HttpGet]
     [Route("/property/{propertyId:int}/view")]

@@ -99,7 +99,7 @@ public class PropertyService : IPropertyService
 
     public PropertyDbModel GetDbModelFromViewModel(PropertyViewModel prop)
     {
-        return _dbContext.Properties.SingleOrDefault(p => p.Id == prop.Id);
+        return _dbContext.Properties.SingleOrDefault(p => p.Id == prop.PropertyId);
     }
 
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId)

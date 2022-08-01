@@ -42,7 +42,6 @@
             <td>@prop.Rent</td>
             <td>@prop.Description</td>
             <td>@Html.ActionLink("View","ViewProperty","Property", new { propertyId = @prop.PropertyId })</td>
-            <td><input type="button" class="btn btn-outline-danger" value="Delete" onclick="location.href='@Url.Action("DeleteProperty", "Property", prop)'" /></td>
         </tr>
         i++;
     }
