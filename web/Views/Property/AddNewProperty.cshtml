@@ -4,7 +4,7 @@
     ViewData["Title"] = "Add Property";
 }
 
-<h1>Add new property</h1>
+<h1 class="display-6">Add new property</h1>
 
 <hr/>
 
@@ -15,7 +15,7 @@
     </div>
 }
 
-<form method="post" class="w-50" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@Model.Step">
+<form method="post" class="narrow-form" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@Model.Step">
 
     <partial name=@("_AddFormStep" + Model.Step) model="Model.Property"/>
 
