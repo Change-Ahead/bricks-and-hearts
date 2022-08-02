@@ -132,8 +132,7 @@ public class PropertyController : AbstractController
     }
     
     [HttpPost]
-    [Authorize(Roles = "Landlord")]
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Landlord, Admin")]
     public ActionResult DeleteProperty(int propertyId)
     {
         PropertyDbModel? propDB = _propertyService.GetPropertyByPropertyId(propertyId);
@@ -145,8 +144,8 @@ public class PropertyController : AbstractController
 
         if (GetCurrentUser().IsAdmin == false & GetCurrentUser().LandlordId != propDB.LandlordId)
         {
-            _logger.LogWarning("Property with ID {PropertyId} is not your property.", propertyId);
-            return StatusCode(405);
+            _logger.LogWarning("You do not have access to any property with ID {PropertyId}.", propertyId);
+            return StatusCode(404);
         }
 
         // Delete property
