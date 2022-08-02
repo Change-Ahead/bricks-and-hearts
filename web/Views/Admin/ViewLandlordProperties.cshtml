@@ -45,4 +45,5 @@
     </tbody>
 </table>
 
-@Html.ActionLink("Add new property", "AdminAddNewProperty_Begin", "Property", null, new { @class = "btn btn-primary" })
+@Html.ActionLink("Add new property", "AdminAddNewProperty_Begin", "Property", 
+    new { landlordId = Model.LandlordId }, new { @class = "btn btn-primary" })

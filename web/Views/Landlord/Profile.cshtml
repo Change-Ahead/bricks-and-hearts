@@ -156,10 +156,7 @@
         
         @if (User.IsInRole("Admin"))
         {
-            @using (Html.BeginForm("AdminViewProperties", "Property", new { landlordId = Model.LandlordId }, FormMethod.Post))
-            {
-                <button type="submit" class="btn btn-outline-primary">View Properties</button>
-            }
+            <a class="btn btn-outline-primary" asp-area="" asp-controller="Property" asp-action="AdminViewProperties" asp-route-landlordId="@Model.LandlordId">View Properties</a>
         }
     </div>
 </div>

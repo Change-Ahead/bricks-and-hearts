@@ -127,6 +127,8 @@ public class PropertyController : AbstractController
     public async Task<ActionResult> AddNewProperty_Cancel()
     {
         var landlordId = GetCurrentUser().LandlordId!.Value;
+
+        // Get the property we're currently adding
         var property = _propertyService.GetIncompleteProperty(landlordId);
         if (property == null)
         {
@@ -247,35 +249,139 @@ public class PropertyController : AbstractController
     }
     
     [Authorize(Roles = "Admin")]
-    [HttpPost]
+    [HttpGet]
+    [Route("/admin/view-properties/landlordId/{landlordId:int}")]
     public IActionResult AdminViewProperties(int landlordId)
     {
         var databaseResult = _propertyService.GetPropertiesByLandlord(landlordId);
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
-        return View("../Admin/ViewLandlordProperties", new PropertiesDashboardViewModel(listOfProperties));
+        return View("../Admin/ViewLandlordProperties", new PropertiesDashboardViewModel(listOfProperties, landlordId));
     }
     
     [Authorize(Roles = "Admin")]
-    [HttpGet("admin/add")]
-    public ActionResult AdminAddNewProperty_Begin()
+    [HttpGet("admin/add-property/landlordId/{landlordId:int?}")]
+    public ActionResult AdminAddNewProperty_Begin(int? landlordId)
     {
-        // Start at step 1
-        return AdminAddNewProperty_Continue(1);
-    }
-    
-    [Authorize(Roles = "Admin")]
-    [HttpGet("admin/add/step/{step:int}")]
-    public ActionResult AdminAddNewProperty_Continue([FromRoute] int step)
-    {
-        var landlordId = GetCurrentUser().LandlordId!.Value;
+        if (!landlordId.HasValue)
+        {
+            throw new ArgumentException("Landlord Id should not be null");
+        }
 
+        // Start at step 1
+        return AdminAddNewProperty_Continue(1, landlordId.Value);
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("admin/add-property/landlordId/{landlordId:int}/step/{step:int}")]
+    public ActionResult AdminAddNewProperty_Continue(int step, int landlordId)
+    {
         // See if we're already adding a property
         var dbModel = _propertyService.GetIncompleteProperty(landlordId);
         var property = dbModel == null
             ? new PropertyViewModel { Address = new PropertyAddress() }
             : PropertyViewModel.FromDbModel(dbModel);
-
         // Show the form for this step
-        return View("AddNewProperty", new AddNewPropertyViewModel { Step = step, Property = property });
+        return View("AdminManageProperty/AddNewProperty", new AddNewPropertyViewModel { Step = step, Property = property, LandlordId = landlordId});
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost("admin/add-property/landlordId/{landlordId:int}/step/{step:int}")]
+    public async Task<IActionResult> AdminAddNewProperty_Continue([FromRoute] int step, [FromRoute] int? landlordId,
+        [FromForm] PropertyViewModel newPropertyModel)
+    {
+        if (!landlordId.HasValue)
+        {
+            throw new ArgumentException("LandlordId should not be null");
+        }
+        if (!ModelState.IsValid)
+        {
+            return View("AdminManageProperty/AddNewProperty", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel, LandlordId = landlordId});
+        }
+
+        // Get the property we're currently adding
+        var property = _propertyService.GetIncompleteProperty(landlordId.Value);
+        if (newPropertyModel.Address.Postcode != null)
+        {
+            newPropertyModel.Address.Postcode =
+                Regex.Replace(newPropertyModel.Address.Postcode, @"^(\S+?)\s*?(\d\w\w)$", "$1 $2");
+            newPropertyModel.Address.Postcode = newPropertyModel.Address.Postcode.ToUpper();
+        }
+
+        if (step == 1)
+        {
+            if (newPropertyModel.Address.AddressLine1 == null || newPropertyModel.Address.Postcode == null)
+            {
+                // Address line 1 and postcode are the minimum information we need to create a new record
+                return View("AdminManageProperty/AddNewProperty",
+                    new AddNewPropertyViewModel { Step = step, Property = newPropertyModel, LandlordId = landlordId.Value});
+            }
+
+            await _azureMapsApiService.AutofillAddress(newPropertyModel);
+
+            if (property == null)
+            {
+                // Create new record in the database for this property
+                _propertyService.AddNewProperty(landlordId.Value, newPropertyModel, isIncomplete: true);
+            }
+            else
+            {
+                _propertyService.UpdateProperty(property.Id, newPropertyModel, isIncomplete: true);
+            }
+
+            // Go to step 2
+            return RedirectToAction("AdminAddNewProperty_Continue", new { step = 2, landlordId = landlordId.Value } );
+        }
+        else if (step < AddNewPropertyViewModel.MaximumStep)
+        {
+            if (property == null)
+            {
+                // No property in progress
+                return RedirectToAction("AdminViewProperties",new {landlordId = landlordId.Value });
+            }
+
+            // Update the property's record with the values entered at this step
+            _propertyService.UpdateProperty(property.Id, newPropertyModel, isIncomplete: true);
+
+            // Go to next step
+            return RedirectToAction("AdminAddNewProperty_Continue", new { step = step + 1, landlordId = landlordId.Value });
+        }
+        else
+        {
+            if (property == null)
+            {
+                // No property in progress
+                return RedirectToAction("AdminViewProperties",new { landlordId = landlordId.Value });
+            }
+
+            // Update the property's record with the final set of values
+            _propertyService.UpdateProperty(property.Id, newPropertyModel, isIncomplete: false);
+
+            // Finished adding property, so go to View Properties page
+            return RedirectToAction("AdminViewProperties",new{ landlordId = landlordId.Value });
+        }
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpPost("admin/add-property/cancel/landlordId/{landlordId:int?}")]
+    public ActionResult AdminAddNewProperty_Cancel([FromRoute] int? landlordId)
+    {
+        if (!landlordId.HasValue)
+        {
+            throw new ArgumentException("LandlordId should not be null");
+        }
+        
+        // Get the property we're currently adding
+        var property = _propertyService.GetIncompleteProperty(landlordId.Value);
+        if (property == null)
+        {
+            // No property in progress
+            return RedirectToAction("AdminViewProperties", new { landlordId = landlordId.Value});
+        }
+
+        // Delete partially complete property
+        _propertyService.DeleteProperty(property);
+
+        // Go to View Properties page
+        return RedirectToAction("AdminViewProperties", new { landlordId = landlordId.Value});
     }
 }
