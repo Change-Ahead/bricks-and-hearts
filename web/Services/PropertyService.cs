@@ -1,4 +1,5 @@
-﻿using BricksAndHearts.Database;
+﻿using BricksAndHearts.Auth;
+using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
 
 namespace BricksAndHearts.Services;
