@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using BricksAndHearts.ViewModels;
+using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -12,34 +14,17 @@ public class AdminControllerTests : AdminControllerTestsBase
     public void Index_WhenCalledByAnonymousUser_ReturnsViewWithLoginLink()
     {
         // Arrange
-        _underTest.ControllerContext = new ControllerContext
+        UnderTest.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext { User = _anonUser }
         };
 
         // Act
-        var result = _underTest.Index() as ViewResult;
+        var result = UnderTest.Index() as ViewResult;
 
         // Assert
         result!.ViewData.Model.Should().BeOfType<AdminViewModel>()
             .Which.CurrentUser.Should().BeNull();
-    }
-    
-    [Fact]
-    public async Task GetAdminList_WhenCalledByAdmin_ReturnsViewWithAdminList()
-    {
-        // Arrange 
-        var adminUser = CreateAdminUserInController(_underTest);
-        _underTest.ControllerContext = new ControllerContext
-        {
-            HttpContext = new DefaultHttpContext { User = new ClaimsPrincipal(adminUser) }
-        };
-
-        // Act
-        var result = await _underTest.GetAdminList() as ViewResult;
-
-        // Assert
-        result!.ViewData.Model.Should().BeOfType<AdminListModel>() ;
     }
 
     [Fact]
@@ -61,10 +46,10 @@ public class AdminControllerTests : AdminControllerTestsBase
     public void GetAdminList_ReturnsViewWithAdminListModel()
     {
         // Arrange
-        MakeUserPrincipalInController(CreateAdminUser(), _underTest);
+        MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
         
         // Act
-        var result = _underTest.GetAdminList().Result as ViewResult;
+        var result = UnderTest.GetAdminList().Result as ViewResult;
 
         // Assert
         result!.ViewData.Model.Should().BeOfType<AdminListModel>();
@@ -74,26 +59,26 @@ public class AdminControllerTests : AdminControllerTestsBase
     public void AcceptAdminRequest_WhenCalled_ApprovesAdminAccessRequest()
     {
         // Arrange
-        MakeUserPrincipalInController(CreateAdminUser(), _underTest);
+        MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
         var dummyId = 1;
 
         // Act
-        var result = _underTest.AcceptAdminRequest(dummyId);
+        var result = UnderTest.AcceptAdminRequest(dummyId);
         
         // Assert
-        A.CallTo(() => adminService.ApproveAdminAccessRequest(dummyId)).MustHaveHappened();
+        A.CallTo(() => AdminService.ApproveAdminAccessRequest(dummyId)).MustHaveHappened();
     }
     
     [Fact]
     public void RejectAdminRequest_WhenCalled_RejectsAdminAccessRequest()
     {
         // Arrange
-        MakeUserPrincipalInController(CreateAdminUser(), _underTest);
+        MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
 
         // Act
-        var result = _underTest.RejectAdminRequest(1);
+        var result = UnderTest.RejectAdminRequest(1);
         
         // Assert
-        A.CallTo(() => adminService.RejectAdminAccessRequest(1)).MustHaveHappened();
+        A.CallTo(() => AdminService.RejectAdminAccessRequest(1)).MustHaveHappened();
     }
 }
