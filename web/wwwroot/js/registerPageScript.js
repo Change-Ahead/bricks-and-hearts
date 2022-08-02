@@ -5,7 +5,7 @@ let inputs, currentInput
 
 inputs = document.getElementsByTagName('input');
 // Execute a function when the user presses a key on the keyboard
-window.addEventListener("keyup", function (event) {
+window.addEventListener("keydown", function (event) {
     // If the user presses the "Enter" key on the keyboard
     if (event.key === "Enter") {
         // Cancel the default action, if needed
@@ -20,6 +20,7 @@ window.addEventListener("keyup", function (event) {
 });
 if(localStorage.getItem("storedCurrentTab")!=null){
     currentTab = parseInt(localStorage.getItem("storedCurrentTab"));
+    localStorage.setItem("storedCurrentTab", "0");
 }
 showTab(currentTab);
 
