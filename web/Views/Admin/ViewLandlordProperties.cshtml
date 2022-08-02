@@ -1,0 +1,48 @@
+@model PropertiesDashboardViewModel
+
+@{
+    ViewData["Title"] = "View All Properties";
+}
+
+<h2>All properties</h2>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th scope="col">#</th>
+        <th scope="col">Address</th>
+        <th scope="col">Type</th>
+        <th scope="col"># of Bedrooms</th>
+        <th scope="col">Rent (pcm)</th>
+        <th scope="col">Description</th>
+        <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>
+    @{
+        var i = 1;
+    }
+    @foreach (var prop in Model.Properties)
+    {
+        <tr>
+            <th scope="row">@i</th>
+            <td>
+                @prop.Address.AddressLine1,
+                @prop.Address.AddressLine2@(prop.Address.AddressLine2 != null ? "," : "")
+                @prop.Address.AddressLine3@(prop.Address.AddressLine3 != null ? "," : "")
+                @prop.Address.TownOrCity,
+                @prop.Address.County,
+                @prop.Address.Postcode
+            </td>
+            <td>@prop.PropertyType</td>
+            <td>@prop.NumOfBedrooms</td>
+            <td>@prop.Rent</td>
+            <td>@prop.Description</td>
+            <td>@Html.ActionLink("View","ViewProperty","Property", new { propertyId = @prop.PropertyId })</td>
+        </tr>
+        i++;
+    }
+    </tbody>
+</table>
+
+@Html.ActionLink("Add new property", "AdminAddNewProperty_Begin", "Property", null, new { @class = "btn btn-primary" })

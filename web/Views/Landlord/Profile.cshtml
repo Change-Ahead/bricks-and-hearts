@@ -153,5 +153,13 @@
                 <button type="submit" class="btn btn-outline-primary">Get Invite Link</button>
             }
         }
+        
+        @if (User.IsInRole("Admin"))
+        {
+            @using (Html.BeginForm("AdminViewProperties", "Property", new { landlordId = Model.LandlordId }, FormMethod.Post))
+            {
+                <button type="submit" class="btn btn-outline-primary">View Properties</button>
+            }
+        }
     </div>
 </div>
