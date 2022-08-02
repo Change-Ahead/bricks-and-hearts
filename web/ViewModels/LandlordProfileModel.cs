@@ -36,6 +36,7 @@ public class LandlordProfileModel
     [Phone]
     public string Phone { get; set; } = string.Empty;
 
+    [DisplayName("Type of landlord")]
     public string LandlordStatus { get; set; } = string.Empty;
 
     public bool LandlordProvidedCharterStatus { get; set; }
@@ -46,6 +47,9 @@ public class LandlordProfileModel
 
     public bool Unassigned { get; set; }
 
+    [DisplayName("For / not for profit")]
+    public bool IsLandlordForProfit { get; set; }
+    
     public static LandlordProfileModel FromDbModel(LandlordDbModel landlord, BricksAndHeartsUser user)
     {
         return new LandlordProfileModel
@@ -60,6 +64,7 @@ public class LandlordProfileModel
             LandlordStatus = landlord.LandlordStatus,
             LandlordProvidedCharterStatus = landlord.LandlordProvidedCharterStatus,
             CharterApproved = landlord.CharterApproved,
+            IsLandlordForProfit = landlord.IsLandlordForProfit,
             CurrentUserIsAdmin = user.IsAdmin
         };
     }

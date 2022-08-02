@@ -49,6 +49,7 @@ public class LandlordService : ILandlordService
             Email = createModel.Email,
             Phone = createModel.Phone,
             LandlordStatus = createModel.LandlordStatus,
+            IsLandlordForProfit = createModel.IsLandlordForProfit,
             LandlordProvidedCharterStatus = createModel.LandlordProvidedCharterStatus
         };
 
@@ -100,6 +101,7 @@ public class LandlordService : ILandlordService
             Email = createModel.Email,
             Phone = createModel.Phone,
             LandlordStatus = createModel.LandlordStatus,
+            IsLandlordForProfit = createModel.IsLandlordForProfit,
             LandlordProvidedCharterStatus = createModel.LandlordProvidedCharterStatus
         };
         await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
@@ -141,12 +143,6 @@ public class LandlordService : ILandlordService
         return $"Successfully approved Landlord Charter for {landlord.FirstName} {landlord.LastName}.";
     }
 
-    private async Task<LandlordDbModel?> GetLandlordIfExistsFromModel(LandlordDbModel model)
-    {
-        var landlord = await _dbContext.Landlords.SingleOrDefaultAsync(l => l.Email == model.Email);
-        return landlord;
-    }
-
     public async Task<ILandlordService.LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel)
     {
         var landlordToEdit = await _dbContext.Landlords.SingleAsync(l => l.Id == editModel.LandlordId);
@@ -156,6 +152,8 @@ public class LandlordService : ILandlordService
         landlordToEdit.CompanyName = editModel.CompanyName;
         landlordToEdit.Email = editModel.Email;
         landlordToEdit.Phone = editModel.Phone;
+        landlordToEdit.LandlordStatus = editModel.LandlordStatus;
+        landlordToEdit.IsLandlordForProfit = editModel.IsLandlordForProfit;
 
         await _dbContext.SaveChangesAsync();
         return ILandlordService.LandlordRegistrationResult.Success;
