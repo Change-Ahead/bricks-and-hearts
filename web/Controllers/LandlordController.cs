@@ -10,10 +10,10 @@ namespace BricksAndHearts.Controllers;
 [Route("/landlord")]
 public class LandlordController : AbstractController
 {
-    private readonly ILogger<LandlordController> _logger;
     private readonly ILandlordService _landlordService;
     private readonly IPropertyService _propertyService;
     private readonly IMailService _mailService;
+    private readonly ILogger<LandlordController> _logger;
 
     public LandlordController(ILogger<LandlordController> logger,
         ILandlordService landlordService, IPropertyService propertyService, IMailService mailService)
@@ -77,7 +77,7 @@ public class LandlordController : AbstractController
         {
             case ILandlordService.LandlordRegistrationResult.Success:
                 _logger.LogInformation("Successfully created landlord for user {UserId}", user.Id);
-                var msgBody = "A Landlord has just registered\n"
+                var msgBody = $"A Landlord has just registered\n"
                               + "\n"
                               + $"Title: {createModel.Title}\n"
                               + $"First Name: {createModel.FirstName}" + "\n"
@@ -85,11 +85,10 @@ public class LandlordController : AbstractController
                               + $"Company Name: {createModel.CompanyName}" + "\n"
                               + $"Email: {createModel.Email}" + "\n"
                               + $"Phone: {createModel.Phone}" + "\n";
-                _mailService.SendMsg(msgBody);
-                if (!createModel.Unassigned)
-                {
-                    return RedirectToAction("MyProfile");
-                }
+                var subject = "Bricks&Hearts - landlord registration notification";
+                #pragma warning disable CS4014
+                Task.Run( () => TrySendMsg(msgBody, subject));
+                #pragma warning restore CS4014
 
                 return RedirectToAction("Profile", "Landlord", new { landlord!.Id });
 
@@ -109,11 +108,31 @@ public class LandlordController : AbstractController
     }
 
     [HttpGet]
+    public async Task TrySendMsg(
+        string msgBody,
+        string subject,
+        string msgFromName = "",
+        string msgToName = ""
+    )
+    {
+        try
+        {
+            await _mailService.SendMsg(msgBody, subject, msgFromName, msgToName);
+            _logger.LogInformation("Successfully sent emails");
+        }
+        catch (Exception e)
+        {
+            // ignored
+            _logger.LogWarning("Failed to send email with message:\n{Msg}\n \nSubject:\n{Subject}",msgBody,subject);
+            _logger.LogWarning("Email sending exception message: {E}",e);
+        }
+    }
+    
+    [HttpGet]
     [Route("{id:int}/profile")]
     public async Task<ActionResult> Profile([FromRoute] int id)
     {
         var user = GetCurrentUser();
-
         if (user.LandlordId != id && !user.IsAdmin)
         {
             return StatusCode(403);
