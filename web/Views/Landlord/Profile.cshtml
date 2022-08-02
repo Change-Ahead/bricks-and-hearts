@@ -83,6 +83,17 @@
                     <td>@Html.DisplayNameFor(model => model.CompanyName)</td>
                     <td>@Html.DisplayFor(model => model.CompanyName)</td>
                 </tr>
+                <tr>
+                    <td>@Html.DisplayNameFor(model => model.LandlordStatus)</td>
+                    <td>@Html.DisplayFor(model => model.LandlordStatus)</td>
+                </tr>
+                <tr>
+                    <td>@Html.DisplayNameFor(model => model.IsLandlordForProfit)</td>
+                    <td>
+                        @if (Model.IsLandlordForProfit) { <text>For profit</text> }
+                        else { <text>Not for profit</text> }
+                    </td>
+                </tr>
             </table>
         </div>
     </div>

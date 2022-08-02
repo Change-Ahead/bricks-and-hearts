@@ -29,9 +29,18 @@
         <label>Landlord type:</label>
         @Html.DropDownList("LandlordStatus", new List<SelectListItem>
         {
-            new() { Text = "Private Residential Sector", Value = "Private Residential Sector", Selected = true },
-            new() { Text = "Housing association", Value = "Housing association" },
-            new() { Text = "Private landlord", Value = "Private landlord" }
+            new() { Text = "Charity", Value = "Charity", Selected = true },
+            new() { Text = "Private Residential Sector", Value = "Private Residential Sector" },
+            new() { Text = "Registered Provider", Value = "Registered Provider" },
+            new() { Text = "Local Authority", Value = "Local Authority" }
+        })
+    </div>
+    <div class="form-group my-3">
+        <label>For/ Not for profit:</label>
+        @Html.DropDownList("IsLandlordForProfit", new List<SelectListItem>
+        {
+            new() { Text = "For Profit", Value = "true", Selected = true },
+            new() { Text = "Not For Profit", Value = "false" }
         })
     </div>
     <div class="form-group my-3">
