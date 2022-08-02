@@ -219,4 +219,62 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         result.Should().NotBeNull();
         result!.StatusCode.Should().Be(403);
     }
+    
+    [Fact]
+    public async void TieUserWithLandlord_WithNonExistentLink_RedirectToInvite()
+    {
+        // Arrange 
+        var landlordUser = CreateLandlordUser();
+        const string inviteLink = "11111";
+        A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink,landlordUser))
+            .Returns(ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist);
+        MakeUserPrincipalInController(landlordUser, UnderTest);
+
+        // Act
+        var result = await UnderTest.TieUserWithLandlord(inviteLink);
+
+        // Assert
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("Invite");
+        result.Should().BeOfType<RedirectToActionResult>().Which.RouteValues.Should()
+            .Contain("inviteLink",inviteLink);
+        UnderTest.TempData["FlashMessage"].Should().BeNull();
+    }
+    
+    [Fact]
+    public async void TieUserWithLandlord_WithLandlord_RedirectToProfile()
+    {
+        // Arrange 
+        var landlordUser = CreateLandlordUser();
+        const string inviteLink = "11111";
+
+        A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink,landlordUser))
+            .Returns(ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord);
+        MakeUserPrincipalInController(landlordUser, UnderTest);
+
+        // Act
+        var result = await UnderTest.TieUserWithLandlord(inviteLink);
+
+        // Assert   
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("MyProfile");
+        UnderTest.TempData["FlashMessage"].Should().Be($"User already registered with landlord (landlordId = {landlordUser.LandlordId})");
+    }
+    
+    [Fact]
+    public async void TieUserWithLandlord_WithNonLandlordUser_RedirectToProfile()
+    {
+        // Arrange 
+        var nonLandlordUser = CreateUnregisteredUser();
+        const string inviteLink = "11111";
+
+        A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink,nonLandlordUser))
+            .Returns(ILandlordService.LinkUserWithLandlordResult.Success);
+        MakeUserPrincipalInController(nonLandlordUser, UnderTest);
+
+        // Act
+        var result = await UnderTest.TieUserWithLandlord(inviteLink);
+
+        // Assert
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("MyProfile");
+        UnderTest.TempData["FlashMessage"].Should().Be($"User {nonLandlordUser.Id} successfully linked with landlord (landlordId = {nonLandlordUser.LandlordId})");
+    }
 }

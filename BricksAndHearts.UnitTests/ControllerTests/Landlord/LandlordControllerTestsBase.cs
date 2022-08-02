@@ -12,16 +12,17 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
 public class LandlordControllerTestsBase : ControllerTestsBase
 {
     protected readonly ILandlordService LandlordService;
-    protected readonly Logger<LandlordController> Logger;
+    protected readonly ILogger<LandlordController> Logger;
     protected readonly IMailService MailService;
     protected readonly IPropertyService PropertyService;
     protected readonly LandlordController UnderTest;
 
     protected LandlordControllerTestsBase()
     {
-        PropertyService = A.Fake<IPropertyService>();
+        Logger = A.Fake<ILogger<LandlordController>>();
         LandlordService = A.Fake<ILandlordService>();
-        Logger = A.Fake<Logger<LandlordController>>();
+        MailService = A.Fake<IMailService>();
+        PropertyService = A.Fake<IPropertyService>();
         MailService = A.Fake<IMailService>();
         var httpContext = new DefaultHttpContext();
         var tempData = new TempDataDictionary(httpContext, A.Fake<ITempDataProvider>());

@@ -220,4 +220,46 @@ public class LandlordController : AbstractController
         _logger.LogInformation("Successfully edited landlord for landlord {LandlordId}", editModel.LandlordId);
         return RedirectToAction("Profile", new { id = editModel.LandlordId });
     }
+
+    [HttpGet]
+    [Route("/invite/{inviteLink}")]
+    public ActionResult Invite(string inviteLink)
+    {
+        InviteViewModel model = new();
+        var landlord = _landlordService.FindLandlordWithInviteLink(inviteLink);
+        if (landlord == null)
+        {
+            return View(model);
+        }
+
+        model.InviteLinkToAccept = inviteLink;
+        return View(model);
+    }
+
+    [HttpPost]
+    [Route("/invite/{inviteLink}/accepted")]
+    public async Task<IActionResult> TieUserWithLandlord(string inviteLink)
+    {
+        var user = GetCurrentUser();
+        var result = await _landlordService.LinkExistingLandlordWithUser(inviteLink, user);
+        if (result == ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist)
+        {
+            _logger.LogWarning("Invite Link {Link} does not work", inviteLink);
+            return RedirectToAction(nameof(Invite),new {inviteLink});
+        }
+        if (result == ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord)
+        {
+            _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
+            TempData["FlashMessage"] = $"User already registered with landlord (landlordId = {user.LandlordId})"; // This will be displayed on the Profile page
+            return RedirectToAction(nameof(MyProfile));
+        }
+
+        if (result == ILandlordService.LinkUserWithLandlordResult.Success)
+        {
+            _logger.LogInformation("Successfully registered landlord with user {UserId}", user.Id);
+            TempData["FlashMessage"] = $"User {user.Id} successfully linked with landlord (landlordId = {user.LandlordId})"; // This will be displayed on the Profile page
+            return RedirectToAction(nameof(MyProfile));
+        }
+        throw new Exception($"Unknown landlord registration error ${result}");
+    }
 }

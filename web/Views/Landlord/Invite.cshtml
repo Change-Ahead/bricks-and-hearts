@@ -1,0 +1,20 @@
+@model InviteViewModel
+@{
+    ViewData["Title"] = "Accept Invite";
+}
+
+@if (@Model.InviteLinkToAccept != null)
+{
+    @using (Html.BeginForm("TieUserWithLandlord", "Landlord", new { inviteLink = @Model.InviteLinkToAccept }))
+    {
+        <h3>Welcome! You've been invited...</h3>
+        <br/>
+        <input type="submit" class="btn-primary btn-lg" value="Accept Invite"/>
+    }
+}
+else
+{
+    <h3>Ooops your invite link does not seem to work!</h3>
+}
+
+
