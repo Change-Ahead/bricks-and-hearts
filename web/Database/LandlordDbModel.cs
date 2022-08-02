@@ -18,6 +18,8 @@ public class LandlordDbModel
 
     //Whether the landlord claims to have signed the charter
     public bool LandlordProvidedCharterStatus { get; set; } = false;
+    
+    public string? MembershipId { get; set; }
 
     //Whether the charter has been approved by an admin
     public bool CharterApproved { get; set; } = false;

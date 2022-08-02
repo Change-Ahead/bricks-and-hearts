@@ -96,6 +96,11 @@ public class LandlordController : AbstractController
                 _logger.LogWarning("Email already registered {Email}", createModel.Email);
                 ModelState.AddModelError("Email", "Email already registered");
                 return View("Register", createModel);
+            
+            case ILandlordService.LandlordRegistrationResult.ErrorLandlordMembershipIdAlreadyRegistered:
+                _logger.LogWarning("Membership Id already registered {MembershipId}", createModel.MembershipId);
+                ModelState.AddModelError("MembershipId", "Membership Id already registered");
+                return View("Register", createModel);
 
             case ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord:
                 _logger.LogWarning("User {UserId} already associated with landlord", user.Id);

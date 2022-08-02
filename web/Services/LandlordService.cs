@@ -10,6 +10,7 @@ public interface ILandlordService
 {
     public enum LandlordRegistrationResult
     {
+        ErrorLandlordMembershipIdAlreadyRegistered,
         ErrorLandlordEmailAlreadyRegistered,
         ErrorUserAlreadyHasLandlordRecord,
         Success
@@ -63,8 +64,12 @@ public class LandlordService : ILandlordService
             Phone = createModel.Phone,
             LandlordType = createModel.LandlordType,
             IsLandlordForProfit = createModel.IsLandlordForProfit,
-            LandlordProvidedCharterStatus = createModel.LandlordProvidedCharterStatus
+            LandlordProvidedCharterStatus = createModel.LandlordProvidedCharterStatus,
         };
+        if (createModel.LandlordProvidedCharterStatus)
+        {
+            dbModel.MembershipId = createModel.MembershipId;
+        }
 
         await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
         {
@@ -73,6 +78,15 @@ public class LandlordService : ILandlordService
             if (await _dbContext.Landlords.AnyAsync(l => l.Email == createModel.Email))
             {
                 return (ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered, null);
+            }
+            
+            // If the landlord has a membershipId, check there isn't already a Landlord with that membershipId.
+            if (dbModel.MembershipId != null)
+            {
+                if (await _dbContext.Landlords.AnyAsync(l => l.MembershipId == dbModel.MembershipId))
+                {
+                    return (ILandlordService.LandlordRegistrationResult.ErrorLandlordMembershipIdAlreadyRegistered, null);
+                }
             }
 
             // Check the user doesn't already have a landlord associated
@@ -115,8 +129,12 @@ public class LandlordService : ILandlordService
             Phone = createModel.Phone,
             LandlordType = createModel.LandlordType,
             IsLandlordForProfit = createModel.IsLandlordForProfit,
-            LandlordProvidedCharterStatus = createModel.LandlordProvidedCharterStatus
+            LandlordProvidedCharterStatus = createModel.LandlordProvidedCharterStatus,
         };
+        if (createModel.LandlordProvidedCharterStatus)
+        {
+            dbModel.MembershipId = createModel.MembershipId;
+        }
         await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
         {
             // Check there isn't already a Landlord with that email. Nothing depends on this currently, but it would probably mean the landlord is a duplicate
@@ -124,6 +142,15 @@ public class LandlordService : ILandlordService
             if (await _dbContext.Landlords.AnyAsync(l => l.Email == createModel.Email))
             {
                 return (ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered, null);
+            }
+            
+            // If the landlord has a membershipId, check there isn't already a Landlord with that membershipId.
+            if (dbModel.MembershipId != null)
+            {
+                if (await _dbContext.Landlords.AnyAsync(l => l.MembershipId == dbModel.MembershipId))
+                {
+                    return (ILandlordService.LandlordRegistrationResult.ErrorLandlordMembershipIdAlreadyRegistered, null);
+                }
             }
 
             // Insert the landlord and call SaveChanges

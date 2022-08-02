@@ -1,4 +1,4 @@
-﻿@model LandlordProfileModel
+@model LandlordProfileModel
 <div class="registerTab" id="Name">
     <div class="form-group my-3">
         <label>Title:</label>
@@ -63,15 +63,44 @@
     </div>
 </div>
 
-<div class="registerTab" id="ChangeAhead status">
-    <p>ChangeAhead Charter</p>
-    <p>What is your ChangeAhead Charter status?</p>
-
-    @Html.DropDownList("CharterStatus", new List<SelectListItem>
+<div class="registerTab" id="ChangeAhead status" >
+   
+    @if (Model.LandlordProvidedCharterStatus)
     {
-        new() { Text = "Already approved", Value = "true", Selected = true },
-        new() { Text = "Not yet approved", Value = "false" }
-    })
+        <style>
+            div.hidetrue {}
+            div.hidefalse {display: none;}
+        </style>
+    }
+    else
+    {
+        <style>
+            div.hidetrue {display: none;}
+            div.hidefalse {}
+        </style>
+    }
+    
+    <p>ChangeAhead Charter</p>
+
+    <div class="my-3">
+        <label asp-for="LandlordProvidedCharterStatus" class="form-label">What is your ChangeAhead Charter status?</label>
+        <select asp-for="LandlordProvidedCharterStatus" class="form-select" required
+                id="Select" onclick="checkIfSelectedValueIsTarget()">
+            <option selected disabled value="">Charter Status</option>
+            <option value="true">Already approved</option>
+            <option value="false">Not yet approved</option>
+        </select>
+        <span asp-validation-for="LandlordProvidedCharterStatus" class="text-danger"></span>
+    </div>
+
+    <div id="ifTrue" class="form-group my-3 hidetrue">
+        <label class="control-label">Please provide your Charter Membership Id:</label>
+        <input asp-for="MembershipId" class="form-control empty"/>
+        <span asp-validation-for="MembershipId" class="text-danger"></span>
+    </div>
+    <div id="ifFalse" class="hidefalse">
+        ChangeAhead require your participation in a charter system.
+    </div>
 </div>
 
 <div class="registerTab" id="Terms and conditions">

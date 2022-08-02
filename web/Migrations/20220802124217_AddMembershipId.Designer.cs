@@ -4,6 +4,7 @@ using BricksAndHearts.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BricksAndHearts.Migrations
 {
     [DbContext(typeof(BricksAndHeartsDbContext))]
-    partial class BricksAndHeartsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220802124217_AddMembershipId")]
+    partial class AddMembershipId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -53,13 +55,10 @@ namespace BricksAndHearts.Migrations
                     b.Property<string>("InviteLink")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsLandlordForProfit")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("LandlordProvidedCharterStatus")
                         .HasColumnType("bit");
 
-                    b.Property<string>("LandlordType")
+                    b.Property<string>("LandlordStatus")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -90,27 +89,6 @@ namespace BricksAndHearts.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<bool?>("AcceptsBenefits")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("AcceptsCouple")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("AcceptsFamily")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("AcceptsNotEET")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("AcceptsPets")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("AcceptsSingleTenant")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("AcceptsWithoutGuarantor")
-                        .HasColumnType("bit");
 
                     b.Property<string>("AddressLine1")
                         .IsRequired()
