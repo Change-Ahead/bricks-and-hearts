@@ -40,7 +40,7 @@ public class PropertyController : AbstractController
         _propertyService.ChangePropertyToIncomplete(property);
         var propertyViewModel = PropertyViewModel.FromDbModel(property);
         // Start at step 1
-        return View("AddNewProperty", new AddNewPropertyViewModel { Step = 1, Property = propertyViewModel });
+        return View("EditProperty", new AddNewPropertyViewModel { Step = 1, Property = propertyViewModel });
     }
 
     [Authorize(Roles = "Landlord")]
@@ -124,6 +124,94 @@ public class PropertyController : AbstractController
             return RedirectToAction("ViewProperties", "Landlord");
         }
     }
+    
+    [Authorize(Roles = "Landlord")]
+    [HttpPost("edit/step/{step:int}")]
+    public async Task<IActionResult> EditProperty_Continue([FromRoute] int step, [FromForm] PropertyViewModel newPropertyModel)
+    {
+        var landlordId = GetCurrentUser().LandlordId!.Value;
+        var updatedPropertyViewModel = new PropertyViewModel();
+
+        if (!ModelState.IsValid)
+        {
+            return View("EditProperty", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
+        }
+
+        // Get the property we're currently adding
+        var property = _propertyService.GetIncompleteProperty(landlordId);
+        updatedPropertyViewModel = PropertyViewModel.FromDbModel(property);
+        
+        if (newPropertyModel.Address.Postcode != null)
+        {
+            newPropertyModel.Address.Postcode =
+                Regex.Replace(newPropertyModel.Address.Postcode, @"^(\S+?)\s*?(\d\w\w)$", "$1 $2");
+            newPropertyModel.Address.Postcode = newPropertyModel.Address.Postcode.ToUpper();
+        }
+        if (step == 3)
+        {
+            if (newPropertyModel.Address.AddressLine1 == null || newPropertyModel.Address.Postcode == null)
+            {
+                // Address line 1 and postcode are the minimum information we need to create a new record
+                return View("EditProperty",
+                    new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
+            }
+
+            await _azureMapsApiService.AutofillAddress(newPropertyModel);
+            
+            updatedPropertyViewModel = UpdatePropertyViewModel(updatedPropertyViewModel, newPropertyModel);
+            
+            // Go to step 2
+            /*return RedirectToAction("EditProperty_ContinueStep", new { step = 2 , newPropertyModel = updatedPropertyViewModel});*/
+            return View("EditProperty", new AddNewPropertyViewModel { Step = 4, Property = updatedPropertyViewModel });
+        }
+
+        if (step < AddNewPropertyViewModel.MaximumStep)
+        {
+            if (newPropertyModel.Address.AddressLine1 == null || newPropertyModel.Address.Postcode == null)
+            {
+                // Address line 1 and postcode are the minimum information we need to create a new record
+                return View("EditProperty",
+                    new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
+            }
+
+            await _azureMapsApiService.AutofillAddress(newPropertyModel);
+            
+            updatedPropertyViewModel = UpdatePropertyViewModel(updatedPropertyViewModel, newPropertyModel);
+            
+            // Go to step 2
+            /*return RedirectToAction("EditProperty_ContinueStep", new { step = 2 , newPropertyModel = updatedPropertyViewModel});*/
+            return View("EditProperty", new AddNewPropertyViewModel { Step = step + 1, Property = updatedPropertyViewModel });
+        }
+        else if (step < 0)
+        {
+            if (property == null)
+            {
+                // No property in progress
+                return RedirectToAction("ViewProperties", "Landlord");
+            }
+            
+            // Update the property's record with the values entered at this step
+            updatedPropertyViewModel = UpdatePropertyViewModel(updatedPropertyViewModel, newPropertyModel);
+
+            // Go to next step
+            return View("EditProperty", new AddNewPropertyViewModel { Step = step + 1, Property = updatedPropertyViewModel });
+            /*return RedirectToAction("EditProperty_ContinueStep", new { step = step + 1 , newPropertyModel = updatedPropertyViewModel });*/
+        }
+        else
+        {
+            if (property == null)
+            {
+                // No property in progress
+                return RedirectToAction("ViewProperties", "Landlord");
+            }
+            updatedPropertyViewModel = UpdatePropertyViewModel(updatedPropertyViewModel, newPropertyModel);
+            // Update the property's record with the final set of values
+            _propertyService.UpdateProperty(property.Id, updatedPropertyViewModel, isIncomplete: false);
+
+            // Finished adding property, so go to View Properties page
+            return RedirectToAction("ViewProperties", "Landlord");
+        }
+    }
 
     [Authorize(Roles = "Landlord")]
     [HttpPost("add/cancel")]
@@ -167,6 +255,28 @@ public class PropertyController : AbstractController
         return RedirectToAction("ViewProperties", "Landlord");
     }
     
+    [Authorize(Roles = "Landlord")]
+    [HttpPost("edit/cancel")]
+    public ActionResult EditProperty_Cancel()
+    {
+        var landlordId = GetCurrentUser().LandlordId!.Value;
+
+        // Get the property we're currently adding
+        var property = _propertyService.GetIncompleteProperty(landlordId);
+        if (property == null)
+        {
+            // No property in progress
+            return RedirectToAction("ViewProperties", "Landlord");
+        }
+
+        // Delete partially complete property
+        _propertyService.ChangePropertyToComplete(property);
+
+        // Go to View Properties page
+        return RedirectToAction("ViewProperties", "Landlord");
+    }
+
+
     [HttpGet]
     [Authorize(Roles = "Landlord, Admin")]
     [Route("/property/{propertyId:int}/view")]
@@ -180,6 +290,24 @@ public class PropertyController : AbstractController
         }
         PropertyViewModel propertyViewModel = PropertyViewModel.FromDbModel(model);
         return View(propertyViewModel);
+    }
+    
+    public PropertyViewModel UpdatePropertyViewModel(PropertyViewModel oldModel, PropertyViewModel updateModel)
+    {
+        // Update fields if they have been set (i.e. not null) in updateModel
+        // Otherwise use the value we currently have in the database
+        oldModel.Address.AddressLine1 = updateModel.Address.AddressLine1 ?? oldModel.Address.AddressLine1;
+        oldModel.Address.AddressLine2 = updateModel.Address.AddressLine2 ?? oldModel.Address.AddressLine2;
+        oldModel.Address.AddressLine3 = updateModel.Address.AddressLine3 ?? oldModel.Address.AddressLine3;
+        oldModel.Address.TownOrCity = updateModel.Address.TownOrCity ?? oldModel.Address.TownOrCity;
+        oldModel.Address.County = updateModel.Address.County ?? oldModel.Address.County;
+        oldModel.Address.Postcode = updateModel.Address.Postcode ?? oldModel.Address.Postcode;
+        oldModel.PropertyType = updateModel.PropertyType ?? oldModel.PropertyType;
+        oldModel.NumOfBedrooms = updateModel.NumOfBedrooms ?? oldModel.NumOfBedrooms;
+        oldModel.Rent = updateModel.Rent ?? oldModel.Rent;
+        oldModel.Description = updateModel.Description ?? oldModel.Description;
+
+        return oldModel;
     }
 
     [Authorize(Roles = "Landlord, Admin")]
