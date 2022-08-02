@@ -8,15 +8,15 @@
     <label class="form-label">Select all that apply:</label>
 
     <div class="form-check">
-        <input asp-for="AcceptsSingleTenant" class="form-check-input">
+        @Html.CheckBox("AcceptsSingleTenant", Model.AcceptsSingleTenant ?? false, new { @class = "form-check-input" })
         <label asp-for="AcceptsSingleTenant" class="form-check-label">Single tenant</label>
     </div>
     <div class="form-check">
-        <input asp-for="AcceptsCouple" class="form-check-input">
+        @Html.CheckBox("AcceptsCouple", Model.AcceptsCouple ?? false, new { @class = "form-check-input" })
         <label asp-for="AcceptsCouple" class="form-check-label">Couple</label>
     </div>
     <div class="form-check">
-        <input asp-for="AcceptsFamily" class="form-check-input">
+        @Html.CheckBox("AcceptsFamily", Model.AcceptsFamily ?? false, new { @class = "form-check-input" })
         <label asp-for="AcceptsFamily" class="form-check-label">Family (3+)</label>
     </div>
 </div>
@@ -38,19 +38,19 @@
     <label class="form-label">Will you accept tenants:</label>
 
     <div class="form-check">
-        <input asp-for="AcceptsBenefits" class="form-check-input">
+        @Html.CheckBox("AcceptsBenefits", Model.AcceptsBenefits ?? false, new { @class = "form-check-input" })
         <label asp-for="AcceptsBenefits" class="form-check-label">
             on Universal Credit or housing benefits?
         </label>
     </div>
     <div class="form-check">
-        <input asp-for="AcceptsNotEET" class="form-check-input">
+        @Html.CheckBox("AcceptsNotEET", Model.AcceptsNotEET ?? false, new { @class = "form-check-input" })
         <label asp-for="AcceptsNotEET" class="form-check-label">
             not in EET (Employment, Education, or Training)?
         </label>
     </div>
     <div class="form-check">
-        <input asp-for="AcceptsWithoutGuarantor" class="form-check-input">
+        @Html.CheckBox("AcceptsWithoutGuarantor", Model.AcceptsWithoutGuarantor ?? false, new { @class = "form-check-input" })
         <label asp-for="AcceptsWithoutGuarantor" class="form-check-label">
             without a rent guarantor?
         </label>

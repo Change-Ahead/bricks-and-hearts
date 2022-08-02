@@ -4,7 +4,8 @@ using BricksAndHearts.ViewModels;
 
 namespace BricksAndHearts.Services;
 
-public interface IPropertyService{
+public interface IPropertyService
+{
     public List<PropertyDbModel> GetPropertiesByLandlord(int landlordId);
     public int AddNewProperty(int landlordId, PropertyViewModel createModel, bool isIncomplete = true);
     public void UpdateProperty(int propertyId, PropertyViewModel updateModel, bool isIncomplete = true);
@@ -12,10 +13,10 @@ public interface IPropertyService{
     public PropertyDbModel? GetIncompleteProperty(int landlordId);
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId);
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId);
-
 }
 
-public class PropertyService : IPropertyService{
+public class PropertyService : IPropertyService
+{
     private readonly BricksAndHeartsDbContext _dbContext;
 
     public PropertyService(BricksAndHeartsDbContext dbContext)
@@ -88,14 +89,13 @@ public class PropertyService : IPropertyService{
 
         dbModel.Description = updateModel.Description ?? dbModel.Description;
 
-        // These default to false, so if updated version is true then set to true, else stay the same
-        dbModel.AcceptsSingleTenant = updateModel.AcceptsSingleTenant || dbModel.AcceptsSingleTenant;
-        dbModel.AcceptsCouple = updateModel.AcceptsCouple || dbModel.AcceptsCouple;
-        dbModel.AcceptsFamily = updateModel.AcceptsFamily || dbModel.AcceptsFamily;
-        dbModel.AcceptsPets = updateModel.AcceptsPets || dbModel.AcceptsPets;
-        dbModel.AcceptsBenefits = updateModel.AcceptsBenefits || dbModel.AcceptsBenefits;
-        dbModel.AcceptsNotEET = updateModel.AcceptsNotEET || dbModel.AcceptsNotEET;
-        dbModel.AcceptsWithoutGuarantor = updateModel.AcceptsWithoutGuarantor || dbModel.AcceptsWithoutGuarantor;
+        dbModel.AcceptsSingleTenant = updateModel.AcceptsSingleTenant ?? dbModel.AcceptsSingleTenant;
+        dbModel.AcceptsCouple = updateModel.AcceptsCouple ?? dbModel.AcceptsCouple;
+        dbModel.AcceptsFamily = updateModel.AcceptsFamily ?? dbModel.AcceptsFamily;
+        dbModel.AcceptsPets = updateModel.AcceptsPets ?? dbModel.AcceptsPets;
+        dbModel.AcceptsBenefits = updateModel.AcceptsBenefits ?? dbModel.AcceptsBenefits;
+        dbModel.AcceptsNotEET = updateModel.AcceptsNotEET ?? dbModel.AcceptsNotEET;
+        dbModel.AcceptsWithoutGuarantor = updateModel.AcceptsWithoutGuarantor ?? dbModel.AcceptsWithoutGuarantor;
 
         dbModel.Rent = updateModel.Rent ?? dbModel.Rent;
 
@@ -126,12 +126,14 @@ public class PropertyService : IPropertyService{
         {
             return true;
         }
+
         var propertyLandlordId = GetPropertyByPropertyId(propertyId)!.LandlordId;
         var userLandlordId = currentUser.LandlordId;
         if (propertyLandlordId == userLandlordId)
         {
             return true;
         }
+
         return false;
     }
 }

@@ -3,7 +3,8 @@
 namespace BricksAndHearts.Database;
 
 [Table("Property")]
-public class PropertyDbModel{
+public class PropertyDbModel
+{
     // Backend
     public int Id { get; set; }
     public int LandlordId { get; set; }
@@ -27,13 +28,13 @@ public class PropertyDbModel{
     public string? Description { get; set; }
 
     // Tenant profile
-    public bool AcceptsSingleTenant { get; set; }
-    public bool AcceptsCouple { get; set; }
-    public bool AcceptsFamily { get; set; }
-    public bool AcceptsPets { get; set; }
-    public bool AcceptsBenefits { get; set; }
-    public bool AcceptsNotEET { get; set; }
-    public bool AcceptsWithoutGuarantor { get; set; }
+    public bool? AcceptsSingleTenant { get; set; }
+    public bool? AcceptsCouple { get; set; }
+    public bool? AcceptsFamily { get; set; }
+    public bool? AcceptsPets { get; set; }
+    public bool? AcceptsBenefits { get; set; }
+    public bool? AcceptsNotEET { get; set; }
+    public bool? AcceptsWithoutGuarantor { get; set; }
 
     // Rent, deposits, and duration
     public int? Rent { get; set; }

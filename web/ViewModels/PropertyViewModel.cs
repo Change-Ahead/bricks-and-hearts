@@ -4,7 +4,8 @@ using BricksAndHearts.Database;
 
 namespace BricksAndHearts.ViewModels;
 
-public class PropertyViewModel{
+public class PropertyViewModel
+{
     // Backend info
     public int PropertyId;
     public DateTime? CreationTime { get; set; }
@@ -29,13 +30,13 @@ public class PropertyViewModel{
 
 
     // Tenant profile
-    public bool AcceptsSingleTenant { get; set; }
-    public bool AcceptsCouple { get; set; }
-    public bool AcceptsFamily { get; set; }
-    public bool AcceptsPets { get; set; }
-    public bool AcceptsBenefits { get; set; }
-    public bool AcceptsNotEET { get; set; }
-    public bool AcceptsWithoutGuarantor { get; set; }
+    public bool? AcceptsSingleTenant { get; set; }
+    public bool? AcceptsCouple { get; set; }
+    public bool? AcceptsFamily { get; set; }
+    public bool? AcceptsPets { get; set; }
+    public bool? AcceptsBenefits { get; set; }
+    public bool? AcceptsNotEET { get; set; }
+    public bool? AcceptsWithoutGuarantor { get; set; }
 
 
     // Rent, deposits, and duration
@@ -73,7 +74,8 @@ public class PropertyViewModel{
     }
 }
 
-public class PropertyAddress{
+public class PropertyAddress
+{
     [StringLength(10000)]
     public string? AddressLine1 { get; set; }
 
