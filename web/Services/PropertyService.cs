@@ -11,7 +11,7 @@ public interface IPropertyService
     public int AddNewProperty(int landlordId, PropertyViewModel createModel, bool isIncomplete = true);
     public void UpdateProperty(int propertyId, PropertyViewModel updateModel, bool isIncomplete = true);
     public void DeleteProperty(PropertyDbModel property);
-    public PropertyDbModel? GetIncompleteProperty(int landlordId);
+    /*public PropertyDbModel? GetIncompleteProperty(int landlordId);*/
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId);
     public void ChangePropertyToIncomplete(PropertyDbModel property);
     public void ChangePropertyToComplete(PropertyDbModel property);
@@ -151,11 +151,11 @@ public class PropertyService : IPropertyService
         _dbContext.SaveChanges();
     }
 
-    public PropertyDbModel? GetIncompleteProperty(int landlordId)
+    /*public PropertyDbModel? GetIncompleteProperty(int landlordId)
     {
         // Only one property for each landlord is allowed to be incomplete at a time
         return _dbContext.Properties.SingleOrDefault(p => p.LandlordId == landlordId && p.IsIncomplete == true);
-    }
+    }*/
 
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId)
     {

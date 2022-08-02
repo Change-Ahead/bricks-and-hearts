@@ -72,7 +72,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <form method="post" asp-controller="Property" asp-action="AddNewProperty_Cancel">
+                <form method="post" asp-controller="Property" asp-action="AddNewProperty_Cancel" asp-route-id="@Model.Property.PropertyId">
                     <input type="submit" value="Cancel" class="btn btn-danger"/>
                 </form>
             </div>

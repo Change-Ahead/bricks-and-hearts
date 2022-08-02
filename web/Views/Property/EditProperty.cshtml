@@ -15,7 +15,7 @@
     </div>
 }
 
-<form method="post" class="w-50" asp-controller="Property" asp-action="EditProperty_Continue" asp-route-step="@Model.Step">
+<form method="post" class="w-50" asp-controller="Property" asp-action="EditProperty_Continue" asp-route-step="@Model.Step" asp-route-propertyId="@Model.Property.PropertyId">
         <partial name=@("_AddFormStep" + Model.Step) model="Model.Property"/>
 
     <div class="mt-4">
@@ -46,7 +46,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <form method="post" asp-controller="Property" asp-action="EditProperty_Cancel">
+                <form method="post" asp-controller="Property" asp-action="EditProperty_Cancel" asp-route-id="@Model.Property.PropertyId">
                     <input type="submit" value="Cancel" class="btn btn-danger"/>
                 </form>
             </div>
