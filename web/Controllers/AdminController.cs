@@ -65,7 +65,7 @@ public class AdminController : AbstractController
     public async Task<IActionResult> AdminList()
     {
         var adminLists = await _adminService.GetAdminLists();
-        var adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
+        AdminListModel adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
         return View(adminListModel);
     }
 

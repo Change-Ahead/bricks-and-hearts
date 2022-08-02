@@ -14,19 +14,20 @@ public class PropertyController : AbstractController
     private readonly IPropertyService _propertyService;
     private readonly IAzureMapsApiService _azureMapsApiService;
     private readonly ILogger<PropertyController> _logger;
+    private readonly IAzureStorage _azureStorage;
 
-    public PropertyController(IPropertyService propertyService, IAzureMapsApiService azureMapsApiService, ILogger<PropertyController> logger)
+    public PropertyController(IPropertyService propertyService, IAzureMapsApiService azureMapsApiService, ILogger<PropertyController> logger, IAzureStorage azureStorage)
     {
         _propertyService = propertyService;
         _azureMapsApiService = azureMapsApiService;
         _logger = logger;
+        _azureStorage = azureStorage;
     }
 
     [Authorize(Roles = "Landlord")]
     [HttpGet("add")]
     public ActionResult AddNewProperty_Begin()
     {
-        // Start at step 1
         return AddNewProperty_Continue(1);
     }
 
@@ -35,14 +36,12 @@ public class PropertyController : AbstractController
     public ActionResult AddNewProperty_Continue([FromRoute] int step)
     {
         var landlordId = GetCurrentUser().LandlordId!.Value;
-
-        // See if we're already adding a property
+        
         var dbModel = _propertyService.GetIncompleteProperty(landlordId);
         var property = dbModel == null
             ? new PropertyViewModel { Address = new PropertyAddress() }
             : PropertyViewModel.FromDbModel(dbModel);
-
-        // Show the form for this step
+        
         return View("AddNewProperty", new AddNewPropertyViewModel { Step = step, Property = property });
     }
 
@@ -56,8 +55,7 @@ public class PropertyController : AbstractController
         {
             return View("AddNewProperty", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
         }
-
-        // Get the property we're currently adding
+        
         var property = _propertyService.GetIncompleteProperty(landlordId);
         if (newPropertyModel.Address.Postcode != null)
         {
@@ -94,14 +92,11 @@ public class PropertyController : AbstractController
         {
             if (property == null)
             {
-                // No property in progress
                 return RedirectToAction("ViewProperties", "Landlord");
             }
             
             // Update the property's record with the values entered at this step
             _propertyService.UpdateProperty(property.Id, newPropertyModel, isIncomplete: true);
-
-            // Go to next step
             return RedirectToAction("AddNewProperty_Continue", new { step = step + 1 });
         }
         else
@@ -114,33 +109,26 @@ public class PropertyController : AbstractController
             
             // Update the property's record with the final set of values
             _propertyService.UpdateProperty(property.Id, newPropertyModel, isIncomplete: false);
-
-            // Finished adding property, so go to View Properties page
             return RedirectToAction("ViewProperties", "Landlord");
         }
     }
 
     [Authorize(Roles = "Landlord")]
     [HttpPost("add/cancel")]
-    public ActionResult AddNewProperty_Cancel()
+    public async Task<ActionResult> AddNewProperty_Cancel()
     {
         var landlordId = GetCurrentUser().LandlordId!.Value;
-
-        // Get the property we're currently adding
         var property = _propertyService.GetIncompleteProperty(landlordId);
         if (property == null)
         {
-            // No property in progress
             return RedirectToAction("ViewProperties", "Landlord");
         }
-
-        // Delete partially complete property
         _propertyService.DeleteProperty(property);
-
-        // Go to View Properties page
+        await _azureStorage.DeleteContainer("property", property.Id);
+        
         return RedirectToAction("ViewProperties", "Landlord");
     }
-
+    
     [HttpGet]
     [Route("/property/{propertyId:int}/view")]
     public ActionResult ViewProperty(int propertyId)
@@ -151,7 +139,74 @@ public class PropertyController : AbstractController
             _logger.LogWarning("Property with ID {PropertyId} does not exist", propertyId);
             return RedirectToAction("Error", "Home", new { status = 404 });
         }
-        var propertyViewModel = PropertyViewModel.FromDbModel(model);
+        PropertyViewModel propertyViewModel = PropertyViewModel.FromDbModel(model);
         return View(propertyViewModel);
+    }
+
+    [Authorize(Roles = "Landlord, Admin")]
+    [HttpGet]
+    public async Task<IActionResult> ListPropertyImages(int propertyId)
+    {
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
+        {
+            return StatusCode(403);
+        }
+        ImageListViewModel imageList = await _azureStorage.ListFiles("property", propertyId);
+        return View(imageList);
+    }
+    
+    [Authorize(Roles = "Landlord, Admin")]
+    [HttpPost("addImage")]
+    public async Task<IActionResult> AddPropertyImages(List<IFormFile> images, int propertyId)
+    {
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
+        {
+            return StatusCode(403);
+        }
+        foreach (var image in images)
+        {
+            if (image.Length > 0)
+            {
+                await _azureStorage.UploadFile(image, "property", propertyId);
+            }
+            else
+            {
+                FlashMessage(_logger,
+                    ($"File {image.FileName} has length zero",
+                        "danger",
+                        "File contains no data"));
+            }
+        }
+        return RedirectToAction("ListPropertyImages", "Property", new{propertyId});
+    }
+    
+    [Authorize(Roles = "Landlord, Admin")]
+    [HttpPost("displayImage")]
+    public async Task<IActionResult> DisplayPropertyImage(int propertyId, string fileName)
+    {
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
+        {
+            return StatusCode(403);
+        }
+        var image = await _azureStorage.DownloadFile("property", propertyId, fileName);
+        if (image == (null, null))
+        {
+            return StatusCode(404);
+        }
+        var data = image.data;
+        var fileType = image.fileType;
+        return File(data!, $"image/{fileType}");
+    }
+    
+    [Authorize(Roles = "Landlord, Admin")]
+    [HttpPost("deleteImage")]
+    public async Task<IActionResult> DeletePropertyImage(int propertyId, string fileName)
+    {
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
+        {
+            return StatusCode(403);
+        }
+        await _azureStorage.DeleteFile("property", propertyId, fileName);
+        return RedirectToAction("ListPropertyImages", "Property", new{propertyId});
     }
 }

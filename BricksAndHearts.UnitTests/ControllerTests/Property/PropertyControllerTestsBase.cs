@@ -1,9 +1,11 @@
 ﻿using System;
+using System.IO;
 using BricksAndHearts.Controllers;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Property;
@@ -12,6 +14,7 @@ public class PropertyControllerTestsBase : ControllerTestsBase
 {
     protected readonly IPropertyService PropertyService;
     protected readonly IAzureMapsApiService AzureMapsApiService;
+    protected readonly IAzureStorage AzureStorage;
     protected readonly PropertyController UnderTest;
     protected readonly ILogger<PropertyController> Logger;
 
@@ -19,8 +22,9 @@ public class PropertyControllerTestsBase : ControllerTestsBase
     {
         PropertyService = A.Fake<IPropertyService>();
         AzureMapsApiService = A.Fake<IAzureMapsApiService>();
+        AzureStorage = A.Fake<IAzureStorage>();
         Logger = A.Fake<ILogger<PropertyController>>();
-        UnderTest = new PropertyController(PropertyService, AzureMapsApiService, Logger);
+        UnderTest = new PropertyController(PropertyService, AzureMapsApiService, Logger, AzureStorage);
     }
 
     protected PropertyViewModel CreateExamplePropertyViewModel()
@@ -55,5 +59,12 @@ public class PropertyControllerTestsBase : ControllerTestsBase
             Rent = 750,
             Description = "Property description"
         };
+    }
+
+    protected IFormFile CreateExampleImage()
+    {
+        var stream = new MemoryStream();
+        IFormFile fakeImage = new FormFile(stream, 0, 1, null!, "fakeImage.jpeg");
+        return fakeImage;
     }
 }
