@@ -152,23 +152,31 @@ public class LandlordController : AbstractController
     }
 
     [HttpGet]
-    [Route("/properties")]
-    public IActionResult ViewProperties()
+    [Route("me/properties")]
+    [Route("{id:int}/properties")]
+    public IActionResult ViewProperties(int? id = null)
     {
-        var landlordId = GetCurrentUser().LandlordId;
-        if (!landlordId.HasValue)
+        if (id == null)
+        {
+            id = GetCurrentUser().LandlordId;
+            if (id == null)
+            {
+                return StatusCode(404);
+            }
+        }
+        else if (!GetCurrentUser().IsAdmin && id != GetCurrentUser().LandlordId)
         {
             return StatusCode(403);
         }
 
-        var databaseResult = _propertyService.GetPropertiesByLandlord(landlordId.Value);
+        var databaseResult = _propertyService.GetPropertiesByLandlord(id.Value);
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
         return View("Properties", new PropertiesDashboardViewModel(listOfProperties));
     }
 
     [HttpGet]
     [Route("{landlordId:int}/edit")]
-    public async Task<ActionResult> EditProfilePage(int landlordId)
+    public async Task<ActionResult> EditProfilePage(int? landlordId)
     {
         var user = GetCurrentUser();
         var landlordFromDb = await _landlordService.GetLandlordIfExistsFromId(landlordId);
@@ -190,11 +198,16 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> EditProfileUpdate([FromForm] LandlordProfileModel editModel)
     {
         var user = GetCurrentUser();
-        if (!ModelState.IsValid) return StatusCode(404);
+        if (!ModelState.IsValid)
+        {
+            return StatusCode(404);
+        }
+
         if (user.LandlordId != editModel.LandlordId && !user.IsAdmin)
         {
             return StatusCode(403);
         }
+
         var isEmailDuplicated = _landlordService.CheckForDuplicateEmail(editModel);
         if (isEmailDuplicated)
         {

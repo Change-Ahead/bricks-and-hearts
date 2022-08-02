@@ -1,59 +1,76 @@
 html {
-  font-size: 14px;
+    font-size: 14px;
 }
 
 @media (min-width: 768px) {
-  html {
-    font-size: 16px;
-  }
+    html {
+        font-size: 16px;
+    }
 }
 
 html {
-  position: relative;
-  min-height: 100%;
+    position: relative;
+    min-height: 100%;
 }
 
 body {
-  margin-bottom: 60px;
+    margin-bottom: 60px;
 }
 
-.test{
-  display: table-cell;
-  padding-right: 3%;
+.test {
+    display: table-cell;
+    padding-right: 3%;
 }
 
-.form-group my-3{
-  display: table;
+.form-group my-3 {
+    display: table;
 }
 
 /* Mark input boxes that gets an error on validation: */
 input.invalid {
-  background-color: #ffdddd;
+    background-color: #ffdddd;
 }
 
 /* Hide all steps by default: */
 .registerTab {
-  display: none;
+    display: none;
 }
 
 /* Make circles that indicate the steps of the form: */
 .step {
-  height: 15px;
-  width: 15px;
-  margin: 0 2px;
-  background-color: #bbbbbb;
-  border: none;
-  border-radius: 50%;
-  display: inline-block;
-  opacity: 0.5;
+    height: 15px;
+    width: 15px;
+    margin: 0 2px;
+    background-color: #bbbbbb;
+    border: none;
+    border-radius: 50%;
+    display: inline-block;
+    opacity: 0.5;
 }
 
 /* Mark the active step: */
 .step.active {
-  opacity: 1;
+    opacity: 1;
 }
 
 /* Mark the steps that are finished and valid: */
 .step.finish {
   background-color: blue;
+}
+
+.tables {
+    display: inline-block;
+    clear: both;
+}
+
+.tables .table {
+    width: 100%;
+}
+
+.hidden-button {
+    display: none;
+}
+
+.bi {
+    cursor: pointer;
 }

@@ -1,9 +1,12 @@
+using System.Linq;
+using BricksAndHearts.Controllers;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
@@ -85,9 +88,9 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var adminUser = CreateAdminUser();
         LandlordDbModel? fakeNullLandlord = null;
         MakeUserPrincipalInController(adminUser, UnderTest);
+        A.CallTo(() => LandlordService.GetLandlordIfExistsFromId(A<int>._)).Returns(fakeNullLandlord);
 
         // Act
-        A.CallTo(() => LandlordService.GetLandlordIfExistsFromId(A<int>._)).Returns(fakeNullLandlord);
         var result = UnderTest.EditProfilePage(1000).Result;
 
         // Assert   
@@ -115,11 +118,11 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
         var landlordProfileModel = CreateTestLandlordProfileModel();
-
-        // Act
         A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(false);
         A.CallTo(() => LandlordService.EditLandlordDetails(landlordProfileModel))
             .Returns(ILandlordService.LandlordRegistrationResult.Success);
+
+        // Act
         var result = UnderTest.EditProfileUpdate(landlordProfileModel).Result;
 
         // Assert   
@@ -134,9 +137,9 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
         var landlordProfileModel = CreateTestLandlordProfileModel();
+        A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(true);
 
         // Act
-        A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(true);
         var result = UnderTest.EditProfileUpdate(landlordProfileModel).Result as ViewResult;
 
         // Assert   
@@ -173,5 +176,47 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
         // Assert   
         result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(404);
+    }
+
+    [Fact]
+    public void ViewProperties_CalledByAdmin_CanReturnOtherUsersPropertyList()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        adminUser.Id = 1;
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        A.CallTo(() => PropertyService.GetPropertiesByLandlord(2))
+            .Returns(A.CollectionOfFake<PropertyDbModel>(10).ToList());
+
+        // Act
+        var result = UnderTest.ViewProperties(2) as ViewResult;
+
+        // Assert
+        result.Should().BeOfType<ViewResult>();
+        result.Should().NotBeNull();
+        result!.Model.Should().BeOfType<PropertiesDashboardViewModel>();
+        result.Model.As<PropertiesDashboardViewModel>().Properties.Count.Should()
+            .Be(10);
+    }
+
+    [Fact]
+    public void ViewProperties_CalledByNonAdmin_CannotReturnOtherUsersPropertyList()
+    {
+        // Arrange
+        var unregisteredUser = CreateUnregisteredUser();
+        unregisteredUser.Id = 1;
+        var fakeLandlordService = A.Fake<ILandlordService>();
+        var fakePropertyService = A.Fake<IPropertyService>();
+        var underTest =
+            new LandlordController(A.Fake<ILogger<LandlordController>>(), fakeLandlordService, null!, null!);
+        MakeUserPrincipalInController(unregisteredUser, underTest);
+        A.CallTo(() => fakePropertyService.GetPropertiesByLandlord(2))
+            .Returns(A.CollectionOfFake<PropertyDbModel>(10).ToList());
+
+        // Act
+        var result = underTest.ViewProperties(2) as StatusCodeResult;
+        result.Should().BeOfType<StatusCodeResult>();
+        result.Should().NotBeNull();
+        result!.StatusCode.Should().Be(403);
     }
 }

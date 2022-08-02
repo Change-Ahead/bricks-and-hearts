@@ -27,13 +27,14 @@
         <th scope="col">Company Name</th>
         <th scope="col">Charter Provided by Landlord?</th>
         <th scope="col">Charter Approval Status</th>
+        <th scope="col">Profile</th>
+        <th scope="col">Properties</th>
     </tr>
     </thead>
     <tbody>
     @foreach (var landlord in Model.LandlordDisplayList!)
     {
-        <tr class ="clickable"
-            onclick="location.href = '@Url.Action("Profile", "Landlord", new { id = landlord!.Id })'">
+        <tr>
             <td>@landlord.FirstName</td>
             <td>@landlord.LastName</td>
             <td>@landlord.CompanyName</td>
@@ -53,6 +54,17 @@
             {
                 <td>Pending</td>
             }
+
+            <td>
+                <a type="button" class="btn btn-outline-primary" value="@landlord.Id" href="@Url.Action("Profile", "Landlord", new { id = landlord.Id })">
+                    <i class="bi bi-person"></i>
+                </a>
+            </td>
+            <td>
+                <a type="button" class="btn btn-outline-primary" href="@Url.Action("ViewProperties", "Landlord", new { id = landlord.Id })">
+                    <i class="bi bi-house"></i>
+                </a>
+            </td>
         </tr>
     }
     </tbody>

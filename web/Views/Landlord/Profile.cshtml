@@ -43,14 +43,16 @@
         }
     }
     <h4>Landlord</h4>
-    
+
     <hr/>
     <div class="col-lg-5">
         <div class="d-flex p-2 justify-content-between">
             <h4>Personal details</h4>
-            <td><input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new{landlordId = Model.LandlordId})'; setCurrentTab(0);" /></td>
+            <td>
+                <input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(0);"/>
+            </td>
         </div>
-    
+
         <div class="tables">
             <table class="table table-bordered">
                 <tbody>
@@ -69,9 +71,11 @@
     <div class="col-lg-5">
         <div class="d-flex p-2 justify-content-between">
             <h4>Landlord details</h4>
-            <td><input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", new{landlordId = Model.LandlordId})'; setCurrentTab(1);" /></td>
+            <td>
+                <input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", new { landlordId = Model.LandlordId })'; setCurrentTab(1);"/>
+            </td>
         </div>
-    
+
         <div class="tables">
             <table class="table table-bordered">
                 <tbody>
@@ -86,7 +90,9 @@
     <div class="col-lg-5">
         <div class="d-flex p-2 justify-content-between">
             <h4>Contact details</h4>
-            <td><input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", new{landlordId = Model.LandlordId})'; setCurrentTab(2);" /></td>
+            <td>
+                <input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", new { landlordId = Model.LandlordId })'; setCurrentTab(2);"/>
+            </td>
         </div>
         <div class="tables">
             <table class="table table-bordered">
@@ -102,8 +108,15 @@
             </table>
         </div>
     </div>
-    
-    <div class="container-md">
+    <div class="col-lg-5">
+        @if (User.IsInRole("Admin"))
+        {
+            <h4>Landlord Properties</h4>
+            <a class="btn btn-outline-primary" href='@Url.Action("ViewProperties", "Landlord", new { id = Model.LandlordId })'><i class="bi bi-house"></i> View Properties</a>
+            <br/>
+        }
+    </div>
+    <div class="col-lg-5">
         <h4>ChangeAhead Charter</h4>
         @if (Model.CharterApproved)
         {
@@ -121,7 +134,7 @@
                 }
             }
         }
-        
+
         @if (User.IsInRole("Admin"))
         {
             @using (Html.BeginForm("GetInviteLink", "Admin", new { landlordId = Model.LandlordId }, FormMethod.Post))

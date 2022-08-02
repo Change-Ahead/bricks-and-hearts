@@ -15,14 +15,12 @@ public interface ILandlordService
         Success
     }
 
-    public Task<(LandlordRegistrationResult result, LandlordDbModel? dbModel)> RegisterLandlord(
-        LandlordProfileModel createModel,
+    public Task<(LandlordRegistrationResult result, LandlordDbModel? dbModel)> RegisterLandlord(LandlordProfileModel createModel,
         BricksAndHeartsUser user);
-
-    public Task<(LandlordRegistrationResult result, LandlordDbModel? landlord)> RegisterLandlord(
+public Task<(LandlordRegistrationResult result, LandlordDbModel? landlord)> RegisterLandlord(
         LandlordProfileModel createModel);
 
-    public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int id);
+    public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int? id);
     public Task<LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel);
     public bool CheckForDuplicateEmail(LandlordProfileModel editModel);
     public Task<string> ApproveLandlord(int landlordId, BricksAndHeartsUser user);
@@ -85,7 +83,7 @@ public class LandlordService : ILandlordService
         return (ILandlordService.LandlordRegistrationResult.Success, dbModel);
     }
 
-    public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int id)
+    public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int? id)
     {
         return _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id);
     }
@@ -130,6 +128,7 @@ public class LandlordService : ILandlordService
         {
             return "Sorry, it appears that no landlord with this ID exists";
         }
+
         if (landlord.CharterApproved)
         {
             return $"The Landlord Charter for {landlord.FirstName} {landlord.LastName} has already been approved.";
@@ -147,7 +146,7 @@ public class LandlordService : ILandlordService
         var landlord = await _dbContext.Landlords.SingleOrDefaultAsync(l => l.Email == model.Email);
         return landlord;
     }
-    
+
     public async Task<ILandlordService.LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel)
     {
         var landlordToEdit = await _dbContext.Landlords.SingleAsync(l => l.Id == editModel.LandlordId);
