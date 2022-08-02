@@ -52,6 +52,7 @@ public class PropertyControllerTestsBase : ControllerTestsBase
     {
         return new PropertyDbModel
         {
+            LandlordId = 1,
             Id = 1,
             AddressLine1 = "10 Downing Street",
             Postcode = "SW1A 2AA",

@@ -47,7 +47,7 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord")]
     [HttpPost("add/step/{step:int}")]
-    public async Task<IActionResult> AddNewProperty_Continue([FromRoute] int step, [FromForm] PropertyViewModel newPropertyModel)
+    public async Task<ActionResult> AddNewProperty_Continue([FromRoute] int step, [FromForm] PropertyViewModel newPropertyModel)
     {
         var landlordId = GetCurrentUser().LandlordId!.Value;
 
@@ -123,12 +123,39 @@ public class PropertyController : AbstractController
         {
             return RedirectToAction("ViewProperties", "Landlord");
         }
+
+        // Delete partially complete property
         _propertyService.DeleteProperty(property);
         await _azureStorage.DeleteContainer("property", property.Id);
         
         return RedirectToAction("ViewProperties", "Landlord");
     }
     
+    [HttpPost]
+    [Authorize(Roles = "Landlord, Admin")]
+    public ActionResult DeleteProperty(int propertyId)
+    {
+        PropertyDbModel? propDB = _propertyService.GetPropertyByPropertyId(propertyId);
+        if (propDB == null)
+        {
+            _logger.LogWarning("Property with ID {PropertyId} does not exist", propertyId);
+            return StatusCode(404);
+        }
+
+        if (GetCurrentUser().IsAdmin == false & GetCurrentUser().LandlordId != propDB.LandlordId)
+        {
+            _logger.LogWarning("You do not have access to any property with ID {PropertyId}.", propertyId);
+            return StatusCode(404);
+        }
+
+        // Delete property
+        _propertyService.DeleteProperty(propDB);
+
+        // Go to View Properties page
+        return RedirectToAction("ViewProperties", "Landlord");
+    }
+
+
     [HttpGet]
     [Route("/property/{propertyId:int}/view")]
     public ActionResult ViewProperty(int propertyId)

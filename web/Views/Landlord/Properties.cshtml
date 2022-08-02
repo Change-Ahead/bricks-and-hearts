@@ -13,6 +13,7 @@
         <th scope="col">Address</th>
         <th scope="col">Type</th>
         <th scope="col"># of Bedrooms</th>
+        <th scope="col">Created</th>
         <th scope="col">Rent (pcm)</th>
         <th scope="col">Description</th>
         <th scope="col"></th>
@@ -37,8 +38,10 @@
             </td>
             <td>@prop.PropertyType</td>
             <td>@prop.NumOfBedrooms</td>
+            <td>@prop.CreationTime</td>
             <td>@prop.Rent</td>
             <td>@prop.Description</td>
+            <td>@Html.ActionLink("View","ViewProperty","Property", new { propertyId = @prop.PropertyId })</td>
         </tr>
         i++;
     }
