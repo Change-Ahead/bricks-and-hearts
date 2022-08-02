@@ -56,12 +56,12 @@
             }
 
             <td>
-                <a type="button" value="@landlord.Id" href="@Url.Action("Profile", "Landlord", new { id = landlord.Id })">
+                <a type="button" class="btn btn-outline-primary" value="@landlord.Id" href="@Url.Action("Profile", "Landlord", new { id = landlord.Id })">
                     <i class="bi bi-person"></i>
                 </a>
             </td>
             <td>
-                <a type="button" href="@Url.Action("ViewProperties", "Landlord", new { id = landlord.Id })">
+                <a type="button" class="btn btn-outline-primary" href="@Url.Action("ViewProperties", "Landlord", new { id = landlord.Id })">
                     <i class="bi bi-house"></i>
                 </a>
             </td>
