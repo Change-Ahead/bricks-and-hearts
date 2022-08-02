@@ -1,5 +1,6 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using BricksAndHearts.ViewModels;
 
 namespace BricksAndHearts.Services
 {
@@ -7,7 +8,7 @@ namespace BricksAndHearts.Services
     {
         Task DeleteContainer(string varType, int id);
         Task UploadFile(IFormFile file, string varType, int id);
-        Task<List<string>> ListFiles(string varType, int id);
+        Task<ImageListViewModel> ListFiles(string varType, int id);
         Task<(Stream? data, string? fileType)> DownloadFile(string varType, int id, string blobFilename);
         Task DeleteFile(string varType, int id, string blobFilename);
     }
@@ -66,16 +67,20 @@ namespace BricksAndHearts.Services
             }
         }
 
-        public async Task<List<string>> ListFiles(string varType, int id)
+        public async Task<ImageListViewModel> ListFiles(string varType, int id)
         {
             var containerClient = await GetOrCreateContainerClient(varType, id);
             List<string> fileNames = new List<string>();
-            fileNames.Add(id.ToString());
             await foreach (BlobItem file in containerClient.GetBlobsAsync())
             {
                 fileNames.Add(file.Name);
             }
-            return fileNames;
+            ImageListViewModel imageList = new ImageListViewModel()
+            {
+                PropertyId = id,
+                FileList = fileNames
+            };
+            return imageList;
         }
 
         public async Task<(Stream?, string?)> DownloadFile(string varType, int id, string blobName)

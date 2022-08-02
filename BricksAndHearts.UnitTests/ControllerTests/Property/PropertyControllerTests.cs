@@ -316,8 +316,13 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
+        A.CallTo(() => PropertyService.IsUserAdminOrCorrectLandlord(adminUser, 1)).Returns(true);
 
-        var model = new List<string> { "image1", "image2" };
+        var model = new ImageListViewModel
+        {
+            PropertyId = 1,
+            FileList = new List<string> { "image1", "image2" }
+        };
         A.CallTo(() => AzureStorage.ListFiles("property", 1)).Returns(model);
 
         // Act
@@ -325,7 +330,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         // Assert
         A.CallTo(() => AzureStorage.ListFiles("property", 1)).MustHaveHappened();
-        result!.ViewData.Model.Should().BeOfType<List<string>>().And.Be(model);
+        result!.ViewData.Model.Should().BeOfType<ImageListViewModel>().And.Be(model);
     }
     
     [Fact]
@@ -334,6 +339,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
+        A.CallTo(() => PropertyService.IsUserAdminOrCorrectLandlord(adminUser, 1)).Returns(true);
 
         var fakeImage = CreateExampleImage();
         var fakeImage2 = CreateExampleImage();
@@ -354,6 +360,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
+        A.CallTo(() => PropertyService.IsUserAdminOrCorrectLandlord(adminUser, 1)).Returns(true);
         
         var fakeImage = CreateExampleImage();
         var image = (fakeImage.OpenReadStream(), "jpeg");
@@ -373,6 +380,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
+        A.CallTo(() => PropertyService.IsUserAdminOrCorrectLandlord(adminUser, 1)).Returns(true);
         
         var fakeImage = CreateExampleImage();
         

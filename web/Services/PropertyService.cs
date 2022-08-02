@@ -1,4 +1,5 @@
-﻿using BricksAndHearts.Database;
+﻿using BricksAndHearts.Auth;
+using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
 
 namespace BricksAndHearts.Services;
@@ -11,6 +12,7 @@ public interface IPropertyService
     public void DeleteProperty(PropertyDbModel property);
     public PropertyDbModel? GetIncompleteProperty(int landlordId);
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId);
+    public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId);
 
 }
 
@@ -99,4 +101,18 @@ public class PropertyService : IPropertyService
         return _dbContext.Properties.SingleOrDefault(p => p.Id == propertyId);
     }
 
+    public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId)
+    {
+        if (currentUser.IsAdmin)
+        {
+            return true;
+        }
+        var propertyLandlordId = GetPropertyByPropertyId(propertyId)!.LandlordId;
+        var userLandlordId = currentUser.LandlordId;
+        if (propertyLandlordId == userLandlordId)
+        {
+            return true;
+        }
+        return false;
+    }
 }

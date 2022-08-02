@@ -143,19 +143,23 @@ public class PropertyController : AbstractController
         return View(propertyViewModel);
     }
 
+    [Authorize(Roles = "Landlord, Admin")]
     [HttpGet]
     public async Task<IActionResult> ListPropertyImages(int propertyId)
     {
-        List<string> fileNames = await _azureStorage.ListFiles("property", propertyId);
-        return View(fileNames);
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
+        {
+            return StatusCode(403);
+        }
+        ImageListViewModel imageList = await _azureStorage.ListFiles("property", propertyId);
+        return View(imageList);
     }
     
     [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("addImage")]
     public async Task<IActionResult> AddPropertyImages(List<IFormFile> images, int propertyId)
     {
-        var user = GetCurrentUser();
-        if (!user.IsAdmin && _propertyService.GetPropertyByPropertyId(propertyId)!.LandlordId != user.LandlordId)
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
         {
             return StatusCode(403);
         }
@@ -165,13 +169,25 @@ public class PropertyController : AbstractController
             {
                 await _azureStorage.UploadFile(image, "property", propertyId);
             }
+            else
+            {
+                FlashMessage(_logger,
+                    ($"File {image.FileName} has length zero",
+                        "danger",
+                        "File contains no data"));
+            }
         }
         return RedirectToAction("ListPropertyImages", "Property", new{propertyId});
     }
     
+    [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("displayImage")]
     public async Task<IActionResult> DisplayPropertyImage(int propertyId, string fileName)
     {
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
+        {
+            return StatusCode(403);
+        }
         var image = await _azureStorage.DownloadFile("property", propertyId, fileName);
         if (image == (null, null))
         {
@@ -186,8 +202,7 @@ public class PropertyController : AbstractController
     [HttpPost("deleteImage")]
     public async Task<IActionResult> DeletePropertyImage(int propertyId, string fileName)
     {
-        var user = GetCurrentUser();
-        if (!user.IsAdmin && _propertyService.GetPropertyByPropertyId(propertyId)!.LandlordId != user.LandlordId)
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
         {
             return StatusCode(403);
         }

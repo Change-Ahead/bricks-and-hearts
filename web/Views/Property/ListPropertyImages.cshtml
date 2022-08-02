@@ -1,27 +1,27 @@
-﻿@model List<string>
+﻿@model ImageListViewModel
 
 @{
     ViewData["Title"] = "Image List";
 }
 
-<h2>Images available in container @Model[0]</h2>
+<h2>Images available for property @Model.PropertyId</h2>
 
 <table>
-    @for (int i = 1; i < Model.Count; i++)
+    @foreach (var file in Model.FileList!)
     {
         <tr>
             <td>
                 @using (Html.BeginForm("DisplayPropertyImage", "Property", FormMethod.Post))
                 {
-                    <input type="hidden" id="propertyId" name="propertyId" value=@Model[0]>
-                    <input type="hidden" id="fileName" name="fileName" value=@Model[i]>
-                    <button type="submit" class="btn btn-primary">Display @Model[i]</button>
+                    <input type="hidden" id="propertyId" name="propertyId" value=@Model.PropertyId>
+                    <input type="hidden" id="fileName" name="fileName" value=@file>
+                    <button type="submit" class="btn btn-primary">Display @file</button>
                 }
             </td>
             <td>
                 <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
-                    onclick="setValue('deleteFileName', '@Model[i]'); setValue('deletePropertyId', '@Model[0]')">
-                Delete @Model[i]
+                    onclick="setValue('deleteFileName', '@file'); setValue('deletePropertyId', '@Model.PropertyId')">
+                Delete @file
                 </button>
             </td>
         </tr>
@@ -31,7 +31,7 @@
 @using (Html.BeginForm("AddPropertyImages", "Property", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     <div>Please upload images of the property</div>
-    <input type="hidden" id="propertyId" name="propertyId" value=@Model[0]>
+    <input type="hidden" id="propertyId" name="propertyId" value=@Model.PropertyId>
     <input name="images" type="file" multiple accept="image/*">
     <input type="submit" value="Upload Image" />
 }
