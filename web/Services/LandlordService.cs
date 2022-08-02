@@ -19,7 +19,7 @@ public interface ILandlordService
     public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int id);
     public Task<LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel);
     public bool CheckForDuplicateEmail(LandlordProfileModel editModel);
-    public Task ApproveLandlord(int landlordId, BricksAndHeartsUser user);
+    public Task<string> ApproveLandlord(int landlordId, BricksAndHeartsUser user);
 
 }
 
@@ -83,21 +83,22 @@ public class LandlordService : ILandlordService
         return _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id);
     }
 
-    public async Task ApproveLandlord(int landlordId,  BricksAndHeartsUser user)
+    public async Task<string> ApproveLandlord(int landlordId,  BricksAndHeartsUser user)
     {
         var landlord = await GetLandlordIfExistsFromId(landlordId);
         if (landlord is null)
         {
-            throw new Exception("Landlord does not exist");
+            return "Sorry, it appears that no landlord with this ID exists";
         }
         if (landlord.CharterApproved)
         {
-            throw new Exception("Landlord already approved");
+            return $"The Landlord Charter for {landlord.FirstName} {landlord.LastName} has already been approved.";
         }
         landlord.CharterApproved = true;
         landlord.ApprovalTime = DateTime.Now;
         landlord.ApprovalAdminId = user.Id;
         await _dbContext.SaveChangesAsync();
+        return $"Successfully approved Landlord Charter for {landlord.FirstName} {landlord.LastName}.";
     }
     
     public async Task<ILandlordService.LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel)

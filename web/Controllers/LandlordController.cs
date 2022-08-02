@@ -123,7 +123,7 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> ApproveCharter(int landlordId)
     {
         var user = GetCurrentUser();
-        await _landlordService.ApproveLandlord(landlordId, user);
+        TempData["ApprovalSuccessMessage"] = await _landlordService.ApproveLandlord(landlordId, user);
         return RedirectToAction("Profile", "Landlord", new { Id = landlordId });
     }
 
