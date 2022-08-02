@@ -9,12 +9,12 @@ public interface IAdminService
     public void RequestAdminAccess(BricksAndHeartsUser user);
     public void CancelAdminAccessRequest(BricksAndHeartsUser user);
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
+
     public Task<List<LandlordDbModel>> GetLandlordDisplayList(string approvalStatus);
     public UserDbModel? FindUserByLandlordId(int landlordId);
     public string? FindExistingInviteLink(int landlordId);
     public string CreateNewInviteLink(int landlordId);
     public void DeleteExistingInviteLink(int landlordId);
-
 }
 
 public class AdminService : IAdminService
@@ -39,19 +39,7 @@ public class AdminService : IAdminService
         userRecord.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
     }
-
-    private async Task<List<UserDbModel>> GetCurrentAdmins()
-    {
-        var currentAdmins = await _dbContext.Users.Where(u => u.IsAdmin == true).ToListAsync();
-        return currentAdmins;
-    }
-
-    private async Task<List<UserDbModel>> GetPendingAdmins()
-    {
-        List<UserDbModel> pendingAdmins = await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
-        return pendingAdmins;
-    }
-
+    
     public async Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists()
     {
         return (await GetCurrentAdmins(), await GetPendingAdmins());
@@ -71,7 +59,7 @@ public class AdminService : IAdminService
     {
         return _dbContext.Users.SingleOrDefault(u => u.LandlordId == landlordId);
     }
-    
+
     public string? FindExistingInviteLink(int landlordId)
     {
         // Find landlord in db (assumes existence)
@@ -89,6 +77,7 @@ public class AdminService : IAdminService
         {
             throw new Exception("Landlord should not have existing invite link!");
         }
+
         var g = Guid.NewGuid();
         var inviteLink = g.ToString();
         landlord.InviteLink = inviteLink;
@@ -105,9 +94,22 @@ public class AdminService : IAdminService
         {
             throw new Exception("Landlord should have existing invite link!");
         }
-        
+
         // Delete
         landlord.InviteLink = null;
         _dbContext.SaveChanges();
+    }
+
+    private async Task<List<UserDbModel>> GetCurrentAdmins()
+    {
+        var currentAdmins = await _dbContext.Users.Where(u => u.IsAdmin == true).ToListAsync();
+        return currentAdmins;
+    }
+
+    private async Task<List<UserDbModel>> GetPendingAdmins()
+    {
+        var pendingAdmins =
+            await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
+        return pendingAdmins;
     }
 }

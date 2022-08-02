@@ -29,12 +29,9 @@ public class LandlordProfileModel
     [DisplayName("Company")]
     public string? CompanyName { get; set; }
 
-    [Required]
-    [EmailAddress]
-    public string Email { get; set; } = string.Empty;
+    [Required] [EmailAddress] public string Email { get; set; } = string.Empty;
 
-    [Phone]
-    public string Phone { get; set; } = string.Empty;
+    [Phone] public string Phone { get; set; } = string.Empty;
 
     public string LandlordStatus { get; set; } = string.Empty;
 
@@ -43,6 +40,8 @@ public class LandlordProfileModel
     public bool CharterApproved { get; set; } = false;
 
     public bool CurrentUserIsAdmin { get; set; }
+
+    public bool Unassigned { get; set; }
 
     public static LandlordProfileModel FromDbModel(LandlordDbModel landlord, BricksAndHeartsUser user)
     {

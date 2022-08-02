@@ -1,4 +1,5 @@
-﻿using BricksAndHearts.Services;
+﻿using BricksAndHearts.Database;
+using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,9 +11,9 @@ namespace BricksAndHearts.Controllers;
 public class LandlordController : AbstractController
 {
     private readonly ILandlordService _landlordService;
-    private readonly IPropertyService _propertyService;
-    private readonly IMailService _mailService;
     private readonly ILogger<LandlordController> _logger;
+    private readonly IMailService _mailService;
+    private readonly IPropertyService _propertyService;
 
     public LandlordController(ILogger<LandlordController> logger,
         ILandlordService landlordService, IPropertyService propertyService, IMailService mailService)
@@ -25,13 +26,18 @@ public class LandlordController : AbstractController
 
     [HttpGet]
     [Route("register")]
-    public ActionResult RegisterGet()
+    public ActionResult RegisterGet(bool createUnassigned = false)
     {
         var currentUser = GetCurrentUser();
-        if (currentUser.LandlordId != null)
+        if (currentUser.LandlordId != null && !currentUser.IsAdmin)
         {
             _logger.LogWarning("User {UserId} is already registered, will redirect to profile", currentUser.Id);
             return Redirect(Url.Action("MyProfile")!);
+        }
+
+        if (currentUser.IsAdmin && createUnassigned)
+        {
+            return View("Register", new LandlordProfileModel { Unassigned = true });
         }
 
         return View("Register", new LandlordProfileModel
@@ -51,29 +57,46 @@ public class LandlordController : AbstractController
         }
 
         var user = GetCurrentUser();
+        ILandlordService.LandlordRegistrationResult result;
+        LandlordDbModel? landlord = null;
 
-        var result = await _landlordService.RegisterLandlordWithUser(createModel, user);
+        if (createModel.Unassigned == false)
+        {
+            (result, landlord) = await _landlordService.RegisterLandlord(createModel, user);
+        }
+        else if (createModel.Unassigned && user.IsAdmin)
+        {
+            (result, landlord) = await _landlordService.RegisterLandlord(createModel);
+        }
+        else
+        {
+            return StatusCode(403);
+        }
 
         switch (result)
         {
             case ILandlordService.LandlordRegistrationResult.Success:
                 _logger.LogInformation("Successfully created landlord for user {UserId}", user.Id);
-                string msgBody = $"A Landlord has just registered\n"
-                                 + "\n"
-                                 + $"Title: {createModel.Title}\n"
-                                 + $"First Name: {createModel.FirstName}" + "\n"
-                                 + $"Last Name: {createModel.LastName}" + "\n"
-                                 + $"Company Name: {createModel.CompanyName}" + "\n"
-                                 + $"Email: {createModel.Email}" + "\n"
-                                 + $"Phone: {createModel.Phone}" + "\n";
+                var msgBody = "A Landlord has just registered\n"
+                              + "\n"
+                              + $"Title: {createModel.Title}\n"
+                              + $"First Name: {createModel.FirstName}" + "\n"
+                              + $"Last Name: {createModel.LastName}" + "\n"
+                              + $"Company Name: {createModel.CompanyName}" + "\n"
+                              + $"Email: {createModel.Email}" + "\n"
+                              + $"Phone: {createModel.Phone}" + "\n";
                 _mailService.SendMsg(msgBody);
+                if (!createModel.Unassigned)
+                {
+                    return RedirectToAction("MyProfile");
+                }
 
-                return Redirect(Url.Action("MyProfile")!);
+                return RedirectToAction("Profile", "Landlord", new { landlord!.Id });
 
             case ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered:
                 _logger.LogWarning("Email already registered {Email}", createModel.Email);
                 ModelState.AddModelError("Email", "Email already registered");
-                return View("Register");
+                return View("Register", createModel);
 
             case ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord:
                 _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
@@ -90,6 +113,7 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> Profile([FromRoute] int id)
     {
         var user = GetCurrentUser();
+
         if (user.LandlordId != id && !user.IsAdmin)
         {
             return StatusCode(403);
@@ -117,8 +141,8 @@ public class LandlordController : AbstractController
 
         return await Profile(landlordId.Value);
     }
-    
-    [Authorize(Roles="Admin")]
+
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public async Task<ActionResult> ApproveCharter(int landlordId)
     {
@@ -147,9 +171,17 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> EditProfilePage(int landlordId)
     {
         var user = GetCurrentUser();
-        var landlordFromDb =  await _landlordService.GetLandlordIfExistsFromId(landlordId);
-        if (landlordFromDb == null) return StatusCode(404);
-        if (user.LandlordId != landlordFromDb.Id && !user.IsAdmin) return StatusCode(403);
+        var landlordFromDb = await _landlordService.GetLandlordIfExistsFromId(landlordId);
+        if (landlordFromDb == null)
+        {
+            return StatusCode(404);
+        }
+
+        if (user.LandlordId != landlordFromDb.Id && !user.IsAdmin)
+        {
+            return StatusCode(403);
+        }
+
         return View("EditProfilePage", LandlordProfileModel.FromDbModel(landlordFromDb, user));
     }
 
@@ -159,7 +191,10 @@ public class LandlordController : AbstractController
     {
         var user = GetCurrentUser();
         if (!ModelState.IsValid) return StatusCode(404);
-        if (user.LandlordId != editModel.LandlordId && !user.IsAdmin) return StatusCode(403);
+        if (user.LandlordId != editModel.LandlordId && !user.IsAdmin)
+        {
+            return StatusCode(403);
+        }
         var isEmailDuplicated = _landlordService.CheckForDuplicateEmail(editModel);
         if (isEmailDuplicated)
         {
@@ -170,6 +205,6 @@ public class LandlordController : AbstractController
 
         await _landlordService.EditLandlordDetails(editModel);
         _logger.LogInformation("Successfully edited landlord for landlord {LandlordId}", editModel.LandlordId);
-        return RedirectToAction("Profile", new{id = editModel.LandlordId});
+        return RedirectToAction("Profile", new { id = editModel.LandlordId });
     }
 }

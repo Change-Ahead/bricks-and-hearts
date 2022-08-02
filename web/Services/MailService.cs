@@ -15,7 +15,7 @@ public interface IMailService
     );
 }
 
-public class MailService: IMailService
+public class MailService : IMailService
 {
     private readonly IOptions<EmailConfigOptions> _config;
 
@@ -23,7 +23,7 @@ public class MailService: IMailService
     {
         _config = config;
     }
-    
+
     public void SendMsg(
         string msgBody = "Hi",
         string subject = "From Softwire Intern Alice",
@@ -31,8 +31,8 @@ public class MailService: IMailService
         string msgToName = ""
     )
     {
-        var msgFromAddress = _config.Value.FromAddress; 
-        
+        var msgFromAddress = _config.Value.FromAddress;
+
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(msgFromName, msgFromAddress));
         message.Subject = subject;
@@ -41,9 +41,7 @@ public class MailService: IMailService
             Text = msgBody
         };
         foreach (var msgToAddress in _config.Value.ToAddress)
-        {
             message.To.Add(new MailboxAddress(msgToName, msgToAddress));
-        }
 
         using var client = new SmtpClient();
         client.Connect(_config.Value.Host, _config.Value.Port, true);
