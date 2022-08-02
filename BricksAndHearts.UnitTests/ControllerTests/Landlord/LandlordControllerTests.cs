@@ -194,12 +194,9 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Assert
         result.Should().BeOfType<ViewResult>();
         result.Should().NotBeNull();
-        if (result != null)
-        {
-            result!.Model.Should().BeOfType<PropertiesDashboardViewModel>();
-            result.Model.As<PropertiesDashboardViewModel>().Properties.Count.Should()
-                .Be(10);
-        }
+        result!.Model.Should().BeOfType<PropertiesDashboardViewModel>();
+        result.Model.As<PropertiesDashboardViewModel>().Properties.Count.Should()
+            .Be(10);
     }
 
     [Fact]
@@ -220,9 +217,6 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var result = underTest.ViewProperties(2) as StatusCodeResult;
         result.Should().BeOfType<StatusCodeResult>();
         result.Should().NotBeNull();
-        if (result != null)
-        {
-            result!.StatusCode.Should().Be(403);
-        }
+        result!.StatusCode.Should().Be(403);
     }
 }
