@@ -88,8 +88,8 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
 
         // Assert
 
-        result.Item1.Should().BeOfType<List<UserDbModel>>();
-        result.Item2.Should().BeOfType<List<UserDbModel>>();
+        result.Item1.Should().BeOfType<List<UserDbModel>>().And.Subject.Where(l => l.IsAdmin).Should().HaveCount(result.Item1.Count);
+        result.Item2.Should().BeOfType<List<UserDbModel>>().And.Subject.Where(l => l.HasRequestedAdmin).Should().HaveCount(result.Item2.Count);
     }
 
     [Fact]
@@ -133,7 +133,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         var result = service.GetLandlordDisplayList("").Result;
         
         // Assert
-        result.Should().BeOfType<List<LandlordDbModel>>().And.Subject.Should().HaveCount(context.Landlords.ToList().Count);
+        result.Should().BeOfType<List<LandlordDbModel>>().And.Subject.Should().HaveCount(context.Landlords.Count());
     }
 
     [Fact]
@@ -148,7 +148,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         var result = service.FindUserByLandlordId(1);
 
         // Assert
-
+        // This landlord is created first by the fixture so should have id 1
         result.Should().BeOfType<UserDbModel>();
         result!.GoogleAccountId.Should().Be(approvedLandlord.GoogleAccountId);
     }
@@ -165,7 +165,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
 
         // Assert
 
-        result.Should().Be(null);
+        result.Should().BeNull();
     }
 
     [Fact]
