@@ -27,9 +27,16 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
         };
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel))
             .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));
+        A.CallTo(() => MailService.SendMsg(
+            A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored
+        )).WithAnyArguments().DoesNothing();
         // Act
         var result = await UnderTest.RegisterPost(formResultModel) as RedirectToActionResult;
         // Assert
+        A.CallTo(() => MailService.SendMsg(
+            A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored
+        )).WithAnyArguments().MustHaveHappened();
+        A.CallTo(() => LandlordService.RegisterLandlord(formResultModel)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Profile");
@@ -51,11 +58,15 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel))
             .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));
         A.CallTo(() => MailService.SendMsg(
-            "hi", "hi", "hi", "hi"
+            A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored
         )).WithAnyArguments().DoesNothing();
         var result = await UnderTest.RegisterPost(formResultModel) as StatusCodeResult;
 
         // Assert
+        A.CallTo(() => LandlordService.RegisterLandlord(formResultModel)).WithAnyArguments().MustNotHaveHappened();
+        A.CallTo(() => MailService.SendMsg(
+            A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored
+        )).WithAnyArguments().MustNotHaveHappened();
         result.Should().NotBeNull();
         if (result != null)
         {

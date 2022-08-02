@@ -41,6 +41,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var result = await UnderTest.RegisterPost(formResultModel) as RedirectToActionResult;
 
         // Assert
+        A.CallTo(() => LandlordService.RegisterLandlord(formResultModel, unregisteredUser)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("MyProfile");
@@ -76,7 +77,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Assert   
         result!.Model.Should().BeOfType<LandlordProfileModel>();
     }
-    
+
     [Fact]
     public void EditProfilePage_CalledUsingInvalidId_Returns404Error()
     {
@@ -92,7 +93,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Assert   
         result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(404);
     }
-    
+
     [Fact]
     public void EditProfilePage_CalledUsingNonAdmin_Returns403Error()
     {
@@ -106,7 +107,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Assert   
         result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(403);
     }
-    
+
     [Fact]
     public void EditProfileUpdate_CalledUsingLandlordDatabaseModel_ReturnsProfileViewWithLandlordProfile()
     {
@@ -157,14 +158,14 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Assert   
         result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(403);
     }
-    
+
     [Fact]
     public void EditProfileUpdate_CalledUsingInvalidModel_Returns404Error()
     {
         // Arrange
         var landlordUser = CreateLandlordUser();
         MakeUserPrincipalInController(landlordUser, UnderTest);
-        UnderTest.ModelState.AddModelError("Invalid","this is a pretend error");
+        UnderTest.ModelState.AddModelError("Invalid", "this is a pretend error");
         var invalidLandlordModel = CreateInvalidLandlordProfileModel();
 
         // Act
