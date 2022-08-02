@@ -147,7 +147,8 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> ApproveCharter(int landlordId)
     {
         var user = GetCurrentUser();
-        TempData["ApprovalSuccessMessage"] = await _landlordService.ApproveLandlord(landlordId, user);
+        var flashMessageBody = await _landlordService.ApproveLandlord(landlordId, user);
+        FlashMessage(_logger,("charter status updated successfully","success",flashMessageBody));
         return RedirectToAction("Profile", "Landlord", new { Id = landlordId });
     }
 

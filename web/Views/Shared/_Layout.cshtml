@@ -77,6 +77,15 @@
         </div>
     </nav>
 </header>
+@{
+    if (TempData["FlashMessage"] != null)
+    {
+        //uses warning as the default alert colour if there's no value in TempData["FlashType"]
+        <div class="alert alert-@(TempData["FlashType"] ?? "warning")" role="alert">
+                @TempData["FlashMessage"]
+        </div>
+    }
+}
 <div class="container">
     <main role="main" class="pb-3">
         @RenderBody()
