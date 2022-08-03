@@ -63,7 +63,7 @@
 </table>
 
 @{ var from = (Model.Page - 1) * Model.PropPerPage + 1;
-    var to = Math.Min((Model.Page - 1) * Model.PropPerPage + Model.PropPerPage, Model.Total?? (Model.Page - 1) * Model.PropPerPage + Model.PropPerPage);}
+    var to = Math.Min((Model.Page - 1) * Model.PropPerPage + Model.PropPerPage, Model.Total);}
 
 <p>Displaying properties @from to @to of @Model.Total</p>
 

@@ -54,19 +54,4 @@ public class AdminControllerTests : AdminControllerTestsBase
         // Assert
         result!.ViewData.Model.Should().BeOfType<AdminListModel>();
     }
-
-    [Fact]
-    public void ViewLandlord_ReturnsViewWith_LandlordProfileModel()
-    {
-        // Arrange
-        var landlordUser = CreateLandlordUser();
-        MakeUserPrincipalInController(landlordUser, UnderTest);
-        var dummyId = 1;
-
-        // Act
-        var result = UnderTest.ViewLandlord(dummyId).Result as ViewResult;
-
-        // Assert
-        result!.Model.Should().BeOfType<LandlordProfileModel>();
-    }
 }

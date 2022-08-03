@@ -168,16 +168,4 @@ public class AdminController : AbstractController
 
         return RedirectToAction("GetAdminList");
     }
-
-    public async Task<IActionResult> ViewLandlord(int landlordId)
-    {
-        var landlord = await _adminService.GetLandlordDbModelFromId(landlordId);
-        if (landlord == null)
-        {
-            return StatusCode(404);
-        }
-
-        var LandlordViewModel = LandlordProfileModel.FromDbModel(landlord, GetCurrentUser());
-        return View("~/Views/Landlord/Profile.cshtml", LandlordViewModel);
-    }
 }

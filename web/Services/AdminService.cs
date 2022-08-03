@@ -9,9 +9,6 @@ public interface IAdminService
     public void RequestAdminAccess(BricksAndHeartsUser user);
     public void CancelAdminAccessRequest(BricksAndHeartsUser user);
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
-    public Task<List<PropertyDbModel>> GetPropertyList();
-    public Task<LandlordDbModel> GetLandlordDbModelFromId(int landlordId);
-    public List<PropertyDbModel> SortProperties(string by);
     public Task<List<LandlordDbModel>> GetLandlordDisplayList(string approvalStatus);
     public UserDbModel? FindUserByLandlordId(int landlordId);
     public string? FindExistingInviteLink(int landlordId);
@@ -20,7 +17,6 @@ public interface IAdminService
     public void ApproveAdminAccessRequest(int userId);
     public void RejectAdminAccessRequest(int userId);
     public UserDbModel GetUserFromId(int userId);
-    public Task<List<LandlordDbModel>> GetUnapprovedLandlords();
 }
 
 public class AdminService : IAdminService
@@ -144,34 +140,5 @@ public class AdminService : IAdminService
     {
         UserDbModel userFromId = _dbContext.Users.SingleOrDefault(u => u.Id == userId)!;
         return userFromId;
-    }
-    
-    public async Task<List<LandlordDbModel>> GetUnapprovedLandlords()
-    {
-        List<LandlordDbModel> UnapprovedLandlords = await _dbContext.Landlords.Where(u => u.CharterApproved == false).ToListAsync();
-        return UnapprovedLandlords;
-    }
-
-    public async Task<List<PropertyDbModel>> GetPropertyList()
-    {
-        return await _dbContext.Properties.ToListAsync();
-    }
-
-    public async Task<LandlordDbModel> GetLandlordDbModelFromId(int landlordId)
-    {
-        return (await _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == landlordId))!;
-    }
-    
-    public List<PropertyDbModel> SortProperties(string by)
-    {
-        List<PropertyDbModel> properties;
-        if (by == "Availability")
-        {
-            properties = _dbContext.Properties.OrderBy(m => m.RenterUserId).ToList();
-        }
-        else {
-            properties = _dbContext.Properties.OrderBy(m => m.Rent).ToList();
-        }
-        return properties;
     }
 }
