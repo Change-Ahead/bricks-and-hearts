@@ -79,8 +79,7 @@ public class PropertyController : AbstractController
 
         if (!ModelState.IsValid)
         {
-            return Vi
-            Property", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
+            return View("AddNewProperty", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
         }
 
         PropertyDbModel? property = null;
