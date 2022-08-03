@@ -32,6 +32,7 @@ public interface ILandlordService
     public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int? id);
     public Task<LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel);
     public bool CheckForDuplicateEmail(LandlordProfileModel editModel);
+    public bool CheckForDuplicateMembershipId(LandlordProfileModel editModel);
     public Task<string> ApproveLandlord(int landlordId, BricksAndHeartsUser user);
     public LandlordDbModel? FindLandlordWithInviteLink(string inviteLink);
 
@@ -206,6 +207,15 @@ public class LandlordService : ILandlordService
         landlordToEdit.Phone = editModel.Phone;
         landlordToEdit.LandlordType = editModel.LandlordType;
         landlordToEdit.IsLandlordForProfit = editModel.IsLandlordForProfit;
+        landlordToEdit.LandlordProvidedCharterStatus = editModel.LandlordProvidedCharterStatus;
+        if (editModel.LandlordProvidedCharterStatus)
+        {
+            landlordToEdit.MembershipId = editModel.MembershipId;
+        }
+        else
+        {
+            landlordToEdit.MembershipId = null;
+        }
 
         await _dbContext.SaveChangesAsync();
         return ILandlordService.LandlordRegistrationResult.Success;
@@ -216,6 +226,17 @@ public class LandlordService : ILandlordService
         var editedLandlord = _dbContext.Landlords.Single(l => l.Id == editModel.LandlordId);
         return _dbContext.Landlords.SingleOrDefault(l => l.Email == editModel.Email) != null
                && editedLandlord.Email != editModel.Email;
+    }
+    
+    public bool CheckForDuplicateMembershipId(LandlordProfileModel editModel)
+    {
+        var editedLandlord = _dbContext.Landlords.Single(l => l.Id == editModel.LandlordId);
+        if (!editModel.LandlordProvidedCharterStatus)
+        {
+            return false;
+        }
+        return _dbContext.Landlords.SingleOrDefault(l => l.MembershipId == editModel.MembershipId) != null
+               && editedLandlord.MembershipId != editModel.MembershipId;
     }
     
     // Link existing landlord with user

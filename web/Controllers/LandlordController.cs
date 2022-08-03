@@ -240,6 +240,14 @@ public class LandlordController : AbstractController
             ModelState.AddModelError("Email", "Email already registered");
             return View("EditProfilePage", editModel);
         }
+        
+        var isMembershipIdDuplicated = _landlordService.CheckForDuplicateMembershipId(editModel);
+        if (isMembershipIdDuplicated)
+        {
+            _logger.LogWarning("Membership Id already registered {MembershipId}", editModel.MembershipId);
+            ModelState.AddModelError("MembershipId", "Membership Id already registered");
+            return View("EditProfilePage", editModel);
+        }
 
         await _landlordService.EditLandlordDetails(editModel);
         _logger.LogInformation("Successfully edited landlord for landlord {LandlordId}", editModel.LandlordId);
