@@ -11,12 +11,12 @@
 @if (Model.Step > 1)
 {
     <div class="mb-4">
-        <a asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@(Model.Step - 1)" asp-route-propId="@{ Model.Property != null ? Model.Property!.PropertyId : -1 }" class="link-secondary">Back</a>
+        <a asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@(Model.Step - 1)" asp-route-propId="@(Model.Property != null ? Model.Property!.PropertyId : -1)" class="link-secondary">Back</a>
     </div>
 }
 
 
-<form method="post" class="w-50" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-propId="@{ Model.Property != null ? Model.Property!.PropertyId : -1 }" asp-route-step="@Model.Step">
+<form method="post" class="w-50" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-propId="@(Model.Property != null ? Model.Property!.PropertyId : -1)" asp-route-step="@Model.Step">
 
     <partial name=@("_AddFormStep" + Model.Step) model="Model.Property"/>
 
