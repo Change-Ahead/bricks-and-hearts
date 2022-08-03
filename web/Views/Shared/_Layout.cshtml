@@ -1,6 +1,7 @@
 ﻿@using BricksAndHearts.Auth
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -13,84 +14,81 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 </head>
+
 <body>
-<header>
-    <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+<header class="mb-3">
+    <nav class="navbar navbar-primary navbar-expand-sm navbar-light border-bottom bg-white box-shadow">
         <div class="container-fluid">
-            <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">BricksAndHearts</a>
+            <a class="navbar-brand fw-bold ms-4 me-5" asp-controller="Home" asp-action="Index">Bricks & Hearts</a>
+
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
                     aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                <ul class="navbar-nav flex-grow-1">
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                    </li>
-                    @if (User.IsInRole("Admin"))
-                    {
-                        <li class="nav-item dropdown">
-                            <a class="nav-link active dropdown-toggle" href="#" id="navbarDropdownMenuLink" data-bs-toggle="dropdown">
-                                Admins
-                            </a>
-                            <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
-                                <a class="dropdown-item text-dark" asp-area="" asp-controller="Admin" asp-action="GetAdminList">Admin List</a>
-                                <a class="dropdown-item text-dark" asp-area="" asp-controller="Admin" asp-action="LandlordList">Landlord List</a>
-                                <a class="dropdown-item text-dark" asp-area="" asp-controller="Property" asp-action="SortProperties">Property Overview</a>
-                            </div>
-                        </li>
-                    }
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="ContactUs">Contact Us</a>
-                    </li>
-                    @if (User.IsInRole("Landlord"))
-                    {
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Landlord" asp-action="MyProfile">Profile</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Landlord" asp-action="ViewProperties">View Properties</a>
-                        </li>
-                    }
-                </ul>
 
-                <ul class="navbar-nav ms-auto">
+            <div class="collapse navbar-collapse">
+                <div class="navbar-nav me-auto">
+                    @* Change this link to landlord index when created *@
+                    <a class="nav-link text-dark mx-3" asp-controller="Landlord" asp-action="RegisterGet">List your properties</a>
+                    <a class="nav-link text-dark mx-3" asp-controller="Admin" asp-action="Index">Facilitate rentals</a>
+                </div>
+
+                <div class="navbar-nav">
                     @if (User.Identity?.IsAuthenticated == true)
                     {
-                        <li class="nav-item">
-                            <a class="nav-link">@(((BricksAndHeartsUser)User.Identity).GoogleEmail)</a>
-                        </li>
-                        <li class="nav-item">
-                            @using (Html.BeginForm("Logout", "Login", FormMethod.Post))
-                            {
-                                <button type="submit" class="btn btn-link nav-link border-0">Log out</button>
-                            }
-                        </li>
+                        @if (User.IsInRole("Landlord"))
+                        {
+                            @* Replace with profile picture in the future *@
+                            <a asp-controller="Landlord" asp-action="Profile" asp-route-id="@(((BricksAndHeartsUser)User.Identity).LandlordId!.Value)" class="bi bi-person-circle nav-link pt-0 pb-0 fs-4 ms-3"></a>
+                        }
+                        @using (Html.BeginForm("Logout", "Login", FormMethod.Post))
+                        {
+                            <button type="submit" class="btn btn-outline-primary mx-3">Log out</button>
+                        }
                     }
                     else
                     {
-                        <li class="nav-item" style="margin-left: auto;">
-                            <a class="nav-link" asp-area="" asp-controller="Login" asp-action="Google">Log in</a>
-                        </li>
+                        <a class="btn btn-outline-primary mx-3" asp-controller="Login" asp-action="Google">Log in</a>
                     }
-                </ul>
+                </div>
             </div>
         </div>
     </nav>
+
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        @if (User.IsInRole("Admin"))
+        {
+            <nav class="navbar navbar-secondary navbar-expand-sm navbar-dark bg-primary py-1">
+                <a asp-controller="Admin" asp-action="Index" class="nav-link text-light mx-3">Dashboard</a>
+                <div class="vr my-2"></div>
+                <a asp-controller="Admin" asp-action="GetAdminList" class="nav-link text-light mx-3">Admin list</a>
+                <div class="vr my-2"></div>
+                <a asp-controller="Admin" asp-action="LandlordList" class="nav-link text-light mx-3">Landlord list</a>
+                <div class="vr my-2"></div>
+                <a asp-controller="Property" asp-action="SortProperties" class="nav-link text-light mx-3">Property overview</a>
+            </nav>
+        }
+        @if (User.IsInRole("Landlord"))
+        {
+            <nav class="navbar navbar-secondary navbar-expand-sm navbar-dark bg-primary py-1">
+                @* Change this link to landlord index when created *@
+                <a asp-controller="Landlord" asp-action="RegisterGet" class="nav-link text-light mx-3">Dashboard</a>
+                <div class="vr my-2"></div>
+                <a asp-controller="Landlord" asp-action="ViewProperties" class="nav-link text-light mx-3">Properties</a>
+            </nav>
+        }
+    }
 </header>
+
 <div class="container">
     <main role="main" class="pb-3">
-        @{
-            if (TempData["FlashMessage"] != null)
-            {
-                //uses warning as the default alert colour if there's no value in TempData["FlashType"]
-                <div class="alert alert-@(TempData["FlashType"] ?? "warning")" role="alert">
-                        @TempData["FlashMessage"]
-                </div>
-            }
+        @if (TempData["FlashMessage"] != null)
+        {
+            @* uses warning as the default alert colour if there's no value in TempData["FlashType"] *@
+            <div class="alert alert-@(TempData["FlashType"] ?? "warning")" role="alert">
+                @TempData["FlashMessage"]
+            </div>
         }
         @RenderBody()
     </main>
@@ -98,9 +96,14 @@
 
 <footer class="border-top footer text-muted">
     <div class="container">
-        &copy; 2022 - BricksAndHearts - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        <div class="nav">
+            <span class="navbar-text me-3">&copy; 2022 - Bricks & Hearts</span>
+            <a asp-controller="Home" asp-action="Privacy" class="nav-link">Privacy</a>
+            <a asp-controller="Home" asp-action="ContactUs" class="nav-link">Contact</a>
+        </div>
     </div>
 </footer>
+
 <script src="~/lib/jquery/dist/jquery.min.js"></script>
 <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 <script src="~/js/site.js" asp-append-version="true"></script>
