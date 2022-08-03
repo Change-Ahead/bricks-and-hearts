@@ -59,7 +59,28 @@
                 <input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", new { landlordId = Model.LandlordId })'; setCurrentTab(1);"/>
             </td>
         </div>
+        <div class="tables">
+            <table class="table table-bordered">
+                <tbody>
+                <tr>
+                    <td>@Html.DisplayNameFor(model => model.Email)</td>
+                    <td>@Html.DisplayFor(model => model.Email)</td>
+                </tr>
+                <tr>
+                    <td>@Html.DisplayNameFor(model => model.Phone)</td>
+                    <td>@Html.DisplayFor(model => model.Phone)</td>
+                </tr>
+            </table>
+        </div>
+    </div>
 
+    <div class="col-lg-5">
+        <div class="d-flex p-2 justify-content-between">
+            <h4>Contact details</h4>
+            <td>
+                <input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", new { landlordId = Model.LandlordId })'; setCurrentTab(2);"/>
+            </td>
+        </div>
         <div class="tables">
             <table class="table table-bordered">
                 <tbody>
@@ -87,28 +108,6 @@
             </table>
         </div>
     </div>
-
-    <div class="col-lg-5">
-        <div class="d-flex p-2 justify-content-between">
-            <h4>Contact details</h4>
-            <td>
-                <input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", new { landlordId = Model.LandlordId })'; setCurrentTab(2);"/>
-            </td>
-        </div>
-        <div class="tables">
-            <table class="table table-bordered">
-                <tbody>
-                <tr>
-                    <td>@Html.DisplayNameFor(model => model.Email)</td>
-                    <td>@Html.DisplayFor(model => model.Email)</td>
-                </tr>
-                <tr>
-                    <td>@Html.DisplayNameFor(model => model.Phone)</td>
-                    <td>@Html.DisplayFor(model => model.Phone)</td>
-                </tr>
-            </table>
-        </div>
-    </div>
     <div class="col-lg-5">
         @if (User.IsInRole("Admin"))
         {
@@ -121,7 +120,7 @@
         <div class="d-flex p-2 justify-content-between">
             <h4>ChangeAhead Charter</h4>
             <td>
-                <input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", new { landlordId = Model.LandlordId })'; setCurrentTab(3);"/>
+                <input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", new { landlordId = Model.LandlordId })'; setCurrentTab(2);"/>
             </td>
         </div>
         @if (Model.CharterApproved)
