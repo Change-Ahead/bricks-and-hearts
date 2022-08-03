@@ -15,14 +15,20 @@ public interface IAdminService
     public string? FindExistingInviteLink(int landlordId);
     public string CreateNewInviteLink(int landlordId);
     public void DeleteExistingInviteLink(int landlordId);
+    public void ApproveAdminAccessRequest(int userId);
+    public void RejectAdminAccessRequest(int userId);
+    public UserDbModel GetUserFromId(int userId);
+    public Task<List<LandlordDbModel>> GetUnapprovedLandlords();
 }
 
 public class AdminService : IAdminService
 {
     private readonly BricksAndHeartsDbContext _dbContext;
+    private readonly ILogger<AdminService> _logger;
 
-    public AdminService(BricksAndHeartsDbContext dbContext)
+    public AdminService(BricksAndHeartsDbContext dbContext, ILogger<AdminService> logger)
     {
+        _logger = logger;
         _dbContext = dbContext;
     }
 
@@ -39,7 +45,7 @@ public class AdminService : IAdminService
         userRecord.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
     }
-    
+
     public async Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists()
     {
         return (await GetCurrentAdmins(), await GetPendingAdmins());
@@ -111,5 +117,36 @@ public class AdminService : IAdminService
         var pendingAdmins =
             await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
         return pendingAdmins;
+    }
+    
+    public void ApproveAdminAccessRequest(int userId)
+    {
+        var userToAdmin = _dbContext.Users.Single(u => u.Id == userId);
+        
+        userToAdmin.IsAdmin = true;
+        userToAdmin.HasRequestedAdmin = false;
+        _dbContext.SaveChanges();
+        _logger.LogInformation("Admin request approved");
+    }
+    
+    public void RejectAdminAccessRequest(int userId)
+    {
+        var userToAdmin = _dbContext.Users.Single(u => u.Id == userId);
+        
+        userToAdmin.HasRequestedAdmin = false;
+        _dbContext.SaveChanges();
+        _logger.LogInformation("Admin request rejected");
+    }
+
+    public UserDbModel GetUserFromId(int userId)
+    {
+        UserDbModel userFromId = _dbContext.Users.SingleOrDefault(u => u.Id == userId)!;
+        return userFromId;
+    }
+    
+    public async Task<List<LandlordDbModel>> GetUnapprovedLandlords()
+    {
+        List<LandlordDbModel> UnapprovedLandlords = await _dbContext.Landlords.Where(u => u.CharterApproved == false).ToListAsync();
+        return UnapprovedLandlords;
     }
 }

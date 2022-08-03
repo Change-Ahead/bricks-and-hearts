@@ -52,23 +52,28 @@ public class AdminController : AbstractController
         if (user.IsAdmin)
         {
             LoggerAlreadyAdminWarning(_logger, user);
+
             return RedirectToAction(nameof(Index));
         }
 
         _adminService.CancelAdminAccessRequest(user);
+
         FlashRequestSuccess(_logger, user, "cancelled admin access request");
+
         return RedirectToAction(nameof(Index));
     }
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
-    public async Task<IActionResult> AdminList()
+    public async Task<ActionResult> GetAdminList()
     {
         var adminLists = await _adminService.GetAdminLists();
+        
         AdminListModel adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
-        return View(adminListModel);
+        
+        return View("AdminList", adminListModel);
     }
-
+    
     [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> LandlordList(string? approvalStatus = "")
@@ -138,5 +143,28 @@ public class AdminController : AbstractController
             ($"User {user.Id} already an admin",
                 "danger",
                 "Already an admin"));
+    }
+
+    [Authorize(Roles="Admin")]
+    [HttpPost]
+    public ActionResult AcceptAdminRequest(int userToAcceptId)
+    {
+        if (_adminService.GetUserFromId(userToAcceptId) == null)
+        {
+            return View("Error", new ErrorViewModel());
+        }
+        
+        _adminService.ApproveAdminAccessRequest(userToAcceptId);
+
+        return RedirectToAction("GetAdminList");
+    }
+    
+    [Authorize(Roles="Admin")]
+    [HttpPost]
+    public ActionResult RejectAdminRequest(int userToAcceptId)
+    {
+        _adminService.RejectAdminAccessRequest(userToAcceptId);
+
+        return RedirectToAction("GetAdminList");
     }
 }

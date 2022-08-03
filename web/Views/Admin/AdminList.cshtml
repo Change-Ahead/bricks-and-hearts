@@ -20,7 +20,18 @@
             <tr>
                 <td>@pendingAdmin.GoogleEmail</td>
                 <td>@pendingAdmin.GoogleUserName</td>
-                <td>Actions</td>
+                <td>
+                    @using (Html.BeginForm("AcceptAdminRequest", "Admin", new { userToAcceptId = pendingAdmin.Id }, FormMethod.Post))
+                    {
+                        <button type="submit" class="btn btn-outline-success">Accept</button>
+                    }
+                </td>
+                <td>
+                    @using (Html.BeginForm("RejectAdminRequest", "Admin", new { userToAcceptId = pendingAdmin.Id }, FormMethod.Post))
+                    {
+                        <button type="submit" class="btn btn-outline-danger">Reject</button>
+                    }
+                </td>
             </tr>
         }
         </tbody>

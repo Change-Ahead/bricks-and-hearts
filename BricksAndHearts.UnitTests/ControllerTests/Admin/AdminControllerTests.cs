@@ -1,4 +1,5 @@
-﻿using BricksAndHearts.ViewModels;
+using System.Security.Claims;
+using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
@@ -39,5 +40,45 @@ public class AdminControllerTests : AdminControllerTestsBase
         // Assert
         A.CallTo(() => AdminService.GetLandlordDisplayList("")).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<LandlordListModel?>();
+    }
+
+    [Fact]
+    public void GetAdminList_ReturnsViewWithAdminListModel()
+    {
+        // Arrange
+        MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
+        
+        // Act
+        var result = UnderTest.GetAdminList().Result as ViewResult;
+
+        // Assert
+        result!.ViewData.Model.Should().BeOfType<AdminListModel>();
+    }
+
+    [Fact]
+    public void AcceptAdminRequest_WhenCalled_ApprovesAdminAccessRequest()
+    {
+        // Arrange
+        MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
+        var dummyId = 1;
+
+        // Act
+        var result = UnderTest.AcceptAdminRequest(dummyId);
+        
+        // Assert
+        A.CallTo(() => AdminService.ApproveAdminAccessRequest(dummyId)).MustHaveHappened();
+    }
+    
+    [Fact]
+    public void RejectAdminRequest_WhenCalled_RejectsAdminAccessRequest()
+    {
+        // Arrange
+        MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
+
+        // Act
+        var result = UnderTest.RejectAdminRequest(1);
+        
+        // Assert
+        A.CallTo(() => AdminService.RejectAdminAccessRequest(1)).MustHaveHappened();
     }
 }
