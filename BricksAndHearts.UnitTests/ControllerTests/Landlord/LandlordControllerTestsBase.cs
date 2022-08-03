@@ -61,7 +61,7 @@ public class LandlordControllerTestsBase : ControllerTestsBase
             CompanyName = "John Doe",
             Email = "test.email@gmail.com",
             CharterApproved = false,
-            LandlordStatus = "some data",
+            LandlordType = "some data",
             LandlordProvidedCharterStatus = false
         };
     }
@@ -75,7 +75,7 @@ public class LandlordControllerTestsBase : ControllerTestsBase
             LastName = "Doe",
             CompanyName = "John Doe",
             CharterApproved = false,
-            LandlordStatus = "some data",
+            LandlordType = "some data",
             LandlordProvidedCharterStatus = false
         };
     }

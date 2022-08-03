@@ -8,14 +8,6 @@
 
 <div>
     @{
-        if (TempData["FlashMessage"] != null)
-        {
-            <div class="alert alert-warning" role="alert">
-                @TempData["FlashMessage"]
-            </div>
-        }
-    }
-    @{
         if (TempData["InviteLinkMessage"] != null)
         {
             <div class="alert alert-warning" role="alert">
@@ -31,14 +23,6 @@
                         <button type="submit" class="btn btn-sm btn-outline-primary">Get New Link</button>
                     }
                 }
-            </div>
-        }
-    }
-    @{
-        if (TempData["ApprovalSuccessMessage"] != null)
-        {
-            <div class="alert alert-warning" role="alert">
-                @TempData["ApprovalSuccessMessage"]
             </div>
         }
     }
@@ -84,8 +68,8 @@
                     <td>@Html.DisplayFor(model => model.CompanyName)</td>
                 </tr>
                 <tr>
-                    <td>@Html.DisplayNameFor(model => model.LandlordStatus)</td>
-                    <td>@Html.DisplayFor(model => model.LandlordStatus)</td>
+                    <td>@Html.DisplayNameFor(model => model.LandlordType)</td>
+                    <td>@Html.DisplayFor(model => model.LandlordType)</td>
                 </tr>
                 <tr>
                     <td>@Html.DisplayNameFor(model => model.IsLandlordForProfit)</td>

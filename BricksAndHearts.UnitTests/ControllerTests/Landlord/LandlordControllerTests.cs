@@ -63,7 +63,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
         // Assert
         A.CallTo(() => LandlordService.ApproveLandlord(landlord.Id, adminUser)).MustHaveHappened();
-        UnderTest.TempData["ApprovalSuccessMessage"].Should().Be("");
+        UnderTest.TempData["FlashMessage"].Should().Be("");
     }
 
     [Fact]

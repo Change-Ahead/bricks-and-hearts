@@ -14,7 +14,7 @@ public class LandlordDbModel
     public string Phone { get; set; } = null!;
 
     //Type of landlord
-    public string LandlordStatus { get; set; } = null!;
+    public string LandlordType { get; set; } = null!;
 
     //Whether the landlord claims to have signed the charter
     public bool LandlordProvidedCharterStatus { get; set; } = false;

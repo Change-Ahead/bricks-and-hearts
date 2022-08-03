@@ -59,7 +59,7 @@ namespace BricksAndHearts.Migrations
                     b.Property<bool>("LandlordProvidedCharterStatus")
                         .HasColumnType("bit");
 
-                    b.Property<string>("LandlordStatus")
+                    b.Property<string>("LandlordType")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
