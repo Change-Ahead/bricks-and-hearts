@@ -1,10 +1,58 @@
-﻿@model PropertyViewModel
+@model PropertyViewModel
 
-<h2>Description</h2>
+<h2>What kind of tenant would you prefer?</h2>
 
 <div asp-validation-summary="All" class="text-danger"></div>
-<div class="my-3">
-    <label asp-for="Description" class="form-label">Description</label>
-    <textarea asp-for="Description" class="form-control" rows="5" required></textarea>
-    <span asp-validation-for="Description" class="text-danger"></span>
+
+<div class="my-4 py-3">
+    <label class="form-label">Select all that apply:</label>
+
+    <div class="form-check">
+        @Html.CheckBox("AcceptsSingleTenant", Model.AcceptsSingleTenant ?? false, new { @class = "form-check-input" })
+        <label asp-for="AcceptsSingleTenant" class="form-check-label">Single tenant</label>
+    </div>
+    <div class="form-check">
+        @Html.CheckBox("AcceptsCouple", Model.AcceptsCouple ?? false, new { @class = "form-check-input" })
+        <label asp-for="AcceptsCouple" class="form-check-label">Couple</label>
+    </div>
+    <div class="form-check">
+        @Html.CheckBox("AcceptsFamily", Model.AcceptsFamily ?? false, new { @class = "form-check-input" })
+        <label asp-for="AcceptsFamily" class="form-check-label">Family (3+)</label>
+    </div>
+</div>
+
+<div class="my-4 py-3">
+    <label class="form-label">Do you accept pets?</label>
+
+    <div class="form-check">
+        <input type="radio" asp-for="AcceptsPets" value="true" id="PetsTrue" class="form-check-input">
+        <label for="PetsTrue" class="form-check-label">Yes</label>
+    </div>
+    <div class="form-check">
+        <input type="radio" asp-for="AcceptsPets" value="false" id="PetsFalse" class="form-check-input">
+        <label for="PetsFalse" class="form-check-label">No</label>
+    </div>
+</div>
+
+<div class="my-4 py-3">
+    <label class="form-label">Will you accept tenants:</label>
+
+    <div class="form-check">
+        @Html.CheckBox("AcceptsBenefits", Model.AcceptsBenefits ?? false, new { @class = "form-check-input" })
+        <label asp-for="AcceptsBenefits" class="form-check-label">
+            on Universal Credit or housing benefits?
+        </label>
+    </div>
+    <div class="form-check">
+        @Html.CheckBox("AcceptsNotEET", Model.AcceptsNotEET ?? false, new { @class = "form-check-input" })
+        <label asp-for="AcceptsNotEET" class="form-check-label">
+            not in EET (Employment, Education, or Training)?
+        </label>
+    </div>
+    <div class="form-check">
+        @Html.CheckBox("AcceptsWithoutGuarantor", Model.AcceptsWithoutGuarantor ?? false, new { @class = "form-check-input" })
+        <label asp-for="AcceptsWithoutGuarantor" class="form-check-label">
+            without a rent guarantor?
+        </label>
+    </div>
 </div>

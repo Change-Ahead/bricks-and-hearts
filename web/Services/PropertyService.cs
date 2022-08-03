@@ -13,7 +13,6 @@ public interface IPropertyService
     public PropertyDbModel? GetIncompleteProperty(int landlordId);
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId);
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId);
-
 }
 
 public class PropertyService : IPropertyService
@@ -50,8 +49,18 @@ public class PropertyService : IPropertyService
 
             PropertyType = createModel.PropertyType,
             NumOfBedrooms = createModel.NumOfBedrooms,
-            Rent = createModel.Rent,
-            Description = createModel.Description
+
+            Description = createModel.Description,
+
+            AcceptsSingleTenant = createModel.AcceptsSingleTenant,
+            AcceptsCouple = createModel.AcceptsCouple,
+            AcceptsFamily = createModel.AcceptsFamily,
+            AcceptsPets = createModel.AcceptsPets,
+            AcceptsBenefits = createModel.AcceptsBenefits,
+            AcceptsNotEET = createModel.AcceptsNotEET,
+            AcceptsWithoutGuarantor = createModel.AcceptsWithoutGuarantor,
+
+            Rent = createModel.Rent
         };
 
         // Add the new property to the database
@@ -77,8 +86,18 @@ public class PropertyService : IPropertyService
 
         dbModel.PropertyType = updateModel.PropertyType ?? dbModel.PropertyType;
         dbModel.NumOfBedrooms = updateModel.NumOfBedrooms ?? dbModel.NumOfBedrooms;
-        dbModel.Rent = updateModel.Rent ?? dbModel.Rent;
+
         dbModel.Description = updateModel.Description ?? dbModel.Description;
+
+        dbModel.AcceptsSingleTenant = updateModel.AcceptsSingleTenant ?? dbModel.AcceptsSingleTenant;
+        dbModel.AcceptsCouple = updateModel.AcceptsCouple ?? dbModel.AcceptsCouple;
+        dbModel.AcceptsFamily = updateModel.AcceptsFamily ?? dbModel.AcceptsFamily;
+        dbModel.AcceptsPets = updateModel.AcceptsPets ?? dbModel.AcceptsPets;
+        dbModel.AcceptsBenefits = updateModel.AcceptsBenefits ?? dbModel.AcceptsBenefits;
+        dbModel.AcceptsNotEET = updateModel.AcceptsNotEET ?? dbModel.AcceptsNotEET;
+        dbModel.AcceptsWithoutGuarantor = updateModel.AcceptsWithoutGuarantor ?? dbModel.AcceptsWithoutGuarantor;
+
+        dbModel.Rent = updateModel.Rent ?? dbModel.Rent;
 
         dbModel.IsIncomplete = isIncomplete;
         _dbContext.SaveChanges();
@@ -107,12 +126,14 @@ public class PropertyService : IPropertyService
         {
             return true;
         }
+
         var propertyLandlordId = GetPropertyByPropertyId(propertyId)!.LandlordId;
         var userLandlordId = currentUser.LandlordId;
         if (propertyLandlordId == userLandlordId)
         {
             return true;
         }
+
         return false;
     }
 }
