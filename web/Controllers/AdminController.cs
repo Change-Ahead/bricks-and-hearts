@@ -169,13 +169,6 @@ public class AdminController : AbstractController
         return RedirectToAction("GetAdminList");
     }
 
-    public async Task<IActionResult> PropertyList()
-    {
-        var propertyList = await _adminService.GetPropertyList();
-        var listOfProperties = propertyList.Select(PropertyViewModel.FromDbModel).ToList();
-        return View(new PropertiesDashboardViewModel(listOfProperties));
-    }
-
     public async Task<IActionResult> ViewLandlord(int landlordId)
     {
         var landlord = await _adminService.GetLandlordDbModelFromId(landlordId);

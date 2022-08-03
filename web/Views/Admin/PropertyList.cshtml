@@ -1,4 +1,5 @@
-﻿@model PropertiesDashboardViewModel
+﻿@using Microsoft.EntityFrameworkCore.Migrations
+@model PropertiesDashboardViewModel
 
 @{
     ViewData["Title"] = "All Properties List";
@@ -9,7 +10,7 @@
 <div class="mb-3">
     @using (Html.BeginForm("SortProperties", "Property", FormMethod.Get))
     {
-        <select class="form-select" id="by" name="by">
+        <select class="form-select" id="sortBy" name="sortBy">
             <option value="Availability">Sort by availability</option>
             <option value="Rent">Sort by rent</option>
         </select>
@@ -19,23 +20,16 @@
 
 <table class="table table-hover">
     <thead>
-        <tr>
-            <th scope="col">Address</th>
-            <th scope="col">Type</th>
-            <th scope="col"># of Bedrooms</th>
-            <th scope="col">Created</th>
-            <th scope="col">Rent (pcm)
-                <a href=@Url.Action("SortProperties", "Property", new { by = "Rent", descending = true })>
-                    <i class="bi bi-chevron-down"></i>
-                </a>
-                <a href=@Url.Action("SortProperties", "Property", new { by = "Rent"})>
-                    <i class="bi bi-chevron-up"></i>
-                </a>
-            </th>
-            <th scope="col">Description</th>
-            <th scope="col">Availability</th>
-            <th scope="col">Landlord's profile</th>
-        </tr>
+    <tr>
+        <th scope="col">Address</th>
+        <th scope="col">Type</th>
+        <th scope="col"># of Bedrooms</th>
+        <th scope="col">Created</th>
+        <th scope="col">Rent (pcm)</th>
+        <th scope="col">Description</th>
+        <th scope="col">Availability</th>
+        <th scope="col">Landlord's profile</th>
+    </tr>
     </thead>
     <tbody>
     @foreach (var property in Model.Properties!)
@@ -67,3 +61,25 @@
     }
     </tbody>
 </table>
+
+@{ var from = (Model.Page - 1) * Model.PropPerPage + 1;
+    var to = Math.Min((Model.Page - 1) * Model.PropPerPage + Model.PropPerPage, Model.Total?? (Model.Page - 1) * Model.PropPerPage + Model.PropPerPage);}
+
+<p>Displaying properties @from to @to of @Model.Total</p>
+
+@if (Model.Page > 1)
+{
+    <a type="button" class="btn btn-outline-primary" value="Previous" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page - 1, propPerPage = Model.PropPerPage })">
+        <i class="previous"> Previous </i>
+    </a>
+}
+
+@if (Model.Page <= Model.Total/Model.PropPerPage)
+{
+    <a type="button" class="btn btn-outline-primary" value="Next" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page + 1, propPerPage = Model.PropPerPage })">
+        <i class="bi"> Next </i>
+    </a>
+}
+
+
+

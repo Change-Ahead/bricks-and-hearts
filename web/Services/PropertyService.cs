@@ -13,6 +13,8 @@ public interface IPropertyService
     public PropertyDbModel? GetIncompleteProperty(int landlordId);
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId);
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId);
+    public List<PropertyDbModel> SortProperties(string by);
+
 }
 
 public class PropertyService : IPropertyService
@@ -134,5 +136,20 @@ public class PropertyService : IPropertyService
         var propertyLandlordId = GetPropertyByPropertyId(propertyId)!.LandlordId;
         var userLandlordId = currentUser.LandlordId;
         return propertyLandlordId == userLandlordId;
+    }
+    
+    public List<PropertyDbModel> SortProperties(string? by)
+    {
+        List<PropertyDbModel> properties;
+        if (by == "Availability")
+        {
+            properties = _dbContext.Properties.OrderBy(m => m.RenterUserId).ToList();
+        }
+        else if (by == "Rent")
+            properties = _dbContext.Properties.OrderBy(m => m.Rent).ToList();
+        else {
+            properties = _dbContext.Properties.ToList();
+        }
+        return properties;
     }
 }

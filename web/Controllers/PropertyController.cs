@@ -246,18 +246,15 @@ public class PropertyController : AbstractController
         await _azureStorage.DeleteFile("property", propertyId, fileName);
         return RedirectToAction("ListPropertyImages", "Property", new{propertyId});
     }
-    
-    
-    public IActionResult SortProperties(string by, bool descending = false)
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("SortProperties")]
+    public IActionResult SortProperties(string sortBy, int page = 1, int propPerPage = 10)
     {
-        List<PropertyDbModel> properties = _adminService.SortProperties(by);
-        
-        if (descending)
-        {
-            properties.Reverse();
-        }
-        
+        List<PropertyDbModel> properties = _propertyService.SortProperties(sortBy);
+
         var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).ToList();
-        return View("PropertyList", new PropertiesDashboardViewModel(listOfProperties));
+        
+        return View("~/Views/Admin/PropertyList.cshtml", new PropertiesDashboardViewModel(listOfProperties.Skip((page-1)*propPerPage).Take(propPerPage).ToList(), page, listOfProperties.Count, sortBy));
     }
 }
