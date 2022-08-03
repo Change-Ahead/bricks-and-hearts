@@ -119,6 +119,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         MakeUserPrincipalInController(adminUser, UnderTest);
         var landlordProfileModel = CreateTestLandlordProfileModel();
         A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(false);
+        A.CallTo(() => LandlordService.CheckForDuplicateMembershipId(landlordProfileModel)).Returns(false);
         A.CallTo(() => LandlordService.EditLandlordDetails(landlordProfileModel))
             .Returns(ILandlordService.LandlordRegistrationResult.Success);
 
@@ -138,6 +139,26 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         MakeUserPrincipalInController(adminUser, UnderTest);
         var landlordProfileModel = CreateTestLandlordProfileModel();
         A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(true);
+        A.CallTo(() => LandlordService.CheckForDuplicateMembershipId(landlordProfileModel)).Returns(false);
+
+        // Act
+        var result = UnderTest.EditProfileUpdate(landlordProfileModel).Result as ViewResult;
+
+        // Assert   
+        result!.Model.Should().BeOfType<LandlordProfileModel>();
+        result.Should().BeOfType<ViewResult>().Which.ViewName!.Should().BeEquivalentTo("EditProfilePage");
+    }
+    
+    [Fact]
+    public void
+        EditProfileUpdate_CalledUsingLandlordDatabaseModelWithDuplicateMembershipId_ReturnsEditProfileViewWithLandlordProfile()
+    {
+        // Arrange 
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        var landlordProfileModel = CreateTestLandlordProfileModel();
+        A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(false);
+        A.CallTo(() => LandlordService.CheckForDuplicateMembershipId(landlordProfileModel)).Returns(true);
 
         // Act
         var result = UnderTest.EditProfileUpdate(landlordProfileModel).Result as ViewResult;
