@@ -300,4 +300,37 @@ public class LandlordController : AbstractController
 
         throw new Exception($"Unknown landlord registration error ${result}");
     }
+    
+    [HttpGet]
+    [Route("{id:int}/dashboard")]
+    public async Task<ActionResult> Dashboard([FromRoute] int id)
+    {
+        var user = GetCurrentUser();
+        if (user.LandlordId != id && !user.IsAdmin)
+        {
+            return StatusCode(403);
+        }
+
+        var landlord = await _landlordService.GetLandlordIfExistsFromId(id);
+        if (landlord == null)
+        {
+            return StatusCode(404);
+        }
+
+        var viewModel = LandlordProfileModel.FromDbModel(landlord, user);
+        return View("Dashboard", viewModel);
+    }
+    
+    [HttpGet]
+    [Route("me/dashboard")]
+    public async Task<ActionResult> MyDashboard()
+    {
+        var landlordId = GetCurrentUser().LandlordId;
+        if (landlordId == null)
+        {
+            return StatusCode(404);
+        }
+
+        return await Dashboard(landlordId.Value);
+    }
 }
