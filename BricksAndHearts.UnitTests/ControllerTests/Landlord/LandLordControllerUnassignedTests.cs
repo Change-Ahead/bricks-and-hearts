@@ -25,16 +25,26 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
         {
             Unassigned = true
         };
+        var msgBody = $"A Landlord has just registered\n"
+                      + "\n"
+                      + $"Title: {formResultModel.Title}\n"
+                      + $"First Name: {formResultModel.FirstName}" + "\n"
+                      + $"Last Name: {formResultModel.LastName}" + "\n"
+                      + $"Company Name: {formResultModel.CompanyName}" + "\n"
+                      + $"Email: {formResultModel.Email}" + "\n"
+                      + $"Phone: {formResultModel.Phone}" + "\n";
+        var subject = "Bricks&Hearts - landlord registration notification";
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel))
             .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));
         A.CallTo(() => MailService.SendMsg(
-            A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored
+            A<string>.That.Matches(s => s == msgBody), A<string>.That.Matches(s => s == subject), A<string>.Ignored,
+            A<string>.Ignored
         )).WithAnyArguments().DoesNothing();
         // Act
         var result = await UnderTest.RegisterPost(formResultModel) as RedirectToActionResult;
         // Assert
         A.CallTo(() => MailService.SendMsg(
-            A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored
+            A<string>.That.Matches(s=>s==msgBody), A<string>.That.Matches(s=>s==subject), A<string>.Ignored, A<string>.Ignored
         )).WithAnyArguments().MustHaveHappened();
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>();
