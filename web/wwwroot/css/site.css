@@ -1,3 +1,14 @@
+:root{
+    --blue: #3A67C7;
+    --darkOrange: #DD5050;
+    --orange: #FF5757;
+    --lightOrange: #FF9595;
+    --black: #000000;
+    --paleBlue: #ECF2FF;
+    --paleOrange: #FFEEEE;
+    --white: #FFFFFF
+}
+
 html {
     font-size: 14px;
 }
@@ -26,6 +37,47 @@ body {
     display: table;
 }
 
+.btn-primary{
+    background-color: var(--orange);
+    border-color: var(--orange);
+}
+
+.btn-outline-primary{
+    border-color: var(--orange);
+    color: var(--orange)
+}
+
+.btn-primary:hover{
+    background-color: var(--darkOrange);
+    border-color: var(--orange);
+}
+
+.btn-outline-primary:hover{
+    background-color: var(--darkOrange);
+    border-color: var(--orange);
+    color: var(--white);
+}
+
+.btn-primary:focus, .btn-primary:active, .btn-primary:active:focus{
+    background-color: var(--orange);
+    border-color: var(--orange);
+    outline-color: var(--lightOrange);
+    box-shadow: 0 0 0 3px var(--lightOrange);
+}
+
+.btn-outline-primary:focus, .btn-outline-primary:active, .btn-outline-primary:active:focus{
+    background-color: var(--orange);
+    border-color: var(--orange);
+    outline-color: var(--lightOrange);
+    box-shadow: 0 0 0 3px var(--lightOrange);
+    color: var(--white);
+}
+
+.form-control{
+    border-color: var(--blue);
+}
+
+/*Javascript form styling:*/
 /* Mark input boxes that gets an error on validation: */
 input.invalid {
     background-color: #ffdddd;
@@ -41,22 +93,24 @@ input.invalid {
     height: 15px;
     width: 15px;
     margin: 0 2px;
-    background-color: #bbbbbb;
+    background-color: var(--paleOrange);
     border: none;
     border-radius: 50%;
     display: inline-block;
-    opacity: 0.5;
-}
-
-/* Mark the active step: */
-.step.active {
-    opacity: 1;
 }
 
 /* Mark the steps that are finished and valid: */
 .step.finish {
-    background-color: blue;
+  background-color: var(--orange);
+    opacity: 50%;
 }
+
+/* Mark the active step: */
+.step.active {
+    background-color: var(--orange);
+    opacity: 100%;
+}
+/*End of javascript form styling*/
 
 .tables {
     display: inline-block;
