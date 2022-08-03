@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BricksAndHearts.Database;
 
@@ -19,7 +19,9 @@ public class PropertyDbModel
     public string? TownOrCity { get; set; }
     public string? County { get; set; }
     public string Postcode { get; set; } = string.Empty;
-
+    public decimal? Lat { get; set; } // latitude
+    public decimal? Lon { get; set; } // longitude
+    
     // Property details
     public string? PropertyType { get; set; }
     public int? NumOfBedrooms { get; set; }

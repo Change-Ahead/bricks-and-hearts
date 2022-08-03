@@ -98,6 +98,15 @@ public class AzureMapsAzureMapsApiService : IAzureMapsApiService
         {
             model.Address.County = results.Address["countrySecondarySubdivision"];
         }
+        if (results.LatLon != null && results.LatLon.ContainsKey("lat"))
+        {
+            model.Lat = results.LatLon["lat"];
+        }
+
+        if (results.LatLon != null && results.LatLon.ContainsKey("lon"))
+        {
+            model.Lon = results.LatLon["lon"];
+        }
 
         return model;
     }

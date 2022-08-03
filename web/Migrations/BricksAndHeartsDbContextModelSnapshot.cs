@@ -134,6 +134,14 @@ namespace BricksAndHearts.Migrations
                     b.Property<int>("LandlordId")
                         .HasColumnType("int");
 
+                    b.Property<decimal?>("Lat")
+                        .HasPrecision(12, 9)
+                        .HasColumnType("decimal(12,9)");
+
+                    b.Property<decimal?>("Lon")
+                        .HasPrecision(12, 9)
+                        .HasColumnType("decimal(12,9)");
+
                     b.Property<int?>("NumOfBedrooms")
                         .HasColumnType("int");
 

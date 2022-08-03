@@ -1,4 +1,4 @@
-﻿using System.ComponentModel;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using BricksAndHearts.Database;
 
@@ -37,13 +37,14 @@ public class PropertyViewModel
     public bool? AcceptsBenefits { get; set; }
     public bool? AcceptsNotEET { get; set; }
     public bool? AcceptsWithoutGuarantor { get; set; }
-
-
+    
     // Rent, deposits, and duration
     [Range(0, 100000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
     public int? Rent { get; set; }
-
-
+    
+    // Latitude and Longitude
+    public decimal? Lat { get; set; }
+    public decimal? Lon { get; set; }
     public static PropertyViewModel FromDbModel(PropertyDbModel property)
     {
         return new PropertyViewModel
@@ -54,6 +55,8 @@ public class PropertyViewModel
             CreationTime = property.CreationTime,
             Rent = property.Rent,
             Description = property.Description,
+            Lat = property.Lat,
+            Lon = property.Lon,
             Address = new PropertyAddress
             {
                 AddressLine1 = property.AddressLine1,
@@ -61,7 +64,7 @@ public class PropertyViewModel
                 AddressLine3 = property.AddressLine3,
                 TownOrCity = property.TownOrCity,
                 County = property.County,
-                Postcode = property.Postcode
+                Postcode = property.Postcode,
             },
             AcceptsSingleTenant = property.AcceptsSingleTenant,
             AcceptsCouple = property.AcceptsCouple,

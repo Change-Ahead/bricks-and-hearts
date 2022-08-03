@@ -6,6 +6,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using BricksAndHearts.Auth;
 using BricksAndHearts.Services;
+using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
@@ -14,23 +15,29 @@ using Xunit;
 
 namespace BricksAndHearts.UnitTests.ServiceTests.Api;
 
-public class ApiTests
+public class ApiServiceTests
 {
     // A fake options
-    private static readonly IOptions<AzureMapsOptions> _options = A.Fake<IOptions<AzureMapsOptions>>();
+    private IOptions<AzureMapsOptions> _options; 
+    private ILogger<AzureMapsAzureMapsApiService> _logger; 
+    private HttpMessageHandler _messageHandler;
+    private HttpClient _httpClient;
+    
     // A real API service
-    private readonly AzureMapsAzureMapsApiService _underTest = new(null!, _options);
+    private AzureMapsAzureMapsApiService _underTest;
+
+    public ApiServiceTests()
+    {
+        _options = A.Fake<IOptions<AzureMapsOptions>>();
+        _logger= A.Fake<ILogger<AzureMapsAzureMapsApiService>>();
+        _messageHandler = A.Fake<HttpMessageHandler>();
+        _httpClient = new HttpClient(_messageHandler);
+        _underTest= new AzureMapsAzureMapsApiService(_logger, _options,_httpClient);
+    }
     
     [Fact]
     public async Task MakeApiRequestToAzureMaps_WhenCalled_ReturnsNonEmptyString()
     {
-        // Setup
-        var options = A.Fake<IOptions<AzureMapsOptions>>();
-        var logger = A.Fake<ILogger<AzureMapsAzureMapsApiService>>();
-        var fakeMessageHandler = A.Fake<HttpMessageHandler>();
-        var fakeHttpClient = new HttpClient(fakeMessageHandler);
-        var underTest = new AzureMapsAzureMapsApiService(logger, options, fakeHttpClient);
-
         // Arrange
         const string postalCode = "cb11dx";
         var responseBody = await File.ReadAllTextAsync($"{AppDomain.CurrentDomain.BaseDirectory}/../../../ServiceTests/Api/AzureMapsApiResponse.json");
@@ -40,10 +47,10 @@ public class ApiTests
             Content = new StringContent(responseBody)
         };
         // Slightly icky because "SendAsync" is protected
-        A.CallTo(fakeMessageHandler).Where(c => c.Method.Name == "SendAsync").WithReturnType<Task<HttpResponseMessage>>().Returns(response);
+        A.CallTo(_messageHandler).Where(c => c.Method.Name == "SendAsync").WithReturnType<Task<HttpResponseMessage>>().Returns(response);
 
         // Act
-        var result = await underTest.MakeApiRequestToAzureMaps(postalCode);
+        var result = await _underTest.MakeApiRequestToAzureMaps(postalCode);
 
         // Assert
         result.Should().Be(responseBody);
@@ -67,12 +74,12 @@ public class ApiTests
         }
         var results = postcodeApiResponseViewModel.ListOfResults[0];
         results.Address.Should().NotBeNull("Address should not be null");
-        if (results.Address == null)
-        {
-            return;
-        }
-        results.Address.Keys.ToList().Should().Contain("streetName");
-        results.Address["streetName"].Should().Be("Adam & Eve Street");
+        results.LatLon.Should().NotBeNull("LatLon should not be null");
+
+        results.Address!.Keys.ToList().Should().Contain("streetName");
+        results.Address!["streetName"].Should().Be("Adam & Eve Street");
+        results.LatLon!["lat"].Should().Be((decimal)52.2046);
+        results.LatLon!["lon"].Should().Be((decimal)0.13244);
     }
     
     [Fact]
@@ -87,7 +94,33 @@ public class ApiTests
         // Assert
         postcodeApiResponseViewModel.ListOfResults.Should().BeNull("should be null");
     }
-    
-    // The AutofillAddress method is getting tested manually via the front-end 
-    // We tested 5 different postcodes and they all work
+
+    [Fact]
+    public async void AutofillAddress_WithValidPostcode_AutocompletesEverything()
+    {
+        // Arrange
+        var model = new PropertyViewModel();
+        const string postcode = "cb11dx";
+        var responseBody = await File.ReadAllTextAsync($"{AppDomain.CurrentDomain.BaseDirectory}/../../../ServiceTests/Api/AzureMapsApiResponse.json");
+        var response = new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent(responseBody)
+        };
+        // Slightly icky because "SendAsync" is protected
+        A.CallTo(_messageHandler).Where(c => c.Method.Name == "SendAsync").WithReturnType<Task<HttpResponseMessage>>().Returns(response);
+        
+        model.Address.Postcode = postcode;
+        model.Address.AddressLine1 = "12 Adam & Eve Court";
+        
+        // Act
+        await _underTest.AutofillAddress(model);
+        
+        // Assert
+        model.Address.AddressLine2.Should().NotBeNull();
+        model.Address.County.Should().NotBeNull();
+        model.Address.TownOrCity.Should().NotBeNull();
+        model.Lat.Should().Be((decimal)52.2046);
+        model.Lon.Should().Be((decimal)0.13244);
+    }
 }
