@@ -55,16 +55,6 @@ public class AdminControllerTests : AdminControllerTestsBase
         result!.ViewData.Model.Should().BeOfType<AdminListModel>();
     }
 
-
-    /*public void PropertyList_ReturnsViewWith_PropertiesDashboardViewModel()
-    {
-        // Act
-        var result = UnderTest.PropertyList().Result as ViewResult;
-
-        // Assert
-        result!.Model.Should().BeOfType<PropertiesDashboardViewModel>();
-    }*/
-
     [Fact]
     public void ViewLandlord_ReturnsViewWith_LandlordProfileModel()
     {
@@ -79,15 +69,4 @@ public class AdminControllerTests : AdminControllerTestsBase
         // Assert
         result!.Model.Should().BeOfType<LandlordProfileModel>();
     }
-
-    /*
-    [Fact]
-    public void SortProperties_ReturnsViewWith_PropertiesDashboardViewModel()
-    {
-        // Arrange
-        var dummyString = A.Dummy<string>();
-
-        // Act
-        var result = UnderTest.SortProperties(dummyString) as ViewResult;
-    }*/
 }
