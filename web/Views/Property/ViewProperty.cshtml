@@ -47,10 +47,39 @@
                     <td> </td>
                 </tr>
             </table>
-            
+
         </div>
         <div class="col-4">
-            
+            <table class="table table-bordered">
+                <tr>
+                    <td>Accepts single tenants</td>
+                    <td>@Model.AcceptsSingleTenant</td>
+                </tr>
+                <tr>
+                    <td>Accepts couples</td>
+                    <td>@Model.AcceptsCouple</td>
+                </tr>
+                <tr>
+                    <td>Accepts families</td>
+                    <td>@Model.AcceptsFamily</td>
+                </tr>
+                <tr>
+                    <td>Allows pets</td>
+                    <td>@Model.AcceptsPets</td>
+                </tr>
+                <tr>
+                    <td>Accepts tenants on Universal Credit/housing benefits</td>
+                    <td>@Model.AcceptsBenefits</td>
+                </tr>
+                <tr>
+                    <td>Accepts tenants not in EET</td>
+                    <td>@Model.AcceptsNotEET</td>
+                </tr>
+                <tr>
+                    <td>Accepts tenants without a rent guarantor</td>
+                    <td>@Model.AcceptsWithoutGuarantor</td>
+                </tr>
+            </table>
         </div>
     </div>
     @Html.ActionLink("Property images", "ListPropertyImages", "Property", new { propertyId = Model.PropertyId }, new { @class = "btn btn-primary" })
@@ -69,7 +98,7 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete this property? 
+                Are you sure you want to delete this property?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>

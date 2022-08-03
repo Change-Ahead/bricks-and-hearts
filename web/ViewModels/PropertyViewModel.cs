@@ -4,7 +4,7 @@ using BricksAndHearts.Database;
 
 namespace BricksAndHearts.ViewModels;
 
-public class PropertyViewModel
+public class PropertyViewModel : IValidatableObject
 {
     // Backend info
     public int PropertyId;
@@ -74,6 +74,14 @@ public class PropertyViewModel
             AcceptsNotEET = property.AcceptsNotEET,
             AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor
         };
+    }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (AcceptsSingleTenant == false && AcceptsCouple == false && AcceptsFamily == false)
+        {
+            yield return new ValidationResult("At least one type of tenant must be selected");
+        }
     }
 }
 
