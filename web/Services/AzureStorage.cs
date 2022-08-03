@@ -70,10 +70,10 @@ namespace BricksAndHearts.Services
 
             if (blob.FileName != fileName)
             {
-                return $"Successfully uploaded {blob.FileName} with name {fileName}";
+                return $"Successfully uploaded {blob.FileName} with name {fileName}.";
             }
 
-            return $"Successfully uploaded {blob.FileName}";
+            return $"Successfully uploaded {blob.FileName}.";
         }
 
         public async Task<ImageListViewModel> ListFiles(string varType, int id)

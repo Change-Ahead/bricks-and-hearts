@@ -1,3 +1,4 @@
+using System.Diagnostics.Eventing.Reader;
 using System.Text.RegularExpressions;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
@@ -195,7 +196,8 @@ public class PropertyController : AbstractController
             if (!_azureStorage.IsImage(image.FileName))
             {
                 FlashMessage(_logger,
-                    ($"File {image.FileName} not in a recognised image format", "danger", $"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: JPG, JPEG, PNG, BMP, GIF"));
+                    ($"Failed to upload {image.FileName}: not in a recognised image format", "danger",
+                        "{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: JPG, JPEG, PNG, BMP, GIF"));
             }
             else
             {
@@ -208,7 +210,7 @@ public class PropertyController : AbstractController
                 else
                 {
                     FlashMessage(_logger,
-                        ($"File {image.FileName} has length zero", "danger", $"{image.FileName} contains no data, and so has not been uploaded"));
+                        ($"Failed to upload {image.FileName}: has length zero.", "danger", $"{image.FileName} contains no data, and so has not been uploaded"));
                 }
             }
         }
