@@ -46,6 +46,8 @@ public class PropertyService : IPropertyService
             TownOrCity = createModel.Address.TownOrCity,
             County = createModel.Address.County,
             Postcode = createModel.Address.Postcode!,
+            Lat = createModel.Lat,
+            Lon = createModel.Lon,
 
             PropertyType = createModel.PropertyType,
             NumOfBedrooms = createModel.NumOfBedrooms,
@@ -83,6 +85,8 @@ public class PropertyService : IPropertyService
         dbModel.TownOrCity = updateModel.Address.TownOrCity ?? dbModel.TownOrCity;
         dbModel.County = updateModel.Address.County ?? dbModel.County;
         dbModel.Postcode = updateModel.Address.Postcode ?? dbModel.Postcode;
+        dbModel.Lat = updateModel.Lat ?? dbModel.Lat;
+        dbModel.Lon = updateModel.Lat ?? dbModel.Lon;
 
         dbModel.PropertyType = updateModel.PropertyType ?? dbModel.PropertyType;
         dbModel.NumOfBedrooms = updateModel.NumOfBedrooms ?? dbModel.NumOfBedrooms;
