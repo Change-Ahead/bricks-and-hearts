@@ -61,7 +61,7 @@ public class LandlordService : ILandlordService
             CompanyName = createModel.CompanyName,
             Email = createModel.Email,
             Phone = createModel.Phone,
-            LandlordStatus = createModel.LandlordStatus,
+            LandlordType = createModel.LandlordType,
             IsLandlordForProfit = createModel.IsLandlordForProfit,
             LandlordProvidedCharterStatus = createModel.LandlordProvidedCharterStatus
         };
@@ -113,7 +113,7 @@ public class LandlordService : ILandlordService
             CompanyName = createModel.CompanyName,
             Email = createModel.Email,
             Phone = createModel.Phone,
-            LandlordStatus = createModel.LandlordStatus,
+            LandlordType = createModel.LandlordType,
             IsLandlordForProfit = createModel.IsLandlordForProfit,
             LandlordProvidedCharterStatus = createModel.LandlordProvidedCharterStatus
         };
@@ -177,7 +177,7 @@ public class LandlordService : ILandlordService
         landlordToEdit.CompanyName = editModel.CompanyName;
         landlordToEdit.Email = editModel.Email;
         landlordToEdit.Phone = editModel.Phone;
-        landlordToEdit.LandlordStatus = editModel.LandlordStatus;
+        landlordToEdit.LandlordType = editModel.LandlordType;
         landlordToEdit.IsLandlordForProfit = editModel.IsLandlordForProfit;
 
         await _dbContext.SaveChangesAsync();

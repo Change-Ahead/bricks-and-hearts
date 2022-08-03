@@ -37,7 +37,7 @@ public class LandlordProfileModel
     public string Phone { get; set; } = string.Empty;
 
     [DisplayName("Type of landlord")]
-    public string LandlordStatus { get; set; } = string.Empty;
+    public string LandlordType { get; set; } = string.Empty;
 
     public bool LandlordProvidedCharterStatus { get; set; }
 
@@ -61,7 +61,7 @@ public class LandlordProfileModel
             LastName = landlord.LastName,
             Phone = landlord.Phone,
             Title = landlord.Title,
-            LandlordStatus = landlord.LandlordStatus,
+            LandlordType = landlord.LandlordType,
             LandlordProvidedCharterStatus = landlord.LandlordProvidedCharterStatus,
             CharterApproved = landlord.CharterApproved,
             IsLandlordForProfit = landlord.IsLandlordForProfit,

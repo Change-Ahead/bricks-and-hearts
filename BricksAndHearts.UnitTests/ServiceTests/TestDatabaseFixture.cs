@@ -1,4 +1,4 @@
-using BricksAndHearts.Database;
+﻿using BricksAndHearts.Database;
 using Microsoft.Extensions.Configuration;
 
 namespace BricksAndHearts.UnitTests.ServiceTests;
@@ -168,7 +168,7 @@ public class TestDatabaseFixture
             LastName = "McFace",
             Title = "Dr",
             Phone = "01189998819991197253",
-            LandlordStatus = "Non profit",
+            LandlordType = "Non profit",
             CharterApproved = true
         };
     }
@@ -182,7 +182,7 @@ public class TestDatabaseFixture
             LastName = "McCheeks",
             Title = "Mr",
             Phone = "01189998819991197253",
-            LandlordStatus = "Non profit",
+            LandlordType = "Non profit",
             CharterApproved = false
         };
     }
@@ -196,7 +196,7 @@ public class TestDatabaseFixture
             LastName = "McMc",
             Title = "Sister",
             Phone = "01189998819991197253",
-            LandlordStatus = "Non profit",
+            LandlordType = "Non profit",
             CharterApproved = true,
             InviteLink = "InvitimusLinkimus"
         };
@@ -211,7 +211,7 @@ public class TestDatabaseFixture
             LastName = "Landlord",
             Title = "Mr",
             Phone = "004",
-            LandlordStatus = "Non profit",
+            LandlordType = "Non profit",
             CharterApproved = true,
             InviteLink = "invite-unlinked-landlord"
         };
