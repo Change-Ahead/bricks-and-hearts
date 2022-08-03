@@ -64,22 +64,6 @@
 </div>
 
 <div class="registerTab" id="ChangeAhead status" >
-   
-    @if (Model.LandlordProvidedCharterStatus)
-    {
-        <style>
-            div.hidetrue {}
-            div.hidefalse {display: none;}
-        </style>
-    }
-    else
-    {
-        <style>
-            div.hidetrue {display: none;}
-            div.hidefalse {}
-        </style>
-    }
-    
     <p>ChangeAhead Charter</p>
 
     <div class="my-3">
@@ -93,12 +77,12 @@
         <span asp-validation-for="LandlordProvidedCharterStatus" class="text-danger"></span>
     </div>
 
-    <div id="ifTrue" class="form-group my-3 hidetrue">
+    <div id="ifTrue" class="form-group my-3" style="@(Model.LandlordProvidedCharterStatus ? "" : "display: none;")">
         <label class="control-label">Please provide your Charter Membership Id:</label>
         <input asp-for="MembershipId" class="form-control empty"/>
         <span asp-validation-for="MembershipId" class="text-danger"></span>
     </div>
-    <div id="ifFalse" class="hidefalse">
+    <div id="ifFalse" style="@(!Model.LandlordProvidedCharterStatus ? "" : "display: none;")">
         ChangeAhead require your participation in a charter system.
     </div>
 </div>
