@@ -24,7 +24,7 @@
     }
     @foreach (var prop in Model.Properties)
     {
-        <tr class ="clickable"
+        <tr class="clickable"
             onclick="location.href = '@Url.Action("ViewProperty", "Property", new { propertyId = prop!.PropertyId })'">
             <th scope="row">@i</th>
             <td>
@@ -39,6 +39,18 @@
             <td>@prop.NumOfBedrooms</td>
             <td>@prop.Rent</td>
             <td>@prop.Description</td>
+            <td>
+                @if (prop.IsIncomplete)
+                {
+                    <a class="btn btn-primary position-relative" href="@Url.Action("AddNewProperty_Continue", "Property", new { propId = prop.PropertyId, step = 1 })">
+                        Edit
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
+                            <i class="bi bi-circle-half"></i>
+                            <span class="visually-hidden">Property is incomplete</span>
+                        </span>
+                    </a>
+                }
+            </td>
         </tr>
         i++;
     }

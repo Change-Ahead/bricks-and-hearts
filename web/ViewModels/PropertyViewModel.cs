@@ -9,7 +9,8 @@ public class PropertyViewModel
     public int PropertyId;
     public PropertyAddress Address { get; set; } = new();
 
-    [StringLength(10000)] public string? PropertyType { get; set; }
+    [StringLength(10000)]
+    public string? PropertyType { get; set; }
 
     [Range(0, 1000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
     [DisplayName("Number of Bedrooms")]
@@ -20,18 +21,22 @@ public class PropertyViewModel
     [Range(0, 100000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
     public int? Rent { get; set; }
 
-    [StringLength(20000)] public string? Description { get; set; }
+    public bool IsIncomplete { get; set; }
+
+    [StringLength(20000)]
+    public string? Description { get; set; }
 
     public static PropertyViewModel FromDbModel(PropertyDbModel property)
     {
         return new PropertyViewModel
         {
-            PropertyId =  property.Id,
+            PropertyId = property.Id,
             PropertyType = property.PropertyType,
             NumOfBedrooms = property.NumOfBedrooms,
             CreationTime = property.CreationTime,
             Rent = property.Rent,
             Description = property.Description,
+            IsIncomplete = property.IsIncomplete,
             Address = new PropertyAddress
             {
                 AddressLine1 = property.AddressLine1,
@@ -47,17 +52,23 @@ public class PropertyViewModel
 
 public class PropertyAddress
 {
-    [StringLength(10000)] public string? AddressLine1 { get; set; }
+    [StringLength(10000)]
+    public string? AddressLine1 { get; set; }
 
-    [StringLength(10000)] public string? AddressLine2 { get; set; }
+    [StringLength(10000)]
+    public string? AddressLine2 { get; set; }
 
-    [StringLength(10000)] public string? AddressLine3 { get; set; }
+    [StringLength(10000)]
+    public string? AddressLine3 { get; set; }
 
-    [StringLength(10000)] public string? TownOrCity { get; set; }
+    [StringLength(10000)]
+    public string? TownOrCity { get; set; }
 
-    [StringLength(10000)] public string? County { get; set; }
+    [StringLength(10000)]
+    public string? County { get; set; }
 
-    [RegularExpression(@"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})",
-    ErrorMessage="Please enter a valid postcode")]
+    [RegularExpression(
+        @"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})",
+        ErrorMessage = "Please enter a valid postcode")]
     public string? Postcode { get; set; }
 }

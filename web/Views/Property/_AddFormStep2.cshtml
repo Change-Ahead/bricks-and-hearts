@@ -6,31 +6,31 @@
 <div asp-validation-summary="All" class="text-danger"></div>
 <div class="my-3">
     <label asp-for="Address!.AddressLine1" class="form-label">Address Line 1</label>
-    <input asp-for="Address!.AddressLine1" class="form-control" required/>
+    <input asp-for="Address!.AddressLine1" value="@Model.Address.AddressLine1" class="form-control" required/>
     <span asp-validation-for="Address!.AddressLine1" class="text-danger"></span>
 </div>
 <div class="my-3">
     <label asp-for="Address!.AddressLine2" class="form-label">Address Line 2</label>
-    <input asp-for="Address!.AddressLine2" class="form-control"/>
+    <input asp-for="Address!.AddressLine2" value="@Model.Address.AddressLine2" class="form-control"/>
     <span asp-validation-for="Address!.AddressLine2" class="text-danger"></span>
 </div>
 <div class="my-3">
     <label asp-for="Address!.AddressLine3" class="form-label">Address Line 3</label>
-    <input asp-for="Address!.AddressLine3" class="form-control"/>
+    <input asp-for="Address!.AddressLine3" value="@Model.Address.AddressLine3" class="form-control"/>
     <span asp-validation-for="Address!.AddressLine3" class="text-danger"></span>
 </div>
 <div class="my-3">
     <label asp-for="Address!.TownOrCity" class="form-label">Town or City</label>
-    <input asp-for="Address!.TownOrCity" class="form-control" required/>
+    <input asp-for="Address!.TownOrCity" value="@Model.Address.TownOrCity" class="form-control" required/>
     <span asp-validation-for="Address!.TownOrCity" class="text-danger"></span>
 </div>
 <div class="my-3">
     <label asp-for="Address!.County" class="form-label">County</label>
-    <input asp-for="Address!.County" class="form-control" required/>
+    <input asp-for="Address!.County" value="@Model.Address.County" class="form-control" required/>
     <span asp-validation-for="Address!.County" class="text-danger"></span>
 </div>
 <div class="my-3">
     <label asp-for="Address!.Postcode" class="form-label">Postcode</label>
-    <input asp-for="Address!.Postcode" class="form-control" required/>
+    <input asp-for="Address!.Postcode" value="@Model.Address.Postcode" class="form-control" required/>
     <span asp-validation-for="Address!.Postcode" class="text-danger"></span>
 </div>

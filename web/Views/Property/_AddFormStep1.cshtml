@@ -6,11 +6,11 @@
 <div asp-validation-summary="All" class="text-danger"></div>
 <div class="my-3">
     <label asp-for="Address!.AddressLine1" class="form-label">Address Line 1</label>
-    <input asp-for="Address!.AddressLine1" class="form-control" required/>
+    <input asp-for="Address!.AddressLine1" value="@Model.Address.AddressLine1" class="form-control" required/>
     <span asp-validation-for="Address!.AddressLine1" class="text-danger"></span>
 </div>
 <div class="my-3">
     <label asp-for="Address!.Postcode" class="form-label">Postcode</label>
-    <input asp-for="Address!.Postcode" class="form-control" required/>
+    <input asp-for="Address!.Postcode" value="@Model.Address.Postcode" class="form-control" required/>
     <span asp-validation-for="Address!.Postcode" class="text-danger"></span>
 </div>

@@ -4,7 +4,7 @@
 
 <div asp-validation-summary="All" class="text-danger"></div>
 <div class="my-3">
-    <label asp-for="PropertyType" class="form-label">Property type</label>
+    <label asp-for="PropertyType" value="@Model.PropertyType" class="form-label">Property type</label>
     <select asp-for="PropertyType" class="form-select" required>
         <option selected disabled value="">Choose a property type</option>
         <option>Top floor flat</option>
@@ -19,6 +19,6 @@
 </div>
 <div class="my-3">
     <label asp-for="NumOfBedrooms" class="form-label">Number of bedrooms</label>
-    <input asp-for="NumOfBedrooms" class="form-control" required/>
+    <input asp-for="NumOfBedrooms" value="@Model.NumOfBedrooms" class="form-control" required/>
     <span asp-validation-for="NumOfBedrooms" class="text-danger"></span>
 </div>

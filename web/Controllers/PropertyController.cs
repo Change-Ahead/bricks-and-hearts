@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -28,14 +29,19 @@ public class PropertyController : AbstractController
     [HttpGet("add")]
     public ActionResult AddNewProperty_Begin()
     {
-        return AddNewProperty_Continue(1);
+        return AddNewProperty_Continue(1, null);
     }
 
     [Authorize(Roles = "Landlord")]
-    //[HttpGet("add/step/{step:int}")]
-    [HttpGet("add/{propId:int=null}/step/{step:int}")]
-    public ActionResult AddNewProperty_Continue([FromRoute] int step, [FromRoute] int? propId = null)
+    [HttpGet("add/step/{step:int}")]
+    [HttpGet("edit/{propId:int}/step/{step:int}")]
+    public ActionResult AddNewProperty_Continue([FromRoute] int step, [FromRoute] int? propId)
     {
+        if (propId == -1)
+        {
+            propId = null;
+        }
+
         var landlordId = GetCurrentUser().LandlordId!.Value;
         PropertyViewModel property;
 
@@ -67,16 +73,24 @@ public class PropertyController : AbstractController
     [Authorize(Roles = "Landlord")]
     [HttpPost("add/{propId:int}/step/{step:int}")]
     public async Task<IActionResult> AddNewProperty_Continue([FromRoute] int step,
-        [FromForm] PropertyViewModel newPropertyModel)
+        [FromForm] PropertyViewModel newPropertyModel, [FromRoute] int? propId)
     {
         var landlordId = GetCurrentUser().LandlordId!.Value;
 
         if (!ModelState.IsValid)
         {
-            return View("AddNewProperty", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
+            return Vi
+            Property", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
         }
 
-        var property = _propertyService.GetIncompleteProperty(landlordId);
+        PropertyDbModel? property = null;
+
+        if (propId != null)
+        {
+            property = _propertyService.GetPropertyByPropertyId((int)propId!);
+            newPropertyModel.PropertyId = (int)propId;
+        }
+
         if (newPropertyModel.Address.Postcode != null)
         {
             newPropertyModel.Address.Postcode =
@@ -136,13 +150,23 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord")]
     [HttpPost("add/{propId:int}/cancel")]
-    public async Task<ActionResult> AddNewProperty_Cancel([FromRoute] int propId)
+    public async Task<ActionResult> AddNewProperty_Cancel([FromRoute] int? propId = null)
     {
         var landlordId = GetCurrentUser().LandlordId!.Value;
-        var property = _propertyService.GetIncompleteProperty(landlordId);
+        if (propId == null)
+        {
+            return RedirectToAction("ViewProperties", "Landlord");
+        }
+
+        var property = _propertyService.GetPropertyByPropertyId((int)propId);
         if (property == null)
         {
             return RedirectToAction("ViewProperties", "Landlord");
+        }
+
+        if (property.LandlordId != landlordId)
+        {
+            return StatusCode(403);
         }
 
         _propertyService.DeleteProperty(property);
