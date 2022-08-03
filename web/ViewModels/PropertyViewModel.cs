@@ -54,7 +54,6 @@ public class PropertyViewModel : IValidatableObject
         return new PropertyViewModel
         {
             PropertyId = property.Id,
-            PropertyId =  property.Id,
             LandlordId = property.LandlordId,
             PropertyType = property.PropertyType,
             NumOfBedrooms = property.NumOfBedrooms,

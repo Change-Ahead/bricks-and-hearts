@@ -80,7 +80,7 @@ namespace BricksAndHearts.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Landlord", (string)null);
+                    b.ToTable("Landlord");
                 });
 
             modelBuilder.Entity("BricksAndHearts.Database.PropertyDbModel", b =>
@@ -158,6 +158,9 @@ namespace BricksAndHearts.Migrations
                     b.Property<int?>("Rent")
                         .HasColumnType("int");
 
+                    b.Property<int?>("RenterUserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("TownOrCity")
                         .HasColumnType("nvarchar(max)");
 
@@ -165,7 +168,7 @@ namespace BricksAndHearts.Migrations
 
                     b.HasIndex("LandlordId");
 
-                    b.ToTable("Property", (string)null);
+                    b.ToTable("Property");
                 });
 
             modelBuilder.Entity("BricksAndHearts.Database.UserDbModel", b =>
@@ -206,7 +209,7 @@ namespace BricksAndHearts.Migrations
                         .IsUnique()
                         .HasFilter("[LandlordId] IS NOT NULL");
 
-                    b.ToTable("User", (string)null);
+                    b.ToTable("User");
                 });
 
             modelBuilder.Entity("BricksAndHearts.Database.PropertyDbModel", b =>
