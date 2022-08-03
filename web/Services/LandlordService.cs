@@ -22,6 +22,7 @@ public interface ILandlordService
         ErrorUserAlreadyHasLandlordRecord,
         Success
     }
+
     public Task<(LandlordRegistrationResult result, LandlordDbModel? dbModel)> RegisterLandlord(
         LandlordProfileModel createModel,
         BricksAndHeartsUser user);
@@ -30,6 +31,7 @@ public interface ILandlordService
         LandlordProfileModel createModel);
 
     public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int? id);
+    public Task<LandlordDbModel> GetLandlordFromId(int id);
     public Task<LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel);
     public bool CheckForDuplicateEmail(LandlordProfileModel editModel);
     public bool CheckForDuplicateMembershipId(LandlordProfileModel editModel);
@@ -39,7 +41,6 @@ public interface ILandlordService
     public Task<LinkUserWithLandlordResult> LinkExistingLandlordWithUser(
         string inviteLink,
         BricksAndHeartsUser user);
-
 }
 
 public class LandlordService : ILandlordService
@@ -164,7 +165,7 @@ public class LandlordService : ILandlordService
         return (ILandlordService.LandlordRegistrationResult.Success, dbModel);
     }
 
-    public async Task<string> ApproveLandlord(int landlordId,  BricksAndHeartsUser user)
+    public async Task<string> ApproveLandlord(int landlordId, BricksAndHeartsUser user)
     {
         var landlord = await GetLandlordIfExistsFromId(landlordId);
         if (landlord is null)
@@ -184,17 +185,11 @@ public class LandlordService : ILandlordService
         return $"Successfully approved Landlord Charter for {landlord.FirstName} {landlord.LastName}.";
     }
 
-    private async Task<LandlordDbModel?> GetLandlordIfExistsFromModel(LandlordDbModel model)
-    {
-        var landlord = await _dbContext.Landlords.SingleOrDefaultAsync(l => l.Email == model.Email);
-        return landlord;
-    }
-
     public LandlordDbModel? FindLandlordWithInviteLink(string inviteLink)
     {
         return _dbContext.Landlords.SingleOrDefault(l => l.InviteLink == inviteLink);
     }
-    
+
 
     public async Task<ILandlordService.LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel)
     {
@@ -227,7 +222,7 @@ public class LandlordService : ILandlordService
         return _dbContext.Landlords.SingleOrDefault(l => l.Email == editModel.Email) != null
                && editedLandlord.Email != editModel.Email;
     }
-    
+
     public bool CheckForDuplicateMembershipId(LandlordProfileModel editModel)
     {
         var editedLandlord = _dbContext.Landlords.Single(l => l.Id == editModel.LandlordId);
@@ -265,16 +260,28 @@ public class LandlordService : ILandlordService
 
             // Disable invite link
             landlord.InviteLink = null;
-            
+
             // Now we can update the user record too
             userRecord.LandlordId = landlord.Id; // EF should automatically update the rest of it for us
             await _dbContext.SaveChangesAsync();
 
             // and finally commit
             await transaction.CommitAsync();
-            
+
             user.LandlordId = landlord.Id; // Update the in memory user object
         }
+
         return ILandlordService.LinkUserWithLandlordResult.Success;
+    }
+
+    public Task<LandlordDbModel> GetLandlordFromId(int id)
+    {
+        return _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id)!;
+    }
+
+    private async Task<LandlordDbModel?> GetLandlordIfExistsFromModel(LandlordDbModel model)
+    {
+        var landlord = await _dbContext.Landlords.SingleOrDefaultAsync(l => l.Email == model.Email);
+        return landlord;
     }
 }

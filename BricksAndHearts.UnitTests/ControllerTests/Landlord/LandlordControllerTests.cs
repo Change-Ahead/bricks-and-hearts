@@ -1,4 +1,5 @@
 using System.Linq;
+using System.Threading.Tasks;
 using BricksAndHearts.Controllers;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
@@ -200,7 +201,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     }
 
     [Fact]
-    public void ViewProperties_CalledByAdmin_CanReturnOtherUsersPropertyList()
+    public async Task ViewProperties_CalledByAdmin_CanReturnOtherUsersPropertyList()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -210,7 +211,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
             .Returns(A.CollectionOfFake<PropertyDbModel>(10).ToList());
 
         // Act
-        var result = UnderTest.ViewProperties(2) as ViewResult;
+        var result = await UnderTest.ViewProperties(2) as ViewResult;
 
         // Assert
         result.Should().BeOfType<ViewResult>();
@@ -221,7 +222,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     }
 
     [Fact]
-    public void ViewProperties_CalledByNonAdmin_CannotReturnOtherUsersPropertyList()
+    public async Task ViewProperties_CalledByNonAdmin_CannotReturnOtherUsersPropertyList()
     {
         // Arrange
         var unregisteredUser = CreateUnregisteredUser();
@@ -235,19 +236,19 @@ public class LandlordControllerTests : LandlordControllerTestsBase
             .Returns(A.CollectionOfFake<PropertyDbModel>(10).ToList());
 
         // Act
-        var result = underTest.ViewProperties(2) as StatusCodeResult;
+        var result = await underTest.ViewProperties(2) as StatusCodeResult;
         result.Should().BeOfType<StatusCodeResult>();
         result.Should().NotBeNull();
         result!.StatusCode.Should().Be(403);
     }
-    
+
     [Fact]
     public async void TieUserWithLandlord_WithNonExistentLink_RedirectToInvite()
     {
         // Arrange 
         var landlordUser = CreateLandlordUser();
         const string inviteLink = "11111";
-        A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink,landlordUser))
+        A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink, landlordUser))
             .Returns(ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist);
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
@@ -257,10 +258,10 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Assert
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("Invite");
         result.Should().BeOfType<RedirectToActionResult>().Which.RouteValues.Should()
-            .Contain("inviteLink",inviteLink);
+            .Contain("inviteLink", inviteLink);
         UnderTest.TempData["FlashMessage"].Should().BeNull();
     }
-    
+
     [Fact]
     public async void TieUserWithLandlord_WithLandlord_RedirectToProfile()
     {
@@ -268,7 +269,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var landlordUser = CreateLandlordUser();
         const string inviteLink = "11111";
 
-        A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink,landlordUser))
+        A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink, landlordUser))
             .Returns(ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord);
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
@@ -277,9 +278,10 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
         // Assert   
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("MyProfile");
-        UnderTest.TempData["FlashMessage"].Should().Be($"User already registered with landlord (landlordId = {landlordUser.LandlordId})");
+        UnderTest.TempData["FlashMessage"].Should()
+            .Be($"User already registered with landlord (landlordId = {landlordUser.LandlordId})");
     }
-    
+
     [Fact]
     public async void TieUserWithLandlord_WithNonLandlordUser_RedirectToProfile()
     {
@@ -287,7 +289,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var nonLandlordUser = CreateUnregisteredUser();
         const string inviteLink = "11111";
 
-        A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink,nonLandlordUser))
+        A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink, nonLandlordUser))
             .Returns(ILandlordService.LinkUserWithLandlordResult.Success);
         MakeUserPrincipalInController(nonLandlordUser, UnderTest);
 
@@ -296,6 +298,8 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
         // Assert
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("MyProfile");
-        UnderTest.TempData["FlashMessage"].Should().Be($"User {nonLandlordUser.Id} successfully linked with landlord (landlordId = {nonLandlordUser.LandlordId})");
+        UnderTest.TempData["FlashMessage"].Should()
+            .Be(
+                $"User {nonLandlordUser.Id} successfully linked with landlord (landlordId = {nonLandlordUser.LandlordId})");
     }
 }

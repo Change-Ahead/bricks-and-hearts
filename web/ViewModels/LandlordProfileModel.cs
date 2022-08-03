@@ -51,7 +51,7 @@ public class LandlordProfileModel
 
     [DisplayName("For / not for profit")]
     public bool IsLandlordForProfit { get; set; }
-    
+
     public static LandlordProfileModel FromDbModel(LandlordDbModel landlord, BricksAndHeartsUser user)
     {
         return new LandlordProfileModel
@@ -69,6 +69,25 @@ public class LandlordProfileModel
             CharterApproved = landlord.CharterApproved,
             IsLandlordForProfit = landlord.IsLandlordForProfit,
             CurrentUserIsAdmin = user.IsAdmin
+        };
+    }
+
+    public static LandlordProfileModel FromDbModel(LandlordDbModel landlord)
+    {
+        return new LandlordProfileModel
+        {
+            LandlordId = landlord.Id,
+            CompanyName = landlord.CompanyName,
+            Email = landlord.Email,
+            FirstName = landlord.FirstName,
+            LastName = landlord.LastName,
+            Phone = landlord.Phone,
+            Title = landlord.Title,
+            LandlordType = landlord.LandlordType,
+            LandlordProvidedCharterStatus = landlord.LandlordProvidedCharterStatus,
+            CharterApproved = landlord.CharterApproved,
+            IsLandlordForProfit = landlord.IsLandlordForProfit,
+            CurrentUserIsAdmin = landlord.User?.IsAdmin ?? false
         };
     }
 }

@@ -11,9 +11,9 @@ namespace BricksAndHearts.Controllers;
 public class LandlordController : AbstractController
 {
     private readonly ILandlordService _landlordService;
-    private readonly IPropertyService _propertyService;
-    private readonly IMailService _mailService;
     private readonly ILogger<LandlordController> _logger;
+    private readonly IMailService _mailService;
+    private readonly IPropertyService _propertyService;
 
     public LandlordController(ILogger<LandlordController> logger,
         ILandlordService landlordService, IPropertyService propertyService, IMailService mailService)
@@ -77,7 +77,7 @@ public class LandlordController : AbstractController
         {
             case ILandlordService.LandlordRegistrationResult.Success:
                 _logger.LogInformation("Successfully created landlord for user {UserId}", user.Id);
-                var msgBody = $"A Landlord has just registered\n"
+                var msgBody = "A Landlord has just registered\n"
                               + "\n"
                               + $"Title: {createModel.Title}\n"
                               + $"First Name: {createModel.FirstName}" + "\n"
@@ -86,9 +86,9 @@ public class LandlordController : AbstractController
                               + $"Email: {createModel.Email}" + "\n"
                               + $"Phone: {createModel.Phone}" + "\n";
                 var subject = "Bricks&Hearts - landlord registration notification";
-                #pragma warning disable CS4014
-                Task.Run( () => TrySendMsg(msgBody, subject));
-                #pragma warning restore CS4014
+#pragma warning disable CS4014
+                Task.Run(() => TrySendMsg(msgBody, subject));
+#pragma warning restore CS4014
 
                 return RedirectToAction("Profile", "Landlord", new { landlord!.Id });
 
@@ -128,11 +128,11 @@ public class LandlordController : AbstractController
         catch (Exception e)
         {
             // ignored
-            _logger.LogWarning("Failed to send email with message:\n{Msg}\n \nSubject:\n{Subject}",msgBody,subject);
-            _logger.LogWarning("Email sending exception message: {E}",e);
+            _logger.LogWarning("Failed to send email with message:\n{Msg}\n \nSubject:\n{Subject}", msgBody, subject);
+            _logger.LogWarning("Email sending exception message: {E}", e);
         }
     }
-    
+
     [HttpGet]
     [Route("{id:int}/profile")]
     public async Task<ActionResult> Profile([FromRoute] int id)
@@ -172,14 +172,14 @@ public class LandlordController : AbstractController
     {
         var user = GetCurrentUser();
         var flashMessageBody = await _landlordService.ApproveLandlord(landlordId, user);
-        FlashMessage(_logger,("charter status updated successfully","success",flashMessageBody));
+        FlashMessage(_logger, ("charter status updated successfully", "success", flashMessageBody));
         return RedirectToAction("Profile", "Landlord", new { Id = landlordId });
     }
 
     [HttpGet]
     [Route("me/properties")]
     [Route("{id:int}/properties")]
-    public IActionResult ViewProperties(int? id = null)
+    public async Task<IActionResult> ViewProperties(int? id = null)
     {
         if (id == null)
         {
@@ -196,7 +196,10 @@ public class LandlordController : AbstractController
 
         var databaseResult = _propertyService.GetPropertiesByLandlord(id.Value);
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
-        return View("Properties", new PropertiesDashboardViewModel(listOfProperties));
+        var landlordProfile = LandlordProfileModel.FromDbModel(await _landlordService.GetLandlordFromId((int)id));
+        var viewModel = new PropertiesDashboardViewModel(listOfProperties, landlordProfile);
+
+        return View("Properties", viewModel);
     }
 
     [HttpGet]
@@ -278,21 +281,25 @@ public class LandlordController : AbstractController
         if (result == ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist)
         {
             _logger.LogWarning("Invite Link {Link} does not work", inviteLink);
-            return RedirectToAction(nameof(Invite),new {inviteLink});
+            return RedirectToAction(nameof(Invite), new { inviteLink });
         }
+
         if (result == ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord)
         {
             _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
-            TempData["FlashMessage"] = $"User already registered with landlord (landlordId = {user.LandlordId})"; // This will be displayed on the Profile page
+            TempData["FlashMessage"] =
+                $"User already registered with landlord (landlordId = {user.LandlordId})"; // This will be displayed on the Profile page
             return RedirectToAction(nameof(MyProfile));
         }
 
         if (result == ILandlordService.LinkUserWithLandlordResult.Success)
         {
             _logger.LogInformation("Successfully registered landlord with user {UserId}", user.Id);
-            TempData["FlashMessage"] = $"User {user.Id} successfully linked with landlord (landlordId = {user.LandlordId})"; // This will be displayed on the Profile page
+            TempData["FlashMessage"] =
+                $"User {user.Id} successfully linked with landlord (landlordId = {user.LandlordId})"; // This will be displayed on the Profile page
             return RedirectToAction(nameof(MyProfile));
         }
+
         throw new Exception($"Unknown landlord registration error ${result}");
     }
 }
