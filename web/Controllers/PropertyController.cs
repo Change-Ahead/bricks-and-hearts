@@ -192,16 +192,24 @@ public class PropertyController : AbstractController
         }
         foreach (var image in images)
         {
-            if (image.Length > 0)
+            if (!_azureStorage.IsImage(image.FileName))
             {
-                await _azureStorage.UploadFile(image, "property", propertyId);
+                FlashMessage(_logger,
+                    ($"File {image.FileName} not in a recognised image format", "danger", $"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: JPG, JPEG, PNG, BMP, GIF"));
             }
             else
             {
-                FlashMessage(_logger,
-                    ($"File {image.FileName} has length zero",
-                        "danger",
-                        "File contains no data"));
+                if (image.Length > 0)
+                {
+                    string message = await _azureStorage.UploadFile(image, "property", propertyId);
+                    FlashMessage(_logger,
+                        ($"Successfully uploaded {image.FileName}", "success", message));
+                }
+                else
+                {
+                    FlashMessage(_logger,
+                        ($"File {image.FileName} has length zero", "danger", $"{image.FileName} contains no data, and so has not been uploaded"));
+                }
             }
         }
         return RedirectToAction("ListPropertyImages", "Property", new{propertyId});
