@@ -47,7 +47,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel, unregisteredUser)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
-        result!.ActionName.Should().BeEquivalentTo("MyProfile");
+        result!.ActionName.Should().BeEquivalentTo("Profile");
     }
 
     [Fact]
