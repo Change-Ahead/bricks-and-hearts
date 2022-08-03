@@ -112,20 +112,27 @@
         }
     </div>
     <div class="col-lg-5">
-        <h4>ChangeAhead Charter</h4>
+        <div class="d-flex p-2 justify-content-between">
+            <h4>ChangeAhead Charter</h4>
+            <td>
+                <input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", new { landlordId = Model.LandlordId })'; setCurrentTab(3);"/>
+            </td>
+        </div>
         @if (Model.CharterApproved)
         {
             <p>Charter status: Approved</p>
+            <p>Membership Id: @Model.MembershipId</p>
         }
         else
         {
             <p>Charter status: Pending</p>
-            @if (Model.CurrentUserIsAdmin)
+            @if (Model.CurrentUserIsAdmin && Model.MembershipId != null)
             {
+                <p>Membership Id: @Model.MembershipId</p>
                 @using (Html.BeginForm("ApproveCharter", "Landlord", FormMethod.Post))
                 {
                     <input type="hidden" id="landlordId" name="landlordId" value=@Model.LandlordId>
-                    <button type="submit" class="btn btn-outline-primary">Approve Landlord</button>
+                    <button type="submit" class="btn btn-outline-primary">Confirm Landlord Charter Membership</button>
                 }
             }
         }

@@ -64,12 +64,17 @@ function validateForm() {
     // This function deals with validation of the form fields
     let tabList, tabInputList, tabInputIterator, valid = true;
     tabList = document.getElementsByClassName("registerTab");
-    tabInputList = tabList[currentTab].getElementsByTagName("input");
+    tabInputList = tabList[currentTab].querySelectorAll("input, select");
     // A loop that checks every input field in the current tab:
     for (tabInputIterator = 0; tabInputIterator < tabInputList.length; tabInputIterator++) {
         // Validation checks for the form
         let currentField = tabInputList[tabInputIterator]
+        if ((currentField.name === "MembershipId") && ((tabInputList[tabInputIterator-1]).value === "false"))
+        {
+           currentField.className = "form-control empty";
+        }
         if ((currentField.value === "" && currentField.className!=="form-control empty")
+            || ((currentField.name === "MembershipId") && (currentField.value === "") && ((tabInputList[tabInputIterator-1]).value === "true"))
             || (currentField.type === "email" && (currentField.value.indexOf("@") === -1))
             || (currentField.type === "tel" && !Number.isInteger(Number(currentField.value.replace(/\+/g,"")))))
         {
