@@ -1,4 +1,3 @@
-using System.Security.Claims;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
@@ -20,10 +19,10 @@ public class AdminControllerTests : AdminControllerTestsBase
         };
 
         // Act
-        var result = UnderTest.Index() as ViewResult;
+        var result = UnderTest.AdminDashboard() as ViewResult;
 
         // Assert
-        result!.ViewData.Model.Should().BeOfType<AdminViewModel>()
+        result!.ViewData.Model.Should().BeOfType<AdminDashboardViewModel>()
             .Which.CurrentUser.Should().BeNull();
     }
 
