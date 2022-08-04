@@ -31,6 +31,9 @@ html {
 
 body {
     margin-bottom: 60px;
+    background-image: url("images/backgroundHouses.jpg");
+    background-color: rgba(255,255,255,0.97);
+    background-blend-mode: lighten;
 }
 
 .test {
@@ -83,8 +86,10 @@ body {
     border-color: var(--red);
 }
 
-.form-control {
+.form-control, .form-select{
     border-color: var(--blue);
+    line-height: 2.5;
+    font-size: larger;
 }
 
 /*font classes*/
@@ -140,25 +145,35 @@ input.invalid {
 
 /* Make circles that indicate the steps of the form: */
 .step {
-    height: 15px;
-    width: 15px;
-    margin: 0 2px;
+    height: 32px;
+    width: 32px;
     background-color: var(--paleOrange);
-    border: none;
     border-radius: 50%;
     display: inline-block;
+    color: var(--white);
+    z-index: 1000;
+}
+ /* Make lines connecting the steps*/
+.stepline {
+    height: 4px;
+    width: 25%;
+    margin-top: 14px;
+    margin-left: -0.1%;
+    margin-right: -0.1%;
+    background-color: var(--paleOrange);
+    display: inline-block;
+    z-index: 0;
 }
 
 /* Mark the steps that are finished and valid: */
-.step.finish {
-    background-color: var(--orange);
-    opacity: 50%;
+.step.finish, .stepline.finish {
+  background-color: var(--lightOrange);
 }
 
 /* Mark the active step: */
 .step.active {
     background-color: var(--orange);
-    opacity: 100%;
+    box-shadow: 0 0 0 3px var(--lightOrange);
 }
 
 /*End of javascript form styling*/
