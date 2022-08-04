@@ -33,7 +33,7 @@
         <div class="d-flex p-2 justify-content-between">
             <h4>Personal details</h4>
             <td>
-                <input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(0);"/>
+                <a class="btn btn-outline-primary" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(0);">Edit</a>
             </td>
         </div>
 
@@ -56,7 +56,7 @@
         <div class="d-flex p-2 justify-content-between">
             <h4>Landlord details</h4>
             <td>
-                <input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", new { landlordId = Model.LandlordId })'; setCurrentTab(1);"/>
+                <a class="btn btn-outline-primary" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(1);">Edit</a>
             </td>
         </div>
         <div class="tables">
@@ -78,7 +78,7 @@
         <div class="d-flex p-2 justify-content-between">
             <h4>Contact details</h4>
             <td>
-                <input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", new { landlordId = Model.LandlordId })'; setCurrentTab(2);"/>
+                <a class="btn btn-outline-primary" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(2);">Edit</a>
             </td>
         </div>
         <div class="tables">
@@ -120,7 +120,7 @@
         <div class="d-flex p-2 justify-content-between">
             <h4>ChangeAhead Charter</h4>
             <td>
-                <input type="button" class="btn btn-outline-primary" value="Edit" onclick="location.href='@Url.Action("EditProfilePage", new { landlordId = Model.LandlordId })'; setCurrentTab(2);"/>
+                <a class="btn btn-outline-primary" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(2);">Edit</a>
             </td>
         </div>
         @if (Model.CharterApproved)
