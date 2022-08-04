@@ -14,6 +14,10 @@ html {
     font-size: 14px;
 }
 
+html *{
+    font-family: 'Roboto', sans-serif;
+}
+
 @media (min-width: 768px) {
     html {
         font-size: 16px;
@@ -82,6 +86,46 @@ body {
 .form-control {
     border-color: var(--blue);
 }
+
+/*font classes*/
+.font-logo {
+    font-size: 24px;
+    font-weight: bolder;
+}
+
+.font-navText {
+    font-size: 18px;
+}
+
+.font-statistics {
+    font-size: 48px;
+}
+
+.font-h1 {
+    font-size: 32px;
+}
+
+.font-h2 {
+    font-size: 20px;
+    font-weight: bold;
+}
+
+.font-h3 {
+    font-size: 20px;
+}
+
+.font-body {
+    font-size: 18px;
+}
+
+.font-smallBody {
+    font-size: 16px;
+}
+
+.font-subtitle {
+    font-size: 12px;
+}
+/*end font classes*/
 
 /*Javascript form styling:*/
 /* Mark input boxes that gets an error on validation: */
