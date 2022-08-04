@@ -38,6 +38,8 @@
                     {
                         @if (User.IsInRole("Landlord"))
                         {
+                            @* TODO BNH-99: Replace icon with profile picture *@
+
                             <a asp-controller="Landlord" asp-action="Profile" asp-route-id="@(((BricksAndHeartsUser)User.Identity).LandlordId!.Value)" class="bi bi-person-circle nav-link pt-0 pb-0 fs-4 ms-3"></a>
                         }
                         @using (Html.BeginForm("Logout", "Login", FormMethod.Post))
