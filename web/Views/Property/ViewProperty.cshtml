@@ -82,12 +82,13 @@
             </table>
         </div>
     </div>
-    @Html.ActionLink("Property images", "ListPropertyImages", "Property", new { propertyId = Model.PropertyId }, new { @class = "btn btn-primary" })
+    @Html.ActionLink("Property images", "ListPropertyImages", "Property", new { propertyId = Model.PropertyId }, 
+        new { @class = "btn btn-primary" })
+    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#deleteModal">
+        Delete Property
+    </button>
 </div>
 
-<button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#deleteModal">
-    Delete
-</button>
 
 <!-- Modal -->
 <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
