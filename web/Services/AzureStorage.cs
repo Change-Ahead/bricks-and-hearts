@@ -7,10 +7,11 @@ namespace BricksAndHearts.Services
     public interface IAzureStorage
     {
         Task DeleteContainer(string varType, int id);
-        Task UploadFile(IFormFile file, string varType, int id);
+        Task<string> UploadFile(IFormFile file, string varType, int id);
         Task<ImageListViewModel> ListFiles(string varType, int id);
         Task<(Stream? data, string? fileType)> DownloadFile(string varType, int id, string blobFilename);
         Task DeleteFile(string varType, int id, string blobFilename);
+        public bool IsImage(string fileName);
     }
 
     public class AzureStorage : IAzureStorage
@@ -50,21 +51,29 @@ namespace BricksAndHearts.Services
             await containerClient.DeleteAsync();
         }
 
-        public async Task UploadFile(IFormFile blob, string varType, int id)
+        public async Task<string> UploadFile(IFormFile blob, string varType, int id)
         {
             var containerClient = await GetOrCreateContainerClient(varType, id);
             var blobClient = containerClient.GetBlobClient(blob.FileName);
+            string fileName = blob.FileName;
             int i = 0;
             while (blobClient.Exists())
             {
                 i += 1;
-                string fileName = SplitFileName(blob.FileName).name + i + "." + SplitFileName(blob.FileName).type;
+                fileName = SplitFileName(blob.FileName).name + i + "." + SplitFileName(blob.FileName).type;
                 blobClient = containerClient.GetBlobClient(fileName);
             }
             await using (Stream? data = blob.OpenReadStream())
             {
                 await blobClient.UploadAsync(data);
             }
+
+            if (blob.FileName != fileName)
+            {
+                return $"Successfully uploaded {blob.FileName} with name {fileName}.";
+            }
+
+            return $"Successfully uploaded {blob.FileName}.";
         }
 
         public async Task<ImageListViewModel> ListFiles(string varType, int id)
@@ -104,6 +113,17 @@ namespace BricksAndHearts.Services
             {
                 await blobClient.DeleteAsync();
             }
+        }
+        
+        public bool IsImage(string fileName)
+        {
+            string fileType = SplitFileName(fileName).type;
+            List<string> imageExtensions = new List<string> { "jpg", "jpeg", "png", "bmp", "gif" };
+            if (imageExtensions.Contains(fileType.ToLower()))
+            {
+                return true;
+            }
+            return false;
         }
 
         private (string name, string type) SplitFileName(string fileName)

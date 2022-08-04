@@ -6,7 +6,8 @@
     --black: #000000;
     --paleBlue: #ECF2FF;
     --paleOrange: #FFEEEE;
-    --white: #FFFFFF
+    --white: #FFFFFF;
+    --red: #C0392B
 }
 
 html {
@@ -71,6 +72,11 @@ body {
     outline-color: var(--lightOrange);
     box-shadow: 0 0 0 3px var(--lightOrange);
     color: var(--white);
+}
+
+.btn-danger{
+    background-color: var(--red);
+    border-color: var(--red);
 }
 
 .form-control{

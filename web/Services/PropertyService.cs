@@ -133,11 +133,6 @@ public class PropertyService : IPropertyService
 
         var propertyLandlordId = GetPropertyByPropertyId(propertyId)!.LandlordId;
         var userLandlordId = currentUser.LandlordId;
-        if (propertyLandlordId == userLandlordId)
-        {
-            return true;
-        }
-
-        return false;
+        return propertyLandlordId == userLandlordId;
     }
 }

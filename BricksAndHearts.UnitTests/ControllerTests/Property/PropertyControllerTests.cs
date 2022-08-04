@@ -334,7 +334,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
     
     [Fact]
-    public async void AddPropertyImages_CallsUploadImageForEachImage_AndRedirectsToListImages()
+    public async void AddPropertyImages_CallsUploadImageForEachImage_AndRedirectsToListImagesWithFlashMessage()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -343,6 +343,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         var fakeImage = CreateExampleImage();
         var fakeImage2 = CreateExampleImage();
+        A.CallTo(() => AzureStorage.IsImage(fakeImage.FileName)).Returns(true);
+        A.CallTo(() => AzureStorage.IsImage(fakeImage2.FileName)).Returns(true);
         var fakeImageList = new List<IFormFile>{fakeImage, fakeImage2};
         
         // Act
@@ -352,8 +354,9 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => AzureStorage.UploadFile(fakeImage, "property", 1)).MustHaveHappened();
         A.CallTo(() => AzureStorage.UploadFile(fakeImage2, "property", 1)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ListPropertyImages");
+        UnderTest.TempData["FlashMessage"].Should().Be("");
     }
-    
+
     [Fact]
     public async void DisplayImage_CallsDownloadFileAsync_AndReturnsFile()
     {

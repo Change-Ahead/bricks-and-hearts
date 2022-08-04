@@ -14,7 +14,7 @@
                 @using (Html.BeginForm("DisplayPropertyImage", "Property", FormMethod.Post))
                 {
                     <input type="hidden" id="propertyId" name="propertyId" value=@Model.PropertyId>
-                    <input type="hidden" id="fileName" name="fileName" value=@file>
+                    <input type="hidden" id="fileName" name="fileName" value="@file">
                     <button type="submit" class="btn btn-primary">Display @file</button>
                 }
             </td>

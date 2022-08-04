@@ -6,6 +6,7 @@ using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Property;
@@ -24,7 +25,9 @@ public class PropertyControllerTestsBase : ControllerTestsBase
         AzureMapsApiService = A.Fake<IAzureMapsApiService>();
         AzureStorage = A.Fake<IAzureStorage>();
         Logger = A.Fake<ILogger<PropertyController>>();
-        UnderTest = new PropertyController(PropertyService, AzureMapsApiService, Logger, AzureStorage);
+        var httpContext = new DefaultHttpContext();
+        var tempData = new TempDataDictionary(httpContext, A.Fake<ITempDataProvider>());
+        UnderTest = new PropertyController(PropertyService, AzureMapsApiService, Logger, AzureStorage){TempData = tempData};
     }
 
     protected PropertyViewModel CreateExamplePropertyViewModel()
