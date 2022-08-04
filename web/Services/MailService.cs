@@ -15,6 +15,13 @@ public interface IMailService
         string msgFromName = "",
         string msgToName = ""
     );
+
+    public Task<string> TrySendMsg(
+        string msgBody,
+        string subject,
+        string msgFromName = "",
+        string msgToName = ""
+    );
 }
 
 public class MailService : IMailService
@@ -55,5 +62,28 @@ public class MailService : IMailService
 
         await client.SendAsync(message);
         await client.DisconnectAsync(true);
+    }
+    
+    public async Task<string> TrySendMsg(
+        string msgBody,
+        string subject,
+        string msgFromName = "",
+        string msgToName = ""
+    )
+    {
+        var loggerMessage = "";
+        try
+        {
+            await SendMsg(msgBody, subject, msgFromName, msgToName);
+            loggerMessage = "Successfully sent emails";
+        }
+        catch (Exception e)
+        {
+            // ignored
+            loggerMessage = $"Failed to send email with message:\n{msgBody}\n \nSubject:\n{subject}";
+            loggerMessage += $"\nEmail sending exception message: {e}";
+        }
+
+        return loggerMessage;
     }
 }

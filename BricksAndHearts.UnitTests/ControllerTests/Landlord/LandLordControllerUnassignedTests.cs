@@ -43,7 +43,7 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
         // Act
         var result = await UnderTest.RegisterPost(formResultModel) as RedirectToActionResult;
         // Assert
-        A.CallTo(() => MailService.SendMsg(
+        A.CallTo(() => MailService.TrySendMsg(
             A<string>.That.Matches(s=>s==msgBody), A<string>.That.Matches(s=>s==subject), A<string>.Ignored, A<string>.Ignored
         )).WithAnyArguments().MustHaveHappened();
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel)).MustHaveHappened();
