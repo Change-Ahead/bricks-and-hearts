@@ -74,12 +74,12 @@ public class AdminController : AbstractController
     public async Task<ActionResult> GetAdminList()
     {
         var adminLists = await _adminService.GetAdminLists();
-        
+
         AdminListModel adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
-        
+
         return View("AdminList", adminListModel);
     }
-    
+
     [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> LandlordList(string? approvalStatus = "")
@@ -96,23 +96,27 @@ public class AdminController : AbstractController
         var user = _adminService.FindUserByLandlordId(landlordId);
         if (user != null) // If landlord already linked to user
         {
-            TempData["InviteLinkMessage"] = $"Landlord already linked to user {user.GoogleUserName}";
+            var flashMessageBody = $"Landlord already linked to user {user.GoogleUserName}";
+            FlashMessage(_logger, (flashMessageBody, "warning", flashMessageBody));
         }
         else
         {
             var inviteLink = _adminService.FindExistingInviteLink(landlordId);
+            string flashMessageBody;
             if (string.IsNullOrEmpty(inviteLink))
             {
-                TempData["InviteLinkMessage"] = "Successfully created a new invite link :)";
+                flashMessageBody = "Successfully created a new invite link";
                 inviteLink = _adminService.CreateNewInviteLink(landlordId);
             }
             else
             {
-                TempData["InviteLinkMessage"] = "Landlord already has an invite link!";
+                flashMessageBody = "Landlord already has an invite link";
             }
-            TempData["InviteLink"] = $"{inviteLink}";
+
+            FlashMessage(_logger, (flashMessageBody, "success", flashMessageBody + $": {inviteLink}"));
         }
-        return RedirectToAction("Profile","Landlord", new {id=landlordId});
+
+        return RedirectToAction("Profile", "Landlord", new { id = landlordId });
     }
 
     [Authorize(Roles = "Admin")]
@@ -138,9 +142,11 @@ public class AdminController : AbstractController
                 inviteLink = _adminService.CreateNewInviteLink(landlordId);
                 TempData["InviteLinkMessage"] = "Successfully created a new invite link :)";
             }
+
             TempData["InviteLink"] = $"{inviteLink}";
         }
-        return RedirectToAction("Profile","Landlord", new {id=landlordId});
+
+        return RedirectToAction("Profile", "Landlord", new { id = landlordId });
     }
 
     private void LoggerAlreadyAdminWarning(ILogger logger, BricksAndHeartsUser user)
@@ -151,7 +157,7 @@ public class AdminController : AbstractController
                 "Already an admin"));
     }
 
-    [Authorize(Roles="Admin")]
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public ActionResult AcceptAdminRequest(int userToAcceptId)
     {
@@ -159,13 +165,13 @@ public class AdminController : AbstractController
         {
             return View("Error", new ErrorViewModel());
         }
-        
+
         _adminService.ApproveAdminAccessRequest(userToAcceptId);
 
         return RedirectToAction("GetAdminList");
     }
-    
-    [Authorize(Roles="Admin")]
+
+    [Authorize(Roles = "Admin")]
     [HttpPost]
     public ActionResult RejectAdminRequest(int userToAcceptId)
     {

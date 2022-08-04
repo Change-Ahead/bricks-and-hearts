@@ -7,15 +7,21 @@
     --paleBlue: #ECF2FF;
     --paleOrange: #FFEEEE;
     --white: #FFFFFF;
-    --red: #C0392B
+    --red: #C0392B;
+    --blue50: #9db3e3;
 }
 
 html {
     font-size: 14px;
 }
 
-html *{
+html * {
     font-family: 'Roboto', sans-serif;
+    font-size: 18px;
+}
+
+a, .nav-link {
+    color: var(--blue);
 }
 
 @media (min-width: 768px) {
@@ -92,7 +98,7 @@ img:hover {
     color: var(--white);
 }
 
-.btn-danger{
+.btn-danger {
     background-color: var(--red);
     border-color: var(--red);
 }
@@ -256,4 +262,32 @@ input:checked + .pill-check i {
 
 .navbar-brand {
     color: var(--blue) !important;
+}
+
+/* Tables */
+table {
+    border-style: solid;
+    border-color: var(--blue) !important;
+}
+
+td, th {
+    border-width: 1px;
+    border-color: var(--blue50);
+    padding-left: 1rem !important;
+}
+
+th {
+    color: var(--blue);
+    font-weight: normal;
+}
+
+
+.profile-photo {
+    height: 100px;
+}
+
+.profile-photo img {
+    height: 100%;
+    width: auto;
+    clip-path: circle();
 }
