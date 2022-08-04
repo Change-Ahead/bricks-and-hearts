@@ -199,3 +199,27 @@ input:checked + .pill-check i {
 .icon-link {
     text-decoration: none;
 }
+
+
+/* Navbar */
+.navbar-primary a {
+    text-transform: uppercase;
+}
+
+.navbar-primary a.btn {
+    text-transform: none;
+}
+
+.navbar-secondary {
+    background-color: var(--blue) !important;
+}
+
+.navbar-secondary .vr {
+    color: var(--paleBlue);
+    width: 2px;
+    opacity: 30%;
+}
+
+.navbar-brand {
+    color: var(--blue) !important;
+}
