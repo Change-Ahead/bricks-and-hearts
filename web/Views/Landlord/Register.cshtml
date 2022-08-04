@@ -10,7 +10,7 @@
 <hr/>
 
 <!-- Circles which indicates the steps of the form: -->
-<div>
+<div class="d-flex justify-content-center">
     <span class="step"></span>
     <span class = "stepline"></span>
     <span class="step"></span>
@@ -21,10 +21,8 @@
 </div>
 
 <div class="row">
-    <div class="col-md-4">
-        <form method="post" asp-controller="Landlord" asp-action="RegisterPost" id="landlordEntry">
+    <form method="post" asp-controller="Landlord" asp-action="RegisterPost" id="landlordEntry">
         <div asp-validation-summary="All" class="text-danger"></div>
-            @{ await Html.RenderPartialAsync("_RegisterPagePartial", Model); }
-        </form>
-    </div>
+        @{ await Html.RenderPartialAsync("_RegisterPagePartial", Model); }
+    </form>
 </div>

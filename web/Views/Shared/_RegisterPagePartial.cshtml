@@ -1,37 +1,38 @@
 @model LandlordProfileModel
-<div class="registerTab" id="Name">
+<div class="registerTab col-md-5" id="Name">
     <div class="form-group my-3">
-        <label>Title:</label>
         @Html.HiddenFor(m => m.Unassigned, new { value = Model.Unassigned })
-        @Html.DropDownList("Title", new List<SelectListItem>
-        {
-            new() { Text = "Mr", Value = "Mr", Selected = true },
-            new() { Text = "Mrs", Value = "Mrs" },
-            new() { Text = "Miss", Value = "Miss" },
-            new() { Text = "Ms", Value = "Ms" },
-            new() { Text = "Dr", Value = "Dr" }
-        }, new { @class = "form-control" })
+        <label asp-for="Title" class="form-label"></label>
+        <select asp-for="Title" class="form-select" required>
+            <option selected disabled value="">Title</option>
+            <option value="Mr">Mr</option>
+            <option value="Mrs">Mrs</option>
+            <option value="Miss">Miss</option>
+            <option value="Ms">Ms</option>
+            <option value="Dr">Dr</option>
+        </select>
+        <span asp-validation-for="Title" class="text-danger"></span>
     </div>
     <div class="form-group my-3">
-        <label asp-for="FirstName" class="control-label"></label>
+        <label asp-for="FirstName" class="form-label"></label>
         <input asp-for="FirstName" class="form-control"/>
         <span asp-validation-for="FirstName" class="text-danger"></span>
     </div>
     <div class="form-group my-3">
-        <label asp-for="LastName" class="control-label"></label>
+        <label asp-for="LastName" class="form-label"></label>
         <input asp-for="LastName" class="form-control"/>
         <span asp-validation-for="LastName" class="text-danger"></span>
     </div>
 </div>
 
-<div class="registerTab" id="Contact details">
+<div class="registerTab col-md-5" id="Contact details">
     <div class="form-group my-3">
-        <label asp-for="Email" class="control-label"></label>
+        <label asp-for="Email" class="form-label"></label>
         <input type="email" asp-for="Email" class="form-control"/>
         <span asp-validation-for="Email" class="text-danger"></span>
     </div>
     <div class="form-group my-3">
-        <label asp-for="Phone" class="control-label"></label>
+        <label asp-for="Phone" class="form-label"></label>
         <input type="tel" asp-for="Phone" class="form-control"/>
         <span asp-validation-for="Phone" class="text-danger"></span>
     </div>
@@ -39,51 +40,58 @@
 
 
 <div class="registerTab" id="Landlord details">
-    <div class="form-group my-3">
-        <label>Landlord type:</label>
-        @Html.DropDownList("LandlordType", new List<SelectListItem>
-        {
-            new() { Text = "Charity", Value = "Charity", Selected = true },
-            new() { Text = "Private Residential Sector", Value = "Private Residential Sector" },
-            new() { Text = "Registered Provider", Value = "Registered Provider" },
-            new() { Text = "Local Authority", Value = "Local Authority" }
-        }, new { @class = "form-control" })
-    </div>
-    <div class="form-group my-3">
-        <label>For/ Not for profit:</label>
-        @Html.DropDownList("IsLandlordForProfit", new List<SelectListItem>
-        {
-            new() { Text = "For Profit", Value = "true", Selected = true },
-            new() { Text = "Not For Profit", Value = "false" }
-        }, new { @class = "form-control" })
-    </div>
-    <div class="form-group my-3">
-        <label class="control-label">Company (optional)</label>
-        <input asp-for="CompanyName" class="form-control empty"/>
-        <span asp-validation-for="CompanyName" class="text-danger"></span>
-    </div>
-    
-    <p>ChangeAhead Charter</p>
-    
-        <div class="my-3">
-            <label asp-for="LandlordProvidedCharterStatus" class="form-label">What is your ChangeAhead Charter status?</label>
-            <select asp-for="LandlordProvidedCharterStatus" class="form-select" required
-                    id="Select" onclick="checkIfSelectedValueIsTarget()">
-                <option selected disabled value="">Charter Status</option>
-                <option value="true">Already approved</option>
-                <option value="false">Not yet approved</option>
-            </select>
-            <span asp-validation-for="LandlordProvidedCharterStatus" class="text-danger"></span>
+    <div class="row">
+        <div class="col-md-5">
+            <div class="form-group my-3">
+                <label asp-for="LandlordType" class="form-label"></label>
+                <select asp-for="LandlordType" class="form-select" required>
+                    <option selected disabled value="">Landlord Type</option>
+                    <option value="Charity">Charity</option>
+                    <option value="Private Residential Sector">Private Residential Sector</option>
+                    <option value="Registered Provider">Registered Provider</option>
+                    <option value="Local Authority">Local Authority</option>
+                </select>
+                <span asp-validation-for="LandlordType" class="text-danger"></span>
+            </div>
+            <div class="form-group my-3">
+                <label asp-for="IsLandlordForProfit" class="form-label"></label>
+                <select asp-for="IsLandlordForProfit" class="form-select" required>
+                    <option selected disabled value="">For / Not for profit</option>
+                    <option value="true">For Profit</option>
+                    <option value="false">Not For Profit</option>
+                </select>
+                <span asp-validation-for="IsLandlordForProfit" class="text-danger"></span>
+            </div>
+            <div class="form-group my-3">
+                <label asp-for="CompanyName" class="form-label">Company name (optional)</label>
+                <input asp-for="CompanyName" class="form-control empty"/>
+                <span asp-validation-for="CompanyName" class="text-danger"></span>
+            </div>
         </div>
-    
-        <div id="ifTrue" class="form-group my-3" style="@(Model.LandlordProvidedCharterStatus ? "" : "display: none;")">
-            <label class="control-label">Please provide your Charter Membership Id:</label>
-            <input asp-for="MembershipId" class="form-control empty"/>
-            <span asp-validation-for="MembershipId" class="text-danger"></span>
+        <div class="col-1"></div>
+        <div class="col-md-5">
+            <div class="form-group my-3">
+                <label asp-for="LandlordProvidedCharterStatus" class="form-label">Charter status</label>
+                <select asp-for="LandlordProvidedCharterStatus" class="form-select" required
+                        id="Select" onclick="checkIfSelectedValueIsTarget()">
+                    <option selected disabled value="">Charter Status</option>
+                    <option value="true">Already approved</option>
+                    <option value="false">Not yet approved</option>
+                </select>
+                <span asp-validation-for="LandlordProvidedCharterStatus" class="text-danger"></span>
+            </div>
+
+            <div id="ifTrue" class="form-group my-3" style="@(Model.LandlordProvidedCharterStatus ? "" : "display: none;")">
+                <label asp-for="MembershipId" class="form-label">Membership id</label>
+                <input asp-for="MembershipId" class="form-control empty"/>
+                <span asp-validation-for="MembershipId" class="text-danger"></span>
+            </div>
+            <div id="ifFalse" style="@(!Model.LandlordProvidedCharterStatus ? "" : "display: none;")">
+                ChangeAhead require your participation in a charter system.<br/>
+                Please get in touch with ChangeAhead if you are not sure what this means.
+            </div>
         </div>
-        <div id="ifFalse" style="@(!Model.LandlordProvidedCharterStatus ? "" : "display: none;")">
-            ChangeAhead require your participation in a charter system.
-        </div>
+    </div>
 </div>
 
 <div class="registerTab" id="Terms and conditions">
@@ -92,7 +100,7 @@
 
 <hr/>
 <button type="button" class="btn btn-outline-primary" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
-<button type="button" class="btn btn-outline-primary" id="nextBtn" onclick="nextPrev(1)">Next</button>
+<button type="button" class="btn btn-primary" id="nextBtn" onclick="nextPrev(1)">Next</button>
 <hr/>
 <!-- Circles which indicates the steps of the form: -->
 <div>
