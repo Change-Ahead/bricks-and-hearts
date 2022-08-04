@@ -49,6 +49,7 @@ public class LandlordProfileModel
 
     [DisplayName("For / not for profit")]
     public bool IsLandlordForProfit { get; set; }
+    public int NumOfProperties { get; set; }
 
     public static LandlordProfileModel FromDbModel(LandlordDbModel landlord, BricksAndHeartsUser user)
     {
@@ -65,7 +66,8 @@ public class LandlordProfileModel
             LandlordProvidedCharterStatus = landlord.LandlordProvidedCharterStatus,
             MembershipId = landlord.MembershipId,
             CharterApproved = landlord.CharterApproved,
-            IsLandlordForProfit = landlord.IsLandlordForProfit
+            IsLandlordForProfit = landlord.IsLandlordForProfit,
+            NumOfProperties = landlord.Properties.Count,
         };
     }
 
@@ -83,7 +85,8 @@ public class LandlordProfileModel
             LandlordType = landlord.LandlordType,
             LandlordProvidedCharterStatus = landlord.LandlordProvidedCharterStatus,
             CharterApproved = landlord.CharterApproved,
-            IsLandlordForProfit = landlord.IsLandlordForProfit
+            IsLandlordForProfit = landlord.IsLandlordForProfit,
+            NumOfProperties = landlord.Properties.Count,
         };
     }
 }
