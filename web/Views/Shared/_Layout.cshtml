@@ -28,8 +28,8 @@
 
             <div class="collapse navbar-collapse">
                 <div class="navbar-nav me-auto">
-                    @* TODO BNH-96: Change this link to landlord index when created *@
-                    <a class="nav-link text-dark mx-3" asp-controller="Landlord" asp-action="Profile">List your properties</a>
+                    @* TODO BNH-96: Change this link from profile to landlord index when created *@
+                    <a class="nav-link text-dark mx-3" asp-controller="Landlord" asp-action="@(User.IsInRole("Landlord") ? "Profile" : "RegisterGet")">List your properties</a>
                     <a class="nav-link text-dark mx-3" asp-controller="Admin" asp-action="Index">Facilitate rentals</a>
                 </div>
 
