@@ -28,8 +28,8 @@
 
             <div class="collapse navbar-collapse">
                 <div class="navbar-nav me-auto">
-                    @* Change this link to landlord index when created *@
-                    <a class="nav-link text-dark mx-3" asp-controller="Landlord" asp-action="RegisterGet">List your properties</a>
+                    @* TODO BNH-96: Change this link to landlord index when created *@
+                    <a class="nav-link text-dark mx-3" asp-controller="Landlord" asp-action="Profile">List your properties</a>
                     <a class="nav-link text-dark mx-3" asp-controller="Admin" asp-action="Index">Facilitate rentals</a>
                 </div>
 
@@ -38,8 +38,6 @@
                     {
                         @if (User.IsInRole("Landlord"))
                         {
-                            @* TODO BNH-99: Replace with profile picture in the future *@
-
                             <a asp-controller="Landlord" asp-action="Profile" asp-route-id="@(((BricksAndHeartsUser)User.Identity).LandlordId!.Value)" class="bi bi-person-circle nav-link pt-0 pb-0 fs-4 ms-3"></a>
                         }
                         @using (Html.BeginForm("Logout", "Login", FormMethod.Post))
@@ -73,8 +71,8 @@
         @if (User.IsInRole("Landlord"))
         {
             <nav class="navbar navbar-secondary navbar-expand-sm navbar-dark bg-primary py-1">
-                @* Change this link to landlord index when created *@
-                <a asp-controller="Landlord" asp-action="RegisterGet" class="nav-link text-light mx-3">Dashboard</a>
+                @* TODO BNH-96: Change this link to landlord index when created *@
+                <a asp-controller="Landlord" asp-action="Profile" class="nav-link text-light mx-3">Dashboard</a>
                 <div class="vr my-2"></div>
                 <a asp-controller="Landlord" asp-action="ViewProperties" class="nav-link text-light mx-3">Properties</a>
             </nav>
