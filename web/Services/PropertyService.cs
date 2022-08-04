@@ -1,4 +1,5 @@
 ﻿using System.Net;
+using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
 

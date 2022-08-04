@@ -1,3 +1,4 @@
+using System.Diagnostics.Eventing.Reader;
 using System.Text.RegularExpressions;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
@@ -185,7 +186,7 @@ public class PropertyController : AbstractController
 
         // Delete partially complete property
         _propertyService.DeleteProperty(property);
-        await _azureStorage.DeleteContainer("property", property.Id);
+        _azureStorage.DeleteContainer("property", property.Id);
 
         return RedirectToAction("ViewProperties", "Landlord");
     }
@@ -350,3 +351,46 @@ public class PropertyController : AbstractController
         return View("~/Views/Admin/PropertyList.cshtml", new PropertiesDashboardViewModel(listOfProperties.Skip((page-1)*propPerPage).Take(propPerPage).ToList(),  listOfProperties.Count, null! , page, sortBy));
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
