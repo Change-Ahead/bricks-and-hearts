@@ -158,6 +158,9 @@ namespace BricksAndHearts.Migrations
                     b.Property<int?>("Rent")
                         .HasColumnType("int");
 
+                    b.Property<int?>("RenterUserId")
+                        .HasColumnType("int");
+
                     b.Property<string>("TownOrCity")
                         .HasColumnType("nvarchar(max)");
 

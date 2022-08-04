@@ -1,6 +1,7 @@
 #region
 
 using BricksAndHearts.Auth;
+using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;

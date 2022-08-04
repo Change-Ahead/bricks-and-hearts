@@ -1,0 +1,85 @@
+﻿@using Microsoft.EntityFrameworkCore.Migrations
+@model PropertiesDashboardViewModel
+
+@{
+    ViewData["Title"] = "All Properties List";
+}
+
+<h2>All Properties List</h2>
+
+<div class="mb-3">
+    @using (Html.BeginForm("SortProperties", "Property", FormMethod.Get))
+    {
+        <select class="form-select" id="sortBy" name="sortBy">
+            <option value="Availability">Sort by availability</option>
+            <option value="Rent">Sort by rent</option>
+        </select>
+        <button type="submit" class="btn custom-btn-primary"> Display results </button>
+    }
+</div>
+
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th scope="col">Address</th>
+        <th scope="col">Type</th>
+        <th scope="col"># of Bedrooms</th>
+        <th scope="col">Created</th>
+        <th scope="col">Rent (pcm)</th>
+        <th scope="col">Description</th>
+        <th scope="col">Availability</th>
+        <th scope="col">Landlord's profile</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var property in Model.Properties!)
+    {
+        <tr>
+            <td>@property.Address!.AddressLine1, @property.Address.AddressLine2, @property.Address.AddressLine3, @property.Address.TownOrCity</td>
+            <td>@property.PropertyType</td>
+            <td>@property.NumOfBedrooms</td>
+            <td>@property.CreationTime</td>
+            <td>@property.Rent</td>
+            <td>@property.Description</td>
+            @if (property.UserWhoRented != null)
+            {
+                <td>
+                    <p class="not-available"> Not available </p></td>
+            }
+            else
+            {
+                <td>
+                    <p class="available"> Available </p></td>
+            }
+
+            <td>
+                <a type="button" class="btn btn-outline-primary" value="@property.LandlordId" href="@Url.Action("Profile", "Landlord", new { id = property.LandlordId })">
+                    <i class="bi bi-person"></i>
+                </a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@{ var from = (Model.Page - 1) * Model.PropPerPage + 1;
+    var to = Math.Min((Model.Page - 1) * Model.PropPerPage + Model.PropPerPage, Model.Total);}
+
+<p>Displaying properties @from to @to of @Model.Total</p>
+
+@if (Model.Page > 1)
+{
+    <a type="button" class="btn btn-outline-primary" value="Previous" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page - 1, propPerPage = Model.PropPerPage })">
+        <i class="previous"> Previous </i>
+    </a>
+}
+
+@if (Model.Page <= Model.Total/Model.PropPerPage)
+{
+    <a type="button" class="btn btn-outline-primary" value="Next" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page + 1, propPerPage = Model.PropPerPage })">
+        <i class="bi"> Next </i>
+    </a>
+}
+
+
+

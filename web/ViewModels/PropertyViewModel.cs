@@ -12,6 +12,7 @@ public class PropertyViewModel : IValidatableObject
 
 
     // Address
+    public int LandlordId { get; set; }
     public PropertyAddress Address { get; set; } = new();
 
 
@@ -45,15 +46,20 @@ public class PropertyViewModel : IValidatableObject
     // Latitude and Longitude
     public decimal? Lat { get; set; }
     public decimal? Lon { get; set; }
+    
+    public int? UserWhoRented { get; set; }
+
     public static PropertyViewModel FromDbModel(PropertyDbModel property)
     {
         return new PropertyViewModel
         {
             PropertyId = property.Id,
+            LandlordId = property.LandlordId,
             PropertyType = property.PropertyType,
             NumOfBedrooms = property.NumOfBedrooms,
             CreationTime = property.CreationTime,
             Rent = property.Rent,
+            UserWhoRented = property.RenterUserId,
             Description = property.Description,
             Lat = property.Lat,
             Lon = property.Lon,

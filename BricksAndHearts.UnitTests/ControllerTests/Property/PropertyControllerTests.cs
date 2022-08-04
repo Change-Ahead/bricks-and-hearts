@@ -431,4 +431,17 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustNotHaveHappened();
         result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(404);
     }
+    
+    [Fact]
+    public void SortProperties_ReturnsViewWith_PropertiesDashboardViewModel()
+    {
+        // Arrange
+        var dummyString = "Rent";
+
+        // Act
+        var result = UnderTest.SortProperties(dummyString) as ViewResult;
+
+        // Assert
+        result!.ViewData.Model.Should().BeOfType<PropertiesDashboardViewModel>();
+    }
 }

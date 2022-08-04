@@ -8,6 +8,7 @@ public class PropertyDbModel
     // Backend
     public int Id { get; set; }
     public int LandlordId { get; set; }
+    public int? RenterUserId { get; set; } = null;
     public virtual LandlordDbModel Landlord { get; set; } = null!;
     public bool IsIncomplete { get; set; }
     public DateTime? CreationTime { get; set; }
