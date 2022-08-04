@@ -311,7 +311,7 @@ public class LandlordController : AbstractController
             return StatusCode(403);
         }
 
-        var landlord = await _landlordService.GetLandlordIfExistsFromId(id);
+        var landlord = await _landlordService.GetLandlordIfExistsWithProperties(id);
         if (landlord == null)
         {
             return StatusCode(404);
