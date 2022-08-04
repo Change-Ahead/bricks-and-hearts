@@ -13,7 +13,7 @@ public class PropertiesDashboardViewModel
 
     public int PropPerPage { get; set; } = 10;
 
-    public PropertiesDashboardViewModel(List<PropertyViewModel> properties, int total, LandlordProfileModel owner = null, int page = 1, string? sortBy = null)
+    public PropertiesDashboardViewModel(List<PropertyViewModel> properties, int total, LandlordProfileModel owner = null!, int page = 1, string? sortBy = null)
     {
         Properties = properties;
         Owner = owner;
