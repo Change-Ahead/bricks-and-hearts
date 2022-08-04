@@ -42,10 +42,8 @@ public class LandlordProfileModel
     public bool LandlordProvidedCharterStatus { get; set; }
 
     public string? MembershipId { get; set; }
-    
-    public bool CharterApproved { get; set; }
 
-    public bool CurrentUserIsAdmin { get; set; }
+    public bool CharterApproved { get; set; }
 
     public bool Unassigned { get; set; }
 
@@ -67,8 +65,7 @@ public class LandlordProfileModel
             LandlordProvidedCharterStatus = landlord.LandlordProvidedCharterStatus,
             MembershipId = landlord.MembershipId,
             CharterApproved = landlord.CharterApproved,
-            IsLandlordForProfit = landlord.IsLandlordForProfit,
-            CurrentUserIsAdmin = user.IsAdmin
+            IsLandlordForProfit = landlord.IsLandlordForProfit
         };
     }
 
@@ -86,8 +83,7 @@ public class LandlordProfileModel
             LandlordType = landlord.LandlordType,
             LandlordProvidedCharterStatus = landlord.LandlordProvidedCharterStatus,
             CharterApproved = landlord.CharterApproved,
-            IsLandlordForProfit = landlord.IsLandlordForProfit,
-            CurrentUserIsAdmin = landlord.User?.IsAdmin ?? false
+            IsLandlordForProfit = landlord.IsLandlordForProfit
         };
     }
 }
