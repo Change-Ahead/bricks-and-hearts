@@ -4,9 +4,16 @@
     ViewData["Title"] = "My Properties";
 }
 
-<h2>
-    @(Model.Owner.FirstName ?? "Landlord")'s properties
-</h2>
+@if (Model.Owner == null)
+{
+    <h2>Landlord's properties</h2>
+}
+else
+{
+    <h2>
+        @Model.Owner.FirstName's properties
+    </h2>
+}
 
 <table class="table table-hover">
     <thead>
