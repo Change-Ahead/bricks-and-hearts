@@ -191,29 +191,36 @@ public class PropertyController : AbstractController
         {
             return StatusCode(403);
         }
+
+        List<string> flashTypes = new List<string>(),
+            flashMessages = new List<string>();
         foreach (var image in images)
         {
-            if (!_azureStorage.IsImage(image.FileName))
+            var isImageResult = _azureStorage.IsImage(image.FileName);
+            if (!isImageResult.isImage)
             {
-                FlashMessage(_logger,
-                    ($"Failed to upload {image.FileName}: not in a recognised image format", "danger",
-                        $"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: JPG, JPEG, PNG, BMP, GIF"));
+                _logger.LogInformation($"Failed to upload {image.FileName}: not in a recognised image format");
+                flashTypes.Add("danger");
+                flashMessages.Add($"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: {isImageResult.imageExtString}");
             }
             else
             {
                 if (image.Length > 0)
                 {
                     string message = await _azureStorage.UploadFile(image, "property", propertyId);
-                    FlashMessage(_logger,
-                        ($"Successfully uploaded {image.FileName}", "success", message));
+                    _logger.LogInformation($"Successfully uploaded {image.FileName}");
+                    flashTypes.Add("success");
+                    flashMessages.Add(message);
                 }
                 else
                 {
-                    FlashMessage(_logger,
-                        ($"Failed to upload {image.FileName}: has length zero.", "danger", $"{image.FileName} contains no data, and so has not been uploaded"));
+                    _logger.LogInformation($"Failed to upload {image.FileName}: has length zero.");
+                    flashTypes.Add("danger");
+                    flashMessages.Add($"{image.FileName} contains no data, and so has not been uploaded");
                 }
             }
         }
+        FlashMultipleMessages(flashTypes, flashMessages);
         return RedirectToAction("ListPropertyImages", "Property", new{propertyId});
     }
     

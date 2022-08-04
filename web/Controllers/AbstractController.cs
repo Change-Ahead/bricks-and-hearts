@@ -30,4 +30,10 @@ public abstract class AbstractController : Controller
         TempData["FlashType"] = flash.flashtype;
         TempData["FlashMessage"] = flash.flashmessage;
     }
+    
+    protected void FlashMultipleMessages(List<string> flashTypes, List<string> flashMessages)
+    {
+        TempData["MultipleFlashTypes"] = flashTypes;
+        TempData["MultipleFlashMessages"] = flashMessages;
+    }
 }
