@@ -36,6 +36,11 @@ public class TestDatabaseFixture
                     CreateUnlinkedLandlordUser() 
                     );
                 
+                context.Properties.AddRange(
+                    CreateCompleteProperty(),
+                    CreateIncompleteProperty()
+                );
+                
                 context.SaveChanges();
             }
 
@@ -214,6 +219,34 @@ public class TestDatabaseFixture
             LandlordType = "Non profit",
             CharterApproved = true,
             InviteLink = "invite-unlinked-landlord"
+        };
+    }
+    
+    private PropertyDbModel CreateCompleteProperty()
+    {
+        return new PropertyDbModel
+        {
+            LandlordId = 1,
+            IsIncomplete = false,
+            AddressLine1 = "Complete Property",
+            AddressLine2 = "Complete Street",
+            TownOrCity = "Complete Town",
+            County = "Complete County",
+            Postcode = "CB2 1LA",
+        };
+    }
+    
+    private PropertyDbModel CreateIncompleteProperty()
+    {
+        return new PropertyDbModel
+        {
+            LandlordId = 1,
+            IsIncomplete = true,
+            AddressLine1 = "Complete Property",
+            AddressLine2 = "Complete Street",
+            TownOrCity = "Complete Town",
+            County = "Complete County",
+            Postcode = "CB2 1LA",
         };
     }
 }

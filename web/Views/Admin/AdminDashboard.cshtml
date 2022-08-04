@@ -34,7 +34,7 @@
                                         <a class="btn btn-primary" asp-controller="Admin" asp-action="LandlordList">Landlords</a>
                                     </div>
                                     <p></p>
-                                    <p>@Model.LandlordCounts.RegisteredLandlords Registered Landlord</p>
+                                    <p>@Model.LandlordCounts!.RegisteredLandlords Registered Landlord</p>
                                     <p>@Model.LandlordCounts.ApprovedLandlords Approved Landlords</p>
                                     </div>
                             </div>
@@ -47,9 +47,10 @@
                                     </h1>
                                     <div class="text-center">
                                         <a class="btn btn-primary" asp-controller="Admin" asp-action="LandlordList">Properties</a>
+                                        @*TODO make this link to property list*@
                                     </div>
                                     <p></p>
-                                    <p>@Model.PropertyCounts.RegisteredProperties Registered Properties</p>
+                                    <p>@Model.PropertyCounts!.RegisteredProperties Registered Properties</p>
                                 </div>
                             </div>
                         </div>
@@ -58,6 +59,7 @@
                 <div class="col-4">
                     <h6>Admin Actions</h6>
                     <a class="btn btn-primary" asp-controller="Admin" asp-action="GetAdminList">View Admins</a> <br/>
+                    <p></p>
                     <a class="btn btn-primary" asp-controller="Landlord" asp-action="RegisterGet" asp-route-createUnassigned="true">Create Unassigned Landlord</a> <br/>
                 </div>
             </div>
