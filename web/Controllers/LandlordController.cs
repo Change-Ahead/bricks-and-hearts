@@ -87,6 +87,7 @@ public class LandlordController : AbstractController
                               + $"Phone: {createModel.Phone}" + "\n";
                 var subject = "Bricks&Hearts - landlord registration notification";
 #pragma warning disable CS4014
+                
                 Task.Run(() => TrySendMsg(msgBody, subject));
 #pragma warning restore CS4014
 

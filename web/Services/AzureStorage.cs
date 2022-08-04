@@ -124,12 +124,8 @@ namespace BricksAndHearts.Services
                 return (true, null);
             }
 
-            string imageExtString = "";
-            foreach (string imageExt in imageExtensions)
-            {
-                imageExtString += imageExt + ", ";
-            }
-            return (false, imageExtString.Substring(0, imageExtString.Length - 2));
+            string imageExtString = String.Join(", ", imageExtensions);
+            return (false, imageExtString);
         }
 
         private (string name, string type) SplitFileName(string fileName)

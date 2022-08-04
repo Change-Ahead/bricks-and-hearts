@@ -192,15 +192,14 @@ public class PropertyController : AbstractController
             return StatusCode(403);
         }
 
-        List<string> logInfo = new List<string>(),
-            flashTypes = new List<string>(),
+        List<string> flashTypes = new List<string>(),
             flashMessages = new List<string>();
         foreach (var image in images)
         {
             var isImageResult = _azureStorage.IsImage(image.FileName);
             if (!isImageResult.isImage)
             {
-                logInfo.Add($"Failed to upload {image.FileName}: not in a recognised image format");
+                _logger.LogInformation($"Failed to upload {image.FileName}: not in a recognised image format");
                 flashTypes.Add("danger");
                 flashMessages.Add($"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: {isImageResult.imageExtString}");
             }
@@ -209,19 +208,19 @@ public class PropertyController : AbstractController
                 if (image.Length > 0)
                 {
                     string message = await _azureStorage.UploadFile(image, "property", propertyId);
-                    logInfo.Add($"Successfully uploaded {image.FileName}");
+                    _logger.LogInformation($"Successfully uploaded {image.FileName}");
                     flashTypes.Add("success");
                     flashMessages.Add(message);
                 }
                 else
                 {
-                    logInfo.Add($"Failed to upload {image.FileName}: has length zero.");
+                    _logger.LogInformation($"Failed to upload {image.FileName}: has length zero.");
                     flashTypes.Add("danger");
                     flashMessages.Add($"{image.FileName} contains no data, and so has not been uploaded");
                 }
             }
         }
-        FlashMultipleMessages(_logger, (logInfo, flashTypes, flashMessages));
+        FlashMultipleMessages(flashTypes, flashMessages);
         return RedirectToAction("ListPropertyImages", "Property", new{propertyId});
     }
     

@@ -31,16 +31,8 @@ public abstract class AbstractController : Controller
         TempData["FlashMessage"] = flash.flashmessage;
     }
     
-    protected void FlashMultipleMessages(ILogger logger, (List<string> logInfo, List<string> flashtypes, List<string> flashmessages) flashes)
+    protected void FlashMultipleMessages(List<string> flashTypes, List<string> flashMessages)
     {
-        var flashTypes = new List<string>();
-        var flashMessages = new List<string>();
-        for (int i = 0; i < flashes.logInfo.Count; i++)
-        {
-            logger.LogInformation(flashes.logInfo[i]);
-            flashTypes.Add(flashes.flashtypes[i]);
-            flashMessages.Add(flashes.flashmessages[i]);
-        }
         TempData["MultipleFlashTypes"] = flashTypes;
         TempData["MultipleFlashMessages"] = flashMessages;
     }
