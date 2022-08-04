@@ -31,11 +31,8 @@ public class AdminController : AbstractController
     public IActionResult AdminDashboard()
     {
         var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
-        var viewModel = new AdminDashboardViewModel();
+        var viewModel = new AdminDashboardViewModel(_landlordService.CountLandlords(), _propertyService.CountProperties());
         if (isAuthenticated) viewModel.CurrentUser = GetCurrentUser();
-        viewModel.LandlordCounts = _landlordService.CountLandlords();
-        viewModel.PropertyCounts = _propertyService.CountProperties();
-
         return View(viewModel);
     }
 
