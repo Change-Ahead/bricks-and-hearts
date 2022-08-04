@@ -1,0 +1,68 @@
+﻿@model LandlordProfileModel
+
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+
+<div>
+    <div class="row">
+        <div class="col-1">
+            @* TODO BNH-99: Replace icon with profile picture *@
+            <img alt="profile picture" src="https://www.softwire.com/wp-content/uploads/2019/07/Gareth-J-Final-Head-Shot.jpg" width="100" height="100" class="rounded-circle img-thumbnail img-fluid"/>
+        </div>
+        <div class="col-7">
+            <div class="row">
+                <div class="col-7">
+                    <h6>Hello</h6>
+                    <h2 class="font-blue">@Model.FirstName</h2>
+                    <h6>Start adding your properties to the portal, to get matches</h6>
+                    <div>
+                        <a class="btn btn-primary mt-3" href='@Url.Action("AddNewProperty_Begin", "Property", null)'>Add Properties</a>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-4">
+                <div class="col-5">
+                    <div class="row">
+                        <div class="col-3">
+                            @if (Model.CharterApproved)
+                            {
+                                <h1>
+                                    <i class="bi bi-check"></i>
+                                </h1>
+                            }
+                            else
+                            {
+                                <h1>
+                                    <i class="bi bi-x"></i>
+                                </h1>
+                            }
+                        </div>
+                        <div class="col-5">
+                            Charter Approval State
+                        </div>
+                    </div>
+                </div>
+                <div class="col-5">
+                    <div class="row">
+                        <div class="col-3">
+                            <h1>
+                                <i class="bi bi-house-door"></i>
+                            </h1>
+                        </div>
+                        <div class="col-5">
+                            <h1>
+                                @Model.NumOfProperties
+                            </h1>
+                            <h6>Total Properties</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-4">
+            <h6>My Matches</h6>
+        </div>
+    </div>
+</div>

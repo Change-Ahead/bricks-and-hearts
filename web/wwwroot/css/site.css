@@ -130,6 +130,14 @@ body {
 .font-subtitle {
     font-size: 12px;
 }
+
+.font-orange {
+    color: var(--orange)
+}
+
+.font-blue {
+    color: var(--blue)
+}
 /*end font classes*/
 
 /*Javascript form styling:*/

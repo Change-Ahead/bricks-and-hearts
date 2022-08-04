@@ -31,6 +31,8 @@ public interface ILandlordService
         LandlordProfileModel createModel);
 
     public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int? id);
+    public Task<LandlordDbModel?> GetLandlordIfExistsWithProperties(int? id);
+
     public Task<LandlordDbModel> GetLandlordFromId(int id);
     public Task<LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel);
     public bool CheckForDuplicateEmail(LandlordProfileModel editModel);
@@ -119,6 +121,11 @@ public class LandlordService : ILandlordService
     public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int? id)
     {
         return _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id);
+    }
+    
+    public Task<LandlordDbModel?> GetLandlordIfExistsWithProperties(int? id)
+    {
+        return _dbContext.Landlords.Include(l=>l.Properties).SingleOrDefaultAsync(l => l.Id == id);
     }
 
     public async Task<(ILandlordService.LandlordRegistrationResult result, LandlordDbModel? landlord)> RegisterLandlord(
