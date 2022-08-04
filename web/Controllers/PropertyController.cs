@@ -255,6 +255,6 @@ public class PropertyController : AbstractController
 
         var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).ToList();
         
-        return View("~/Views/Admin/PropertyList.cshtml", new PropertiesDashboardViewModel(listOfProperties.Skip((page-1)*propPerPage).Take(propPerPage).ToList(),  listOfProperties.Count, page, sortBy));
+        return View("~/Views/Admin/PropertyList.cshtml", new PropertiesDashboardViewModel(listOfProperties.Skip((page-1)*propPerPage).Take(propPerPage).ToList(),  listOfProperties.Count, null , page, sortBy));
     }
 }
