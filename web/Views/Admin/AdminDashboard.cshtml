@@ -42,12 +42,11 @@
                         <div class="col-5">
                             <div class="row">
                                 <div class="col-9">
-                                    <h1 class =text-center>
+                                    <h1 class="text-center">
                                         <i class="bi bi-house-door"></i>
                                     </h1>
                                     <div class="text-center">
-                                        <a class="btn btn-primary" asp-controller="Admin" asp-action="LandlordList">Properties</a>
-                                        @*TODO make this link to property list*@
+                                        <a class="btn btn-primary" asp-controller="Property" asp-action="SortProperties">Properties</a>
                                     </div>
                                     <p></p>
                                     <p>@Model.PropertyCounts!.RegisteredProperties Registered Properties</p>

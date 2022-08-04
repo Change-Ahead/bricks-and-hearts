@@ -30,7 +30,7 @@
                 <div class="navbar-nav me-auto">
                     @* TODO BNH-96: Change this link from profile to landlord index when created *@
                     <a class="nav-link text-dark mx-3" asp-controller="Landlord" asp-action="@(User.IsInRole("Landlord") ? "Profile" : "RegisterGet")">List your properties</a>
-                    <a class="nav-link text-dark mx-3" asp-controller="Admin" asp-action="Index">Facilitate rentals</a>
+                    <a class="nav-link text-dark mx-3" asp-controller="Admin" asp-action="AdminDashboard">Facilitate rentals</a>
                 </div>
 
                 <div class="navbar-nav">
@@ -61,7 +61,7 @@
         @if (User.IsInRole("Admin"))
         {
             <nav class="navbar navbar-secondary navbar-expand-sm navbar-dark bg-primary py-1">
-                <a asp-controller="Admin" asp-action="Index" class="nav-link text-light mx-3">Dashboard</a>
+                <a asp-controller="Admin" asp-action="AdminDashboard" class="nav-link text-light mx-3">Dashboard</a>
                 <div class="vr my-2"></div>
                 <a asp-controller="Admin" asp-action="GetAdminList" class="nav-link text-light mx-3">Admin list</a>
                 <div class="vr my-2"></div>

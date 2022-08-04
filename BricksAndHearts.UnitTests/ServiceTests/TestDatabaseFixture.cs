@@ -242,11 +242,11 @@ public class TestDatabaseFixture
         {
             LandlordId = 1,
             IsIncomplete = true,
-            AddressLine1 = "Complete Property",
-            AddressLine2 = "Complete Street",
-            TownOrCity = "Complete Town",
-            County = "Complete County",
-            Postcode = "CB2 1LA",
+            AddressLine1 = "Incomplete Property",
+            AddressLine2 = "Incomplete Street",
+            TownOrCity = "Incomplete Town",
+            County = "Incomplete County",
+            Postcode = "CB3 1LA",
         };
     }
 }
