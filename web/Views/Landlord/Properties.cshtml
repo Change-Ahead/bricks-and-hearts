@@ -40,16 +40,17 @@
             <td>@prop.Rent</td>
             <td>@prop.Description</td>
             <td>
-                @if (prop.IsIncomplete)
-                {
-                    <a class="btn btn-primary position-relative" href="@Url.Action("AddNewProperty_Continue", "Property", new { propId = prop.PropertyId, step = 1 })">
-                        Edit
+                <a class="btn btn-primary position-relative" href="@Url.Action("AddNewProperty_Continue", "Property", new { propId = prop.PropertyId, step = 1 })">
+                    Edit
+                    @if (prop.IsIncomplete)
+                    {
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
                             <i class="bi bi-circle-half"></i>
                             <span class="visually-hidden">Property is incomplete</span>
                         </span>
-                    </a>
-                }
+                    }
+                </a>
+
             </td>
         </tr>
         i++;

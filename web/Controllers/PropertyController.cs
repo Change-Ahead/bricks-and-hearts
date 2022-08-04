@@ -33,7 +33,7 @@ public class PropertyController : AbstractController
     }
 
     [Authorize(Roles = "Landlord")]
-    [HttpGet("add/step/{step:int}")]
+    //[HttpGet("add/step/{step:int}")]
     [HttpGet("edit/{propId:int}/step/{step:int}")]
     public ActionResult AddNewProperty_Continue([FromRoute] int step, [FromRoute] int? propId)
     {
