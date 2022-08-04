@@ -119,7 +119,7 @@ namespace BricksAndHearts.Services
         {
             string fileType = SplitFileName(fileName).type;
             List<string> imageExtensions = new List<string> { "jpg", "jpeg", "png", "bmp", "gif" };
-            if (imageExtensions.Contains(fileType))
+            if (imageExtensions.Contains(fileType.ToLower()))
             {
                 return true;
             }

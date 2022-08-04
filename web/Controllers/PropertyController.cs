@@ -197,7 +197,7 @@ public class PropertyController : AbstractController
             {
                 FlashMessage(_logger,
                     ($"Failed to upload {image.FileName}: not in a recognised image format", "danger",
-                        "{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: JPG, JPEG, PNG, BMP, GIF"));
+                        $"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: JPG, JPEG, PNG, BMP, GIF"));
             }
             else
             {
