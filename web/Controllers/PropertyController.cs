@@ -191,29 +191,36 @@ public class PropertyController : AbstractController
         {
             return StatusCode(403);
         }
+
+        List<string> logInfo = new List<string>(),
+            flashTypes = new List<string>(),
+            flashMessages = new List<string>();
         foreach (var image in images)
         {
             if (!_azureStorage.IsImage(image.FileName))
             {
-                FlashMessage(_logger,
-                    ($"Failed to upload {image.FileName}: not in a recognised image format", "danger",
-                        $"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: JPG, JPEG, PNG, BMP, GIF"));
+                logInfo.Add($"Failed to upload {image.FileName}: not in a recognised image format");
+                flashTypes.Add("danger");
+                flashMessages.Add($"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: JPG, JPEG, PNG, BMP, GIF");
             }
             else
             {
                 if (image.Length > 0)
                 {
                     string message = await _azureStorage.UploadFile(image, "property", propertyId);
-                    FlashMessage(_logger,
-                        ($"Successfully uploaded {image.FileName}", "success", message));
+                    logInfo.Add($"Successfully uploaded {image.FileName}");
+                    flashTypes.Add("success");
+                    flashMessages.Add(message);
                 }
                 else
                 {
-                    FlashMessage(_logger,
-                        ($"Failed to upload {image.FileName}: has length zero.", "danger", $"{image.FileName} contains no data, and so has not been uploaded"));
+                    logInfo.Add($"Failed to upload {image.FileName}: has length zero.");
+                    flashTypes.Add("danger");
+                    flashMessages.Add($"{image.FileName} contains no data, and so has not been uploaded");
                 }
             }
         }
+        FlashMultipleMessages(_logger, (logInfo, flashTypes, flashMessages));
         return RedirectToAction("ListPropertyImages", "Property", new{propertyId});
     }
     
