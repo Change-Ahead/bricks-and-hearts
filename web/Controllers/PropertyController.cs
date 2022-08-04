@@ -197,11 +197,12 @@ public class PropertyController : AbstractController
             flashMessages = new List<string>();
         foreach (var image in images)
         {
-            if (!_azureStorage.IsImage(image.FileName))
+            var isImageResult = _azureStorage.IsImage(image.FileName);
+            if (!isImageResult.isImage)
             {
                 logInfo.Add($"Failed to upload {image.FileName}: not in a recognised image format");
                 flashTypes.Add("danger");
-                flashMessages.Add($"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: JPG, JPEG, PNG, BMP, GIF");
+                flashMessages.Add($"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: {isImageResult.imageExtString}");
             }
             else
             {

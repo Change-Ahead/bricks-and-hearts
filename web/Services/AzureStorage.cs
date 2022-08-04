@@ -11,7 +11,7 @@ namespace BricksAndHearts.Services
         Task<ImageListViewModel> ListFiles(string varType, int id);
         Task<(Stream? data, string? fileType)> DownloadFile(string varType, int id, string blobFilename);
         Task DeleteFile(string varType, int id, string blobFilename);
-        public bool IsImage(string fileName);
+        public (bool isImage, string? imageExtString) IsImage(string fileName);
     }
 
     public class AzureStorage : IAzureStorage
@@ -115,15 +115,21 @@ namespace BricksAndHearts.Services
             }
         }
         
-        public bool IsImage(string fileName)
+        public (bool, string?) IsImage(string fileName)
         {
             string fileType = SplitFileName(fileName).type;
             List<string> imageExtensions = new List<string> { "jpg", "jpeg", "png", "bmp", "gif" };
             if (imageExtensions.Contains(fileType.ToLower()))
             {
-                return true;
+                return (true, null);
             }
-            return false;
+
+            string imageExtString = "";
+            foreach (string imageExt in imageExtensions)
+            {
+                imageExtString += imageExt + ", ";
+            }
+            return (false, imageExtString.Substring(0, imageExtString.Length - 2));
         }
 
         private (string name, string type) SplitFileName(string fileName)
