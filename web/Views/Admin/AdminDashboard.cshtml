@@ -1,0 +1,82 @@
+﻿@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Page";
+}
+
+
+@if (Model.CurrentUser != null)
+{
+    if (Model.CurrentUser.IsAdmin)
+    {
+        <div>
+            <div class="row">
+                <div class="col-1 mt-4">
+                    <h1>
+                        <i class="bi bi-person-square"></i>
+                    </h1>
+                </div>
+                <div class="col-7">
+                    <div class="row">
+                        <div class="col-7">
+                            <h6>Hello</h6>
+                            <h2>FirstName</h2>
+                            <h6>Start adding your properties to the portal, to get matches</h6>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-5">
+                            <div class="row">
+                                <div class="col-3">
+                                    <h1>
+                                        <i class="bi bi-person"></i>
+                                    </h1>
+                                </div>
+                                <div class="col-5">
+                                    @Model.LandlordCounts.RegisteredLandlords Registered Landlords
+                                    @Model.LandlordCounts.ApprovedLandlords Approved Landlords
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <div class="row">
+                                <div class="col-3">
+                                    <h1>
+                                        <i class="bi bi-house-door"></i>
+                                    </h1>
+                                </div>
+                                <div class="col-5">
+                                    @Model.PropertyCounts.RegisteredProperties Registered Properties
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <h6>Admin Actions</h6>
+                </div>
+            </div>
+        </div> 
+        }
+    else
+    {
+        <p>You are not an admin :(</p>
+        @if (Model.CurrentUser.HasRequestedAdmin)
+        {
+            @using (Html.BeginForm("CancelAdminAccessRequest", "Admin", FormMethod.Post))
+            {
+                <button type="submit" class="btn btn-danger">Cancel Admin Access Request</button>
+            }
+        }
+        else
+        {
+            @using (Html.BeginForm("RequestAdminAccess", "Admin", FormMethod.Post))
+            {
+                <button type="submit" class="btn btn-primary">Request Admin Access</button>
+            }
+        }
+    }
+}
+else
+{
+    <a href="@Url.Action("Google", "Login")">Login</a>
+}
