@@ -4,7 +4,9 @@ using System.Linq;
 using System.Security.Claims;
 using BricksAndHearts.Auth;
 using BricksAndHearts.Services;
+using BricksAndHearts.ViewModels;
 using FluentAssertions;
+using Org.BouncyCastle.Asn1;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ServiceTests.Landlord;
@@ -16,6 +18,22 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     public LandlordServiceTests(TestDatabaseFixture fixture)
     {
         Fixture = fixture;
+    }
+    
+    [Fact]
+    public async void CountLandlords_ReturnsLandlordCountModel_WithCorrectData()
+    {
+        // Arrange
+        await using var context = Fixture.CreateReadContext();
+        var service = new LandlordService(context);
+
+        // Act
+        var result = service.CountLandlords();
+
+        // Assert
+        result.Should().BeOfType<LandlordCountModel>();
+        result.RegisteredLandlords.Should().Be(4);
+        result.ApprovedLandlords.Should().Be(3);
     }
     
     [Fact]

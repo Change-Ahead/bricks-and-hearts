@@ -1,0 +1,126 @@
+﻿@model AdminDashboardViewModel
+@{
+    ViewData["Title"] = "Admin Page";
+}
+
+
+@if (Model.CurrentUser != null)
+{
+    if (Model.CurrentUser.IsAdmin)
+    {
+        <div>
+            <div class="row">
+                <div class="col-1 mt-4">
+                    <h1>
+                        <i class="bi bi-person-square"></i>
+                    </h1>
+                </div>
+                <div class="col-7">
+                    <div class="row">
+                        <div class="col-7">
+                            <h6>Hello</h6>
+                            <h2>@Model.CurrentUser.Name</h2>
+                            <h6>You are an admin for the ChangeAhead Bricks&Hearts project.</h6>
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-5">
+                            <div class="row">
+                                <div class="col-8">
+                                    <h1 class="text-center">
+                                        <i class="bi bi-person"></i>
+                                    </h1>
+                                    <div class="text-center">
+                                        <a class="btn btn-primary" asp-controller="Admin" asp-action="LandlordList">Landlords</a>
+                                    </div>
+                                    <p></p>
+                                    <p>@Model.LandlordCounts.RegisteredLandlords Registered Landlord</p>
+                                    <p>@Model.LandlordCounts.ApprovedLandlords Approved Landlords</p>
+                                    </div>
+                            </div>
+                        </div>
+                        <div class="col-5">
+                            <div class="row">
+                                <div class="col-9">
+                                    <h1 class="text-center">
+                                        <i class="bi bi-house-door"></i>
+                                    </h1>
+                                    <div class="text-center">
+                                        <a class="btn btn-primary" asp-controller="Property" asp-action="SortProperties">Properties</a>
+                                    </div>
+                                    <p></p>
+                                    <p>@Model.PropertyCounts.RegisteredProperties Registered Properties</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-4">
+                    <h6>Admin Actions</h6>
+                    <a class="btn btn-primary" asp-controller="Admin" asp-action="GetAdminList">View Admins</a> <br/>
+                    <p></p>
+                    <a class="btn btn-primary" asp-controller="Landlord" asp-action="RegisterGet" asp-route-createUnassigned="true">Create Unassigned Landlord</a> <br/>
+                </div>
+            </div>
+        </div> 
+        }
+    else
+    {
+        <div>
+            <div class="row">
+                <div class="col-1 mt-4">
+                    <h1>
+                        <i class="bi bi-person-square"></i>
+                    </h1>
+                </div>
+                <div class="col-7">
+                    <div class="row">
+                        <div class="col-7">
+                            <h6>Hello</h6>
+                            <h2>@Model.CurrentUser.Name</h2>
+                            <h6>You are not an admin for the ChangeAhead Bricks&Hearts project.</h6>
+                            @if (Model.CurrentUser.HasRequestedAdmin)
+                            {
+                                <p>If you no longer believe that you should be an admin, please cancel your admin access request:</p>
+                                @using (Html.BeginForm("CancelAdminAccessRequest", "Admin", FormMethod.Post))
+                                {
+                                    <button type="submit" class="btn btn-danger">Cancel Admin Access Request</button>
+                                }
+                            }
+                            else
+                            {
+                                <p>If you believe that you should be an admin, please request admin access:</p>
+                                @using (Html.BeginForm("RequestAdminAccess", "Admin", FormMethod.Post))
+                                {
+                                    <button type="submit" class="btn btn-primary">Request Admin Access</button>
+                                }
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div>
+        <div class="row">
+            <div class="col-1 mt-4">
+                <h1>
+                    <i class="bi bi-person-square"></i>
+                </h1>
+            </div>
+            <div class="col-7">
+                <div class="row">
+                    <div class="col-7">
+                        <h6>Hello</h6>
+                        <h2>Welcome to the ChangeAhead Bricks&Hearts Project</h2>
+                        <h6>Please login with Google in order to access the site.</h6>
+                        <a class="btn btn-primary" href="@Url.Action("Google", "Login")">Login</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

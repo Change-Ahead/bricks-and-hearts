@@ -14,20 +14,25 @@ namespace BricksAndHearts.Controllers;
 public class AdminController : AbstractController
 {
     private readonly IAdminService _adminService;
+    private readonly ILandlordService _landlordService;
+    private readonly IPropertyService _propertyService;
     private readonly ILogger<AdminController> _logger;
 
-    public AdminController(ILogger<AdminController> logger, IAdminService adminService)
+    public AdminController(ILogger<AdminController> logger, IAdminService adminService, ILandlordService landlordService, IPropertyService propertyService)
     {
         _logger = logger;
         _adminService = adminService;
+        _landlordService = landlordService;
+        _propertyService = propertyService;
     }
 
-    public IActionResult Index()
+    [HttpGet]
+    [Route("/admin")]
+    public IActionResult AdminDashboard()
     {
         var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
-        var viewModel = new AdminViewModel();
+        var viewModel = new AdminDashboardViewModel(_landlordService.CountLandlords(), _propertyService.CountProperties());
         if (isAuthenticated) viewModel.CurrentUser = GetCurrentUser();
-
         return View(viewModel);
     }
 
@@ -39,12 +44,12 @@ public class AdminController : AbstractController
         if (user.IsAdmin)
         {
             LoggerAlreadyAdminWarning(_logger, user);
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(AdminDashboard));
         }
 
         _adminService.RequestAdminAccess(user);
         FlashRequestSuccess(_logger, user, "requested admin access");
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(AdminDashboard));
     }
 
     public IActionResult CancelAdminAccessRequest()
@@ -54,14 +59,14 @@ public class AdminController : AbstractController
         {
             LoggerAlreadyAdminWarning(_logger, user);
 
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(AdminDashboard));
         }
 
         _adminService.CancelAdminAccessRequest(user);
 
         FlashRequestSuccess(_logger, user, "cancelled admin access request");
 
-        return RedirectToAction(nameof(Index));
+        return RedirectToAction(nameof(AdminDashboard));
     }
 
     [Authorize(Roles = "Admin")]

@@ -41,6 +41,9 @@ public interface ILandlordService
     public Task<LinkUserWithLandlordResult> LinkExistingLandlordWithUser(
         string inviteLink,
         BricksAndHeartsUser user);
+
+    public LandlordCountModel CountLandlords();
+
 }
 
 public class LandlordService : ILandlordService
@@ -283,5 +286,13 @@ public class LandlordService : ILandlordService
     {
         var landlord = await _dbContext.Landlords.SingleOrDefaultAsync(l => l.Email == model.Email);
         return landlord;
+    }
+
+    public LandlordCountModel CountLandlords()
+    {
+        LandlordCountModel landlordCounts = new LandlordCountModel();
+        landlordCounts.RegisteredLandlords = _dbContext.Landlords.Count();
+        landlordCounts.ApprovedLandlords = _dbContext.Landlords.Count(l => l.CharterApproved == true);
+        return landlordCounts;
     }
 }

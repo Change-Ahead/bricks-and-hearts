@@ -14,7 +14,7 @@ public interface IPropertyService
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId);
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId);
     public List<PropertyDbModel> SortProperties(string by);
-
+    public PropertyCountModel CountProperties();
 }
 
 public class PropertyService : IPropertyService
@@ -151,5 +151,13 @@ public class PropertyService : IPropertyService
             properties = _dbContext.Properties.ToList();
         }
         return properties;
+    }
+    
+    public PropertyCountModel CountProperties()
+    {
+        PropertyCountModel propertyCounts = new PropertyCountModel();
+        propertyCounts.RegisteredProperties = _dbContext.Properties.Count();
+        //TODO add counts for properties which are Live, Available (Ticket BNH-40)
+        return propertyCounts;
     }
 }
