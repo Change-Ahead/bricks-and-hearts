@@ -74,8 +74,14 @@
                 <tr>
                     <td>@Html.DisplayNameFor(model => model.IsLandlordForProfit)</td>
                     <td>
-                        @if (Model.IsLandlordForProfit) { <text>For profit</text> }
-                        else { <text>Not for profit</text> }
+                        @if (Model.IsLandlordForProfit)
+                        {
+                            <text>For profit</text>
+                        }
+                        else
+                        {
+                            <text>Not for profit</text>
+                        }
                     </td>
                 </tr>
             </table>
@@ -126,7 +132,7 @@
         else
         {
             <p>Charter status: Pending</p>
-            @if (Model.CurrentUserIsAdmin && Model.MembershipId != null)
+            @if (User.IsInRole("Admin") && Model.MembershipId != null)
             {
                 <p>Membership Id: @Model.MembershipId</p>
                 @using (Html.BeginForm("ApproveCharter", "Landlord", FormMethod.Post))
