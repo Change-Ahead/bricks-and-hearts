@@ -73,7 +73,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     [InlineData(1)]
     [InlineData(2)]
     [InlineData(3)]
-    public async void AddNewPropertyContinuePost_WithInvalidModel_ReturnsViewWithModel(int step)
+    public void AddNewPropertyContinuePost_WithInvalidModel_ReturnsViewWithModel(int step)
     {
         // Arrange
         var landlordUser = CreateLandlordUser();
@@ -93,7 +93,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public async void AddNewPropertyContinuePost_AtStep1_WithoutAddress1AndPostcode_ReturnsViewWithModel()
+    public void AddNewPropertyContinuePost_AtStep1_WithoutAddress1AndPostcode_ReturnsViewWithModel()
     {
         // Arrange
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(null);
@@ -117,7 +117,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public async void AddNewPropertyContinuePost_AtStep1_CreatesNewRecord_AndRedirectsToNextStep()
+    public void AddNewPropertyContinuePost_AtStep1_CreatesNewRecord_AndRedirectsToNextStep()
     {
         // Arrange
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(null);
@@ -151,7 +151,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     [InlineData(2)]
     [InlineData(3)]
     [InlineData(4)]
-    public async void AddNewPropertyContinuePost_AtMiddleSteps_WithNoAddInProgress_RedirectsToViewProperties(int step)
+    public void AddNewPropertyContinuePost_AtMiddleSteps_WithNoAddInProgress_RedirectsToViewProperties(int step)
     {
         // Arrange
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(null);
@@ -196,7 +196,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public async void AddNewPropertyContinuePost_AtFinalStep_UpdatesRecord_AndRedirectsToViewProperties()
+    public void AddNewPropertyContinuePost_AtFinalStep_UpdatesRecord_AndRedirectsToViewProperties()
     {
         // Arrange
         var landlordUser = CreateLandlordUser();
@@ -288,7 +288,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
     // This is not working
     /*[Fact]
-    public async void EditProperty_AtFinalStep_UpdatesRecord_AndRedirectsToViewProperties()
+    public void EditProperty_AtFinalStep_UpdatesRecord_AndRedirectsToViewProperties()
     {
         // Arrange
         var landlordUser = CreateLandlordUser();
@@ -303,7 +303,6 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var result = UnderTest.EditProperty(1) as ViewResult;
 
         // Assert
-        A.CallTo(() => PropertyService.ChangePropertyToIncomplete(model)).MustHaveHappened();
         result.ViewData.Model.Should().BeOfType<AddNewPropertyViewModel>();
     }
     
