@@ -4,7 +4,9 @@
     ViewData["Title"] = "My Properties";
 }
 
-<h2>My properties</h2>
+<h2>
+    @(Model.Owner?.FirstName ?? "Landlord")'s properties
+</h2>
 
 <table class="table table-hover">
     <thead>
@@ -25,7 +27,7 @@
     }
     @foreach (var prop in Model.Properties)
     {
-        <tr class ="clickable"
+        <tr class="clickable"
             onclick="location.href = '@Url.Action("ViewProperty", "Property", new { propertyId = prop!.PropertyId })'">
             <th scope="row">@i</th>
             <td>
@@ -41,7 +43,7 @@
             <td>@prop.CreationTime</td>
             <td>@prop.Rent</td>
             <td>@prop.Description</td>
-            <td>@Html.ActionLink("View","ViewProperty","Property", new { propertyId = @prop.PropertyId })</td>
+            <td>@Html.ActionLink("View", "ViewProperty", "Property", new { propertyId = prop.PropertyId })</td>
         </tr>
         i++;
     }

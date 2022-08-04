@@ -2,10 +2,12 @@
 
 public class PropertiesDashboardViewModel
 {
-    public List<PropertyViewModel> Properties { get; set; }
-
-    public PropertiesDashboardViewModel(List<PropertyViewModel> properties)
+    public PropertiesDashboardViewModel(List<PropertyViewModel> properties, LandlordProfileModel owner)
     {
         Properties = properties;
+        Owner = owner;
     }
+
+    public LandlordProfileModel Owner { get; set; }
+    public List<PropertyViewModel> Properties { get; set; }
 }
