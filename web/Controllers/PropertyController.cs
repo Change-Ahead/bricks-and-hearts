@@ -1,4 +1,3 @@
-using System.Diagnostics.Eventing.Reader;
 using System.Text.RegularExpressions;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
@@ -155,8 +154,7 @@ public class PropertyController : AbstractController
         // Go to View Properties page
         return RedirectToAction("ViewProperties", "Landlord");
     }
-
-
+    
     [HttpGet]
     [Route("/property/{propertyId:int}/view")]
     public ActionResult ViewProperty(int propertyId)
@@ -179,8 +177,26 @@ public class PropertyController : AbstractController
         {
             return StatusCode(403);
         }
-        ImageListViewModel imageList = await _azureStorage.ListFiles("property", propertyId);
+        var fileNames = await _azureStorage.ListFileNames("property", propertyId);
+        var imageFiles = GetFilesFromFileNames(fileNames, propertyId);
+
+        var imageList = new ImageListViewModel()
+        {
+            PropertyId = propertyId,
+            FileList = imageFiles
+        };
+        
         return View(imageList);
+    }
+
+    public List<ImageFileUrlModel> GetFilesFromFileNames(List<string> fileNames, int propertyId)
+    {
+        return fileNames.Select(fileName =>
+            {
+                var url = Url.Action("GetImage", new { propertyId, fileName })!;
+                return new ImageFileUrlModel(fileName, url);
+            })
+            .ToList();
     }
     
     [Authorize(Roles = "Landlord, Admin")]
@@ -225,8 +241,9 @@ public class PropertyController : AbstractController
     }
     
     [Authorize(Roles = "Landlord, Admin")]
-    [HttpPost("displayImage")]
-    public async Task<IActionResult> DisplayPropertyImage(int propertyId, string fileName)
+    [HttpGet]
+    [Route("{propertyId:int}/{fileName}")]
+    public async Task<IActionResult> GetImage(int propertyId, string fileName)
     {
         if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
         {
@@ -241,7 +258,7 @@ public class PropertyController : AbstractController
         var fileType = image.fileType;
         return File(data!, $"image/{fileType}");
     }
-    
+
     [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("deleteImage")]
     public async Task<IActionResult> DeletePropertyImage(int propertyId, string fileName)

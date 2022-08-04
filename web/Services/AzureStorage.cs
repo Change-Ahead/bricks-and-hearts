@@ -1,6 +1,5 @@
 ﻿using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
-using BricksAndHearts.ViewModels;
 
 namespace BricksAndHearts.Services
 {
@@ -8,7 +7,7 @@ namespace BricksAndHearts.Services
     {
         Task DeleteContainer(string varType, int id);
         Task<string> UploadFile(IFormFile file, string varType, int id);
-        Task<ImageListViewModel> ListFiles(string varType, int id);
+        Task<List<string>> ListFileNames(string varType, int id);
         Task<(Stream? data, string? fileType)> DownloadFile(string varType, int id, string blobFilename);
         Task DeleteFile(string varType, int id, string blobFilename);
         public (bool isImage, string? imageExtString) IsImage(string fileName);
@@ -76,7 +75,7 @@ namespace BricksAndHearts.Services
             return $"Successfully uploaded {blob.FileName}.";
         }
 
-        public async Task<ImageListViewModel> ListFiles(string varType, int id)
+        public async Task<List<string>> ListFileNames(string varType, int id)
         {
             var containerClient = await GetOrCreateContainerClient(varType, id);
             List<string> fileNames = new List<string>();
@@ -84,12 +83,7 @@ namespace BricksAndHearts.Services
             {
                 fileNames.Add(file.Name);
             }
-            ImageListViewModel imageList = new ImageListViewModel()
-            {
-                PropertyId = id,
-                FileList = fileNames
-            };
-            return imageList;
+            return fileNames;
         }
 
         public async Task<(Stream?, string?)> DownloadFile(string varType, int id, string blobName)
@@ -118,7 +112,7 @@ namespace BricksAndHearts.Services
         public (bool, string?) IsImage(string fileName)
         {
             string fileType = SplitFileName(fileName).type;
-            List<string> imageExtensions = new List<string> { "jpg", "jpeg", "png", "bmp", "gif" };
+            List<string> imageExtensions = new List<string> { "jpg", "jpeg", "png", "bmp", "gif","jfif" };
             if (imageExtensions.Contains(fileType.ToLower()))
             {
                 return (true, null);

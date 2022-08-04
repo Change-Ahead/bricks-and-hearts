@@ -20,27 +20,15 @@
 
 <h2>Images available for property @Model.PropertyId</h2>
 
-<table>
-    @foreach (var file in Model.FileList!)
-    {
-        <tr>
-            <td>
-                @using (Html.BeginForm("DisplayPropertyImage", "Property", FormMethod.Post))
-                {
-                    <input type="hidden" id="propertyId" name="propertyId" value=@Model.PropertyId>
-                    <input type="hidden" id="fileName" name="fileName" value="@file">
-                    <button type="submit" class="btn btn-primary">Display @file</button>
-                }
-            </td>
-            <td>
-                <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal"
-                    onclick="setValue('deleteFileName', '@file'); setValue('deletePropertyId', '@Model.PropertyId')">
-                Delete @file
-                </button>
-            </td>
-        </tr>
-    }
-</table>
+@foreach (var file in Model.FileList!)
+{
+    <figure class="figure">
+        <img src=@file.FileUrl class="figure-img rounded" alt="Property image @file.FileName">
+        <figcaption class="figure-caption" type="button" data-bs-toggle="modal" data-bs-target="#deleteModal" 
+                    onclick="setValue('deleteFileName', '@file.FileName'); setValue('deletePropertyId', '@Model.PropertyId')"><i class="bi bi-trash"></i></figcaption>
+    </figure>
+}
+
 
 @using (Html.BeginForm("AddPropertyImages", "Property", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
