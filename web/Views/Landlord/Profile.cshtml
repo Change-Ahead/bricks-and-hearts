@@ -4,150 +4,137 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Profile</h1>
+<div class="row py-3">
+    <div class="col-sm-1 profile-photo">
+        <img src="https://www.softwire.com/wp-content/uploads/2019/07/Gareth-J-Final-Head-Shot.jpg" class="img-fluid" alt="profile picture">
+    </div>
+    <div class="col-sm my-auto">
+        <h1 class="font-h1 font-blue">@Html.DisplayFor(model => model.FirstName) @Html.DisplayFor(model => model.LastName)</h1>
+        <div class="font-h3">Profile type: Landlord</div>
+    </div>
+</div>
 
-<div>
-    @{
-        if (TempData["InviteLinkMessage"] != null)
-        {
-            <div class="alert alert-warning" role="alert">
-                @TempData["InviteLinkMessage"]
-                @if (TempData["InviteLink"] != null)
-                {
-                    <br/>
-                    @TempData["InviteLink"]
-                    <br>
-                    <br>
-                    @using (Html.BeginForm("RenewInviteLink", "Admin", new { landlordId = Model.LandlordId }, FormMethod.Post))
-                    {
-                        <button type="submit" class="btn btn-sm btn-outline-primary">Get New Link</button>
-                    }
-                }
+<div class="row">
+    <div class="col-sm">
+
+        <div class="mb-4">
+            <div class="d-flex">
+                <h3 class="font-h3 d-inline-block">Personal details</h3>
+                <a class="bi bi-pencil ms-auto" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(0);"></a>
             </div>
-        }
-    }
-    <h4>Landlord</h4>
-
-    <hr/>
-    <div class="col-lg-5">
-        <div class="d-flex p-2 justify-content-between">
-            <h4>Personal details</h4>
-            <td>
-                <a class="btn btn-outline-primary" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(0);">Edit</a>
-            </td>
-        </div>
-
-        <div class="tables">
-            <table class="table table-bordered">
-                <tbody>
+            <table class="table">
                 <tr>
-                    <td>@Html.DisplayNameFor(model => model.FirstName)</td>
+                    <th class="w-25">First name</th>
                     <td>@Html.DisplayFor(model => model.FirstName)</td>
                 </tr>
                 <tr>
-                    <td>@Html.DisplayNameFor(model => model.LastName)</td>
+                    <th>Last name</th>
                     <td>@Html.DisplayFor(model => model.LastName)</td>
                 </tr>
             </table>
         </div>
+
+        <div class="mb-4">
+            <div class="d-flex">
+                <h3 class="font-h3 d-inline-block">Address</h3>
+                <a class="bi bi-pencil ms-auto"></a>
+            </div>
+            <table class="table">
+                <tr>
+                    <th class="w-25">Address</th>
+                    <td>
+                        Softwire,<br/>
+                        Charter House,<br/>
+                        62-64 Hills Rd,<br/>
+                        Cambridge,<br/>
+                        Cambridgeshire<br/>
+                        CB2 1LA<br/>
+                    </td>
+                </tr>
+                <tr>
+                    <th>Company</th>
+                    <td>@Html.DisplayFor(model => model.CompanyName)</td>
+                </tr>
+            </table>
+        </div>
     </div>
 
-    <div class="col-lg-5">
-        <div class="d-flex p-2 justify-content-between">
-            <h4>Landlord details</h4>
-            <td>
-                <a class="btn btn-outline-primary" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(1);">Edit</a>
-            </td>
-        </div>
-        <div class="tables">
-            <table class="table table-bordered">
-                <tbody>
+
+    <div class="col-sm">
+        <div class="mb-4">
+            <div class="d-flex">
+                <h3 class="font-h3 d-inline-block">Contact</h3>
+                <a class="bi bi-pencil ms-auto" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(1);"></a>
+            </div>
+            <table class="table">
                 <tr>
-                    <td>@Html.DisplayNameFor(model => model.Email)</td>
+                    <th class="w-25">Email</th>
                     <td>@Html.DisplayFor(model => model.Email)</td>
                 </tr>
                 <tr>
-                    <td>@Html.DisplayNameFor(model => model.Phone)</td>
+                    <th>Phone</th>
                     <td>@Html.DisplayFor(model => model.Phone)</td>
                 </tr>
             </table>
         </div>
-    </div>
 
-    <div class="col-lg-5">
-        <div class="d-flex p-2 justify-content-between">
-            <h4>Contact details</h4>
-            <td>
-                <a class="btn btn-outline-primary" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(2);">Edit</a>
-            </td>
-        </div>
-        <div class="tables">
-            <table class="table table-bordered">
-                <tbody>
+        <div class="mb-4">
+            <div class="d-flex">
+                <h3 class="font-h3 d-inline-block">Type</h3>
+                <a class="bi bi-pencil ms-auto" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(2);"></a>
+            </div>
+            <table class="table">
                 <tr>
-                    <td>@Html.DisplayNameFor(model => model.CompanyName)</td>
-                    <td>@Html.DisplayFor(model => model.CompanyName)</td>
-                </tr>
-                <tr>
-                    <td>@Html.DisplayNameFor(model => model.LandlordType)</td>
+                    <th class="w-25">Nature</th>
                     <td>@Html.DisplayFor(model => model.LandlordType)</td>
                 </tr>
                 <tr>
-                    <td>@Html.DisplayNameFor(model => model.IsLandlordForProfit)</td>
-                    <td>
-                        @if (Model.IsLandlordForProfit)
-                        {
-                            <text>For profit</text>
-                        }
-                        else
-                        {
-                            <text>Not for profit</text>
-                        }
-                    </td>
+                    <th>Sector</th>
+                    <td>@(Model.IsLandlordForProfit ? "For profit" : "Not for profit")</td>
                 </tr>
             </table>
         </div>
-    </div>
-    <div class="col-lg-5">
-        @if (User.IsInRole("Admin"))
-        {
-            <h4>Landlord Properties</h4>
-            <a class="btn btn-outline-primary" href='@Url.Action("ViewProperties", "Landlord", new { id = Model.LandlordId })'><i class="bi bi-house"></i> View Properties</a>
-            <br/>
-        }
-    </div>
-    <div class="col-lg-5">
-        <div class="d-flex p-2 justify-content-between">
-            <h4>ChangeAhead Charter</h4>
-            <td>
-                <a class="btn btn-outline-primary" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(2);">Edit</a>
-            </td>
-        </div>
-        @if (Model.CharterApproved)
-        {
-            <p>Charter status: Approved</p>
-            <p>Membership Id: @Model.MembershipId</p>
-        }
-        else
-        {
-            <p>Charter status: Pending</p>
-            @if (User.IsInRole("Admin") && Model.MembershipId != null)
-            {
-                <p>Membership Id: @Model.MembershipId</p>
-                @using (Html.BeginForm("ApproveCharter", "Landlord", FormMethod.Post))
-                {
-                    <input type="hidden" id="landlordId" name="landlordId" value=@Model.LandlordId>
-                    <button type="submit" class="btn btn-outline-primary">Confirm Landlord Charter Membership</button>
-                }
-            }
-        }
 
-        @if (User.IsInRole("Admin"))
-        {
-            @using (Html.BeginForm("GetInviteLink", "Admin", new { landlordId = Model.LandlordId }, FormMethod.Post))
-            {
-                <button type="submit" class="btn btn-outline-primary">Get Invite Link</button>
-            }
-        }
+        <div class="mb-4">
+            <div class="d-flex">
+                <h3 class="font-h3 d-inline-block">Charter</h3>
+                <a class="bi bi-pencil ms-auto" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(2);"></a>
+            </div>
+            <table class="table">
+                <tr>
+                    <th class="w-25">Status</th>
+                    <td>@(Model.CharterApproved ? "Approved" : "Pending")</td>
+                </tr>
+                @if (Model.MembershipId != null)
+                {
+                    <tr>
+                        <th>Membership ID</th>
+                        <td>
+                            <div class="d-flex">
+                                @Model.MembershipId
+                                @if (User.IsInRole("Admin") && !Model.CharterApproved)
+                                {
+                                    using (Html.BeginForm("ApproveCharter", "Landlord", null, FormMethod.Post, null, new { @class = "ms-auto" }))
+                                    {
+                                        <input type="hidden" id="landlordId" name="landlordId" value=@Model.LandlordId>
+                                        <button type="submit" class="btn btn-sm btn-outline-primary">Confirm charter membership</button>
+                                    }
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </table>
+        </div>
     </div>
 </div>
+
+<a class="btn btn-primary my-3" href='@Url.Action("ViewProperties", "Landlord", new { id = Model.LandlordId })'><i class="bi bi-house"></i> View properties</a>
+
+@if (User.IsInRole("Admin"))
+{
+    @using (Html.BeginForm("GetInviteLink", "Admin", new { landlordId = Model.LandlordId }, FormMethod.Post))
+    {
+        <button type="submit" class="btn btn-primary"><i class="bi bi-link"></i> Get invite link</button>
+    }
+}

@@ -6,17 +6,17 @@
     <meta charset="utf-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>@ViewData["Title"] - BricksAndHearts</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/lib/bootstrap/bootstrap-icons/bootstrap-icons.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/BricksAndHearts.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="~/lib/bootstrap/bootstrap-icons/bootstrap-icons.css"/>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true"/>
+    <link rel="stylesheet" href="~/BricksAndHearts.styles.css" asp-append-version="true"/>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 </head>
 
 <body>
-<header class="mb-3">
+<header>
     <nav class="navbar navbar-primary navbar-expand-sm navbar-light border-bottom bg-white box-shadow">
         <div class="container-fluid">
             <a class="navbar-brand fw-bold ms-4 me-5" asp-controller="Home" asp-action="Index">Bricks & Hearts</a>
@@ -29,7 +29,7 @@
             <div class="collapse navbar-collapse">
                 <div class="navbar-nav me-auto">
                     <a class="nav-link text-dark mx-3" asp-controller="Landlord" asp-action="@(User.IsInRole("Landlord") ? "MyDashboard" : "RegisterGet")">List your properties</a>
-                    <a class="nav-link text-dark mx-3" asp-controller="Admin" asp-action="Index">Facilitate rentals</a>
+                    <a class="nav-link text-dark mx-3" asp-controller="Admin" asp-action="AdminDashboard">Facilitate rentals</a>
                 </div>
 
                 <div class="navbar-nav">
@@ -80,11 +80,11 @@
     }
 </header>
 
-<div class="container pb-4">
-    <main role="main" class="pb-3">
+<div class="container mt-3 pb-4">
+    <main role="main">
         @if (TempData["FlashMessage"] != null)
         {
-            @* uses warning as the default alert colour if there's no value in TempData["FlashType"] *@
+        @* uses warning as the default alert colour if there's no value in TempData["FlashType"] *@
             <div class="alert alert-@(TempData["FlashType"] ?? "warning")" role="alert">
                 @TempData["FlashMessage"]
             </div>
@@ -93,7 +93,7 @@
     </main>
 </div>
 
-<footer class="border-top footer text-muted">
+<footer class="border-top footer text-muted bg-white">
     <div class="container">
         <div class="nav">
             <span class="navbar-text me-3">&copy; 2022 - Bricks & Hearts</span>

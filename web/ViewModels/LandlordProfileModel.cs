@@ -47,6 +47,8 @@ public class LandlordProfileModel
 
     public bool Unassigned { get; set; }
 
+    public string? InviteLink { get; set; }
+
     [DisplayName("For / not for profit")]
     public bool IsLandlordForProfit { get; set; }
     public int NumOfProperties { get; set; }
@@ -68,6 +70,7 @@ public class LandlordProfileModel
             CharterApproved = landlord.CharterApproved,
             IsLandlordForProfit = landlord.IsLandlordForProfit,
             NumOfProperties = landlord.Properties.Count,
+            InviteLink = landlord.InviteLink
         };
     }
 
@@ -87,6 +90,7 @@ public class LandlordProfileModel
             CharterApproved = landlord.CharterApproved,
             IsLandlordForProfit = landlord.IsLandlordForProfit,
             NumOfProperties = landlord.Properties.Count,
+            InviteLink = landlord.InviteLink
         };
     }
 }
