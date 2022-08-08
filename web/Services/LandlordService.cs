@@ -311,12 +311,6 @@ public class LandlordService : ILandlordService
         return _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id)!;
     }
 
-    private async Task<LandlordDbModel?> GetLandlordIfExistsFromModel(LandlordDbModel model)
-    {
-        var landlord = await _dbContext.Landlords.SingleOrDefaultAsync(l => l.Email == model.Email);
-        return landlord;
-    }
-
     public LandlordCountModel CountLandlords()
     {
         LandlordCountModel landlordCounts = new LandlordCountModel();
