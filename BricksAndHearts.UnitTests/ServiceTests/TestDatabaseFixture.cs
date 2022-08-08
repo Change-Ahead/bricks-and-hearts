@@ -14,12 +14,8 @@ public class TestDatabaseFixture
     {
         lock (Lock)
         {
-            if (_databaseInitialised)
-            {
-                return;
-            }
-
-            using (var context = CreateContext(false))
+            if (_databaseInitialised) return;
+            using (var context = CreateContext(readOnly: false))
             {
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
@@ -28,7 +24,9 @@ public class TestDatabaseFixture
                     CreateApprovedLandlord(), // landlordId = 1
                     CreateUnapprovedLandlord(), // landlordId = 2
                     CreateLandlordWithLink(), // landlordId = 3
-                    CreateUnlinkedLandlordWithLink() // landlordId = 4
+                    CreateUnlinkedLandlordWithLink(), // landlordId = 4
+                    CreateLandlordWithMembershipId(420), // landlordId = 5
+                    CreateLandlordWithMembershipId(421) // landlordId = 6
                 );
 
                 context.Users.AddRange(
@@ -194,9 +192,9 @@ public class TestDatabaseFixture
         return new LandlordDbModel
         {
             Email = "test.landlord1@gmail.com",
-            FirstName = "Ronnie",
-            LastName = "McFace",
-            Title = "Dr",
+            FirstName = "Landlord1Approved",
+            LastName = "Landlord1Sur",
+            Title = "Mr",
             Phone = "01189998819991197253",
             LandlordType = "Non profit",
             CharterApproved = true,
@@ -215,8 +213,8 @@ public class TestDatabaseFixture
         return new LandlordDbModel
         {
             Email = "test.landlord2@gmail.com",
-            FirstName = "Donnie",
-            LastName = "McCheeks",
+            FirstName = "Landlord2Unapproved",
+            LastName = "Landlord2Sur",
             Title = "Mr",
             Phone = "01189998819991197253",
             LandlordType = "Non profit",
@@ -235,9 +233,9 @@ public class TestDatabaseFixture
         return new LandlordDbModel
         {
             Email = "test.landlord3@gmail.com",
-            FirstName = "Lonnie",
-            LastName = "McMc",
-            Title = "Sister",
+            FirstName = "Landlord3Link",
+            LastName = "Landlord3Sur",
+            Title = "Mr",
             Phone = "01189998819991197253",
             LandlordType = "Non profit",
             CharterApproved = true,
@@ -256,8 +254,8 @@ public class TestDatabaseFixture
         return new LandlordDbModel
         {
             Email = "test.landlord4@gmail.com",
-            FirstName = "Unlinked",
-            LastName = "Landlord",
+            FirstName = "Landlord4Unlinked",
+            LastName = "Landlord4Sur",
             Title = "Mr",
             Phone = "004",
             LandlordType = "Non profit",
@@ -272,6 +270,23 @@ public class TestDatabaseFixture
         };
     }
 
+    private LandlordDbModel CreateLandlordWithMembershipId(int memberId)
+    {
+        return new LandlordDbModel
+        {
+            Email = "test.landlord5&6@gmail.com",
+            FirstName = "Landlord5&6MembershipId",
+            LastName = "Landlord5&6Sur",
+            Title = "Mr",
+            Phone = "005&6",
+            LandlordType = "Non profit",
+            LandlordProvidedCharterStatus = true,
+            CharterApproved = true,
+            MembershipId = $"Member-{memberId}"
+        };
+    }
+    
+    //begin property models
     private PropertyDbModel CreateCompleteProperty()
     {
         return new PropertyDbModel
