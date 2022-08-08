@@ -43,12 +43,12 @@
                         }
                         @using (Html.BeginForm("Logout", "Login", FormMethod.Post))
                         {
-                            <button type="submit" class="btn btn-outline-primary mx-3">Log out</button>
+                            <button type="submit" class="btn btn-thin btn-outline-primary mx-3">Log out</button>
                         }
                     }
                     else
                     {
-                        <a class="btn btn-outline-primary mx-3" asp-controller="Login" asp-action="Google">Log in</a>
+                        <a class="btn btn-thin btn-outline-primary mx-3" asp-controller="Login" asp-action="Google">Log in</a>
                     }
                 </div>
             </div>

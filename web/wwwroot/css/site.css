@@ -38,7 +38,7 @@ html {
 body {
     margin-bottom: 60px;
     background-image: url("images/backgroundHouses.jpg");
-    background-color: rgba(255,255,255,0.97);
+    background-color: rgba(255, 255, 255, 0.97);
     background-blend-mode: lighten;
 }
 
@@ -62,14 +62,31 @@ img:hover {
     display: table;
 }
 
+.btn-large {
+    width: 200px;
+    height: 60px;
+    font-size: 18px;
+}
+
+.btn-thin {
+    width: 140px;
+    height: 40px;
+}
+
 .btn-primary {
     background-color: var(--orange);
     border-color: var(--orange);
 }
 
+.btn-submit {
+    width: 360px;
+    height: 64px;
+}
+
 .btn-outline-primary {
     border-color: var(--orange);
-    color: var(--orange)
+    color: var(--orange);
+    background: white;
 }
 
 .btn-primary:hover {
@@ -98,15 +115,58 @@ img:hover {
     color: var(--white);
 }
 
+.btn-outline-blue {
+    border-color: var(--blue);
+    color: var(--blue);
+    background: white;
+}
+
+.btn-outline-blue:hover, .btn-outline-blue:focus, .btn-outline-blue:active, .btn-outline-blue:active:focus, .btn-check:checked + .btn-outline-blue, .btn-check:active + .btn-outline-blue, .btn-outline-blue.active, .btn-outline-blue.dropdown-toggle.show {
+    background-color: var(--blue);
+    border-color: var(--blue);
+    color: var(--white);
+}
+
 .btn-danger {
     background-color: var(--red);
     border-color: var(--red);
 }
 
-.form-control, .form-select{
+.form-control, .form-select, .input-group {
     border-color: var(--blue);
-    line-height: 2.5;
-    font-size: larger;
+    height: 64px;
+    width: 360px;
+}
+
+.input-group-text {
+    border-color: var(--blue);
+    background-color: var(--paleBlue);
+}
+
+.form-check {
+    margin-bottom: 0.7rem;
+}
+
+.form-check-input {
+    width: 24px;
+    height: 24px;
+    margin-right: 1rem;
+    margin-top: 0.1rem;
+    border-width: 2px;
+    border-color: var(--blue);
+}
+
+.form-check-input:checked {
+    background-color: var(--blue);
+    border-color: var(--blue);
+}
+
+.form-check-input[type=checkbox] {
+    border-radius: 0;
+}
+
+.textarea-description {
+    height: 300px;
 }
 
 /*font classes*/
@@ -155,7 +215,12 @@ img:hover {
 .font-blue {
     color: var(--blue)
 }
+
 /*end font classes*/
+
+.form-label {
+    font-size: 20px;
+}
 
 /*Javascript form styling:*/
 /* Mark input boxes that gets an error on validation: */
@@ -177,8 +242,11 @@ input.invalid {
     display: inline-block;
     color: var(--white);
     z-index: 1000;
+    text-align: center;
+    line-height: 175%;
 }
- /* Make lines connecting the steps*/
+
+/* Make lines connecting the steps*/
 .stepline {
     height: 4px;
     width: 25%;
@@ -192,13 +260,17 @@ input.invalid {
 
 /* Mark the steps that are finished and valid: */
 .step.finish, .stepline.finish {
-  background-color: var(--lightOrange);
+    background-color: var(--lightOrange);
 }
 
 /* Mark the active step: */
 .step.active {
     background-color: var(--orange);
     box-shadow: 0 0 0 3px var(--lightOrange);
+}
+
+.property-steps .stepline {
+    width: 10%;
 }
 
 /*End of javascript form styling*/
@@ -220,12 +292,11 @@ input.invalid {
     cursor: pointer;
 }
 
-.narrow-form {
-    max-width: 40rem;
-}
-
 .pill-radio, .pill-check {
     border-radius: 0.75rem !important;
+    height: 44px;
+    width: 132px;
+    line-height: 30px;
 }
 
 .pill-check i {

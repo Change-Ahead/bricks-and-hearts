@@ -1,28 +1,30 @@
 @model PropertyViewModel
 
-<h2>What kind of tenant would you prefer?</h2>
+<h1 class="font-h1">What kind of tenant would you prefer?</h1>
 
 <div asp-validation-summary="All" class="text-danger"></div>
 
 <div class="my-4 py-3">
-    <label class="form-label">Select all that apply:</label>
+    <label class="form-label mb-3">Select all that apply:</label>
 
-    <div class="form-check">
-        @Html.CheckBox("AcceptsSingleTenant", Model.AcceptsSingleTenant ?? false, new { @class = "form-check-input" })
-        <label asp-for="AcceptsSingleTenant" class="form-check-label">Single tenant</label>
-    </div>
-    <div class="form-check">
-        @Html.CheckBox("AcceptsCouple", Model.AcceptsCouple ?? false, new { @class = "form-check-input" })
-        <label asp-for="AcceptsCouple" class="form-check-label">Couple</label>
-    </div>
-    <div class="form-check">
-        @Html.CheckBox("AcceptsFamily", Model.AcceptsFamily ?? false, new { @class = "form-check-input" })
-        <label asp-for="AcceptsFamily" class="form-check-label">Family (3+)</label>
+    <div class="row g-3">
+        <div class="col-auto d-grid">
+            @Html.CheckBox("AcceptsSingleTenant", Model.AcceptsSingleTenant ?? false, new { @class = "btn-check" })
+            <label asp-for="AcceptsSingleTenant" class="btn btn-outline-blue shadow-none pill-check">Single tenant</label>
+        </div>
+        <div class="col-auto d-grid">
+            @Html.CheckBox("AcceptsCouple", Model.AcceptsCouple ?? false, new { @class = "btn-check" })
+            <label asp-for="AcceptsCouple" class="btn btn-outline-blue shadow-none pill-check">Couple</label>
+        </div>
+        <div class="col-auto d-grid">
+            @Html.CheckBox("AcceptsFamily", Model.AcceptsFamily ?? false, new { @class = "btn-check" })
+            <label asp-for="AcceptsFamily" class="btn btn-outline-blue shadow-none pill-check">Family (3+)</label>
+        </div>
     </div>
 </div>
 
 <div class="my-4 py-3">
-    <label class="form-label">Do you accept pets?</label>
+    <label class="form-label">Will you accept tenants with pets?</label>
 
     <div class="form-check">
         <input type="radio" asp-for="AcceptsPets" value="true" id="PetsTrue" class="form-check-input" required>
