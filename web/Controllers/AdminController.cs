@@ -201,14 +201,29 @@ public class AdminController : AbstractController
     public async Task<ActionResult> ImportTenants(IFormFile csvFile)
     {
         string fileName = csvFile.FileName;
+        if (csvFile.Length == 0)
+        {
+            FlashMessage(_logger, ($"{fileName} has length zero.", "danger",$"{fileName} contains no data. Please upload a file containing the tenant data you would like to import."));
+            return RedirectToAction(nameof(TenantList));
+        }
         if (fileName.Substring(fileName.Length - 3) != "csv")
         {
             FlashMessage(_logger, ($"{fileName} not a CSV file.", "danger",$"{fileName} is not a CSV file. Please upload your data as a CSV file."));
+            return RedirectToAction(nameof(TenantList));
         }
-        else
+        
+        var (columnOrder, flashResponse) = _adminService.CheckIfImportWorks(csvFile);
+        if (flashResponse.FlashTypes.Contains("danger"))
         {
-            await _adminService.ImportTenants(csvFile);
+            FlashMultipleMessages(flashResponse.FlashTypes, flashResponse.FlashMessages);
+            return RedirectToAction(nameof(TenantList));
         }
+        var furtherFlashResponse = await _adminService.ImportTenants(csvFile, columnOrder, flashResponse);
+        if (furtherFlashResponse.FlashMessages.Count() == 0)
+        {
+            FlashMessage(_logger, ("Successfuly imported all tenant data.", "success", "Successfully imported all tenant data."));
+        }
+        FlashMultipleMessages(furtherFlashResponse.FlashTypes, furtherFlashResponse.FlashMessages);
         return RedirectToAction(nameof(TenantList));
     }
 }

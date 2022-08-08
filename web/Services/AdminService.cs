@@ -1,6 +1,6 @@
-﻿using BricksAndHearts.Auth;
+﻿using System.Data;
+using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
-using BricksAndHearts.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace BricksAndHearts.Services;
@@ -20,7 +20,8 @@ public interface IAdminService
     public void RejectAdminAccessRequest(int userId);
     public UserDbModel GetUserFromId(int userId);
     public Task<List<TenantDbModel>> GetTenantDbModelsFromFilter(string[] filterArray);
-    public Task ImportTenants(IFormFile csvFile);
+    public (int[] columnOrder, (List<string> FlashTypes, List<string> FlashMessages)) CheckIfImportWorks(IFormFile csvFile);
+    public Task<(List<string> FlashTypes, List<string> FlashMessages)> ImportTenants(IFormFile csvFile, int[] columnOrder, (List<string> flashTypes, List<string> flashMessages) flashResponse);
 }
 
 public class AdminService : IAdminService
@@ -179,48 +180,123 @@ public class AdminService : IAdminService
         }
         return await tenantQuery.ToListAsync();
     }
-
-    public async Task ImportTenants(IFormFile csvFile)
+    
+    public (int[], (List<string>, List<string>)) CheckIfImportWorks(IFormFile csvFile)
     {
+        string headerLine = "";
         using (var streamReader = new StreamReader(csvFile.OpenReadStream()))
         {
-            string headerLine = streamReader.ReadLine();
-            string[] headers = headerLine.Split(",");
-            string currentLine = streamReader.ReadLine();
-            while (currentLine != null)
+            headerLine = streamReader.ReadLine();
+        }
+        string[] headers = headerLine.Split(",");
+        
+        int[] columnOrder = new int[typeof(TenantDbModel).GetProperties().Count()];
+        bool[] checkUse = new bool[headers.Count()];
+        List<string> flashTypes = new List<string>(), flashMessages = new List<string>();
+        
+        //align database properties with csv file columns
+        for (int i = 1; i < typeof(TenantDbModel).GetProperties().Count(); i++)
+        {
+            var dataProp = typeof(TenantDbModel).GetProperties()[i];
+            for (int j = 0; j < headers.Length; j++)
             {
-                string[] entries = currentLine.Split(",");
-                if (entries != null)
+                if (dataProp.Name == headers[j])
                 {
-                    var dbModel = new TenantDbModel();
-                    foreach (var prop in typeof(TenantDbModel).GetProperties())
-                    {
-                        for (int i = 0; i < headers.Length; i ++)
-                        {
-                            if (prop.Name == headers[i])
-                            {
-                                if (entries[i] == "TRUE")
-                                {
-                                    prop.SetValue(dbModel, true);
-                                }
-                                else if (entries[i] == "FALSE")
-                                {
-                                    prop.SetValue(dbModel, false);
-                                }
-                                else
-                                {
-                                    prop.SetValue(dbModel, entries[i]);
-                                }
-                            }
-                        }
-                    }
-                    _dbContext.Tenants.Add(dbModel);
-                    await _dbContext.SaveChangesAsync();
+                    columnOrder[i] = j;
+                    checkUse[j] = true;
                 }
-                
-                currentLine = streamReader.ReadLine();
+            }
+
+            if (columnOrder[i] == null)
+            {
+                _logger.LogWarning($"Column {dataProp.Name} is missing.");
+                flashTypes.Add("danger");
+                flashMessages.Add($"Import has failed because column {dataProp.Name} is missing. Please add this column to your records before attempting to import them.");
             }
         }
         
+        //check for extra columns in csv file
+        for (int k = 0; k < checkUse.Length; k++)
+        {
+            if (!checkUse[k] && headers[k] != "")
+            {
+                _logger.LogWarning($"Extra column: {headers[k]}");
+                flashTypes.Add("warning");
+                flashMessages.Add(
+                    $"The column {headers[k]} does not exist in the database. All data in this column has been ignored.");
+            }
+        }
+        
+        return (columnOrder, (flashTypes, flashMessages));
+    }
+
+    public async Task<(List<string> FlashTypes, List<string> FlashMessages)> ImportTenants(IFormFile csvFile, int[] columnOrder, (List<string> flashTypes, List<string> flashMessages) flashResponse)
+    {
+        List<string> flashTypes = flashResponse.flashTypes,
+            flashMessages = flashResponse.flashMessages;
+        var target = typeof(TenantDbModel).GetProperties()[7].PropertyType;
+        await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
+        {
+            using (var streamReader = new StreamReader(csvFile.OpenReadStream()))
+            {
+                string currentLine = streamReader.ReadLine();
+                currentLine = streamReader.ReadLine();
+                while (currentLine != null)
+                {
+                    string[] entries = currentLine.Split(",");
+                    if (entries != null)
+                    {
+                        var dbModel = new TenantDbModel();
+                        for(int i = 1; i < typeof(TenantDbModel).GetProperties().Count(); i++)
+                        {
+                            var prop = typeof(TenantDbModel).GetProperties()[i];
+                            int key = columnOrder[i];
+                            if (entries[key] != "")
+                            {
+                                //Boolean fields
+                                if (prop.PropertyType == target)
+                                {
+                                    string boolInput = entries[key].ToUpper();
+                                    if (boolInput == "TRUE"|| boolInput == "YES"|| boolInput == "1")
+                                    {
+                                        prop.SetValue(dbModel, true);
+                                    }
+                                    else if (boolInput == "FALSE"|| boolInput == "NO"|| boolInput == "0")
+                                    {
+                                        prop.SetValue(dbModel, false);
+                                    }
+                                    else
+                                    {
+                                        _logger.LogWarning($"Invalid input for {prop.Name} in record for {dbModel.Name}.");
+                                        flashTypes.Add("danger");
+                                        flashMessages.Add($"Invalid input in record for tenant {dbModel.Name}: '{prop.Name}' cannot be '{entries[key]}', as it must be a Boolean value (true/false).");
+                                    }
+                                }
+                                
+                                //String fields
+                                else
+                                {
+                                    prop.SetValue(dbModel, entries[key]);
+                                }
+                            }
+                        }
+                        if (dbModel.Name == null)
+                        {
+                            _logger.LogWarning($"Name is missing from record {currentLine}.");
+                            flashTypes.Add("danger");
+                            flashMessages.Add($"Name is missing from record {currentLine}. This record has not been added to the database. Please add a name to this tenant in order to import their information.");
+                        }
+                        else
+                        {
+                            _dbContext.Tenants.Add(dbModel);
+                        }
+                        await _dbContext.SaveChangesAsync();
+                    }
+                    currentLine = streamReader.ReadLine();
+                }
+            }
+            await transaction.CommitAsync();
+        }
+        return (flashTypes, flashMessages);
     }
 }
