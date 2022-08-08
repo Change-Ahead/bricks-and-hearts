@@ -56,7 +56,7 @@ public class TestDatabaseFixture
                 context.Tenants.AddRange(
                     CreateTenant()
                 );
-                
+
                 context.SaveChanges();
             }
 
@@ -309,7 +309,8 @@ public class TestDatabaseFixture
             Postcode = "CB1 1DX",
             IsIncomplete = true
         };
-    
+    }
+
     private TenantDbModel CreateTenant()
     {
         return new TenantDbModel
@@ -318,7 +319,7 @@ public class TestDatabaseFixture
             Email = "exampletenant@gmail.com"
         };
     }
-    }
+
 
     private PropertyDbModel CreateCompleteProperty(int landlordId)
     {
