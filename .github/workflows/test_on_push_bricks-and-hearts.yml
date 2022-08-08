@@ -7,12 +7,13 @@ on:
   pull_request:
     branches:
       [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
     name: Build and run tests
     runs-on: ubuntu-latest
-    
+
     services:
       sqlserver:
         image: mcr.microsoft.com/mssql/server:2019-latest
@@ -39,7 +40,7 @@ jobs:
 
       - name: Build with dotnet
         run: dotnet build -warnaserror
-        
+
       # Substitute entries in appsettings.json for CI
       - name: App Settings variable substitution
         uses: microsoft/variable-substitution@v1
