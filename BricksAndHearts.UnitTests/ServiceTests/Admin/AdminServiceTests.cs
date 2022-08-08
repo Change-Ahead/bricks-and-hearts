@@ -91,6 +91,21 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         result.Item1.Should().BeOfType<List<UserDbModel>>().And.Subject.Where(l => l.IsAdmin).Should().HaveCount(result.Item1.Count);
         result.Item2.Should().BeOfType<List<UserDbModel>>().And.Subject.Where(l => l.HasRequestedAdmin).Should().HaveCount(result.Item2.Count);
     }
+    
+    [Fact]
+    public void GetTenantList_GetsListOfTenants()
+    {
+        // Arrange
+        using var context = Fixture.CreateReadContext();
+        var service = new AdminService(context,null!);
+
+        // Act
+        var result = service.GetTenantList().Result;
+
+        // Assert
+
+        result.Should().BeOfType<List<TenantDbModel>>().And.Subject.Should().HaveCount(context.Tenants.Count());
+    }
 
     [Fact]
     public void GetLandlordDisplayList_CalledWithApproved_ReturnsApprovedLandlords()

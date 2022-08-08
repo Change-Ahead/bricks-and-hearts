@@ -40,6 +40,20 @@ public class AdminControllerTests : AdminControllerTestsBase
         A.CallTo(() => AdminService.GetLandlordDisplayList("")).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<LandlordListModel?>();
     }
+    
+    [Fact]
+    public async void TenantList_WhenCalled_CallsGetTenantListAndReturnsTenantListView()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+
+        // Act
+        var result = await UnderTest.TenantList() as ViewResult;
+
+        // Assert
+        result!.ViewData.Model.Should().BeOfType<TenantListModel?>();
+    }
 
     [Fact]
     public void GetAdminList_ReturnsViewWithAdminListModel()

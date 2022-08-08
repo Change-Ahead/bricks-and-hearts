@@ -1,0 +1,41 @@
+﻿@model TenantListModel
+
+@{
+    ViewData["Title"] = "Tenant List";
+}
+
+<h2>Tenant List</h2>
+
+<table class="table table-hover">
+    <thead>
+    <tr>
+        <th scope="col">Name</th>
+        <th scope="col">Email</th>
+        <th scope="col">Phone</th>
+        <th scope="col">Postcode</th>
+        <th scope="col">Type</th>
+        <th scope="col">Has Pet?</th>
+        <th scope="col">In ETT?</th>
+        <th scope="col">On Universal Credit?</th>
+        <th scope="col">On Housing Benefits?</th>
+        <th scope="col">Over 35?</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var tenant in Model.TenantList!)
+    {
+        <tr>
+            <td>@tenant.Name</td>
+            <td>@tenant.Email</td>
+            <td>@tenant.Phone</td>
+            <td>@tenant.Postcode</td>
+            <td>@tenant.Type</td>
+            <td>@tenant.HasPet</td>
+            <td>@tenant.ETT</td>
+            <td>@tenant.UniversalCredit</td>
+            <td>@tenant.HousingBenefits</td>
+            <td>@tenant.Over35</td>
+        </tr>
+    }
+    </tbody>
+</table>

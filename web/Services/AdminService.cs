@@ -10,6 +10,7 @@ public interface IAdminService
     public void CancelAdminAccessRequest(BricksAndHeartsUser user);
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
     public Task<List<LandlordDbModel>> GetLandlordDisplayList(string approvalStatus);
+    public Task<List<TenantDbModel>> GetTenantList();
     public UserDbModel? FindUserByLandlordId(int landlordId);
     public string? FindExistingInviteLink(int landlordId);
     public string CreateNewInviteLink(int landlordId);
@@ -57,6 +58,11 @@ public class AdminService : IAdminService
             "Approved" => await _dbContext.Landlords.Where(u => u.CharterApproved == true).ToListAsync(),
             _ => await _dbContext.Landlords.ToListAsync(),
         };
+    }
+    
+    public async Task<List<TenantDbModel>> GetTenantList()
+    {
+        return await _dbContext.Tenants.ToListAsync();
     }
 
     public UserDbModel? FindUserByLandlordId(int landlordId)

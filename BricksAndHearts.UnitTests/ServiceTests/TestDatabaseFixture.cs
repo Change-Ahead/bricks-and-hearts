@@ -41,6 +41,10 @@ public class TestDatabaseFixture
                     CreateIncompleteProperty()
                 );
                 
+                context.Tenants.AddRange(
+                    CreateTenant()
+                );
+                
                 context.SaveChanges();
             }
 
@@ -247,6 +251,15 @@ public class TestDatabaseFixture
             TownOrCity = "Incomplete Town",
             County = "Incomplete County",
             Postcode = "CB3 1LA",
+        };
+    }
+    
+    private TenantDbModel CreateTenant()
+    {
+        return new TenantDbModel
+        {
+            Name = "Example Tenant",
+            Email = "exampletenant@gmail.com"
         };
     }
 }
