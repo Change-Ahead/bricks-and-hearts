@@ -15,6 +15,7 @@ public interface IPropertyService
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId);
     public List<PropertyDbModel> SortProperties(string by);
     public PropertyCountModel CountProperties();
+    string? CreateNewPublicViewLink(int propertyId);
 }
 
 public class PropertyService : IPropertyService
@@ -178,5 +179,19 @@ public class PropertyService : IPropertyService
         propertyCounts.LiveProperties = _dbContext.Properties.Count(p => p.Availability != PropertyDbModel.Avail_Draft && p.Landlord.CharterApproved);
         propertyCounts.AvailableProperties = _dbContext.Properties.Count(p => p.Availability == PropertyDbModel.Avail_Available);
         return propertyCounts;
+    }
+
+    public string CreateNewPublicViewLink(int propertyId)
+    {
+        var propertyDbModel = _dbContext.Properties.Single(u => u.Id == propertyId);
+        if (!string.IsNullOrEmpty(propertyDbModel.PublicViewLink))
+        {
+            throw new Exception("Property should not have existing public view link!");
+        }
+        var g = Guid.NewGuid();
+        var publicViewLink = g.ToString();
+        propertyDbModel.PublicViewLink = publicViewLink;
+        _dbContext.SaveChanges();
+        return publicViewLink;
     }
 }

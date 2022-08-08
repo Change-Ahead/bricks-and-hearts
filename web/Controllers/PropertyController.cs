@@ -2,6 +2,7 @@ using System.Text.RegularExpressions;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -156,6 +157,7 @@ public class PropertyController : AbstractController
     }
     
     [HttpGet]
+    [Authorize(Roles = "Landlord, Admin")]
     [Route("/property/{propertyId:int}/view")]
     public ActionResult ViewProperty(int propertyId)
     {
@@ -280,5 +282,38 @@ public class PropertyController : AbstractController
         var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).ToList();
         
         return View("~/Views/Admin/PropertyList.cshtml", new PropertiesDashboardViewModel(listOfProperties.Skip((page-1)*propPerPage).Take(propPerPage).ToList(),  listOfProperties.Count, null! , page, sortBy));
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [Route("/admin/get-public-view-link/{propertyId:int}")]
+    [HttpGet]
+    public ActionResult GetPublicViewLink(int propertyId)
+    {
+        var property = _propertyService.GetPropertyByPropertyId(propertyId);
+        if (property == null) // If property does not exist
+        {
+            var flashMessageBody = $"Property with ID: {propertyId} does not exist";
+            FlashMessage(_logger, (flashMessageBody, "warning", flashMessageBody));
+        }
+        else
+        {
+            var publicViewLink = property.PublicViewLink;
+            string flashMessageBody;
+            if (string.IsNullOrEmpty(publicViewLink))
+            {
+                flashMessageBody = "Successfully created a new public view link";
+                publicViewLink = _propertyService.CreateNewPublicViewLink(propertyId);
+                _logger.LogInformation("Created public view link for property {PropertyId}: {PublicViewLink}", propertyId, publicViewLink);
+            }
+            else
+            {
+                flashMessageBody = "Property already has a public view link";
+            }
+
+            var baseUrl = HttpContext.Request.GetUri().Authority;
+            FlashMessage(_logger, (flashMessageBody, "success", flashMessageBody + ": "+ baseUrl + $"/public/propertyid/{propertyId}/{publicViewLink}"));
+        }
+
+        return RedirectToAction("ViewProperty", "Property", new { propertyId });
     }
 }

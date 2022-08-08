@@ -4,7 +4,21 @@
     ViewData["Title"] = "View Public Property";
 }
 
-<div class="container">
+@if (Model.SearchResult == PublicPropertySearchResult.IncorrectPublicViewLink)
+{
+    <p>
+        Error accessing the page. 
+    </p>
+    <p>
+        This might mean that you have entered an incorrect link for viewing the property.
+    </p>
+    <p>
+        If you received this link from Bricks&Hearts, please @Html.ActionLink("contact", "ContactUs", "Home") us.
+    </p>
+}
+else
+{
+    <div class="container">
     <div class="row mb-3">
         <h3>View public property</h3>
     </div>
@@ -85,5 +99,6 @@
     @Html.ActionLink("Property images", "ListPropertyImages", "Property", new { propertyId = Model.PropertyId }, 
         new { @class = "btn btn-primary" })
 </div>
+}
 
 

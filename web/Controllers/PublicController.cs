@@ -18,11 +18,30 @@ public class PublicController : AbstractController
     }
 
     [HttpGet]
-    [Route("/public/propertyId/{propertyId:int}")]
-    public IActionResult ViewPublicProperty(int propertyId)
+    [Route("/public/propertyId/{propertyId:int}/{publicViewLink}")]
+    public IActionResult ViewPublicProperty(int propertyId,string publicViewLink)
     {
         var property = _propertyService.GetPropertyByPropertyId(propertyId);
-        var publicProperty = PublicPropertyViewModel.FromDbModel(property);
-        return View(publicProperty);
+        if (property == null)
+        {
+            var publicProperty = new PublicPropertyViewModel
+            {
+                SearchResult = PublicPropertySearchResult.IncorrectPublicViewLink
+            };
+            return View(publicProperty);
+        }
+        if (property.PublicViewLink == null || property.PublicViewLink != publicViewLink)
+        {
+            var publicProperty = new PublicPropertyViewModel
+            {
+                SearchResult = PublicPropertySearchResult.IncorrectPublicViewLink
+            };
+            return View(publicProperty);
+        }
+        else
+        {
+            var publicProperty = PublicPropertyViewModel.FromDbModel(property); // FromDbModel sets SearchResult as Success automatically
+            return View(publicProperty);
+        }
     }
 }
