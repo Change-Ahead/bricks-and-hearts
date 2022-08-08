@@ -12,8 +12,12 @@ public class TestDatabaseFixture
     {
         lock (Lock)
         {
-            if (_databaseInitialised) return;
-            using (var context = CreateContext(readOnly: false))
+            if (_databaseInitialised)
+            {
+                return;
+            }
+
+            using (var context = CreateContext(false))
             {
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
@@ -24,7 +28,7 @@ public class TestDatabaseFixture
                     CreateLandlordWithLink(), // landlordId = 3
                     CreateUnlinkedLandlordWithLink() // landlordId = 4
                 );
-                
+
                 context.Users.AddRange(
                     CreateAdminUser(),
                     CreateNonAdminUser(),
@@ -33,20 +37,26 @@ public class TestDatabaseFixture
                     CreateApprovedLandlordUser(), // landlordId = 1
                     CreateUnapprovedLandlordUser(), // landlordId = 2
                     CreateLandlordUserWithLink(), // landlordId = 3
-                    CreateUnlinkedLandlordUser() 
-                    );
-                
+                    CreateUnlinkedLandlordUser()
+                );
+
+                context.Properties.AddRange(
+                    CreateCompleteProperty(1),
+                    CreateCompleteProperty(1),
+                    CreateCompleteProperty(2),
+                    CreateIncompleteProperty(2)
+                );
                 context.Properties.AddRange(
                     CreateCompleteProperty(),
                     CreateIncompleteProperty(),
                     CreateAvailableProperty(),
                     CreateDraftProperty()
                 );
-                
+
                 context.Tenants.AddRange(
                     CreateTenant()
                 );
-                
+
                 context.SaveChanges();
             }
 
@@ -63,18 +73,18 @@ public class TestDatabaseFixture
 
     public BricksAndHeartsDbContext CreateReadContext()
     {
-        return CreateContext(readOnly: true);
+        return CreateContext(true);
     }
 
     public BricksAndHeartsDbContext CreateWriteContext()
     {
-        var context = CreateContext(readOnly: false);
+        var context = CreateContext(false);
         // Begin a transaction so the test's writes don't interfere with other tests running in parallel (provides test isolation)
         // Transaction is never committed so is automatically rolled back at the end of the test
         context.Database.BeginTransaction();
         return context;
     }
-    
+
     // Begin User Models
 
     public UserDbModel CreateAdminUser()
@@ -115,7 +125,7 @@ public class TestDatabaseFixture
             HasRequestedAdmin = true
         };
     }
-    
+
     public UserDbModel CreateApprovedLandlordUser()
     {
         return new UserDbModel
@@ -127,7 +137,7 @@ public class TestDatabaseFixture
             LandlordId = 1
         };
     }
-    
+
     public UserDbModel CreateUnapprovedLandlordUser()
     {
         return new UserDbModel
@@ -142,7 +152,7 @@ public class TestDatabaseFixture
 
     public UserDbModel CreateLandlordUserWithLink()
     {
-        return new UserDbModel()
+        return new UserDbModel
         {
             GoogleUserName = "LinkedLandlordUser",
             GoogleEmail = "test.email6@gmail.com",
@@ -151,7 +161,7 @@ public class TestDatabaseFixture
             LandlordId = 3
         };
     }
-    
+
     public UserDbModel CreateUnlinkedLandlordUser()
     {
         return new UserDbModel
@@ -163,12 +173,12 @@ public class TestDatabaseFixture
             HasRequestedAdmin = false
         };
     }
-    
+
     // Please if you want to add in a new user with landlord ID
     // DO NOT use landlordId = 4
     // Use landlordId = 5 instead
     // PLEASE!
-    
+
     // Begin Landlord models
     public LandlordDbModel CreateApprovedLandlord()
     {
@@ -183,7 +193,7 @@ public class TestDatabaseFixture
             CharterApproved = true
         };
     }
-    
+
     public LandlordDbModel CreateUnapprovedLandlord()
     {
         return new LandlordDbModel
@@ -212,7 +222,7 @@ public class TestDatabaseFixture
             InviteLink = "InvitimusLinkimus"
         };
     }
-    
+
     private LandlordDbModel CreateUnlinkedLandlordWithLink()
     {
         return new LandlordDbModel
@@ -227,7 +237,7 @@ public class TestDatabaseFixture
             InviteLink = "invite-unlinked-landlord"
         };
     }
-    
+
     private PropertyDbModel CreateCompleteProperty()
     {
         return new PropertyDbModel
@@ -242,7 +252,7 @@ public class TestDatabaseFixture
             Availability = PropertyDbModel.Avail_Occupied
         };
     }
-    
+
     private PropertyDbModel CreateIncompleteProperty()
     {
         return new PropertyDbModel
@@ -287,13 +297,47 @@ public class TestDatabaseFixture
             Availability = PropertyDbModel.Avail_Draft
         };
     }
-    
+
+    private PropertyDbModel CreateIncompleteProperty(int landlordId)
+    {
+        return new PropertyDbModel
+        {
+            LandlordId = landlordId,
+            AddressLine1 = "22 Test Road",
+            County = "Cambridgeshire",
+            TownOrCity = "Cambridge",
+            Postcode = "CB1 1DX",
+            IsIncomplete = true
+        };
+    }
+
     private TenantDbModel CreateTenant()
     {
         return new TenantDbModel
         {
             Name = "Example Tenant",
             Email = "exampletenant@gmail.com"
+        };
+    }
+
+
+    private PropertyDbModel CreateCompleteProperty(int landlordId)
+    {
+        return new PropertyDbModel
+        {
+            AcceptsBenefits = true,
+            AcceptsCouple = true,
+            AcceptsFamily = true,
+            AcceptsPets = false,
+            AcceptsNotEET = true,
+            AcceptsSingleTenant = true,
+            LandlordId = landlordId,
+            AddressLine1 = "22 Test Road",
+            County = "Cambridgeshire",
+            TownOrCity = "Cambridge",
+            AcceptsWithoutGuarantor = true,
+            Postcode = "CB1 1DX",
+            IsIncomplete = false
         };
     }
 }
