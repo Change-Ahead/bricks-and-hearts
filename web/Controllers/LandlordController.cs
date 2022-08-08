@@ -93,7 +93,7 @@ public class LandlordController : AbstractController
                 _logger.LogWarning("Email already registered {Email}", createModel.Email);
                 ModelState.AddModelError("Email", "Email already registered");
                 return View("Register", createModel);
-            
+
             case ILandlordService.LandlordRegistrationResult.ErrorLandlordMembershipIdAlreadyRegistered:
                 _logger.LogWarning("Membership Id already registered {MembershipId}", createModel.MembershipId);
                 ModelState.AddModelError("MembershipId", "Membership Id already registered");
@@ -144,12 +144,13 @@ public class LandlordController : AbstractController
 
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    public async Task<ActionResult> ApproveCharter(int landlordId)
+    public async Task<ActionResult> ApproveCharter(LandlordProfileModel landlord)
     {
         var user = GetCurrentUser();
-        var flashMessageBody = await _landlordService.ApproveLandlord(landlordId, user);
-        FlashMessage(_logger, ("charter status updated successfully", "success", flashMessageBody));
-        return RedirectToAction("Profile", "Landlord", new { Id = landlordId });
+        var flashMessageBody =
+            await _landlordService.ApproveLandlord(landlord.LandlordId!.Value, user, landlord.MembershipId);
+        FlashMessage(_logger, ("Charter status updated successfully", "success", flashMessageBody));
+        return RedirectToAction("Profile", "Landlord", new { Id = landlord.LandlordId.Value });
     }
 
     [HttpGet]
@@ -173,7 +174,8 @@ public class LandlordController : AbstractController
         var databaseResult = _propertyService.GetPropertiesByLandlord(id.Value);
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
         var landlordProfile = LandlordProfileModel.FromDbModel(await _landlordService.GetLandlordFromId((int)id));
-        return View("Properties", new PropertiesDashboardViewModel(listOfProperties,listOfProperties.Count, landlordProfile));
+        return View("Properties",
+            new PropertiesDashboardViewModel(listOfProperties, listOfProperties.Count, landlordProfile));
     }
 
     [HttpGet]
@@ -217,7 +219,7 @@ public class LandlordController : AbstractController
             ModelState.AddModelError("Email", "Email already registered");
             return View("EditProfilePage", editModel);
         }
-        
+
         var isMembershipIdDuplicated = _landlordService.CheckForDuplicateMembershipId(editModel);
         if (isMembershipIdDuplicated)
         {
@@ -276,7 +278,7 @@ public class LandlordController : AbstractController
 
         throw new Exception($"Unknown landlord registration error ${result}");
     }
-    
+
     [HttpGet]
     [Route("{id:int}/dashboard")]
     public async Task<ActionResult> Dashboard([FromRoute] int id)
@@ -296,7 +298,7 @@ public class LandlordController : AbstractController
         var viewModel = LandlordProfileModel.FromDbModel(landlord, user);
         return View("Dashboard", viewModel);
     }
-    
+
     [HttpGet]
     [Route("me/dashboard")]
     public async Task<ActionResult> MyDashboard()
