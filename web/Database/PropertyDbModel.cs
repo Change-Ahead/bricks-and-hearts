@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BricksAndHearts.Database;
@@ -52,4 +53,7 @@ public class PropertyDbModel
     [DataType(DataType.Date)]
     public DateTime? AvailableFrom { get; set; } = null;
     public int? RenterUserId { get; set; } = null;
+    
+    // Suffix to append to url for public view
+    public string? PublicViewLink { get; set; }
 }
