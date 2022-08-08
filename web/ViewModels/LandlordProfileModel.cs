@@ -87,6 +87,7 @@ public class LandlordProfileModel
             Title = landlord.Title,
             LandlordType = landlord.LandlordType,
             LandlordProvidedCharterStatus = landlord.LandlordProvidedCharterStatus,
+            MembershipId = landlord.MembershipId,
             CharterApproved = landlord.CharterApproved,
             IsLandlordForProfit = landlord.IsLandlordForProfit,
             NumOfProperties = landlord.Properties.Count,

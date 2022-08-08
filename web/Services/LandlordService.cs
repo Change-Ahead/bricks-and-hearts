@@ -213,14 +213,7 @@ public class LandlordService : ILandlordService
         landlordToEdit.LandlordType = editModel.LandlordType;
         landlordToEdit.IsLandlordForProfit = editModel.IsLandlordForProfit;
         landlordToEdit.LandlordProvidedCharterStatus = editModel.LandlordProvidedCharterStatus;
-        if (editModel.LandlordProvidedCharterStatus)
-        {
-            landlordToEdit.MembershipId = editModel.MembershipId;
-        }
-        else
-        {
-            landlordToEdit.MembershipId = null;
-        }
+        landlordToEdit.MembershipId = editModel.LandlordProvidedCharterStatus ? editModel.MembershipId : null;
 
         await _dbContext.SaveChangesAsync();
         return ILandlordService.LandlordRegistrationResult.Success;
@@ -287,12 +280,6 @@ public class LandlordService : ILandlordService
     public Task<LandlordDbModel> GetLandlordFromId(int id)
     {
         return _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id)!;
-    }
-
-    private async Task<LandlordDbModel?> GetLandlordIfExistsFromModel(LandlordDbModel model)
-    {
-        var landlord = await _dbContext.Landlords.SingleOrDefaultAsync(l => l.Email == model.Email);
-        return landlord;
     }
 
     public LandlordCountModel CountLandlords()
