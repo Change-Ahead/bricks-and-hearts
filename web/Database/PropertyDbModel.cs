@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BricksAndHearts.Database;
@@ -8,7 +9,6 @@ public class PropertyDbModel
     // Backend
     public int Id { get; set; }
     public int LandlordId { get; set; }
-    public int? RenterUserId { get; set; } = null;
     public virtual LandlordDbModel Landlord { get; set; } = null!;
     public bool IsIncomplete { get; set; }
     public DateTime? CreationTime { get; set; }
@@ -22,7 +22,7 @@ public class PropertyDbModel
     public string Postcode { get; set; } = string.Empty;
     public decimal? Lat { get; set; } // latitude
     public decimal? Lon { get; set; } // longitude
-    
+
     // Property details
     public string? PropertyType { get; set; }
     public int? NumOfBedrooms { get; set; }
@@ -39,6 +39,11 @@ public class PropertyDbModel
     public bool? AcceptsNotEET { get; set; }
     public bool? AcceptsWithoutGuarantor { get; set; }
 
-    // Rent, deposits, and duration
+    // Rent, deposits, availability and duration
     public int? Rent { get; set; }
+
+    public string Availability { get; set; } = "Draft";
+    [DataType(DataType.Date)]
+    public DateTime? AvailableFrom { get; set; } = null;
+    public int? RenterUserId { get; set; } = null;
 }

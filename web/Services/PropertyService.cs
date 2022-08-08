@@ -64,8 +64,13 @@ public class PropertyService : IPropertyService
             AcceptsNotEET = createModel.AcceptsNotEET,
             AcceptsWithoutGuarantor = createModel.AcceptsWithoutGuarantor,
 
-            Rent = createModel.Rent
+            Rent = createModel.Rent,
+            Availability = createModel.Availability,
         };
+        if (createModel.Availability == "Available Soon")
+        {
+            dbModel.AvailableFrom = createModel.AvailableFrom;
+        }
 
         // Add the new property to the database
         _dbContext.Properties.Add(dbModel);
@@ -104,6 +109,11 @@ public class PropertyService : IPropertyService
         dbModel.AcceptsWithoutGuarantor = updateModel.AcceptsWithoutGuarantor ?? dbModel.AcceptsWithoutGuarantor;
 
         dbModel.Rent = updateModel.Rent ?? dbModel.Rent;
+        dbModel.Availability = updateModel.Availability;
+        if (updateModel.Availability == "Available Soon")
+        {
+            dbModel.AvailableFrom = updateModel.AvailableFrom;
+        }
 
         dbModel.IsIncomplete = isIncomplete;
         _dbContext.SaveChanges();
