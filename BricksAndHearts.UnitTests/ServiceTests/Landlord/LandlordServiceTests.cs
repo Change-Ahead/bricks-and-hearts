@@ -25,10 +25,10 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     //RegisterLandlord can't be tested as it uses a transaction
 
     [Fact]
-    public async void GetLandlordIfExistsFromId_ReturnsLandlord_WithUniqueId()
+    public void GetLandlordIfExistsFromId_ReturnsLandlord_WithUniqueId()
     {
         // Arrange
-        await using var context = Fixture.CreateReadContext();
+        using var context = Fixture.CreateReadContext();
         var service = new LandlordService(context);
 
         // Act
@@ -39,10 +39,10 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     }
 
     [Fact]
-    public async void GetLandlordIfExistsFromId_ReturnsNull_WithInvalidId()
+    public void GetLandlordIfExistsFromId_ReturnsNull_WithInvalidId()
     {
         // Arrange
-        await using var context = Fixture.CreateReadContext();
+        using var context = Fixture.CreateReadContext();
         var service = new LandlordService(context);
 
         // Act
@@ -55,10 +55,10 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     }
 
     [Fact]
-    public async void GetLandlordIfExistsWithProperties_ReturnsLandlord_WithUniqueId()
+    public void GetLandlordIfExistsWithProperties_ReturnsLandlord_WithUniqueId()
     {
         // Arrange
-        await using var context = Fixture.CreateReadContext();
+        using var context = Fixture.CreateReadContext();
         var service = new LandlordService(context);
 
         // Act
@@ -69,10 +69,10 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     }
     
     [Fact]
-    public async void GetLandlordIfExistsWithProperties_ReturnsNull_WithInvalidId()
+    public void GetLandlordIfExistsWithProperties_ReturnsNull_WithInvalidId()
     {
         // Arrange
-        await using var context = Fixture.CreateReadContext();
+        using var context = Fixture.CreateReadContext();
         var service = new LandlordService(context);
 
         // Act
@@ -85,10 +85,10 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     }
 
     [Fact]
-    public async void ApproveLandlord_ReturnsSorry_ForNonexistentLandlord()
+    public void ApproveLandlord_ReturnsSorry_ForNonexistentLandlord()
     {
         // Arrange
-        await using var context = Fixture.CreateReadContext();
+        using var context = Fixture.CreateReadContext();
         var service = new LandlordService(context);
         var user = A.Fake<BricksAndHeartsUser>();
 
@@ -100,10 +100,10 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     }
     
     [Fact]
-    public async void ApproveLandlord_ReturnsCharterAlreadyApproved_ForLandlordWithCharterPreApproved()
+    public void ApproveLandlord_ReturnsCharterAlreadyApproved_ForLandlordWithCharterPreApproved()
     {
         // Arrange
-        await using var context = Fixture.CreateReadContext();
+        using var context = Fixture.CreateReadContext();
         var service = new LandlordService(context);
         var user = A.Fake<BricksAndHeartsUser>();
 
@@ -115,10 +115,10 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     }
     
     [Fact]
-    public async void ApproveLandlord_ReturnsCharterApproved_ForLandlordWithUnapprovedCharter()
+    public void ApproveLandlord_ReturnsCharterApproved_ForLandlordWithUnapprovedCharter()
     {
         // Arrange
-        await using var context = Fixture.CreateWriteContext();
+        using var context = Fixture.CreateWriteContext();
         var service = new LandlordService(context);
         var user = A.Fake<BricksAndHeartsUser>();
 
@@ -137,10 +137,10 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     }
 
     [Fact]
-    public async void FindLandlordWithInviteLink_ReturnsLinkedLandlord_WithValidLink()
+    public void FindLandlordWithInviteLink_ReturnsLinkedLandlord_WithValidLink()
     {
         // Arrange
-        await using var context = Fixture.CreateReadContext();
+        using var context = Fixture.CreateReadContext();
         var service = new LandlordService(context);
 
         // Act
@@ -151,10 +151,10 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     }
     
     [Fact]
-    public async void FindLandlordWithInviteLink_ReturnsNull_WithInvalidLink()
+    public void FindLandlordWithInviteLink_ReturnsNull_WithInvalidLink()
     {
         // Arrange
-        await using var context = Fixture.CreateReadContext();
+        using var context = Fixture.CreateReadContext();
         var service = new LandlordService(context);
 
         // Act
@@ -165,18 +165,15 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     }
 
     [Fact]
-    public async void EditLandlordDetails_UpdatesLandlord_WithNewLandlordDetails()
+    public void EditLandlordDetails_UpdatesLandlord_WithNewLandlordDetails()
     {
         // Arrange
-        await using var context = Fixture.CreateWriteContext();
+        using var context = Fixture.CreateWriteContext();
         var service = new LandlordService(context);
-        var landlordToEdit = context.Landlords.Single(l => l.Id == 3);
-        landlordToEdit.Email = "NewEmail@Boring.com";
-        //prevents the email entry being changed in the test database
-        context.ChangeTracker.Clear();
+        var landlordToEdit = Fixture.CreateLandlordWithEditedEmail("NewEmail@Boring.com");
 
         // Act
-        var result = service.EditLandlordDetails(LandlordProfileModel.FromDbModel(landlordToEdit)).Result;
+        var result = service.EditLandlordDetails(landlordToEdit).Result;
         
         // Before assert we need to clear the context's change tracker so that the following database queries actually
         // query the database, as if this were a new context. This should be done for all write tests.
@@ -187,103 +184,96 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         result.Should().Be(ILandlordService.LandlordRegistrationResult.Success);
     }
 
-    [Fact]
-    public async void CheckForDuplicateEmail_ReturnsTrue_WithDuplicateEmail()
-    {
-        // Arrange
-        await using var context = Fixture.CreateReadContext();
-        var service = new LandlordService(context);
-        var landlordToEdit = context.Landlords.Single(l => l.Id == 3);
-        landlordToEdit.Email = "test.landlord1@gmail.com";
-        //prevents the email entry being changed in the test database
-        context.ChangeTracker.Clear();
+    #region CheckForDuplicateEmail
+
+        [Fact]
+        public void CheckForDuplicateEmail_ReturnsTrue_WithDuplicateEmail()
+        {
+            // Arrange
+            using var context = Fixture.CreateReadContext();
+            var service = new LandlordService(context);
+            var landlordToEdit = Fixture.CreateLandlordWithEditedEmail("test.landlord1@gmail.com");
+
+            // Act
+            var result = service.CheckForDuplicateEmail(landlordToEdit);
+
+            // Assert
+            result.Should().BeTrue();
+        }
         
-        // Act
-        var result = service.CheckForDuplicateEmail(LandlordProfileModel.FromDbModel(landlordToEdit));
+        [Fact]
+        public void CheckForDuplicateEmail_ReturnsFalse_WithNewEmail()
+        {
+            // Arrange
+            using var context = Fixture.CreateReadContext();
+            var service = new LandlordService(context);
+            var landlordToEdit = Fixture.CreateLandlordWithEditedEmail("NewEmail@Boring.com");
 
-        // Assert
-        result.Should().BeTrue();
-    }
-    
-    [Fact]
-    public async void CheckForDuplicateEmail_ReturnsFalse_WithNewEmail()
-    {
-        // Arrange
-        await using var context = Fixture.CreateReadContext();
-        var service = new LandlordService(context);
-        var editedLandlord = context.Landlords.Single(l => l.Id == 3);
-        editedLandlord.Email = "NewEmail@Boring.com";
-        //prevents the email entry being changed in the test database
-        context.ChangeTracker.Clear();
+            // Act
+            var result = service.CheckForDuplicateEmail(landlordToEdit);
 
-        // Act
-        var result = service.CheckForDuplicateEmail(LandlordProfileModel.FromDbModel(editedLandlord));
+            // Assert
+            result.Should().BeFalse();
+        }
 
-        // Assert
-        result.Should().BeFalse();
-    }
-    
-    [Fact]
-    public async void CheckForDuplicateMembershipId_ReturnsTrue_WithDuplicateMembershipId()
-    {
-        // Arrange
-        await using var context = Fixture.CreateReadContext();
-        var service = new LandlordService(context);
-        var landlordToEdit = context.Landlords.Single(l => l.Id == 5);
-        landlordToEdit.MembershipId = "Member-421";
-        //prevents the membership id entry being changed in the test database
-        context.ChangeTracker.Clear();
+    #endregion
+
+    #region CheckForDuplicateMembershipId
+
+        [Fact]
+        public void CheckForDuplicateMembershipId_ReturnsTrue_WithDuplicateMembershipId()
+        {
+            // Arrange
+            using var context = Fixture.CreateReadContext();
+            var service = new LandlordService(context);
+            var landlordToEdit = Fixture.CreateLandlordWithEditedMemberId(421);
+
+            // Act
+            var result = service.CheckForDuplicateMembershipId(landlordToEdit);
+
+            // Assert
+            result.Should().BeTrue();
+        }
         
-        // Act
-        var result = service.CheckForDuplicateMembershipId(LandlordProfileModel.FromDbModel(landlordToEdit));
+        [Fact]
+        public void CheckForDuplicateMembershipId_ReturnsFalse_WithNewMembershipId()
+        {
+            // Arrange
+            using var context = Fixture.CreateReadContext();
+            var service = new LandlordService(context);
+            var landlordToEdit = Fixture.CreateLandlordWithEditedMemberId(1);
 
-        // Assert
-        result.Should().BeTrue();
-    }
-    
-    [Fact]
-    public async void CheckForDuplicateMembershipId_ReturnsFalse_WithNewMembershipId()
-    {
-        // Arrange
-        await using var context = Fixture.CreateReadContext();
-        var service = new LandlordService(context);
-        var landlordToEdit = context.Landlords.Single(l => l.Id == 5);
-        landlordToEdit.MembershipId = "Member-1";
-        //prevents the membership id entry being changed in the test database
-        context.ChangeTracker.Clear();
+            // Act
+            var result = service.CheckForDuplicateMembershipId(landlordToEdit);
+
+            // Assert
+            result.Should().BeFalse();
+        }
         
-        // Act
-        var result = service.CheckForDuplicateMembershipId(LandlordProfileModel.FromDbModel(landlordToEdit));
+        [Fact]
+        public void CheckForDuplicateMembershipId_ReturnsFalse_ForNonProvidedCharterStatus()
+        {
+            // Arrange
+            using var context = Fixture.CreateReadContext();
+            var service = new LandlordService(context);
+            var landlordToEdit = Fixture.CreateLandlordWithEditedMemberId(420);
+            landlordToEdit.LandlordProvidedCharterStatus = false;
 
-        // Assert
-        result.Should().BeFalse();
-    }
+            // Act
+            var result = service.CheckForDuplicateMembershipId(landlordToEdit);
+
+            // Assert
+            result.Should().BeFalse();
+        }
+
+    #endregion
     
-    [Fact]
-    public async void CheckForDuplicateMembershipId_ReturnsFalse_ForNonProvidedCharterStatus()
-    {
-        // Arrange
-        await using var context = Fixture.CreateReadContext();
-        var service = new LandlordService(context);
-        var landlordToEdit = context.Landlords.Single(l => l.Id == 5);
-        landlordToEdit.LandlordProvidedCharterStatus = false;
-        //prevents the membership id entry being changed in the test database
-        context.ChangeTracker.Clear();
-        
-        // Act
-        var result = service.CheckForDuplicateMembershipId(LandlordProfileModel.FromDbModel(landlordToEdit));
-
-        // Assert
-        result.Should().BeFalse();
-    }
-
-
     //this may need to be updated numbers-wise if anyone ever adds any extra landlords to the test area
     [Fact]
-    public async void CountLandlords_ReturnsLandlordCountModel_WithCorrectData()
+    public void CountLandlords_ReturnsLandlordCountModel_WithCorrectData()
     {
         // Arrange
-        await using var context = Fixture.CreateReadContext();
+        using var context = Fixture.CreateReadContext();
         var service = new LandlordService(context);
 
         // Act

@@ -1,4 +1,5 @@
 ﻿using BricksAndHearts.Database;
+using BricksAndHearts.ViewModels;
 using Microsoft.Extensions.Configuration;
 
 namespace BricksAndHearts.UnitTests.ServiceTests;
@@ -335,6 +336,40 @@ public class TestDatabaseFixture
         };
     }
 
+    public LandlordProfileModel CreateLandlordWithEditedEmail(string email)
+    {
+        return new LandlordProfileModel
+        {
+            LandlordId = 3,
+            Email = email,
+            FirstName = "Landlord3Link",
+            LastName = "Landlord3Sur",
+            Title = "Mr",
+            Phone = "01189998819991197253",
+            LandlordType = "Non profit",
+            CharterApproved = true,
+            InviteLink = "InvitimusLinkimus"
+        };
+    }
+    
+    public LandlordProfileModel CreateLandlordWithEditedMemberId(int memberId)
+    {
+        return new LandlordProfileModel
+        {
+            LandlordId = 5,
+            Email = "test.landlord5&6@gmail.com",
+            FirstName = "Landlord3Link",
+            LastName = "Landlord3Sur",
+            Title = "Mr",
+            Phone = "01189998819991197253",
+            LandlordType = "Non profit",
+            CharterApproved = true,
+            MembershipId = $"Member-{memberId}",
+            InviteLink = "InvitimusLinkimus",
+            LandlordProvidedCharterStatus = true
+        };
+    }
+}
 
     private PropertyDbModel CreateCompleteProperty(int landlordId)
     {
