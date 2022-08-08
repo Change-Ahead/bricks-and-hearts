@@ -1,5 +1,4 @@
 using System.Text.RegularExpressions;
-using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.ApplicationInsights.AspNetCore.Extensions;
@@ -12,12 +11,13 @@ namespace BricksAndHearts.Controllers;
 [Route("/property")]
 public class PropertyController : AbstractController
 {
-    private readonly IPropertyService _propertyService;
     private readonly IAzureMapsApiService _azureMapsApiService;
-    private readonly ILogger<PropertyController> _logger;
     private readonly IAzureStorage _azureStorage;
+    private readonly ILogger<PropertyController> _logger;
+    private readonly IPropertyService _propertyService;
 
-    public PropertyController(IPropertyService propertyService, IAzureMapsApiService azureMapsApiService, ILogger<PropertyController> logger, IAzureStorage azureStorage)
+    public PropertyController(IPropertyService propertyService, IAzureMapsApiService azureMapsApiService,
+        ILogger<PropertyController> logger, IAzureStorage azureStorage)
     {
         _propertyService = propertyService;
         _azureMapsApiService = azureMapsApiService;
@@ -29,9 +29,9 @@ public class PropertyController : AbstractController
     [HttpGet("add")]
     public ActionResult AddNewProperty_Begin()
     {
-        return AddNewProperty_Continue(1,0);
+        return AddNewProperty_Continue(1, 0);
     }
-    
+
     [Authorize(Roles = "Landlord")]
     [HttpGet("edit")]
     public ActionResult EditProperty(int propertyId)
@@ -49,23 +49,24 @@ public class PropertyController : AbstractController
     {
         var newPropertyModel = new PropertyViewModel { Address = new PropertyAddress() };
         var landlordId = GetCurrentUser().LandlordId!.Value;
-        
-        var dbModel = _propertyService.GetIncompleteProperty(landlordId);
+
+        var dbModel = _propertyService.GetPropertyByPropertyId(propertyId);
+
+        if (propertyId != 0)
+        {
+            newPropertyModel = PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(propertyId));
+        }
+
         var property = dbModel == null
             ? new PropertyViewModel { Address = new PropertyAddress() }
             : PropertyViewModel.FromDbModel(dbModel);
-        
-        if (propertyId != 0)
-        { 
-            newPropertyModel = PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(propertyId));
-        }
 
         newPropertyModel.PropertyId = propertyId;
 
         // Show the form for this step
         return View("AddNewProperty", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
     }
-    
+
     [Authorize(Roles = "Landlord")]
     [HttpGet("edit/step/{step:int}")]
     public ActionResult EditProperty_Continue([FromRoute] int step, int propertyId)
@@ -79,7 +80,8 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord")]
     [HttpPost("add/step/{step:int}")]
-    public async Task<ActionResult> AddNewProperty_Continue([FromRoute] int step, int propertyId, [FromForm] PropertyViewModel newPropertyModel)
+    public async Task<ActionResult> AddNewProperty_Continue([FromRoute] int step, int propertyId,
+        [FromForm] PropertyViewModel newPropertyModel)
     {
         var landlordId = GetCurrentUser().LandlordId!.Value;
         newPropertyModel.PropertyId = propertyId;
@@ -88,7 +90,7 @@ public class PropertyController : AbstractController
         {
             return View("AddNewProperty", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
         }
-        
+
         var property = _propertyService.GetPropertyByPropertyId(propertyId);
         if (newPropertyModel.Address.Postcode != null)
         {
@@ -109,29 +111,29 @@ public class PropertyController : AbstractController
             await _azureMapsApiService.AutofillAddress(newPropertyModel);
 
             // Create new record in the database for this property
-            var newPropId = _propertyService.AddNewProperty(landlordId, newPropertyModel, isIncomplete: true);
-            
+            var newPropId = _propertyService.AddNewProperty(landlordId, newPropertyModel);
+
             // Go to step 2
-            return RedirectToAction("AddNewProperty_Continue", new { step = 2 , propertyId = newPropId});
+            return RedirectToAction("AddNewProperty_Continue", new { step = 2, propertyId = newPropId });
         }
-        
+
         if (step < AddNewPropertyViewModel.MaximumStep)
         {
             // Update the property's record with the values entered at this step
-            _propertyService.UpdateProperty(property.Id, newPropertyModel, isIncomplete: true);
-            return RedirectToAction("AddNewProperty_Continue", new { step = step + 1 , propertyId = property.Id});
+            _propertyService.UpdateProperty(property.Id, newPropertyModel);
+            return RedirectToAction("AddNewProperty_Continue", new { step = step + 1, propertyId = property.Id });
         }
-        
-        // Update the property's record with the final set of values
-        _propertyService.UpdateProperty(property.Id, newPropertyModel, isIncomplete: false);
-        return RedirectToAction("ViewProperties", "Landlord");
 
+        // Update the property's record with the final set of values
+        _propertyService.UpdateProperty(property.Id, newPropertyModel, false);
+        return RedirectToAction("ViewProperties", "Landlord");
     }
-    
-    
+
+
     [Authorize(Roles = "Landlord")]
     [HttpPost("edit/step/{step:int}")]
-    public async Task<IActionResult> EditProperty_Continue([FromRoute] int step, int propertyId, [FromForm] PropertyViewModel newPropertyModel)
+    public async Task<IActionResult> EditProperty_Continue([FromRoute] int step, int propertyId,
+        [FromForm] PropertyViewModel newPropertyModel)
     {
         newPropertyModel.PropertyId = propertyId;
 
@@ -160,14 +162,14 @@ public class PropertyController : AbstractController
 
             await _azureMapsApiService.AutofillAddress(newPropertyModel);
 
-            _propertyService.UpdateProperty(propertyId, newPropertyModel, isIncomplete: false);
-                // Go to step 2
-             return View("EditProperty", new AddNewPropertyViewModel { Step = 2, Property = newPropertyModel });
+            _propertyService.UpdateProperty(propertyId, newPropertyModel, false);
+            // Go to step 2
+            return View("EditProperty", new AddNewPropertyViewModel { Step = 2, Property = newPropertyModel });
         }
 
         // Update the property's record with the final set of values
-        _propertyService.UpdateProperty(propertyId, newPropertyModel, isIncomplete: false);
-        
+        _propertyService.UpdateProperty(propertyId, newPropertyModel, false);
+
         if (step < AddNewPropertyViewModel.MaximumStep)
         {
             // Update the property's record with the values entered at this step
@@ -196,22 +198,22 @@ public class PropertyController : AbstractController
         // Delete partially complete property
         _propertyService.DeleteProperty(property);
         await _azureStorage.DeleteContainer("property", property.Id);
-        
+
         return RedirectToAction("ViewProperties", "Landlord");
     }
-    
+
     [HttpPost]
     [Authorize(Roles = "Landlord, Admin")]
     public ActionResult DeleteProperty(int propertyId)
     {
-        PropertyDbModel? propDB = _propertyService.GetPropertyByPropertyId(propertyId);
+        var propDB = _propertyService.GetPropertyByPropertyId(propertyId);
         if (propDB == null)
         {
             _logger.LogWarning("Property with ID {PropertyId} does not exist", propertyId);
             return StatusCode(404);
         }
 
-        if (GetCurrentUser().IsAdmin == false & GetCurrentUser().LandlordId != propDB.LandlordId)
+        if ((GetCurrentUser().IsAdmin == false) & (GetCurrentUser().LandlordId != propDB.LandlordId))
         {
             _logger.LogWarning("You do not have access to any property with ID {PropertyId}.", propertyId);
             return StatusCode(404);
@@ -223,7 +225,7 @@ public class PropertyController : AbstractController
         // Go to View Properties page
         return RedirectToAction("ViewProperties", "Landlord");
     }
-    
+
     [Authorize(Roles = "Landlord")]
     [HttpPost("edit/cancel")]
     public ActionResult EditProperty_Cancel()
@@ -238,16 +240,17 @@ public class PropertyController : AbstractController
     [Route("/property/{propertyId:int}/view")]
     public ActionResult ViewProperty(int propertyId)
     {
-        PropertyDbModel? model = _propertyService.GetPropertyByPropertyId(propertyId);
+        var model = _propertyService.GetPropertyByPropertyId(propertyId);
         if (model == null)
         {
             _logger.LogWarning("Property with ID {PropertyId} does not exist", propertyId);
             return RedirectToAction("Error", "Home", new { status = 404 });
         }
-        PropertyViewModel propertyViewModel = PropertyViewModel.FromDbModel(model);
+
+        var propertyViewModel = PropertyViewModel.FromDbModel(model);
         return View(propertyViewModel);
     }
-    
+
     public PropertyViewModel UpdatePropertyViewModel(PropertyViewModel oldModel, PropertyViewModel updateModel)
     {
         // Update fields if they have been set (i.e. not null) in updateModel
@@ -264,6 +267,127 @@ public class PropertyController : AbstractController
         oldModel.Description = updateModel.Description ?? oldModel.Description;
 
         return oldModel;
+    }
+
+    [Authorize(Roles = "Landlord, Admin")]
+    [HttpGet]
+    public async Task<IActionResult> ListPropertyImages(int propertyId)
+    {
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
+        {
+            return StatusCode(403);
+        }
+
+        var fileNames = await _azureStorage.ListFileNames("property", propertyId);
+        var imageFiles = GetFilesFromFileNames(fileNames, propertyId);
+
+        var imageList = new ImageListViewModel
+        {
+            PropertyId = propertyId,
+            FileList = imageFiles
+        };
+
+        return View(imageList);
+    }
+
+    public List<ImageFileUrlModel> GetFilesFromFileNames(List<string> fileNames, int propertyId)
+    {
+        return fileNames.Select(fileName =>
+            {
+                var url = Url.Action("GetImage", new { propertyId, fileName })!;
+                return new ImageFileUrlModel(fileName, url);
+            })
+            .ToList();
+    }
+
+    [Authorize(Roles = "Landlord, Admin")]
+    [HttpPost("addImage")]
+    public async Task<IActionResult> AddPropertyImages(List<IFormFile> images, int propertyId)
+    {
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
+        {
+            return StatusCode(403);
+        }
+
+        List<string> flashTypes = new(),
+            flashMessages = new();
+        foreach (var image in images)
+        {
+            var isImageResult = _azureStorage.IsImage(image.FileName);
+            if (!isImageResult.isImage)
+            {
+                _logger.LogInformation($"Failed to upload {image.FileName}: not in a recognised image format");
+                flashTypes.Add("danger");
+                flashMessages.Add(
+                    $"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: {isImageResult.imageExtString}");
+            }
+            else
+            {
+                if (image.Length > 0)
+                {
+                    var message = await _azureStorage.UploadFile(image, "property", propertyId);
+                    _logger.LogInformation($"Successfully uploaded {image.FileName}");
+                    flashTypes.Add("success");
+                    flashMessages.Add(message);
+                }
+                else
+                {
+                    _logger.LogInformation($"Failed to upload {image.FileName}: has length zero.");
+                    flashTypes.Add("danger");
+                    flashMessages.Add($"{image.FileName} contains no data, and so has not been uploaded");
+                }
+            }
+        }
+
+        FlashMultipleMessages(flashTypes, flashMessages);
+        return RedirectToAction("ListPropertyImages", "Property", new { propertyId });
+    }
+
+    [Authorize(Roles = "Landlord, Admin")]
+    [HttpGet]
+    [Route("{propertyId:int}/{fileName}")]
+    public async Task<IActionResult> GetImage(int propertyId, string fileName)
+    {
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
+        {
+            return StatusCode(403);
+        }
+
+        var image = await _azureStorage.DownloadFile("property", propertyId, fileName);
+        if (image == (null, null))
+        {
+            return StatusCode(404);
+        }
+
+        var data = image.data;
+        var fileType = image.fileType;
+        return File(data!, $"image/{fileType}");
+    }
+
+    [Authorize(Roles = "Landlord, Admin")]
+    [HttpPost("deleteImage")]
+    public async Task<IActionResult> DeletePropertyImage(int propertyId, string fileName)
+    {
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
+        {
+            return StatusCode(403);
+        }
+
+        await _azureStorage.DeleteFile("property", propertyId, fileName);
+        return RedirectToAction("ListPropertyImages", "Property", new { propertyId });
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("SortProperties")]
+    public IActionResult SortProperties(string sortBy, int page = 1, int propPerPage = 10)
+    {
+        var properties = _propertyService.SortProperties(sortBy);
+
+        var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).ToList();
+
+        return View("~/Views/Admin/PropertyList.cshtml",
+            new PropertiesDashboardViewModel(listOfProperties.Skip((page - 1) * propPerPage).Take(propPerPage).ToList(),
+                listOfProperties.Count, null!, page, sortBy));
     }
 
     [Authorize(Roles = "Landlord, Admin")]

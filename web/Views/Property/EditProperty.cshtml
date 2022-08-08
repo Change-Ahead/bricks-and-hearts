@@ -16,7 +16,7 @@
 }
 
 <form method="post" class="w-50" asp-controller="Property" asp-action="EditProperty_Continue" asp-route-step="@Model.Step" asp-route-propertyId="@Model.Property.PropertyId">
-        <partial name=@("_AddFormStep" + Model.Step) model="Model.Property"/>
+    <partial name=@("_AddFormStep" + Model.Step) model="Model.Property"/>
 
     <div class="mt-4">
         @if (Model.Step < AddNewPropertyViewModel.MaximumStep)

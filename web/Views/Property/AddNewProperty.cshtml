@@ -1,5 +1,4 @@
-﻿@using Org.BouncyCastle.Asn1.Ocsp
-@model AddNewPropertyViewModel
+﻿@model AddNewPropertyViewModel
 
 @{
     ViewData["Title"] = "Add Property";
@@ -38,7 +37,7 @@
 }
 
 <form method="post" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@Model.Step" asp-route-propertyId="@Model.Property.PropertyId">
-        <partial name=@("_AddFormStep" + Model.Step) model="Model.Property"/>
+    <partial name=@("_AddFormStep" + Model.Step) model="Model.Property"/>
 
     <div class="row my-4">
         <div class="col-auto">
