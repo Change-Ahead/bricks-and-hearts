@@ -6,10 +6,7 @@ namespace BricksAndHearts.Database;
 public class TenantDbModel
 {
     public int Id { get; set; }
-    public string Title { get; set; } = null!;
-    public string FirstName { get; set; } = null!;
-    public string LastName { get; set; } = null!;
-    
+    public string Name { get; set; } = null!;
     public string? Email { get; set; }
     public string? Phone { get; set; }
     public string? Postcode { get; set; }
@@ -18,5 +15,6 @@ public class TenantDbModel
     public bool? HasPet { get; set; }
     public bool? ETT { get; set; }
     public bool? UniversalCredit { get; set; }
+    public bool? HousingBenefits { get; set; }
     public bool? Over35 { get; set; }
 }

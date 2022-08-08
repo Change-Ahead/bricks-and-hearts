@@ -258,9 +258,7 @@ public class TestDatabaseFixture
     {
         return new TenantDbModel
         {
-            Title = "Mr",
-            FirstName = "Example",
-            LastName = "Tenant",
+            Name = "Example Tenant",
             Email = "exampletenant@gmail.com"
         };
     }
