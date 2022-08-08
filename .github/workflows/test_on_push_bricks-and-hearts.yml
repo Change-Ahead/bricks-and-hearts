@@ -50,4 +50,4 @@ jobs:
           TestDBConnectionString: 'Server=localhost,1433;Database=BricksAndHeartsTest;User Id=SA;Password=JdMsKZPBBA8kVFXVrj8d;'
 
       - name: Test with dotnet
-        run: dotnet test
+        run: dotnet test --no-build -l "console;verbosity=detailed" --blame-hang-timeout 5000
