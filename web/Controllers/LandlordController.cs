@@ -86,11 +86,7 @@ public class LandlordController : AbstractController
                               + $"Email: {createModel.Email}" + "\n"
                               + $"Phone: {createModel.Phone}" + "\n";
                 var subject = "Bricks&Hearts - landlord registration notification";
-#pragma warning disable CS4014
-                
-                Task.Run(() => TrySendMsg(msgBody, subject));
-#pragma warning restore CS4014
-
+                _mailService.TrySendMsgInBackground(msgBody, subject);
                 return RedirectToAction("Profile", "Landlord", new { landlord!.Id });
 
             case ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered:
@@ -110,27 +106,6 @@ public class LandlordController : AbstractController
 
             default:
                 throw new Exception($"Unknown landlord registration error ${result}");
-        }
-    }
-
-    [HttpGet]
-    public async Task TrySendMsg(
-        string msgBody,
-        string subject,
-        string msgFromName = "",
-        string msgToName = ""
-    )
-    {
-        try
-        {
-            await _mailService.SendMsg(msgBody, subject, msgFromName, msgToName);
-            _logger.LogInformation("Successfully sent emails");
-        }
-        catch (Exception e)
-        {
-            // ignored
-            _logger.LogWarning("Failed to send email with message:\n{Msg}\n \nSubject:\n{Subject}", msgBody, subject);
-            _logger.LogWarning("Email sending exception message: {E}", e);
         }
     }
 

@@ -1,6 +1,4 @@
-﻿using System.Net.Mail;
-using BricksAndHearts.Auth;
-using MailKit.Net.Smtp;
+﻿using BricksAndHearts.Auth;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
@@ -15,15 +13,22 @@ public interface IMailService
         string msgFromName = "",
         string msgToName = ""
     );
+
+    public void TrySendMsgInBackground(
+        string msgBody,
+        string subject
+    );
 }
 
 public class MailService : IMailService
 {
     private readonly IOptions<EmailConfigOptions> _config;
+    private readonly ILogger<MailService> _logger;
 
-    public MailService(IOptions<EmailConfigOptions> config)
+    public MailService(IOptions<EmailConfigOptions> config, ILogger<MailService> logger)
     {
         _config = config;
+        _logger = logger;
     }
     
     public async Task SendMsg(
@@ -55,5 +60,33 @@ public class MailService : IMailService
 
         await client.SendAsync(message);
         await client.DisconnectAsync(true);
+    }
+    
+    private async Task TrySendMsg(
+        string msgBody,
+        string subject,
+        string msgFromName = "",
+        string msgToName = ""
+    )
+    {
+        try
+        {
+            await SendMsg(msgBody, subject, msgFromName, msgToName);
+            _logger.LogInformation("Successfully sent emails");
+        }
+        catch (Exception e)
+        {
+            // ignored
+            _logger.LogWarning("Failed to send email with message:\n{Msg}\n \nSubject:\n{Subject}", msgBody, subject);
+            _logger.LogWarning("Email sending exception message: {E}", e);
+        }
+    }
+
+    public void TrySendMsgInBackground(
+        string msgBody,
+        string subject
+    )
+    {
+        Task.Run(() => TrySendMsg(msgBody, subject));
     }
 }
