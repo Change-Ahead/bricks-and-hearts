@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
@@ -35,7 +36,12 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     {
         // Arrange
         var landlordUser = CreateLandlordUser();
+        landlordUser.Id = 1;
         MakeUserPrincipalInController(landlordUser, UnderTest);
+        var prop = A.Fake<PropertyDbModel>();
+        prop.LandlordId = 1;
+        prop.Id = 1;
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(prop);
 
         // Act
         var result = UnderTest.AddNewProperty_Continue(step, 1) as ViewResult;
@@ -73,17 +79,18 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     [InlineData(1)]
     [InlineData(2)]
     [InlineData(3)]
-    public void AddNewPropertyContinuePost_WithInvalidModel_ReturnsViewWithModel(int step)
+    public async void AddNewPropertyContinuePost_WithInvalidModel_ReturnsViewWithModel(int step)
     {
         // Arrange
         var landlordUser = CreateLandlordUser();
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         var formResultModel = CreateExamplePropertyViewModel();
+        formResultModel.LandlordId = 1;
         UnderTest.ViewData.ModelState.AddModelError("Key", "ErrorMessage");
 
         // Act
-        var result = UnderTest.AddNewProperty_Continue(step, 1) as ViewResult;
+        var result = await UnderTest.AddNewProperty_Continue(step, 1, formResultModel) as ViewResult;
 
         // Assert
         A.CallTo(() => PropertyService.UpdateProperty(1, formResultModel, true)).MustNotHaveHappened();
@@ -93,7 +100,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public void AddNewPropertyContinuePost_AtStep1_WithoutAddress1AndPostcode_ReturnsViewWithModel()
+    public async void AddNewPropertyContinuePost_AtStep1_WithoutAddress1AndPostcode_ReturnsViewWithModel()
     {
         // Arrange
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(null);
@@ -107,7 +114,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         };
 
         // Act
-        var result = UnderTest.AddNewProperty_Continue(1, 1) as ViewResult;
+        var result = await UnderTest.AddNewProperty_Continue(1, 1, formResultModel) as ViewResult;
 
         // Assert
         A.CallTo(() => PropertyService.AddNewProperty(1, formResultModel, true)).MustNotHaveHappened();
@@ -117,7 +124,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public void AddNewPropertyContinuePost_AtStep1_CreatesNewRecord_AndRedirectsToNextStep()
+    public async void AddNewPropertyContinuePost_AtStep1_CreatesNewRecord_AndRedirectsToNextStep()
     {
         // Arrange
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(null);
@@ -137,7 +144,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
             .Returns(Task.Run(() => formResultModel));
 
         // Act
-        var result = UnderTest.AddNewProperty_Continue(1, 1);
+        var result = await UnderTest.AddNewProperty_Continue(1, 1, formResultModel);
 
         // Assert
         A.CallTo(() => PropertyService.AddNewProperty(1, formResultModel, true)).MustHaveHappened();
@@ -151,7 +158,9 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     [InlineData(2)]
     [InlineData(3)]
     [InlineData(4)]
-    public void AddNewPropertyContinuePost_AtMiddleSteps_WithNoAddInProgress_RedirectsToViewProperties(int step)
+    public void
+        AddNewPropertyContinuePost_AtMiddleSteps_WithNoAddInProgress_RedirectsToViewProperties(
+            int step) // TODO No longer needed?
     {
         // Arrange
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(null);
@@ -162,20 +171,21 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var formResultModel = CreateExamplePropertyViewModel();
 
         // Act
-        var result = UnderTest.AddNewProperty_Continue(step, 1);
+        var result = UnderTest.AddNewProperty_Continue(step, 1) as RedirectToActionResult;
 
         // Assert
-        A.CallTo(() => PropertyService.UpdateProperty(1, formResultModel, true)).MustNotHaveHappened();
+        A.CallTo(() => PropertyService.UpdateProperty(1, formResultModel, A<bool>._)).MustNotHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
     }
 
     [Theory]
     [InlineData(2)]
     [InlineData(3)]
-    public void AddNewPropertyContinuePost_AtMiddleSteps_UpdatesRecord_AndRedirectsToNextStep(int step)
+    public async void AddNewPropertyContinuePost_AtMiddleSteps_UpdatesRecord_AndRedirectsToNextStep(int step)
     {
         // Arrange
         var fakePropertyDbModel = CreateExamplePropertyDbModel();
+        fakePropertyDbModel.Landlord.Id = 1;
 
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(fakePropertyDbModel);
 
@@ -185,18 +195,18 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var formResultModel = CreateExamplePropertyViewModel();
 
         // Act
-        var result = UnderTest.AddNewProperty_Continue(step, 1);
+        var result = await UnderTest.AddNewProperty_Continue(step, 1, formResultModel);
 
         // Assert
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
-        A.CallTo(() => PropertyService.UpdateProperty(1, formResultModel, true)).MustHaveHappened();
+        A.CallTo(() => PropertyService.UpdateProperty(1, formResultModel, A<bool>._)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("AddNewProperty_Continue");
         result.Should().BeOfType<RedirectToActionResult>().Which.RouteValues.Should().ContainKey("step").WhoseValue
             .Should().Be(step + 1);
     }
 
     [Fact]
-    public void AddNewPropertyContinuePost_AtFinalStep_UpdatesRecord_AndRedirectsToViewProperties()
+    public async void AddNewPropertyContinuePost_AtFinalStep_UpdatesRecord_AndRedirectsToViewProperties()
     {
         // Arrange
         var landlordUser = CreateLandlordUser();
@@ -205,10 +215,10 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var formResultModel = CreateExamplePropertyViewModel();
 
         // Act
-        var result = UnderTest.AddNewProperty_Continue(AddNewPropertyViewModel.MaximumStep, 1);
+        var result = await UnderTest.AddNewProperty_Continue(AddNewPropertyViewModel.MaximumStep, 1, formResultModel);
 
         // Assert
-        A.CallTo(() => PropertyService.UpdateProperty(0, formResultModel, false)).MustHaveHappened();
+        A.CallTo(() => PropertyService.UpdateProperty(0, formResultModel, A<bool>._)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
     }
 
@@ -286,8 +296,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         result!.ViewData.Model.Should().BeOfType<PropertyViewModel>();
     }
 
-    // This is not working
-    /*[Fact]
+    [Fact]
     public void EditProperty_AtFinalStep_UpdatesRecord_AndRedirectsToViewProperties()
     {
         // Arrange
@@ -401,6 +410,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     {
         // Arrange
         var fakePropertyDbModel = CreateExamplePropertyDbModel();
+        fakePropertyDbModel.Landlord = A.Fake<LandlordDbModel>();
+        fakePropertyDbModel.Landlord.Id = 1;
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(fakePropertyDbModel);
 
         var landlordUser = CreateLandlordUser();

@@ -37,7 +37,7 @@ public class PropertyController : AbstractController
     public ActionResult EditProperty(int propertyId)
     {
         var property = _propertyService.GetPropertyByPropertyId(propertyId);
-        /*_propertyService.ChangePropertyToIncomplete(property);*/ //TODU ?
+        /*_propertyService.ChangePropertyToIncomplete(property);*/ //TODO ?
         var propertyViewModel = PropertyViewModel.FromDbModel(property!);
         // Start at step 1
         return View("EditProperty", new AddNewPropertyViewModel { Step = 1, Property = propertyViewModel });
@@ -229,7 +229,7 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("edit/cancel")]
-    public ActionResult EditProperty_Cancel(int landlordId) //TODU Fix this to go to landlord's property page
+    public ActionResult EditProperty_Cancel(int landlordId) //TODO Fix this to go to landlord's property page
     {
         // Go to View Properties page
         return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
