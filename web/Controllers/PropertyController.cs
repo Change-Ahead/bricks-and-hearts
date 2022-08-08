@@ -378,7 +378,7 @@ public class PropertyController : AbstractController
         return RedirectToAction("ListPropertyImages", "Property", new { propertyId });
     }
 
-    [Authorize(Roles = "Landlord, Admin")]
+    [Authorize(Roles = "Admin")]
     [HttpGet("SortProperties")]
     public IActionResult SortProperties(string sortBy, int page = 1, int propPerPage = 10)
     {
@@ -389,119 +389,6 @@ public class PropertyController : AbstractController
         return View("~/Views/Admin/PropertyList.cshtml",
             new PropertiesDashboardViewModel(listOfProperties.Skip((page - 1) * propPerPage).Take(propPerPage).ToList(),
                 listOfProperties.Count, null!, page, sortBy));
-    }
-
-    [Authorize(Roles = "Landlord, Admin")]
-    [HttpGet]
-    public async Task<IActionResult> ListPropertyImages(int propertyId)
-    {
-        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
-        {
-            return StatusCode(403);
-        }
-        var fileNames = await _azureStorage.ListFileNames("property", propertyId);
-        var imageFiles = GetFilesFromFileNames(fileNames, propertyId);
-
-        var imageList = new ImageListViewModel()
-        {
-            PropertyId = propertyId,
-            FileList = imageFiles
-        };
-        
-        return View(imageList);
-    }
-
-    public List<ImageFileUrlModel> GetFilesFromFileNames(List<string> fileNames, int propertyId)
-    {
-        return fileNames.Select(fileName =>
-            {
-                var url = Url.Action("GetImage", new { propertyId, fileName })!;
-                return new ImageFileUrlModel(fileName, url);
-            })
-            .ToList();
-    }
-    
-    [Authorize(Roles = "Landlord, Admin")]
-    [HttpPost("addImage")]
-    public async Task<IActionResult> AddPropertyImages(List<IFormFile> images, int propertyId)
-    {
-        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
-        {
-            return StatusCode(403);
-        }
-
-        List<string> flashTypes = new List<string>(),
-            flashMessages = new List<string>();
-        foreach (var image in images)
-        {
-            var isImageResult = _azureStorage.IsImage(image.FileName);
-            if (!isImageResult.isImage)
-            {
-                _logger.LogInformation($"Failed to upload {image.FileName}: not in a recognised image format");
-                flashTypes.Add("danger");
-                flashMessages.Add($"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: {isImageResult.imageExtString}");
-            }
-            else
-            {
-                if (image.Length > 0)
-                {
-                    string message = await _azureStorage.UploadFile(image, "property", propertyId);
-                    _logger.LogInformation($"Successfully uploaded {image.FileName}");
-                    flashTypes.Add("success");
-                    flashMessages.Add(message);
-                }
-                else
-                {
-                    _logger.LogInformation($"Failed to upload {image.FileName}: has length zero.");
-                    flashTypes.Add("danger");
-                    flashMessages.Add($"{image.FileName} contains no data, and so has not been uploaded");
-                }
-            }
-        }
-        FlashMultipleMessages(flashTypes, flashMessages);
-        return RedirectToAction("ListPropertyImages", "Property", new{propertyId});
-    }
-    
-    [Authorize(Roles = "Landlord, Admin")]
-    [HttpGet]
-    [Route("{propertyId:int}/{fileName}")]
-    public async Task<IActionResult> GetImage(int propertyId, string fileName)
-    {
-        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
-        {
-            return StatusCode(403);
-        }
-        var image = await _azureStorage.DownloadFile("property", propertyId, fileName);
-        if (image == (null, null))
-        {
-            return StatusCode(404);
-        }
-        var data = image.data;
-        var fileType = image.fileType;
-        return File(data!, $"image/{fileType}");
-    }
-
-    [Authorize(Roles = "Landlord, Admin")]
-    [HttpPost("deleteImage")]
-    public async Task<IActionResult> DeletePropertyImage(int propertyId, string fileName)
-    {
-        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
-        {
-            return StatusCode(403);
-        }
-        await _azureStorage.DeleteFile("property", propertyId, fileName);
-        return RedirectToAction("ListPropertyImages", "Property", new{propertyId});
-    }
-
-    [Authorize(Roles = "Admin")]
-    [HttpGet("SortProperties")]
-    public IActionResult SortProperties(string sortBy, int page = 1, int propPerPage = 10)
-    {
-        List<PropertyDbModel> properties = _propertyService.SortProperties(sortBy);
-
-        var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).ToList();
-        
-        return View("~/Views/Admin/PropertyList.cshtml", new PropertiesDashboardViewModel(listOfProperties.Skip((page-1)*propPerPage).Take(propPerPage).ToList(),  listOfProperties.Count, null! , page, sortBy));
     }
     
     [Authorize(Roles = "Admin")]

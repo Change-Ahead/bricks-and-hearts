@@ -58,7 +58,7 @@ public class LandlordController : AbstractController
 
         var user = GetCurrentUser();
         ILandlordService.LandlordRegistrationResult result;
-        LandlordDbModel? landlord = null;
+        LandlordDbModel? landlord;
 
         if (createModel.Unassigned == false)
         {

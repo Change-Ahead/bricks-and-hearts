@@ -48,8 +48,7 @@ public class PropertyViewModel : IValidatableObject
     [Range(0, 100000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
     public int? Rent { get; set; }
 
-
-    // Availability and units
+// Availability and units
     public string? Availability { get; set; }
 
     [DataType(DataType.Date)]
@@ -85,12 +84,16 @@ public class PropertyViewModel : IValidatableObject
 
     public int? AvailableUnits => TotalUnits - OccupiedUnits;
 
-
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (AcceptsSingleTenant == false && AcceptsCouple == false && AcceptsFamily == false)
         {
             yield return new ValidationResult("At least one type of tenant must be selected");
+        }
+
+        if (Availability == PropertyDbModel.Avail_AvailableSoon && AvailableFrom == null)
+        {
+            yield return new ValidationResult("Available From must be provided if property is Available Soon");
         }
     }
 
@@ -126,7 +129,7 @@ public class PropertyViewModel : IValidatableObject
             AcceptsNotEET = property.AcceptsNotEET,
             AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor,
             Availability = property.Availability,
-            AvailableFrom = property.AvailableFrom,
+            AvailableFrom = property.AvailableFrom
             UserWhoRented = property.RenterUserId,
             TotalUnits = property.TotalUnits,
             OccupiedUnits = property.OccupiedUnits
