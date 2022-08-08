@@ -15,7 +15,7 @@
     <span asp-validation-for="Rent" class="text-danger"></span>
 </div>
 
-<div class="my-3">
+<div class="my-4 py-3">
     <label asp-for="Availability" class="form-label">Availability</label>
     <select asp-for="Availability" class="form-select" required
             id="Select" onclick="checkIfSelectedValueIsTarget('Available Soon')">
@@ -29,10 +29,10 @@
 </div>
 
 <div id="ifTrue" class="form-group my-3" style="@(Model.Availability == "Available Soon" ? "" : "display: none;")">
-    <label asp-for="AvailableFrom" class="form-label">Available From</label>
+    <label asp-for="AvailableFrom" class="form-label">Available from</label>
     <input asp-for="AvailableFrom" class="form-control empty"/>
     <span asp-validation-for="AvailableFrom" class="text-danger"></span>
     @*TODO require AvailableFrom date to be in future*@
 </div>
-<div id="ifFalse" style="@(Model.Availability!="AvailableSoon" ? "" : "display: none;")">
+<div id="ifFalse" style="@(Model.Availability != "AvailableSoon" ? "" : "display: none;")">
 </div>
