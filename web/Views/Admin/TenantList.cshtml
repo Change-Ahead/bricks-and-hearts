@@ -6,6 +6,40 @@
 
 <h2>Tenant List</h2>
 
+<form method="post" asp-controller="Admin" asp-action="ReceiveTenantFilterList">
+    <div class="row g-3">
+        <div class="col-auto d-grid">
+            @Html.CheckBoxFor(t => t.Filters[0], new { @class = "btn-check" })
+            <label asp-for="Filters[0]" class="btn btn-outline-blue shadow-none pill-check">Single tenant</label>
+        </div>
+        <div class="col-auto d-grid">
+            @Html.CheckBoxFor(t => t.Filters[1], new { @class = "btn-check" })
+            <label asp-for="Filters[1]" class="btn btn-outline-blue shadow-none pill-check">Couple</label>
+        </div>
+        <div class="col-auto d-grid">
+            @Html.CheckBoxFor(t => t.Filters[2], new { @class = "btn-check" })
+            <label asp-for="Filters[2]" class="btn btn-outline-blue shadow-none pill-check">Family</label>
+        </div>
+        <div class="col-auto d-grid">
+            @Html.CheckBoxFor(t => t.Filters[3], new { @class = "btn-check" })
+            <label asp-for="Filters[3]" class="btn btn-outline-blue shadow-none pill-check">Pet owner</label>
+        </div>
+        <div class="col-auto d-grid">
+            @Html.CheckBoxFor(t => t.Filters[4], new { @class = "btn-check" })
+            <label asp-for="Filters[4]" class="btn btn-outline-blue shadow-none pill-check">Is in ETT</label>
+        </div>
+        <div class="col-auto d-grid">
+            @Html.CheckBoxFor(t => t.Filters[5], new { @class = "btn-check" })
+            <label asp-for="Filters[5]" class="btn btn-outline-blue shadow-none pill-check">Credit/benefits</label>
+        </div>
+        <div class="col-auto d-grid">
+            @Html.CheckBoxFor(t => t.Filters[6], new { @class = "btn-check" })
+            <label asp-for="Filters[6]" class="btn btn-outline-blue shadow-none pill-check">Is over 35</label>
+        </div>
+    </div>
+    <input type="submit" value="Filter" class="btn btn-large btn-primary mb-3"/>
+</form>
+
 <table class="table table-hover">
     <thead>
     <tr>
