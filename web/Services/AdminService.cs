@@ -20,6 +20,7 @@ public interface IAdminService
     public void RejectAdminAccessRequest(int userId);
     public UserDbModel GetUserFromId(int userId);
     public Task<List<TenantDbModel>> GetTenantDbModelsFromFilter(string[] filterArray);
+    public Task ImportTenants(IFormFile csvFile);
 }
 
 public class AdminService : IAdminService
@@ -177,5 +178,49 @@ public class AdminService : IAdminService
             }
         }
         return await tenantQuery.ToListAsync();
+    }
+
+    public async Task ImportTenants(IFormFile csvFile)
+    {
+        using (var streamReader = new StreamReader(csvFile.OpenReadStream()))
+        {
+            string headerLine = streamReader.ReadLine();
+            string[] headers = headerLine.Split(",");
+            string currentLine = streamReader.ReadLine();
+            while (currentLine != null)
+            {
+                string[] entries = currentLine.Split(",");
+                if (entries != null)
+                {
+                    var dbModel = new TenantDbModel();
+                    foreach (var prop in typeof(TenantDbModel).GetProperties())
+                    {
+                        for (int i = 0; i < headers.Length; i ++)
+                        {
+                            if (prop.Name == headers[i])
+                            {
+                                if (entries[i] == "TRUE")
+                                {
+                                    prop.SetValue(dbModel, true);
+                                }
+                                else if (entries[i] == "FALSE")
+                                {
+                                    prop.SetValue(dbModel, false);
+                                }
+                                else
+                                {
+                                    prop.SetValue(dbModel, entries[i]);
+                                }
+                            }
+                        }
+                    }
+                    _dbContext.Tenants.Add(dbModel);
+                    await _dbContext.SaveChangesAsync();
+                }
+                
+                currentLine = streamReader.ReadLine();
+            }
+        }
+        
     }
 }

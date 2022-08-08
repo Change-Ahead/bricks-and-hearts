@@ -195,4 +195,20 @@ public class AdminController : AbstractController
         tenantListModel.TenantList = await _adminService.GetTenantDbModelsFromFilter(tenantListModel.Filters);
         return View("TenantList", tenantListModel);
     }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    public async Task<ActionResult> ImportTenants(IFormFile csvFile)
+    {
+        string fileName = csvFile.FileName;
+        if (fileName.Substring(fileName.Length - 3) != "csv")
+        {
+            FlashMessage(_logger, ($"{fileName} not a CSV file.", "danger",$"{fileName} is not a CSV file. Please upload your data as a CSV file."));
+        }
+        else
+        {
+            await _adminService.ImportTenants(csvFile);
+        }
+        return RedirectToAction(nameof(TenantList));
+    }
 }

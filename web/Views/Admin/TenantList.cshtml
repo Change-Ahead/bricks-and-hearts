@@ -96,3 +96,10 @@
     }
     </tbody>
 </table>
+
+@using (Html.BeginForm("ImportTenants", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div>Please upload a CSV file containing tenant information</div>
+    <input name="csvFile" type="file" accept="file">
+    <input type="submit" value="Import Tenants" />
+}
