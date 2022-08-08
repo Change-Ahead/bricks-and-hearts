@@ -88,6 +88,15 @@ public class AdminController : AbstractController
         landlordListModel.LandlordDisplayList = await _adminService.GetLandlordDisplayList(approvalStatus!);
         return View(landlordListModel);
     }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public async Task<IActionResult> TenantList()
+    {
+        TenantListModel tenantListModel = new TenantListModel();
+        tenantListModel.TenantList = await _adminService.GetTenantList();
+        return View(tenantListModel);
+    }
 
     [Authorize(Roles = "Admin")]
     [HttpPost]
