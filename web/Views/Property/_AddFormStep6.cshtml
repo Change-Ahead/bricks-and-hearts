@@ -1,4 +1,6 @@
-﻿@model PropertyViewModel
+﻿@using BricksAndHearts.Database
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model PropertyViewModel
 
 <h2>Rent, deposits, availability and duration</h2>
 
@@ -13,11 +15,11 @@
     <label asp-for="Availability" class="form-label">Availability</label>
     <select asp-for="Availability" class="form-select" required
             id="Select" onclick="checkIfSelectedValueIsTarget('Available Soon')">
-        <option selected>Draft</option>
-        <option>Available</option>
-        <option>Available Soon</option>
-        <option>Occupied</option>
-        <option>Unavailable</option>
+        <option selected>@PropertyDbModel.Avail_Draft</option>
+        <option>@PropertyDbModel.Avail_Available</option>
+        <option>@PropertyDbModel.Avail_AvailableSoon</option>
+        <option>@PropertyDbModel.Avail_Occupied</option>
+        <option>@PropertyDbModel.Avail_Unavailable</option>
     </select>
     <span asp-validation-for="Availability" class="text-danger"></span>
 </div>
@@ -26,6 +28,7 @@
     <label asp-for="AvailableFrom" class="form-label">Available From</label>
     <input asp-for="AvailableFrom" class="form-control empty"/>
     <span asp-validation-for="AvailableFrom" class="text-danger"></span>
+    @*TODO require AvailableFrom date to be in future*@
 </div>
 <div id="ifFalse" style="@(Model.Availability!="AvailableSoon" ? "" : "display: none;")">
 </div>

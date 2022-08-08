@@ -42,7 +42,13 @@ public class PropertyDbModel
     // Rent, deposits, availability and duration
     public int? Rent { get; set; }
 
-    public string Availability { get; set; } = "Draft";
+    public string Availability { get; set; } = Avail_Draft;
+    public const string Avail_Draft = "Draft";
+    public const string Avail_Available = "Available";
+    public const string Avail_AvailableSoon = "Available Soon";
+    public const string Avail_Occupied = "Occupied";
+    public const string Avail_Unavailable = "Unavailable";
+    
     [DataType(DataType.Date)]
     public DateTime? AvailableFrom { get; set; } = null;
     public int? RenterUserId { get; set; } = null;

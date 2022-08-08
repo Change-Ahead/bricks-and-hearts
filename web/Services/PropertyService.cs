@@ -67,9 +67,13 @@ public class PropertyService : IPropertyService
             Rent = createModel.Rent,
             Availability = createModel.Availability,
         };
-        if (createModel.Availability == "Available Soon")
+        if (createModel.Availability == PropertyDbModel.Avail_AvailableSoon)
         {
             dbModel.AvailableFrom = createModel.AvailableFrom;
+        }
+        else
+        {
+            dbModel.AvailableFrom = null;
         }
 
         // Add the new property to the database
@@ -110,9 +114,13 @@ public class PropertyService : IPropertyService
 
         dbModel.Rent = updateModel.Rent ?? dbModel.Rent;
         dbModel.Availability = updateModel.Availability;
-        if (updateModel.Availability == "Available Soon")
+        if (updateModel.Availability == PropertyDbModel.Avail_AvailableSoon)
         {
             dbModel.AvailableFrom = updateModel.AvailableFrom;
+        }
+        else
+        {
+            dbModel.AvailableFrom = null;
         }
 
         dbModel.IsIncomplete = isIncomplete;
@@ -167,8 +175,8 @@ public class PropertyService : IPropertyService
     {
         PropertyCountModel propertyCounts = new PropertyCountModel();
         propertyCounts.RegisteredProperties = _dbContext.Properties.Count();
-        propertyCounts.LiveProperties = _dbContext.Properties.Count(p => p.Availability != "Draft" && p.Landlord.CharterApproved);
-        propertyCounts.AvailableProperties = _dbContext.Properties.Count(p => p.Availability == "Available");
+        propertyCounts.LiveProperties = _dbContext.Properties.Count(p => p.Availability != PropertyDbModel.Avail_Draft && p.Landlord.CharterApproved);
+        propertyCounts.AvailableProperties = _dbContext.Properties.Count(p => p.Availability == PropertyDbModel.Avail_Available);
         return propertyCounts;
     }
 }

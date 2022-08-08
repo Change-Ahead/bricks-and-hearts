@@ -239,7 +239,7 @@ public class TestDatabaseFixture
             TownOrCity = "Complete Town",
             County = "Complete County",
             Postcode = "CB2 1LA",
-            Availability = "Occupied"
+            Availability = PropertyDbModel.Avail_Occupied
         };
     }
     
@@ -254,7 +254,7 @@ public class TestDatabaseFixture
             TownOrCity = "Incomplete Town",
             County = "Incomplete County",
             Postcode = "CB2 1LA",
-            Availability = "Occupied"
+            Availability = PropertyDbModel.Avail_Occupied
         };
     }
     
@@ -269,7 +269,7 @@ public class TestDatabaseFixture
             TownOrCity = "Available Town",
             County = "Available County",
             Postcode = "CB2 1LA",
-            Availability = "Available"
+            Availability = PropertyDbModel.Avail_Available
         };
     }
     
@@ -284,7 +284,7 @@ public class TestDatabaseFixture
             TownOrCity = "Draft Town",
             County = "Draft County",
             Postcode = "CB2 1LA",
-            Availability = "Draft"
+            Availability = PropertyDbModel.Avail_Draft
         };
     }
     

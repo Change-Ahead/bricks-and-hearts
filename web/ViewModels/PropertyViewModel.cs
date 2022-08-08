@@ -42,7 +42,7 @@ public class PropertyViewModel : IValidatableObject
     // Rent, deposits, and duration
     [Range(0, 100000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
     public int? Rent { get; set; }
-    public string Availability { get; set; } = "Draft";
+    public string Availability { get; set; } = PropertyDbModel.Avail_Draft;
     
     [DataType(DataType.Date)]
     public DateTime? AvailableFrom { get; set; }
@@ -95,7 +95,7 @@ public class PropertyViewModel : IValidatableObject
             yield return new ValidationResult("At least one type of tenant must be selected");
         }
 
-        if (Availability == "Available Soon" && AvailableFrom == null)
+        if (Availability == PropertyDbModel.Avail_AvailableSoon && AvailableFrom == null)
         {
             yield return new ValidationResult("Available From must be provided if property is Available Soon");
         }
