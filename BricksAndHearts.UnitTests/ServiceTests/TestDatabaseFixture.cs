@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
 using Microsoft.Extensions.Configuration;
@@ -14,8 +14,12 @@ public class TestDatabaseFixture
     {
         lock (Lock)
         {
-            if (_databaseInitialised) return;
-            using (var context = CreateContext(readOnly: false))
+            if (_databaseInitialised)
+            {
+                return;
+            }
+
+            using (var context = CreateContext(false))
             {
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
@@ -280,13 +284,69 @@ public class TestDatabaseFixture
             Title = "Mr",
             Phone = "005&6",
             LandlordType = "Non profit",
-            LandlordProvidedCharterStatus = true,
             CharterApproved = true,
-            MembershipId = $"Member-{memberId}"
+            MembershipId = $"Member-{memberId}",
+            AddressLine1 = "adr1",
+            AddressLine2 = "adr2",
+            AddressLine3 = "adr3",
+            TownOrCity = "city",
+            County = "county",
+            Postcode = "cb2 1la"
         };
     }
     
-    //begin property models
+        
+    public LandlordProfileModel CreateLandlordProfileWithEditedEmail(string email)
+    {
+        return new LandlordProfileModel
+        {
+            LandlordId = 3,
+            Email = email,
+            FirstName = "Landlord3Link",
+            LastName = "Landlord3Sur",
+            Title = "Mr",
+            Phone = "01189998819991197253",
+            LandlordType = "Non profit",
+            CharterApproved = true,
+            InviteLink = "InvitimusLinkimus",
+            Address = new AddressModel
+            {
+                AddressLine1 = "adr1",
+                AddressLine2 = "adr2",
+                AddressLine3 = "adr3",
+                TownOrCity = "city",
+                County = "county",
+                Postcode = "cb2 1la"
+            }
+        };
+    }
+    
+    public LandlordProfileModel CreateLandlordProfileWithEditedMemberId(int memberId)
+    {
+        return new LandlordProfileModel
+        {
+            LandlordId = 5,
+            Email = "test.landlord5&6@gmail.com",
+            FirstName = "Landlord3Link",
+            LastName = "Landlord3Sur",
+            Title = "Mr",
+            Phone = "01189998819991197253",
+            LandlordType = "Non profit",
+            CharterApproved = true,
+            MembershipId = $"Member-{memberId}",
+            InviteLink = "InvitimusLinkimus",
+            Address = new AddressModel
+            {
+                AddressLine1 = "adr1",
+                AddressLine2 = "adr2",
+                AddressLine3 = "adr3",
+                TownOrCity = "city",
+                County = "county",
+                Postcode = "cb2 1la"
+            }
+        };
+    }
+
     private PropertyDbModel CreateCompleteProperty()
     {
         return new PropertyDbModel
