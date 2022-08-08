@@ -19,7 +19,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         // Act
-        var result = UnderTest.AddNewProperty_Begin() as ViewResult;
+        var result = UnderTest.AddNewProperty_Begin(landlordUser.Id) as ViewResult;
 
         // Assert
         result!.ViewName.Should().Be("AddNewProperty");

@@ -25,49 +25,46 @@ public class PropertyController : AbstractController
         _azureStorage = azureStorage;
     }
 
-    [Authorize(Roles = "Landlord")]
+    [Authorize(Roles = "Landlord, Admin")]
     [HttpGet("add")]
-    public ActionResult AddNewProperty_Begin()
+    public ActionResult AddNewProperty_Begin(int landlordId)
     {
-        return AddNewProperty_Continue(1, 0);
+        return AddNewProperty_Continue(1, 0, landlordId);
     }
 
-    [Authorize(Roles = "Landlord")]
+    [Authorize(Roles = "Landlord, Admin")]
     [HttpGet("edit")]
     public ActionResult EditProperty(int propertyId)
     {
         var property = _propertyService.GetPropertyByPropertyId(propertyId);
-        /*_propertyService.ChangePropertyToIncomplete(property);*/
-        var propertyViewModel = PropertyViewModel.FromDbModel(property);
+        /*_propertyService.ChangePropertyToIncomplete(property);*/ //TODU ?
+        var propertyViewModel = PropertyViewModel.FromDbModel(property!);
         // Start at step 1
         return View("EditProperty", new AddNewPropertyViewModel { Step = 1, Property = propertyViewModel });
     }
 
-    [Authorize(Roles = "Landlord")]
+    [Authorize(Roles = "Landlord, Admin")]
     [HttpGet("add/step/{step:int}")]
-    public ActionResult AddNewProperty_Continue([FromRoute] int step, int propertyId)
+    public ActionResult AddNewProperty_Continue([FromRoute] int step, int propertyId, int? landlordId = null)
     {
         var newPropertyModel = new PropertyViewModel { Address = new PropertyAddress() };
-        var landlordId = GetCurrentUser().LandlordId!.Value;
-
-        var dbModel = _propertyService.GetPropertyByPropertyId(propertyId);
+        landlordId ??= GetCurrentUser().LandlordId!.Value;
 
         if (propertyId != 0)
         {
             newPropertyModel = PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(propertyId));
         }
-
-        var property = dbModel == null
-            ? new PropertyViewModel { Address = new PropertyAddress() }
-            : PropertyViewModel.FromDbModel(dbModel);
-
-        newPropertyModel.PropertyId = propertyId;
+        else
+        {
+            newPropertyModel.PropertyId = propertyId;
+            newPropertyModel.LandlordId = (int)landlordId;
+        }
 
         // Show the form for this step
         return View("AddNewProperty", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
     }
 
-    [Authorize(Roles = "Landlord")]
+    [Authorize(Roles = "Landlord, Admin")]
     [HttpGet("edit/step/{step:int}")]
     public ActionResult EditProperty_Continue([FromRoute] int step, int propertyId)
     {
@@ -78,13 +75,14 @@ public class PropertyController : AbstractController
         return View("EditProperty", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
     }
 
-    [Authorize(Roles = "Landlord")]
+    [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("add/step/{step:int}")]
     public async Task<ActionResult> AddNewProperty_Continue([FromRoute] int step, int propertyId,
-        [FromForm] PropertyViewModel newPropertyModel)
+        [FromForm] PropertyViewModel newPropertyModel, int? landlordId = null)
     {
-        var landlordId = GetCurrentUser().LandlordId!.Value;
+        landlordId ??= GetCurrentUser().LandlordId!.Value;
         newPropertyModel.PropertyId = propertyId;
+        newPropertyModel.LandlordId = (int)landlordId;
 
         if (!ModelState.IsValid)
         {
@@ -111,7 +109,7 @@ public class PropertyController : AbstractController
             await _azureMapsApiService.AutofillAddress(newPropertyModel);
 
             // Create new record in the database for this property
-            var newPropId = _propertyService.AddNewProperty(landlordId, newPropertyModel);
+            var newPropId = _propertyService.AddNewProperty((int)landlordId, newPropertyModel);
 
             // Go to step 2
             return RedirectToAction("AddNewProperty_Continue", new { step = 2, propertyId = newPropId });
@@ -126,14 +124,14 @@ public class PropertyController : AbstractController
 
         // Update the property's record with the final set of values
         _propertyService.UpdateProperty(property.Id, newPropertyModel, false);
-        return RedirectToAction("ViewProperties", "Landlord");
+        return RedirectToAction("ViewProperties", "Landlord", new { id = property.LandlordId });
     }
 
 
-    [Authorize(Roles = "Landlord")]
+    [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("edit/step/{step:int}")]
     public async Task<IActionResult> EditProperty_Continue([FromRoute] int step, int propertyId,
-        [FromForm] PropertyViewModel newPropertyModel)
+        [FromForm] PropertyViewModel newPropertyModel, int? landlordId = null)
     {
         newPropertyModel.PropertyId = propertyId;
 
@@ -180,26 +178,27 @@ public class PropertyController : AbstractController
         }
 
         // Finished adding property, so go to View Properties page
-        return RedirectToAction("ViewProperties", "Landlord");
+        return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
     }
 
-    [Authorize(Roles = "Landlord")]
+    [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("add/cancel")]
-    public async Task<ActionResult> AddNewProperty_Cancel(int id)
+    public async Task<ActionResult> AddNewProperty_Cancel(int propertyId, int? landlordId = null)
     {
         // Get the property we're currently adding
-        var landlordId = GetCurrentUser().LandlordId!.Value;
-        var property = _propertyService.GetPropertyByPropertyId(id);
+        var property = _propertyService.GetPropertyByPropertyId(propertyId);
         if (property == null)
         {
-            return RedirectToAction("ViewProperties", "Landlord");
+            return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
         }
+
+        landlordId ??= property.Landlord.Id;
 
         // Delete partially complete property
         _propertyService.DeleteProperty(property);
         await _azureStorage.DeleteContainer("property", property.Id);
 
-        return RedirectToAction("ViewProperties", "Landlord");
+        return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
     }
 
     [HttpPost]
@@ -219,19 +218,21 @@ public class PropertyController : AbstractController
             return StatusCode(404);
         }
 
+        var landlordId = propDB.Landlord.Id;
+
         // Delete property
         _propertyService.DeleteProperty(propDB);
 
         // Go to View Properties page
-        return RedirectToAction("ViewProperties", "Landlord");
+        return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
     }
 
-    [Authorize(Roles = "Landlord")]
+    [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("edit/cancel")]
-    public ActionResult EditProperty_Cancel()
+    public ActionResult EditProperty_Cancel(int landlordId) //TODU Fix this to go to landlord's property page
     {
         // Go to View Properties page
-        return RedirectToAction("ViewProperties", "Landlord");
+        return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
     }
 
 
@@ -377,7 +378,7 @@ public class PropertyController : AbstractController
         return RedirectToAction("ListPropertyImages", "Property", new { propertyId });
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Landlord, Admin")]
     [HttpGet("SortProperties")]
     public IActionResult SortProperties(string sortBy, int page = 1, int propPerPage = 10)
     {

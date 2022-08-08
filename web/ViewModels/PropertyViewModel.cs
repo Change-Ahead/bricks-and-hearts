@@ -26,6 +26,7 @@ public class PropertyViewModel : IValidatableObject
     [DisplayName("Number of bedrooms")]
     public int? NumOfBedrooms { get; set; }
 
+    public bool IsIncomplete { get; set; }
 
     // Descriptions
     [StringLength(20000)]
@@ -39,6 +40,7 @@ public class PropertyViewModel : IValidatableObject
     public bool? AcceptsPets { get; set; }
     public bool? AcceptsBenefits { get; set; }
     public bool? AcceptsNotEET { get; set; }
+
     public bool? AcceptsWithoutGuarantor { get; set; }
 
 
@@ -84,6 +86,14 @@ public class PropertyViewModel : IValidatableObject
     public int? AvailableUnits => TotalUnits - OccupiedUnits;
 
 
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (AcceptsSingleTenant == false && AcceptsCouple == false && AcceptsFamily == false)
+        {
+            yield return new ValidationResult("At least one type of tenant must be selected");
+        }
+    }
+
     public static PropertyViewModel FromDbModel(PropertyDbModel property)
     {
         return new PropertyViewModel
@@ -94,6 +104,8 @@ public class PropertyViewModel : IValidatableObject
             NumOfBedrooms = property.NumOfBedrooms,
             CreationTime = property.CreationTime,
             Rent = property.Rent,
+            UserWhoRented = property.RenterUserId,
+            IsIncomplete = property.IsIncomplete,
             Description = property.Description,
             Lat = property.Lat,
             Lon = property.Lon,
