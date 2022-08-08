@@ -167,7 +167,8 @@ public class PropertyService : IPropertyService
     {
         PropertyCountModel propertyCounts = new PropertyCountModel();
         propertyCounts.RegisteredProperties = _dbContext.Properties.Count();
-        //TODO add counts for properties which are Live, Available (Ticket BNH-40)
+        propertyCounts.LiveProperties = _dbContext.Properties.Count(p => p.Availability != "Draft" && p.Landlord.CharterApproved);
+        propertyCounts.AvailableProperties = _dbContext.Properties.Count(p => p.Availability == "Available");
         return propertyCounts;
     }
 }
