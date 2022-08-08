@@ -326,6 +326,26 @@ public class TestDatabaseFixture
             IsIncomplete = true
         };
     }
+    
+    private PropertyDbModel CreateCompleteProperty(int landlordId)
+    {
+        return new PropertyDbModel
+        {
+            AcceptsBenefits = true,
+            AcceptsCouple = true,
+            AcceptsFamily = true,
+            AcceptsPets = false,
+            AcceptsNotEET = true,
+            AcceptsSingleTenant = true,
+            LandlordId = landlordId,
+            AddressLine1 = "22 Test Road",
+            County = "Cambridgeshire",
+            TownOrCity = "Cambridge",
+            AcceptsWithoutGuarantor = true,
+            Postcode = "CB1 1DX",
+            IsIncomplete = false
+        };
+    }
 
     private TenantDbModel CreateTenant()
     {
@@ -367,27 +387,6 @@ public class TestDatabaseFixture
             MembershipId = $"Member-{memberId}",
             InviteLink = "InvitimusLinkimus",
             LandlordProvidedCharterStatus = true
-        };
-    }
-}
-
-    private PropertyDbModel CreateCompleteProperty(int landlordId)
-    {
-        return new PropertyDbModel
-        {
-            AcceptsBenefits = true,
-            AcceptsCouple = true,
-            AcceptsFamily = true,
-            AcceptsPets = false,
-            AcceptsNotEET = true,
-            AcceptsSingleTenant = true,
-            LandlordId = landlordId,
-            AddressLine1 = "22 Test Road",
-            County = "Cambridgeshire",
-            TownOrCity = "Cambridge",
-            AcceptsWithoutGuarantor = true,
-            Postcode = "CB1 1DX",
-            IsIncomplete = false
         };
     }
 }

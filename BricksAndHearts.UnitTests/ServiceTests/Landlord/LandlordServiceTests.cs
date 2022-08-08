@@ -66,6 +66,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
 
         // Assert
         result.Should().BeOfType<LandlordDbModel>().Which.Id.Should().Be(1);
+        result!.Properties.Should().NotBeEmpty().And.NotBeNull();
     }
     
     [Fact]
@@ -83,7 +84,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         result.Should().BeNull();
         result2.Should().BeNull();
     }
-
+    
     [Fact]
     public void ApproveLandlord_ReturnsSorry_ForNonexistentLandlord()
     {
@@ -113,7 +114,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         // Assert
         result.Should().BeOfType<string>().Which.Should().Be("The Landlord Charter for Landlord1Approved Landlord1Sur has already been approved.");
     }
-    
+
     [Fact]
     public void ApproveLandlord_ReturnsCharterApproved_ForLandlordWithUnapprovedCharter()
     {
@@ -135,6 +136,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         context.Landlords.Single(u => u.Id == 2).ApprovalTime.Should().BeCloseTo(DateTime.Now, 1.Seconds());
         context.Landlords.Single(u => u.Id == 2).ApprovalAdminId.Should().Be(user.Id);
     }
+
 
     [Fact]
     public void FindLandlordWithInviteLink_ReturnsLinkedLandlord_WithValidLink()
@@ -163,7 +165,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         // Assert
         result.Should().BeNull();
     }
-
+    
     [Fact]
     public void EditLandlordDetails_UpdatesLandlord_WithNewLandlordDetails()
     {
@@ -180,7 +182,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         context.ChangeTracker.Clear();
 
         // Assert
-        context.Landlords.Single(u => u.Id == 3).Email.Should().Be("NewEmail@Boring.com");
+        context.Landlords.Single(u => u.Id == 3).Email.Should().BeEquivalentTo("NewEmail@Boring.com");
         result.Should().Be(ILandlordService.LandlordRegistrationResult.Success);
     }
 
