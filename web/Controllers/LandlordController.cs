@@ -86,8 +86,7 @@ public class LandlordController : AbstractController
                               + $"Email: {createModel.Email}" + "\n"
                               + $"Phone: {createModel.Phone}" + "\n";
                 var subject = "Bricks&Hearts - landlord registration notification";
-                string loggerInfo = await _mailService.TrySendMsg(msgBody, subject);
-                _logger.LogInformation(loggerInfo);
+                _mailService.TrySendMsgInBackground(msgBody, subject);
                 return RedirectToAction("Profile", "Landlord", new { landlord!.Id });
 
             case ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered:

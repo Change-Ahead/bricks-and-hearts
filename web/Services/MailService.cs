@@ -1,6 +1,4 @@
-﻿using System.Net.Mail;
-using BricksAndHearts.Auth;
-using MailKit.Net.Smtp;
+﻿using BricksAndHearts.Auth;
 using Microsoft.Extensions.Options;
 using MimeKit;
 using SmtpClient = MailKit.Net.Smtp.SmtpClient;
@@ -16,21 +14,21 @@ public interface IMailService
         string msgToName = ""
     );
 
-    public Task<string> TrySendMsg(
+    public void TrySendMsgInBackground(
         string msgBody,
-        string subject,
-        string msgFromName = "",
-        string msgToName = ""
+        string subject
     );
 }
 
 public class MailService : IMailService
 {
     private readonly IOptions<EmailConfigOptions> _config;
+    private readonly ILogger<MailService> _logger;
 
-    public MailService(IOptions<EmailConfigOptions> config)
+    public MailService(IOptions<EmailConfigOptions> config, ILogger<MailService> logger)
     {
         _config = config;
+        _logger = logger;
     }
     
     public async Task SendMsg(
@@ -64,26 +62,31 @@ public class MailService : IMailService
         await client.DisconnectAsync(true);
     }
     
-    public async Task<string> TrySendMsg(
+    private async Task TrySendMsg(
         string msgBody,
         string subject,
         string msgFromName = "",
         string msgToName = ""
     )
     {
-        var loggerMessage = "";
         try
         {
             await SendMsg(msgBody, subject, msgFromName, msgToName);
-            loggerMessage = "Successfully sent emails";
+            _logger.LogInformation("Successfully sent emails");
         }
         catch (Exception e)
         {
             // ignored
-            loggerMessage = $"Failed to send email with message:\n{msgBody}\n \nSubject:\n{subject}";
-            loggerMessage += $"\nEmail sending exception message: {e}";
+            _logger.LogWarning("Failed to send email with message:\n{Msg}\n \nSubject:\n{Subject}", msgBody, subject);
+            _logger.LogWarning("Email sending exception message: {E}", e);
         }
+    }
 
-        return loggerMessage;
+    public void TrySendMsgInBackground(
+        string msgBody,
+        string subject
+    )
+    {
+        Task.Run(() => TrySendMsg(msgBody, subject));
     }
 }
