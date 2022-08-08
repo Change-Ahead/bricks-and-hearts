@@ -2,35 +2,60 @@
 
 @{
     ViewData["Title"] = "Add Property";
+
+    string GetStepClass(int step)
+    {
+        if (step == Model.Step)
+        {
+            return "active";
+        }
+        return step < Model.Step ? "finish" : "";
+    }
 }
 
-<h1 class="display-6">Add new property</h1>
+<!-- Circles which indicate the steps of the form: -->
+<div class="d-flex property-steps my-5">
+    <span class="step @GetStepClass(1)">1</span>
+    <span class="stepline"></span>
+    <span class="step @GetStepClass(2)">2</span>
+    <span class="stepline"></span>
+    <span class="step @GetStepClass(3)">3</span>
+    <span class="stepline"></span>
+    <span class="step @GetStepClass(4)">4</span>
+    <span class="stepline"></span>
+    <span class="step @GetStepClass(5)">5</span>
+    <span class="stepline"></span>
+    <span class="step @GetStepClass(6)">6</span>
+</div>
 
-<hr/>
 
 @if (Model.Step > 1)
 {
     <div class="mb-4">
-        <a asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@(Model.Step - 1)" class="link-secondary">Back</a>
+        <a asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@(Model.Step - 1)">&lt; Back</a>
     </div>
 }
 
-<form method="post" class="narrow-form" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@Model.Step">
+<form method="post" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@Model.Step">
 
     <partial name=@("_AddFormStep" + Model.Step) model="Model.Property"/>
 
-    <div class="mt-4">
-        @if (Model.Step < AddNewPropertyViewModel.MaximumStep)
-        {
-            <input type="submit" value="Save and continue" class="btn btn-primary"/>
-        }
-        else
-        {
-            <input type="submit" value="Submit" class="btn btn-success"/>
-        }
-        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">
-            Cancel
-        </button>
+    <div class="row my-4">
+        <div class="col-auto">
+            @if (Model.Step < AddNewPropertyViewModel.MaximumStep)
+            {
+                <input type="submit" value="Next" class="btn btn-large btn-primary mb-3"/>
+            }
+            else
+            {
+                <input type="submit" value="Submit" class="btn btn-submit btn-primary"/>
+            }
+        </div>
+        <div class="col-auto">
+            <button type="button" class="btn btn-large btn-outline-primary" data-bs-toggle="modal" data-bs-target="#cancelModal">
+                Cancel
+            </button>
+        </div>
     </div>
 </form>
 

@@ -1,13 +1,17 @@
-﻿@using BricksAndHearts.Database
+@using BricksAndHearts.Database
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model PropertyViewModel
 
-<h2>Rent, deposits, availability and duration</h2>
+<h1 class="font-h1">Rent, deposits, availability, and duration</h1>
 
 <div asp-validation-summary="All" class="text-danger"></div>
-<div class="my-3">
-    <label asp-for="Rent" class="form-label">Rent</label>
-    <input asp-for="Rent" class="form-control" required/>
+<div class="my-4 py-3">
+    <label asp-for="Rent" class="form-label">Rent amount</label>
+    <div class="input-group">
+        <span class="input-group-text">£</span>
+        <input asp-for="Rent" class="form-control" required/>
+        <span class="input-group-text">per month</span>
+    </div>
     <span asp-validation-for="Rent" class="text-danger"></span>
 </div>
 
