@@ -24,6 +24,7 @@ else
         <th scope="col"># of Bedrooms</th>
         <th scope="col">Created</th>
         <th scope="col">Rent (pcm)</th>
+        <th scope="col">Availability</th>
         <th scope="col">Description</th>
         <th scope="col"></th>
     </tr>
@@ -49,6 +50,7 @@ else
             <td>@prop.NumOfBedrooms</td>
             <td>@prop.CreationTime</td>
             <td>@prop.Rent</td>
+            <td>@prop.Availability</td>
             <td>@prop.Description</td>
             <td>@Html.ActionLink("View", "ViewProperty", "Property", new { propertyId = prop.PropertyId })</td>
         </tr>

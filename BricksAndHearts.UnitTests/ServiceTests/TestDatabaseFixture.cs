@@ -38,7 +38,9 @@ public class TestDatabaseFixture
                 
                 context.Properties.AddRange(
                     CreateCompleteProperty(),
-                    CreateIncompleteProperty()
+                    CreateIncompleteProperty(),
+                    CreateAvailableProperty(),
+                    CreateDraftProperty()
                 );
                 
                 context.Tenants.AddRange(
@@ -237,6 +239,7 @@ public class TestDatabaseFixture
             TownOrCity = "Complete Town",
             County = "Complete County",
             Postcode = "CB2 1LA",
+            Availability = PropertyDbModel.Avail_Occupied
         };
     }
     
@@ -250,7 +253,38 @@ public class TestDatabaseFixture
             AddressLine2 = "Incomplete Street",
             TownOrCity = "Incomplete Town",
             County = "Incomplete County",
-            Postcode = "CB3 1LA",
+            Postcode = "CB2 1LA",
+            Availability = PropertyDbModel.Avail_Occupied
+        };
+    }
+    
+    private PropertyDbModel CreateAvailableProperty()
+    {
+        return new PropertyDbModel
+        {
+            LandlordId = 1,
+            IsIncomplete = true,
+            AddressLine1 = "Available Property",
+            AddressLine2 = "Available Street",
+            TownOrCity = "Available Town",
+            County = "Available County",
+            Postcode = "CB2 1LA",
+            Availability = PropertyDbModel.Avail_Available
+        };
+    }
+    
+    private PropertyDbModel CreateDraftProperty()
+    {
+        return new PropertyDbModel
+        {
+            LandlordId = 1,
+            IsIncomplete = true,
+            AddressLine1 = "Draft Property",
+            AddressLine2 = "Draft Street",
+            TownOrCity = "Draft Town",
+            County = "Draft County",
+            Postcode = "CB2 1LA",
+            Availability = PropertyDbModel.Avail_Draft
         };
     }
     

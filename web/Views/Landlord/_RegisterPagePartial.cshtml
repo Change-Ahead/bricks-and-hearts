@@ -73,7 +73,7 @@
             <div class="form-group my-3">
                 <label asp-for="LandlordProvidedCharterStatus" class="form-label">Charter status</label>
                 <select asp-for="LandlordProvidedCharterStatus" class="form-select" required
-                        id="Select" onclick="checkIfSelectedValueIsTarget()">
+                        id="Select" onclick="checkIfSelectedValueIsTarget('true')">
                     <option selected disabled value="">Charter Status</option>
                     <option value="true">Already approved</option>
                     <option value="false">Not yet approved</option>

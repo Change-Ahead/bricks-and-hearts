@@ -7,8 +7,8 @@ function setValue(elementId, value) {
     document.getElementById(elementId).value = value;
 }
 
-function checkIfSelectedValueIsTarget(){
-    if ($("#Select :selected").val() == "true")
+function checkIfSelectedValueIsTarget(target){
+    if ($("#Select :selected").val() == target)
     {
         $("#ifTrue").show();
         $("#ifFalse").hide();

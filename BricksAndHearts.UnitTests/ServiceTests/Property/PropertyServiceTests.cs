@@ -26,6 +26,8 @@ public class PropertyServiceTests : IClassFixture<TestDatabaseFixture>
 
         // Assert
         result.Should().BeOfType<PropertyCountModel>();
-        result.RegisteredProperties.Should().Be(2);
+        result.RegisteredProperties.Should().Be(4);
+        result.LiveProperties.Should().Be(3);
+        result.AvailableProperties.Should().Be(1);
     }
 }

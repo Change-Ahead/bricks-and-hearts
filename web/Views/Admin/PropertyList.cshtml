@@ -1,5 +1,4 @@
-﻿@using Microsoft.EntityFrameworkCore.Migrations
-@model PropertiesDashboardViewModel
+﻿@model PropertiesDashboardViewModel
 
 @{
     ViewData["Title"] = "All Properties List";
@@ -28,6 +27,7 @@
         <th scope="col">Rent (pcm)</th>
         <th scope="col">Description</th>
         <th scope="col">Availability</th>
+        <th scope="col">Available From</th>
         <th scope="col">Landlord's profile</th>
     </tr>
     </thead>
@@ -41,17 +41,16 @@
             <td>@property.CreationTime</td>
             <td>@property.Rent</td>
             <td>@property.Description</td>
-            @if (property.UserWhoRented != null)
+            <td>@property.Availability</td>
+            @if (property.AvailableFrom != null)
             {
-                <td>
-                    <p class="not-available"> Not available </p></td>
+                <td>@property.AvailableFrom.Value.ToString("dd/MM/yyyy")</td>
             }
             else
             {
-                <td>
-                    <p class="available"> Available </p></td>
+                <td></td>
             }
-
+            
             <td>
                 <a type="button" class="btn btn-outline-primary" value="@property.LandlordId" href="@Url.Action("Profile", "Landlord", new { id = property.LandlordId })">
                     <i class="bi bi-person"></i>

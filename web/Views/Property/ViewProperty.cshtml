@@ -1,4 +1,6 @@
-﻿@model PropertyViewModel
+﻿@using BricksAndHearts.Database
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model PropertyViewModel
 
 @{
     ViewData["Title"] = "View Property";
@@ -11,8 +13,11 @@
     <div class="row mb-3 ms-0">
         <div class="col-7 border p-2">
             <p>@Model.Address.AddressLine1</p>
-            <p>Current rental: </p>
-            <p>Looking for tenant: </p>
+            <p>Avaibility status: @Model.Availability</p>
+            @if (Model.Availability == PropertyDbModel.Avail_AvailableSoon)
+            {
+                <p>Available from: @Model.AvailableFrom!.Value.ToString("dd/MM/yyyy")</p>
+            }
         </div>
     </div>
     <div class="row mb-3">
