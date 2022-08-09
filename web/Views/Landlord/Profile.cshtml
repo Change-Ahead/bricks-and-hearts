@@ -103,25 +103,21 @@
             <table class="table">
                 <tr>
                     <th class="w-25">Status</th>
-                    <td>@(Model.CharterApproved ? "Approved" : "Pending")</td>
+                    <td>
+                        <div class="d-flex">
+                            @(Model.CharterApproved ? "Approved" : "Pending")
+                            @if (User.IsInRole("Admin") && !Model.CharterApproved)
+                            {
+                                <button type="button" class="btn btn-sm btn-outline-primary ms-auto" data-bs-toggle="modal" data-bs-target="#approveModal">Confirm charter membership</button>
+                            }
+                        </div>
+                    </td>
                 </tr>
                 @if (Model.MembershipId != null)
                 {
                     <tr>
                         <th>Membership ID</th>
-                        <td>
-                            <div class="d-flex">
-                                @Model.MembershipId
-                                @if (User.IsInRole("Admin") && !Model.CharterApproved)
-                                {
-                                    using (Html.BeginForm("ApproveCharter", "Landlord", null, FormMethod.Post, null, new { @class = "ms-auto" }))
-                                    {
-                                        <input type="hidden" id="landlordId" name="landlordId" value=@Model.LandlordId>
-                                        <button type="submit" class="btn btn-sm btn-outline-primary">Confirm charter membership</button>
-                                    }
-                                }
-                            </div>
-                        </td>
+                        <td>@Model.MembershipId</td>
                     </tr>
                 }
             </table>
@@ -138,3 +134,26 @@
         <button type="submit" class="btn btn-primary"><i class="bi bi-link"></i> Get invite link</button>
     }
 }
+
+<!-- Modal -->
+<div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">Confirm charter membership for @Model.FirstName @Model.LastName</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post" asp-controller="Landlord" asp-action="ApproveCharter">
+                <div class="modal-body">
+                    <label asp-for="MembershipId" class="form-label">Membership ID</label>
+                    <input type="text" asp-for="MembershipId" value="@(Model.MembershipId ?? "")" class="form-control" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                    <input type="hidden" asp-for="LandlordId" value="@Model.LandlordId">
+                    <input type="submit" value="Confirm" class="btn btn-primary"/>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

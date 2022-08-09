@@ -23,6 +23,13 @@ public interface ILandlordService
         Success
     }
 
+    public enum ApproveLandlordResult
+    {
+        ErrorLandlordNotFound,
+        ErrorAlreadyApproved,
+        Success
+    }
+
     public Task<(LandlordRegistrationResult result, LandlordDbModel? dbModel)> RegisterLandlord(
         LandlordProfileModel createModel,
         BricksAndHeartsUser user);
@@ -37,7 +44,7 @@ public interface ILandlordService
     public Task<LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel);
     public bool CheckForDuplicateEmail(LandlordProfileModel editModel);
     public bool CheckForDuplicateMembershipId(LandlordProfileModel editModel);
-    public Task<string> ApproveLandlord(int landlordId, BricksAndHeartsUser user);
+    public Task<ApproveLandlordResult> ApproveLandlord(int landlordId, BricksAndHeartsUser user, string membershipId);
     public LandlordDbModel? FindLandlordWithInviteLink(string inviteLink);
 
     public Task<LinkUserWithLandlordResult> LinkExistingLandlordWithUser(
@@ -45,7 +52,6 @@ public interface ILandlordService
         BricksAndHeartsUser user);
 
     public LandlordCountModel CountLandlords();
-
 }
 
 public class LandlordService : ILandlordService
@@ -86,13 +92,14 @@ public class LandlordService : ILandlordService
             {
                 return (ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered, null);
             }
-            
+
             // If the landlord has a membershipId, check there isn't already a Landlord with that membershipId.
             if (dbModel.MembershipId != null)
             {
                 if (await _dbContext.Landlords.AnyAsync(l => l.MembershipId == dbModel.MembershipId))
                 {
-                    return (ILandlordService.LandlordRegistrationResult.ErrorLandlordMembershipIdAlreadyRegistered, null);
+                    return (ILandlordService.LandlordRegistrationResult.ErrorLandlordMembershipIdAlreadyRegistered,
+                        null);
                 }
             }
 
@@ -122,10 +129,10 @@ public class LandlordService : ILandlordService
     {
         return _dbContext.Landlords.SingleOrDefaultAsync(l => l.Id == id);
     }
-    
+
     public Task<LandlordDbModel?> GetLandlordIfExistsWithProperties(int? id)
     {
-        return _dbContext.Landlords.Include(l=>l.Properties).SingleOrDefaultAsync(l => l.Id == id);
+        return _dbContext.Landlords.Include(l => l.Properties).SingleOrDefaultAsync(l => l.Id == id);
     }
 
     public async Task<(ILandlordService.LandlordRegistrationResult result, LandlordDbModel? landlord)> RegisterLandlord(
@@ -147,6 +154,7 @@ public class LandlordService : ILandlordService
         {
             dbModel.MembershipId = createModel.MembershipId;
         }
+
         await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
         {
             // Check there isn't already a Landlord with that email. Nothing depends on this currently, but it would probably mean the landlord is a duplicate
@@ -155,13 +163,14 @@ public class LandlordService : ILandlordService
             {
                 return (ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered, null);
             }
-            
+
             // If the landlord has a membershipId, check there isn't already a Landlord with that membershipId.
             if (dbModel.MembershipId != null)
             {
                 if (await _dbContext.Landlords.AnyAsync(l => l.MembershipId == dbModel.MembershipId))
                 {
-                    return (ILandlordService.LandlordRegistrationResult.ErrorLandlordMembershipIdAlreadyRegistered, null);
+                    return (ILandlordService.LandlordRegistrationResult.ErrorLandlordMembershipIdAlreadyRegistered,
+                        null);
                 }
             }
 
@@ -175,24 +184,27 @@ public class LandlordService : ILandlordService
         return (ILandlordService.LandlordRegistrationResult.Success, dbModel);
     }
 
-    public async Task<string> ApproveLandlord(int landlordId, BricksAndHeartsUser user)
+    public async Task<ILandlordService.ApproveLandlordResult> ApproveLandlord(int landlordId, BricksAndHeartsUser user,
+        string membershipId)
     {
         var landlord = await GetLandlordIfExistsFromId(landlordId);
         if (landlord is null)
         {
-            return "Sorry, it appears that no landlord with this ID exists";
+            return ILandlordService.ApproveLandlordResult.ErrorLandlordNotFound;
         }
 
         if (landlord.CharterApproved)
         {
-            return $"The Landlord Charter for {landlord.FirstName} {landlord.LastName} has already been approved.";
+            return ILandlordService.ApproveLandlordResult.ErrorAlreadyApproved;
         }
 
         landlord.CharterApproved = true;
         landlord.ApprovalTime = DateTime.Now;
         landlord.ApprovalAdminId = user.Id;
+        landlord.MembershipId = membershipId;
+
         await _dbContext.SaveChangesAsync();
-        return $"Successfully approved Landlord Charter for {landlord.FirstName} {landlord.LastName}.";
+        return ILandlordService.ApproveLandlordResult.Success;
     }
 
     public LandlordDbModel? FindLandlordWithInviteLink(string inviteLink)
@@ -240,10 +252,11 @@ public class LandlordService : ILandlordService
         {
             return false;
         }
+
         return _dbContext.Landlords.SingleOrDefault(l => l.MembershipId == editModel.MembershipId) != null
                && editedLandlord.MembershipId != editModel.MembershipId;
     }
-    
+
     // Link existing landlord with user
     public async Task<ILandlordService.LinkUserWithLandlordResult> LinkExistingLandlordWithUser(
         string inviteLink,
