@@ -63,6 +63,8 @@ public class PropertyViewModel : IValidatableObject
     // Tenant
     public int? UserWhoRented { get; set; }
 
+    public int? AvailableUnits => TotalUnits - OccupiedUnits;
+
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
         if (AcceptsSingleTenant == false && AcceptsCouple == false && AcceptsFamily == false)
@@ -82,20 +84,6 @@ public class PropertyViewModel : IValidatableObject
         }
     }
 
-    public int? AvailableUnits => TotalUnits - OccupiedUnits;
-
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-    {
-        if (AcceptsSingleTenant == false && AcceptsCouple == false && AcceptsFamily == false)
-        {
-            yield return new ValidationResult("At least one type of tenant must be selected");
-        }
-
-        if (Availability == PropertyDbModel.Avail_AvailableSoon && AvailableFrom == null)
-        {
-            yield return new ValidationResult("Available From must be provided if property is Available Soon");
-        }
-    }
 
     public static PropertyViewModel FromDbModel(PropertyDbModel property)
     {
@@ -129,8 +117,7 @@ public class PropertyViewModel : IValidatableObject
             AcceptsNotEET = property.AcceptsNotEET,
             AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor,
             Availability = property.Availability,
-            AvailableFrom = property.AvailableFrom
-            UserWhoRented = property.RenterUserId,
+            AvailableFrom = property.AvailableFrom,
             TotalUnits = property.TotalUnits,
             OccupiedUnits = property.OccupiedUnits
         };

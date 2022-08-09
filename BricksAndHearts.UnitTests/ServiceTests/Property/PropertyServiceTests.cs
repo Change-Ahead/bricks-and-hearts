@@ -74,42 +74,6 @@ public class PropertyServiceTests : PropertyServiceTestsBase
 
     #endregion
 
-    #region UpdateProperty
-
-    [Fact]
-    public async void UpdateProperty_UpdatesProperty()
-    {
-        // Arrange
-        await using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context);
-        context.Properties.Single(u => u.Id == 1).AcceptsBenefits = true;
-        var propertiesBeforeCount = context.Properties.Count();
-        var updateModel = new PropertyViewModel
-        {
-            Address = new PropertyAddress
-            {
-                AddressLine1 = "UpdateProperty_UpdatesProperty1",
-                County = "Cambridgeshire",
-                TownOrCity = "Cambridge",
-                Postcode = "CB1 1DX"
-            },
-            AcceptsBenefits = false
-        };
-
-        // Act
-        service.UpdateProperty(1, updateModel, false);
-        context.ChangeTracker.Clear();
-
-        // Assert
-        var property = context.Properties.Single(u => u.Id == 1);
-        property.AddressLine1.Should().Be("UpdateProperty_UpdatesProperty1");
-        property.IsIncomplete.Should().BeFalse();
-        property.AcceptsBenefits.Should().BeFalse();
-        context.Properties.Count().Should().Be(propertiesBeforeCount);
-    }
-
-    #endregion
-
     #region DeleteProperty
 
     [Fact]
@@ -132,63 +96,6 @@ public class PropertyServiceTests : PropertyServiceTestsBase
 
     #endregion
 
-    #region CountProperties
-
-    #region GetPropertiesByLandlord
-
-    [Theory]
-    [InlineData(1)]
-    [InlineData(2)]
-    public async void GetPropertiesByLandlord_OnlyGetsPropertiesFromInputLandlord(int landlordId)
-    {
-        // Arrange
-        await using var context = Fixture.CreateReadContext();
-        var service = new PropertyService(context);
-
-        // Act
-        var propertiesByLandlord = service.GetPropertiesByLandlord(landlordId);
-
-        // Assert
-        propertiesByLandlord.Should().OnlyContain(u => u.LandlordId == landlordId);
-    }
-
-    #endregion
-
-    #region AddNewProperty
-
-    [Theory]
-    [InlineData(1)]
-    [InlineData(2)]
-    public async void AddNewProperty_AddsNewProperty(int landlordId)
-    {
-        // Arrange
-        await using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context);
-        var propertiesBeforeCount = context.Properties.Count();
-        var createModel = new PropertyViewModel
-        {
-            Address = new PropertyAddress
-            {
-                AddressLine1 = "AddNewProperty_AddsNewProperty",
-                County = "Cambridgeshire",
-                TownOrCity = "Cambridge",
-                Postcode = "CB1 1DX"
-            }
-        };
-
-        // Act
-        service.AddNewProperty(landlordId, createModel);
-        context.ChangeTracker.Clear();
-
-        // Assert
-        var property = context.Properties.OrderBy(u => u.CreationTime).Last();
-        property.AddressLine1.Should().Be("AddNewProperty_AddsNewProperty");
-        property.IsIncomplete.Should().BeTrue();
-        property.LandlordId.Should().Be(landlordId);
-        context.Properties.Count().Should().Be(propertiesBeforeCount + 1);
-    }
-
-    #endregion
 
     #region UpdateProperty
 
@@ -336,28 +243,6 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
         propertyDb.Availability.Should().Be(AvailabilityState.Occupied);
         propertyDb.AvailableFrom.Should().BeNull();
-    }
-
-    #endregion
-
-    #region DeleteProperty
-
-    [Fact]
-    public async void DeleteProperty_DeletesProperty()
-    {
-        // Arrange
-        await using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context);
-        var propertiesBeforeCount = context.Properties.Count();
-        var deleteModel = context.Properties.Single(u => u.Id == 1);
-
-        // Act
-        service.DeleteProperty(deleteModel);
-        context.ChangeTracker.Clear();
-
-        // Assert
-        context.Properties.Count(u => u.Id == 1).Should().Be(0);
-        context.Properties.Count().Should().Be(propertiesBeforeCount - 1);
     }
 
     #endregion

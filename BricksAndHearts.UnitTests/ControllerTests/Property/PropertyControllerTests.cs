@@ -301,29 +301,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         result!.ViewName.Should().Be("AddNewProperty");
         result.Model.Should().BeOfType<AddNewPropertyViewModel>().Which.Step.Should().Be(step);
         result.Model.Should().BeOfType<AddNewPropertyViewModel>().Which.Property!.Description.Should()
-            .Be(fakePropertyDbModel.Description);
-    }
-
-    [Theory]
-    [InlineData(2)]
-    [InlineData(3)]
-    [InlineData(4)]
-    public void AddNewPropertyContinueGet_WithNoAddInProgress_ReturnsBlankModel(int step)
-    {
-        // Arrange
-        A.CallTo(() => PropertyService.GetIncompleteProperty(1)).Returns(null);
-
-        var landlordUser = CreateLandlordUser();
-        MakeUserPrincipalInController(landlordUser, UnderTest);
-
-        // Act
-        var result = UnderTest.AddNewProperty_Continue(step) as ViewResult;
-
-        // Assert
-        result!.ViewName.Should().Be("AddNewProperty");
-        A.CallTo(() => PropertyService.GetIncompleteProperty(1)).MustHaveHappened();
-        result.Model.Should().BeOfType<AddNewPropertyViewModel>().Which.Step.Should().Be(step);
-        result.Model.Should().BeOfType<AddNewPropertyViewModel>().Which.Property!.Description.Should().BeNull();
+            .Be(prop.Description);
     }
 
     [Theory]
@@ -669,147 +647,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     #endregion
-    // This is not working
-    /*[Fact]
-    public async void ListPropertyImages_CallsListFilesAsync_AndReturnsViewListPropertyImages()
-    {
-        // Arrange
-        var adminUser = CreateAdminUser();
-        MakeUserPrincipalInController(adminUser, UnderTest);
-        A.CallTo(() => PropertyService.IsUserAdminOrCorrectLandlord(adminUser, 1)).Returns(true);
-        
-        var fakeImage = CreateExampleImage();
-        var image = (fakeImage.OpenReadStream(), "jpeg");
-        A.CallTo(() => AzureStorage.DownloadFile("property", 1, fakeImage.FileName)).Returns(image);
-        
-        var urlHelper = A.Fake<IUrlHelper>();
-        // ReSharper disable once Mvc.ActionNotResolved
-        A.CallTo(() => urlHelper.Action("GetImage", new { propertyId = 1, fileName = "TestFileName" })!).Returns("/fake/url");
-        UnderTest.Url = urlHelper;
-        
-        var fileNames = new List<string> { fakeImage.FileName };
-        A.CallTo(() => AzureStorage.ListFileNames("property", 1)).Returns(fileNames);
 
-        // Act
-        var result = await UnderTest.ListPropertyImages(1) as ViewResult;
-
-        // Assert
-        A.CallTo(() => AzureStorage.ListFileNames("property", 1)).MustHaveHappened();
-        result!.ViewData.Model.Should().BeOfType<ImageListViewModel>().And.Be(fileNames);
-    }*/
-
-    [Fact]
-    public async void AddPropertyImages_CallsUploadImageForEachImage_AndRedirectsToListImagesWithFlashMultipleMessages()
-    {
-        // Arrange
-        var adminUser = CreateAdminUser();
-        MakeUserPrincipalInController(adminUser, UnderTest);
-        A.CallTo(() => PropertyService.IsUserAdminOrCorrectLandlord(adminUser, 1)).Returns(true);
-
-        var fakeImage = CreateExampleImage();
-        var fakeImage2 = CreateExampleImage();
-        A.CallTo(() => AzureStorage.IsImage(fakeImage.FileName)).Returns((true, null));
-        A.CallTo(() => AzureStorage.IsImage(fakeImage2.FileName)).Returns((true, null));
-        var fakeImageList = new List<IFormFile> { fakeImage, fakeImage2 };
-
-        // Act
-        var result = await UnderTest.AddPropertyImages(fakeImageList, 1);
-
-        // Assert
-        A.CallTo(() => AzureStorage.UploadFile(fakeImage, "property", 1)).MustHaveHappened();
-        A.CallTo(() => AzureStorage.UploadFile(fakeImage2, "property", 1)).MustHaveHappened();
-        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ListPropertyImages");
-    }
-
-    [Fact]
-    public async void GetImage_CallsDownloadFileAsync_AndReturnsFile()
-    {
-        // Arrange
-        var adminUser = CreateAdminUser();
-        MakeUserPrincipalInController(adminUser, UnderTest);
-        A.CallTo(() => PropertyService.IsUserAdminOrCorrectLandlord(adminUser, 1)).Returns(true);
-
-        var fakeImage = CreateExampleImage();
-        var image = (fakeImage.OpenReadStream(), "jpeg");
-        A.CallTo(() => AzureStorage.DownloadFile("property", 1, fakeImage.FileName)).Returns(image);
-
-        // Act
-        var result = await UnderTest.GetImage(1, fakeImage.FileName) as FileStreamResult;
-
-        // Assert
-        A.CallTo(() => AzureStorage.DownloadFile("property", 1, fakeImage.FileName)).MustHaveHappened();
-        result!.ContentType.Should().Be("image/jpeg");
-    }
-
-    [Fact]
-    public async void DeleteImage_CallsDeleteFileAsync_AndRedirectsToListImages()
-    {
-        // Arrange
-        var adminUser = CreateAdminUser();
-        MakeUserPrincipalInController(adminUser, UnderTest);
-        A.CallTo(() => PropertyService.IsUserAdminOrCorrectLandlord(adminUser, 1)).Returns(true);
-
-        var fakeImage = CreateExampleImage();
-
-        // Act
-        var result = await UnderTest.DeletePropertyImage(1, fakeImage.FileName);
-
-        // Assert
-        A.CallTo(() => AzureStorage.DeleteFile("property", 1, fakeImage.FileName)).MustHaveHappened();
-        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ListPropertyImages");
-    }
-
-    [Fact]
-    public void DeleteProperty_WithExistingProperty_DeletesAndRedirectsToViewProperties()
-    {
-        // Arrange
-        var fakePropertyDbModel = CreateExamplePropertyDbModel();
-        fakePropertyDbModel.Landlord = A.Fake<LandlordDbModel>();
-        fakePropertyDbModel.Landlord.Id = 1;
-        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(fakePropertyDbModel);
-
-        var landlordUser = CreateLandlordUser();
-        MakeUserPrincipalInController(landlordUser, UnderTest);
-
-        // Act
-        var result = UnderTest.DeleteProperty(1);
-
-        // Assert
-        A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustHaveHappened();
-        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
-    }
-
-    [Fact]
-    public void DeleteProperty_WithNonExistingProperty_Returns404ErrorPage()
-    {
-        // Arrange
-        var fakePropertyDbModel = CreateExamplePropertyDbModel();
-        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(null);
-
-        var landlordUser = CreateLandlordUser();
-        MakeUserPrincipalInController(landlordUser, UnderTest);
-
-        // Act
-        var result = UnderTest.DeleteProperty(1);
-
-        // Assert
-        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
-        A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustNotHaveHappened();
-        result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(404);
-    }
-
-    [Fact]
-    public void SortProperties_ReturnsViewWith_PropertiesDashboardViewModel()
-    {
-        // Arrange
-        var dummyString = "Rent";
-
-        // Act
-        var result = UnderTest.SortProperties(dummyString) as ViewResult;
-
-        // Assert
-        result!.ViewData.Model.Should().BeOfType<PropertiesDashboardViewModel>();
-    }
+    #region AvailableUnits
 
     [Fact]
     public void AvailableUnits_CalculatesCorrectly()
@@ -823,4 +662,6 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Assert
         availableUnits.Should().Be(3);
     }
+
+    #endregion
 }
