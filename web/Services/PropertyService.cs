@@ -129,11 +129,6 @@ public class PropertyService : IPropertyService
                 // If update succeeds in making the property "available soon", then use its from date
                 dbModel.AvailableFrom = updateModel.AvailableFrom;
             }
-            else
-            {
-                // Keep date the same if we're not updating it here
-                dbModel.AvailableFrom = dbModel.AvailableFrom;
-            }
         }
         else
         {
