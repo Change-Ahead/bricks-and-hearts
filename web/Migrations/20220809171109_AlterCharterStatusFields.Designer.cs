@@ -4,6 +4,7 @@ using BricksAndHearts.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BricksAndHearts.Migrations
 {
     [DbContext(typeof(BricksAndHeartsDbContext))]
-    partial class BricksAndHeartsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220809171109_AlterCharterStatusFields")]
+    partial class AlterCharterStatusFields
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
