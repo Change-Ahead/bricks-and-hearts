@@ -111,7 +111,7 @@ public class PropertyController : AbstractController
             return View("AddNewProperty", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
         }
 
-        var property = _propertyService.GetPropertyByPropertyId(propertyId);
+
         if (newPropertyModel.Address.Postcode != null)
         {
             newPropertyModel.Address.Postcode =
@@ -135,6 +135,12 @@ public class PropertyController : AbstractController
 
             // Go to step 2
             return RedirectToAction("AddNewProperty_Continue", new { step = 2, propertyId = newPropId });
+        }
+
+        var property = _propertyService.GetPropertyByPropertyId(propertyId);
+        if (property == null)
+        {
+            return StatusCode(404);
         }
 
         if (step < AddNewPropertyViewModel.MaximumStep)
@@ -166,9 +172,6 @@ public class PropertyController : AbstractController
         {
             return View("EditProperty", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
         }
-
-        // Get the property we're currently adding
-        var property = _propertyService.GetPropertyByPropertyId(propertyId);
 
         if (!(GetCurrentUser().IsAdmin || GetCurrentUser().LandlordId == newPropertyModel.LandlordId))
         {
@@ -202,10 +205,17 @@ public class PropertyController : AbstractController
         // Update the property's record with the final set of values
         _propertyService.UpdateProperty(propertyId, newPropertyModel, false);
 
+
         if (step < AddNewPropertyViewModel.MaximumStep)
         {
+            var property = _propertyService.GetPropertyByPropertyId(propertyId);
+            if (property == null)
+            {
+                return StatusCode(404);
+            }
+
             // Update the property's record with the values entered at this step
-            var newProperty = PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(propertyId));
+            var newProperty = PropertyViewModel.FromDbModel(property);
 
             // Go to next step
             return RedirectToAction("EditProperty_Continue",
