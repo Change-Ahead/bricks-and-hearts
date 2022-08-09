@@ -96,7 +96,7 @@ public class ApiServiceTests
     }
 
     [Fact]
-    public async void AutofillAddress_WithValidPostcode_AutocompletesEverything()
+    public async Task AutofillAddress_WithValidPostcode_AutocompletesEverything()
     {
         // Arrange
         var model = new PropertyViewModel();

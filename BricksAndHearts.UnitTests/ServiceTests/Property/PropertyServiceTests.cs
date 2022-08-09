@@ -1,4 +1,5 @@
 ﻿using System.Linq;
+using System.Threading.Tasks;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
@@ -21,7 +22,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     [Theory]
     [InlineData(1)]
     [InlineData(2)]
-    public async void GetPropertiesByLandlord_OnlyGetsPropertiesFromInputLandlord(int landlordId)
+    public async Task GetPropertiesByLandlord_OnlyGetsPropertiesFromInputLandlord(int landlordId)
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
@@ -41,7 +42,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     [Theory]
     [InlineData(1)]
     [InlineData(2)]
-    public async void AddNewProperty_AddsNewProperty(int landlordId)
+    public async Task AddNewProperty_AddsNewProperty(int landlordId)
     {
         // Arrange
         await using var context = Fixture.CreateWriteContext();
@@ -75,7 +76,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     #region UpdateProperty
 
     [Fact]
-    public async void UpdateProperty_UpdatesProperty()
+    public async Task UpdateProperty_UpdatesProperty()
     {
         // Arrange
         await using var context = Fixture.CreateWriteContext();
@@ -111,7 +112,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     #region DeleteProperty
 
     [Fact]
-    public async void DeleteProperty_DeletesProperty()
+    public async Task DeleteProperty_DeletesProperty()
     {
         // Arrange
         await using var context = Fixture.CreateWriteContext();
@@ -133,7 +134,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     #region CountProperties()
 
     [Fact]
-    public async void CountProperties_ReturnsPropertyCountModel_WithCorrectData()
+    public async Task CountProperties_ReturnsPropertyCountModel_WithCorrectData()
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
@@ -158,7 +159,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     #region IsUserAdminOrCorrectLandlord
 
     [Fact]
-    public async void IsUserAdminOrCorrectLandlord_UsedByAdmin_ReturnsTrueIfPropertyIsntTheirs()
+    public async Task IsUserAdminOrCorrectLandlord_UsedByAdmin_ReturnsTrueIfPropertyIsntTheirs()
     {
         // Arrange
         await using var context = Fixture.CreateWriteContext();
@@ -176,7 +177,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     }
 
     [Fact]
-    public async void IsUserAdminOrCorrectLandlord_UsedByAdmin_ReturnsTrueIfPropertyIsTheirs()
+    public async Task IsUserAdminOrCorrectLandlord_UsedByAdmin_ReturnsTrueIfPropertyIsTheirs()
     {
         // Arrange
         await using var context = Fixture.CreateWriteContext();
@@ -195,7 +196,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     }
 
     [Fact]
-    public async void IsUserAdminOrCorrectLandlord_UsedByLandLord_ReturnsTrueIfPropertyIsTheirs()
+    public async Task IsUserAdminOrCorrectLandlord_UsedByLandLord_ReturnsTrueIfPropertyIsTheirs()
     {
         // Arrange
         await using var context = Fixture.CreateWriteContext();
@@ -214,7 +215,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     }
 
     [Fact]
-    public async void IsUserAdminOrCorrectLandlord_UsedByLandLord_ReturnsFalseIfPropertyIsNotTheirs()
+    public async Task IsUserAdminOrCorrectLandlord_UsedByLandLord_ReturnsFalseIfPropertyIsNotTheirs()
     {
         // Arrange
         await using var context = Fixture.CreateWriteContext();
@@ -240,7 +241,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     [InlineData(1)]
     [InlineData(2)]
     [InlineData(3)]
-    public async void GetPropertyByPropertyId_GetsPropertyWithId(int propertyId)
+    public async Task GetPropertyByPropertyId_GetsPropertyWithId(int propertyId)
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
@@ -255,7 +256,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     }
 
     [Fact]
-    public async void GetPropertyByPropertyIdReturnsNullIfPropertyWithIdDoesntExist()
+    public async Task GetPropertyByPropertyIdReturnsNullIfPropertyWithIdDoesntExist()
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();

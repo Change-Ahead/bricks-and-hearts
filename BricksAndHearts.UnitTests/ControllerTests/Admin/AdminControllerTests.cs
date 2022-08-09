@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
@@ -27,7 +28,7 @@ public class AdminControllerTests : AdminControllerTestsBase
     }
 
     [Fact]
-    public async void LandlordList_WhenCalled_CallsGetLandlordListAndReturnsLandlordListView()
+    public async Task LandlordList_WhenCalled_CallsGetLandlordListAndReturnsLandlordListView()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -42,7 +43,7 @@ public class AdminControllerTests : AdminControllerTestsBase
     }
     
     [Fact]
-    public async void TenantList_WhenCalled_CallsGetTenantListAndReturnsTenantListView()
+    public async Task TenantList_WhenCalled_CallsGetTenantListAndReturnsTenantListView()
     {
         // Arrange
         var adminUser = CreateAdminUser();

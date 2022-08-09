@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
@@ -19,7 +20,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     }
 
     [Fact]
-    public async void GetAdminLists_OnlyGetsAdmins()
+    public async Task GetAdminLists_OnlyGetsAdmins()
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();

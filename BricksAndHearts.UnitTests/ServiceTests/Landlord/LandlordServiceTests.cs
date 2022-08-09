@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
+using System.Threading.Tasks;
 using BricksAndHearts.Auth;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
@@ -21,7 +22,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     }
     
     [Fact]
-    public async void CountLandlords_ReturnsLandlordCountModel_WithCorrectData()
+    public async Task CountLandlords_ReturnsLandlordCountModel_WithCorrectData()
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
@@ -37,7 +38,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     }
     
     [Fact]
-    public async void LinkExistingLandlordWithUser_WithInvalidLink_ReturnsErrorLinkDoesNotExist()
+    public async Task LinkExistingLandlordWithUser_WithInvalidLink_ReturnsErrorLinkDoesNotExist()
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
@@ -54,7 +55,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     }
     
     [Fact]
-    public async void LinkExistingLandlordWithUser_WithValidLink_ReturnsErrorUserAlreadyHasLandlordRecord()
+    public async Task LinkExistingLandlordWithUser_WithValidLink_ReturnsErrorUserAlreadyHasLandlordRecord()
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();

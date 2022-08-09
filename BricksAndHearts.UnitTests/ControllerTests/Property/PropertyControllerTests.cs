@@ -95,7 +95,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     [InlineData(1)]
     [InlineData(2)]
     [InlineData(3)]
-    public async void AddNewPropertyContinuePost_WithInvalidModel_ReturnsViewWithModel(int step)
+    public async Task AddNewPropertyContinuePost_WithInvalidModel_ReturnsViewWithModel(int step)
     {
         // Arrange
         var landlordUser = CreateLandlordUser();
@@ -115,7 +115,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public async void AddNewPropertyContinuePost_AtStep1_WithoutAddress1AndPostcode_ReturnsViewWithModel()
+    public async Task AddNewPropertyContinuePost_AtStep1_WithoutAddress1AndPostcode_ReturnsViewWithModel()
     {
         // Arrange
         A.CallTo(() => PropertyService.GetIncompleteProperty(1)).Returns(null);
@@ -139,7 +139,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public async void AddNewPropertyContinuePost_AtStep1_CreatesNewRecord_AndRedirectsToNextStep()
+    public async Task AddNewPropertyContinuePost_AtStep1_CreatesNewRecord_AndRedirectsToNextStep()
     {
         // Arrange
         A.CallTo(() => PropertyService.GetIncompleteProperty(1)).Returns(null);
@@ -173,7 +173,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     [InlineData(2)]
     [InlineData(3)]
     [InlineData(4)]
-    public async void AddNewPropertyContinuePost_AtMiddleSteps_WithNoAddInProgress_RedirectsToViewProperties(int step)
+    public async Task AddNewPropertyContinuePost_AtMiddleSteps_WithNoAddInProgress_RedirectsToViewProperties(int step)
     {
         // Arrange
         A.CallTo(() => PropertyService.GetIncompleteProperty(1)).Returns(null);
@@ -194,7 +194,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     [Theory]
     [InlineData(2)]
     [InlineData(3)]
-    public async void AddNewPropertyContinuePost_AtMiddleSteps_UpdatesRecord_AndRedirectsToNextStep(int step)
+    public async Task AddNewPropertyContinuePost_AtMiddleSteps_UpdatesRecord_AndRedirectsToNextStep(int step)
     {
         // Arrange
         var fakePropertyDbModel = CreateExamplePropertyDbModel();
@@ -218,7 +218,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public async void AddNewPropertyContinuePost_AtFinalStep_UpdatesRecord_AndRedirectsToViewProperties()
+    public async Task AddNewPropertyContinuePost_AtFinalStep_UpdatesRecord_AndRedirectsToViewProperties()
     {
         // Arrange
         var landlordUser = CreateLandlordUser();
@@ -235,7 +235,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public async void AddNewPropertyCancelPost_DeletesRecordAndContainer_AndRedirectsToViewProperties()
+    public async Task AddNewPropertyCancelPost_DeletesRecordAndContainer_AndRedirectsToViewProperties()
     {
         // Arrange
         var fakePropertyDbModel = CreateExamplePropertyDbModel();
@@ -255,7 +255,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public async void AddNewPropertyCancelPost_WithNoAddInProgress_RedirectsToViewProperties()
+    public async Task AddNewPropertyCancelPost_WithNoAddInProgress_RedirectsToViewProperties()
     {
         // Arrange
         var fakePropertyDbModel = CreateExamplePropertyDbModel();
@@ -312,7 +312,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     
     // This is not working
     /*[Fact]
-    public async void ListPropertyImages_CallsListFilesAsync_AndReturnsViewListPropertyImages()
+    public async Task ListPropertyImages_CallsListFilesAsync_AndReturnsViewListPropertyImages()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -340,7 +340,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }*/
     
     [Fact]
-    public async void AddPropertyImages_CallsUploadImageForEachImage_AndRedirectsToListImagesWithFlashMultipleMessages()
+    public async Task AddPropertyImages_CallsUploadImageForEachImage_AndRedirectsToListImagesWithFlashMultipleMessages()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -363,7 +363,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public async void GetImage_CallsDownloadFileAsync_AndReturnsFile()
+    public async Task GetImage_CallsDownloadFileAsync_AndReturnsFile()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -383,7 +383,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
     
     [Fact]
-    public async void DeleteImage_CallsDeleteFileAsync_AndRedirectsToListImages()
+    public async Task DeleteImage_CallsDeleteFileAsync_AndRedirectsToListImages()
     {
         // Arrange
         var adminUser = CreateAdminUser();

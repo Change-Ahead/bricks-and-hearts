@@ -1,3 +1,4 @@
+using System.Threading.Tasks;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
@@ -11,7 +12,7 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
 public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
 {
     [Fact]
-    public async void
+    public async Task
         RegisterLandlordWithNoAssignedUser_WhenAttemptedByAdmin_CreatesNewUnassignedLandlord_AndRedirectsToTheirProfile()
     {
         // Arrange
@@ -55,7 +56,7 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
     }
 
     [Fact]
-    public async void RegisterLandlordWithNoAssignedUser_WhenAttemptedByNonAdmin_ReturnsForbidden()
+    public async Task RegisterLandlordWithNoAssignedUser_WhenAttemptedByNonAdmin_ReturnsForbidden()
     {
         // Arrange
         var landlordUser = CreateLandlordUser();

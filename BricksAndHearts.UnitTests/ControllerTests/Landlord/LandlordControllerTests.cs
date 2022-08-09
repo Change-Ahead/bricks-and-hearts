@@ -30,7 +30,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     }
 
     [Fact]
-    public async void RegisterPost_CalledByUnregisteredUser_ReturnsProfile()
+    public async Task RegisterPost_CalledByUnregisteredUser_ReturnsProfile()
     {
         // Arrange
         var unregisteredUser = CreateUnregisteredUser();
@@ -52,7 +52,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     }
 
     [Fact]
-    public async void ApproveCharter_CallsApproveLandlord_AndDisplaysSuccessMessage()
+    public async Task ApproveCharter_CallsApproveLandlord_AndDisplaysSuccessMessage()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -243,7 +243,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     }
 
     [Fact]
-    public async void TieUserWithLandlord_WithNonExistentLink_RedirectToInvite()
+    public async Task TieUserWithLandlord_WithNonExistentLink_RedirectToInvite()
     {
         // Arrange 
         var landlordUser = CreateLandlordUser();
@@ -263,7 +263,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     }
 
     [Fact]
-    public async void TieUserWithLandlord_WithLandlord_RedirectToProfile()
+    public async Task TieUserWithLandlord_WithLandlord_RedirectToProfile()
     {
         // Arrange 
         var landlordUser = CreateLandlordUser();
@@ -283,7 +283,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     }
 
     [Fact]
-    public async void TieUserWithLandlord_WithNonLandlordUser_RedirectToProfile()
+    public async Task TieUserWithLandlord_WithNonLandlordUser_RedirectToProfile()
     {
         // Arrange 
         var nonLandlordUser = CreateUnregisteredUser();
