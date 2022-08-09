@@ -168,6 +168,10 @@ public class LandlordController : AbstractController
                 flashMessageBody = "The charter for this landlord has already been approved.";
                 flashMessageType = "warning";
                 break;
+            case ILandlordService.ApproveLandlordResult.ErrorDuplicateMembershipId:
+                flashMessageBody = "This membership ID already exists for another user.";
+                flashMessageType = "warning";
+                break;
             case ILandlordService.ApproveLandlordResult.Success:
                 flashMessageBody = "Successfully approved landlord charter.";
                 flashMessageType = "success";

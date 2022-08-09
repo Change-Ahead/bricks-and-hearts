@@ -27,6 +27,7 @@ public interface ILandlordService
     {
         ErrorLandlordNotFound,
         ErrorAlreadyApproved,
+        ErrorDuplicateMembershipId,
         Success
     }
 
@@ -188,6 +189,12 @@ public class LandlordService : ILandlordService
         if (landlord.CharterApproved)
         {
             return ILandlordService.ApproveLandlordResult.ErrorAlreadyApproved;
+        }
+
+        if (CheckForDuplicateMembershipId(new LandlordProfileModel
+                { LandlordId = landlordId, MembershipId = membershipId }))
+        {
+            return ILandlordService.ApproveLandlordResult.ErrorDuplicateMembershipId;
         }
 
         landlord.CharterApproved = true;

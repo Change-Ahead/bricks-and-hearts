@@ -110,6 +110,29 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         landlord.MembershipId.Should().Be("abc");
     }
 
+    [Fact]
+    public async void ApproveLandlord_ReturnsError_IfDuplicateMembershipId()
+    {
+        // Arrange
+        await using var context = Fixture.CreateWriteContext();
+        var service = new LandlordService(context);
+
+        var landlord = context.Landlords.Single(l => l.Email == "test.landlord2@gmail.com");
+        var admin = new BricksAndHeartsUser(Fixture.CreateAdminUser(), new List<Claim>(), "google");
+
+        // Act
+        var result = await service.ApproveLandlord(landlord.Id, admin, "member1");
+
+        // Assert
+        context.ChangeTracker.Clear();
+
+        result.Should().Be(ILandlordService.ApproveLandlordResult.ErrorDuplicateMembershipId);
+
+        landlord = context.Landlords.Single(l => l.Email == "test.landlord2@gmail.com");
+        landlord.CharterApproved.Should().BeFalse();
+        landlord.MembershipId.Should().BeNull();
+    }
+
     // Cannot test for the case LinkExistingLandlordWithError returning Success
     // Since it involves writing to the database and the method includes a transaction
 }

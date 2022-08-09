@@ -194,7 +194,8 @@ public class TestDatabaseFixture
             Title = "Dr",
             Phone = "01189998819991197253",
             LandlordType = "Non profit",
-            CharterApproved = true
+            CharterApproved = true,
+            MembershipId = "member1"
         };
     }
 
