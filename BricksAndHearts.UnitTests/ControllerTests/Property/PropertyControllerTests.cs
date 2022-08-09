@@ -297,22 +297,51 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public void EditProperty_AtFinalStep_UpdatesRecord_AndRedirectsToViewProperties()
+    public async void EditProperty_AtFinalStep_UpdatesRecord_AndRedirectsToViewProperties()
     {
         // Arrange
         var landlordUser = CreateLandlordUser();
+        landlordUser.LandlordId = 1;
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         var formResultModel = CreateExamplePropertyViewModel();
+        formResultModel.LandlordId = 1;
         var model = CreateExamplePropertyDbModel();
+        model.LandlordId = 1;
 
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(model);
 
         // Act
-        var result = UnderTest.EditProperty(1) as ViewResult;
+        var result =
+            await UnderTest.EditProperty_Continue(AddNewPropertyViewModel.MaximumStep, 1, formResultModel,
+                landlordUser.Id);
 
         // Assert
-        result!.ViewData.Model.Should().BeOfType<AddNewPropertyViewModel>();
+        A.CallTo(() => PropertyService.UpdateProperty(formResultModel.PropertyId, formResultModel, A<bool>._))
+            .MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
+    }
+
+    [Fact]
+    public async void EditProperty_AtFinalStep_WhenPerformedByNonOwner_ReturnsForbidden()
+    {
+        // Arrange
+        var landlordUser = CreateLandlordUser();
+        landlordUser.LandlordId = 2;
+        MakeUserPrincipalInController(landlordUser, UnderTest);
+
+        var formResultModel = CreateExamplePropertyViewModel();
+        formResultModel.LandlordId = 1;
+
+        // Act
+        var result =
+            await UnderTest.EditProperty_Continue(AddNewPropertyViewModel.MaximumStep, 1, formResultModel,
+                landlordUser.Id);
+
+        // Assert
+        A.CallTo(() => PropertyService.UpdateProperty(formResultModel.PropertyId, formResultModel, A<bool>._))
+            .MustNotHaveHappened();
+        result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(403);
     }
 
     // This is not working

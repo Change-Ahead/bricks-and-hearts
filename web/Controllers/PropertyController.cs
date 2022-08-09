@@ -163,6 +163,12 @@ public class PropertyController : AbstractController
 
         // Get the property we're currently adding
         var property = _propertyService.GetPropertyByPropertyId(propertyId);
+
+        if (!(GetCurrentUser().IsAdmin || GetCurrentUser().LandlordId == newPropertyModel.LandlordId))
+        {
+            return StatusCode(403);
+        }
+
         if (newPropertyModel.Address.Postcode != null)
         {
             newPropertyModel.Address.Postcode =
@@ -196,11 +202,6 @@ public class PropertyController : AbstractController
 
             // Go to next step
             return View("EditProperty", new AddNewPropertyViewModel { Step = step + 1, Property = newProperty });
-        }
-
-        if (!(GetCurrentUser().IsAdmin || GetCurrentUser().LandlordId == newPropertyModel.LandlordId))
-        {
-            return StatusCode(403);
         }
 
         // Finished adding property, so go to View Properties page
