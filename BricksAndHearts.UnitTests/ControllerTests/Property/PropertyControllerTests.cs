@@ -1,4 +1,6 @@
+using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
@@ -12,6 +14,79 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Property;
 
 public class PropertyControllerTests : PropertyControllerTestsBase
 {
+    #region SortProperties
+
+    [Fact]
+    public void SortProperties_ReturnsViewWith_PropertiesDashboardViewModel()
+    {
+        // Arrange
+        var dummyString = "Rent";
+
+        // Act
+        var result = UnderTest.SortProperties(dummyString) as ViewResult;
+
+        // Assert
+        result!.ViewData.Model.Should().BeOfType<PropertiesDashboardViewModel>();
+    }
+
+    #endregion
+
+    #region TestDataClasses
+
+    //Classes to allow ranges for tests
+
+    /// <summary>
+    ///     Counts from 1, to 1 below final step
+    /// </summary>
+    private class NoLastStepTestData : IEnumerable<object[]>
+    {
+        public IEnumerator<object[]> GetEnumerator()
+        {
+            foreach (var i in Enumerable.Range(1, AddNewPropertyViewModel.MaximumStep - 1))
+                yield return new object[] { i };
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+    }
+
+    /// <summary>
+    ///     Counts from 2, to 1 below final step
+    /// </summary>
+    private class NoFirstNoLastStepTestData : IEnumerable<object[]>
+    {
+        public IEnumerator<object[]> GetEnumerator()
+        {
+            foreach (var i in Enumerable.Range(2, AddNewPropertyViewModel.MaximumStep - 2))
+                yield return new object[] { i };
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+    }
+
+    /// <summary>
+    ///     Counts from 1, to final step inclusively
+    /// </summary>
+    private class StepTestData : IEnumerable<object[]>
+    {
+        public IEnumerator<object[]> GetEnumerator()
+        {
+            foreach (var i in Enumerable.Range(1, AddNewPropertyViewModel.MaximumStep)) yield return new object[] { i };
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+    }
+
+    #endregion
+
     #region ViewProperties
 
     [Fact]
@@ -48,23 +123,6 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Assert
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<PropertyViewModel>();
-    }
-
-    #endregion
-
-    #region SortProperties
-
-    [Fact]
-    public void SortProperties_ReturnsViewWith_PropertiesDashboardViewModel()
-    {
-        // Arrange
-        var dummyString = "Rent";
-
-        // Act
-        var result = UnderTest.SortProperties(dummyString) as ViewResult;
-
-        // Assert
-        result!.ViewData.Model.Should().BeOfType<PropertiesDashboardViewModel>();
     }
 
     #endregion
@@ -224,10 +282,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Theory]
-    [InlineData(1)]
-    [InlineData(2)]
-    [InlineData(3)]
-    [InlineData(4)]
+    [ClassData(typeof(NoLastStepTestData))]
     public void AddNewPropertyContinueGet_ReturnsViewAtStep(int step)
     {
         // Arrange
@@ -272,9 +327,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Theory]
-    [InlineData(1)]
-    [InlineData(2)]
-    [InlineData(3)]
+    [ClassData(typeof(NoLastStepTestData))]
     public async void AddNewPropertyContinuePost_WithInvalidModel_ReturnsViewWithModel(int step)
     {
         // Arrange
@@ -351,9 +404,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Theory]
-    [InlineData(2)]
-    [InlineData(3)]
-    [InlineData(4)]
+    [ClassData(typeof(NoLastStepTestData))]
     public void
         AddNewPropertyContinuePost_AtMiddleSteps_WithNoAddInProgress_RedirectsToViewProperties(
             int step)
@@ -375,8 +426,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Theory]
-    [InlineData(2)]
-    [InlineData(3)]
+    [ClassData(typeof(NoFirstNoLastStepTestData))]
     public async void AddNewPropertyContinuePost_AtMiddleSteps_UpdatesRecord_AndRedirectsToNextStep(int step)
     {
         // Arrange
@@ -475,6 +525,99 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         result.Model.Should().BeOfType<AddNewPropertyViewModel>().Which.Step.Should().Be(1);
     }
 
+    [Theory]
+    [ClassData(typeof(NoLastStepTestData))]
+    public void EditPropertyContinueGet_ReturnsViewAtStep(int step)
+    {
+        // Arrange
+        var landlordUser = CreateLandlordUser();
+        landlordUser.Id = 1;
+        MakeUserPrincipalInController(landlordUser, UnderTest);
+        var prop = A.Fake<PropertyDbModel>();
+        prop.LandlordId = 1;
+        prop.Id = 1;
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(prop);
+
+        // Act
+        var result = UnderTest.EditProperty_Continue(step, 1) as ViewResult;
+
+        // Assert
+        result!.ViewName.Should().Be("EditProperty");
+        result.Model.Should().BeOfType<AddNewPropertyViewModel>().Which.Step.Should().Be(step);
+    }
+
+
+    [Theory]
+    [ClassData(typeof(NoLastStepTestData))]
+    public async void EditPropertyContinuePost_WithInvalidModel_ReturnsViewWithModel(int step)
+    {
+        // Arrange
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, UnderTest);
+
+        var formResultModel = CreateExamplePropertyViewModel();
+        formResultModel.LandlordId = 1;
+        UnderTest.ViewData.ModelState.AddModelError("Key", "ErrorMessage");
+
+        // Act
+        var result = await UnderTest.EditProperty_Continue(step, 1, formResultModel) as ViewResult;
+
+        // Assert
+        A.CallTo(() => PropertyService.UpdateProperty(1, formResultModel, true)).MustNotHaveHappened();
+        result!.ViewData.Model.Should().BeOfType<AddNewPropertyViewModel>().Which.Property.Should()
+            .BeOfType<PropertyViewModel>().And.Be(formResultModel);
+    }
+
+    [Theory]
+    [ClassData(typeof(NoFirstNoLastStepTestData))]
+    public async void EditPropertyContinuePost_AtMiddleSteps_UpdatesRecord_AndRedirectsToNextStep(int step)
+    {
+        // Arrange
+        var fakePropertyDbModel = CreateExamplePropertyDbModel();
+        fakePropertyDbModel.Landlord.Id = 1;
+
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(fakePropertyDbModel);
+
+        var landlordUser = CreateLandlordUser();
+        MakeUserPrincipalInController(landlordUser, UnderTest);
+        landlordUser.LandlordId = 1;
+
+        var formResultModel = CreateExamplePropertyViewModel();
+        formResultModel.LandlordId = 1;
+        // Act
+        var result = await UnderTest.EditProperty_Continue(step, 1, formResultModel);
+
+        // Assert
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
+        A.CallTo(() => PropertyService.UpdateProperty(1, formResultModel, A<bool>._)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("EditProperty_Continue");
+        result.Should().BeOfType<RedirectToActionResult>().Which.RouteValues.Should().ContainKey("step").WhoseValue
+            .Should().Be(step + 1);
+    }
+
+    [Fact]
+    public void EditPropertyCancelPost_DeletesRecordAndContainer_AndRedirectsToViewProperties()
+    {
+        // Arrange
+        var fakePropertyDbModel = CreateExamplePropertyDbModel();
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(fakePropertyDbModel);
+
+        var landlordUser = CreateLandlordUser();
+        landlordUser.LandlordId = 1;
+        MakeUserPrincipalInController(landlordUser, UnderTest);
+
+        // Act
+        var result = UnderTest.EditProperty_Cancel((int)landlordUser.LandlordId!);
+
+        // Assert
+        A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).WithAnyArguments().MustNotHaveHappened();
+        A.CallTo(() => AzureStorage.DeleteContainer("property", fakePropertyDbModel.Id)).WithAnyArguments()
+            .MustNotHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
+        result.Should().BeOfType<RedirectToActionResult>().Which.RouteValues.Should().ContainKey("id").WhoseValue
+            .Should().Be(landlordUser.LandlordId);
+    }
+
     [Fact]
     public async void EditProperty_AtFinalStep_UpdatesRecord_AndRedirectsToViewProperties()
     {
@@ -503,12 +646,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
 
     [Theory]
-    [InlineData(1)]
-    [InlineData(2)]
-    [InlineData(3)]
-    [InlineData(4)]
-    [InlineData(5)]
-    [InlineData(6)]
+    [ClassData(typeof(StepTestData))]
     public async void EditProperty_AtEachStep_WhenPerformedByNonOwnerNonAdmin_ReturnsForbidden(int step)
     {
         // Arrange

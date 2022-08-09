@@ -195,7 +195,8 @@ public class PropertyController : AbstractController
 
             _propertyService.UpdateProperty(propertyId, newPropertyModel, false);
             // Go to step 2
-            return View("EditProperty", new AddNewPropertyViewModel { Step = 2, Property = newPropertyModel });
+            return RedirectToAction("EditProperty_Continue",
+                new AddNewPropertyViewModel { Step = step + 1, Property = newPropertyModel });
         }
 
         // Update the property's record with the final set of values
@@ -207,7 +208,8 @@ public class PropertyController : AbstractController
             var newProperty = PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(propertyId));
 
             // Go to next step
-            return View("EditProperty", new AddNewPropertyViewModel { Step = step + 1, Property = newProperty });
+            return RedirectToAction("EditProperty_Continue",
+                new AddNewPropertyViewModel { Step = step + 1, Property = newProperty });
         }
 
         // Finished adding property, so go to View Properties page
