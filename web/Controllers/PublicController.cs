@@ -19,7 +19,7 @@ public class PublicController : AbstractController
 
     [HttpGet]
     [Route("/public/propertyId/{propertyId:int}/{publicViewLink}")]
-    public IActionResult ViewPublicProperty(int propertyId,string publicViewLink)
+    public IActionResult ViewPublicProperty(int propertyId, string publicViewLink)
     {
         var property = _propertyService.GetPropertyByPropertyId(propertyId);
         if (property == null)

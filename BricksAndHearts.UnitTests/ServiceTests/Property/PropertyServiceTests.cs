@@ -270,4 +270,19 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     }
 
     #endregion
+    
+    [Fact]
+    public void CreateNewPublicViewLink_UpdateDatabase()
+    {
+        // Arrange
+        using var context = Fixture.CreateWriteContext();
+        var service = new PropertyService(context);
+        
+        // Act
+        var result = service.CreateNewPublicViewLink(1);
+        
+        // Assert
+        result.Should().NotBeNullOrEmpty();
+        context.Properties.Single(p => p.Id == 1).PublicViewLink.Should().Be(result);
+    }
 }
