@@ -66,7 +66,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         result!.ViewName.Should().Be("AddNewProperty");
         A.CallTo(() => PropertyService.GetIncompleteProperty(1)).MustHaveHappened();
         result.Model.Should().BeOfType<AddNewPropertyViewModel>().Which.Step.Should().Be(step);
-        result.Model.Should().BeOfType<AddNewPropertyViewModel>().Which.Property!.Description.Should().Be(fakePropertyDbModel.Description);
+        result.Model.Should().BeOfType<AddNewPropertyViewModel>().Which.Property!.Description.Should()
+            .Be(fakePropertyDbModel.Description);
     }
 
     [Theory]
@@ -279,37 +280,37 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     {
         // Arrange
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(null);
-        
+
         var landlordUser = CreateLandlordUser();
         MakeUserPrincipalInController(landlordUser, UnderTest);
-        
+
         // Act
         var result = UnderTest.ViewProperty(1);
-        
+
         // Assert
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("Error");
-        result.As<RedirectToActionResult>().RouteValues.Should().Contain("status",404);
+        result.As<RedirectToActionResult>().RouteValues.Should().Contain("status", 404);
     }
-    
+
     [Fact]
     public void ViewProperty_WithExistingProperty_ReturnViewPropertyView()
     {
         // Arrange
         var model = CreateExamplePropertyDbModel();
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(model);
-        
+
         var landlordUser = CreateLandlordUser();
         MakeUserPrincipalInController(landlordUser, UnderTest);
-        
+
         // Act
         var result = UnderTest.ViewProperty(1) as ViewResult;
-        
+
         // Assert
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<PropertyViewModel>();
     }
-    
+
     // This is not working
     /*[Fact]
     public async void ListPropertyImages_CallsListFilesAsync_AndReturnsViewListPropertyImages()
@@ -338,7 +339,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => AzureStorage.ListFileNames("property", 1)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<ImageListViewModel>().And.Be(fileNames);
     }*/
-    
+
     [Fact]
     public async void AddPropertyImages_CallsUploadImageForEachImage_AndRedirectsToListImagesWithFlashMultipleMessages()
     {
@@ -351,8 +352,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var fakeImage2 = CreateExampleImage();
         A.CallTo(() => AzureStorage.IsImage(fakeImage.FileName)).Returns((true, null));
         A.CallTo(() => AzureStorage.IsImage(fakeImage2.FileName)).Returns((true, null));
-        var fakeImageList = new List<IFormFile>{fakeImage, fakeImage2};
-        
+        var fakeImageList = new List<IFormFile> { fakeImage, fakeImage2 };
+
         // Act
         var result = await UnderTest.AddPropertyImages(fakeImageList, 1);
 
@@ -369,7 +370,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
         A.CallTo(() => PropertyService.IsUserAdminOrCorrectLandlord(adminUser, 1)).Returns(true);
-        
+
         var fakeImage = CreateExampleImage();
         var image = (fakeImage.OpenReadStream(), "jpeg");
         A.CallTo(() => AzureStorage.DownloadFile("property", 1, fakeImage.FileName)).Returns(image);
@@ -381,7 +382,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => AzureStorage.DownloadFile("property", 1, fakeImage.FileName)).MustHaveHappened();
         result!.ContentType.Should().Be("image/jpeg");
     }
-    
+
     [Fact]
     public async void DeleteImage_CallsDeleteFileAsync_AndRedirectsToListImages()
     {
@@ -389,9 +390,9 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
         A.CallTo(() => PropertyService.IsUserAdminOrCorrectLandlord(adminUser, 1)).Returns(true);
-        
+
         var fakeImage = CreateExampleImage();
-        
+
         // Act
         var result = await UnderTest.DeletePropertyImage(1, fakeImage.FileName);
 
@@ -399,7 +400,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => AzureStorage.DeleteFile("property", 1, fakeImage.FileName)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ListPropertyImages");
     }
-    
+
     [Fact]
     public void DeleteProperty_WithExistingProperty_DeletesAndRedirectsToViewProperties()
     {
@@ -417,7 +418,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
     }
-    
+
     [Fact]
     public void DeleteProperty_WithNonExistingProperty_Returns404ErrorPage()
     {
@@ -436,7 +437,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustNotHaveHappened();
         result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(404);
     }
-    
+
     [Fact]
     public void SortProperties_ReturnsViewWith_PropertiesDashboardViewModel()
     {
@@ -448,5 +449,18 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         // Assert
         result!.ViewData.Model.Should().BeOfType<PropertiesDashboardViewModel>();
+    }
+
+    [Fact]
+    public void AvailableUnits_CalculatesCorrectly()
+    {
+        // Arrange
+        var property = CreateExamplePropertyViewModel();
+
+        // Act
+        var availableUnits = property.AvailableUnits;
+
+        // Assert
+        availableUnits.Should().Be(3);
     }
 }

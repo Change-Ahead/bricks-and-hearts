@@ -8,12 +8,14 @@ public class PropertyViewModel : IValidatableObject
 {
     // Backend info
     public int PropertyId;
+    public int LandlordId { get; set; }
     public DateTime? CreationTime { get; set; }
 
 
-    // Address
-    public int LandlordId { get; set; }
+    // Location
     public PropertyAddress Address { get; set; } = new();
+    public decimal? Lat { get; set; }
+    public decimal? Lon { get; set; }
 
 
     // Property details
@@ -21,7 +23,7 @@ public class PropertyViewModel : IValidatableObject
     public string? PropertyType { get; set; }
 
     [Range(0, 1000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
-    [DisplayName("Number of Bedrooms")]
+    [DisplayName("Number of bedrooms")]
     public int? NumOfBedrooms { get; set; }
 
 
@@ -38,19 +40,48 @@ public class PropertyViewModel : IValidatableObject
     public bool? AcceptsBenefits { get; set; }
     public bool? AcceptsNotEET { get; set; }
     public bool? AcceptsWithoutGuarantor { get; set; }
-    
+
+
     // Rent, deposits, and duration
     [Range(0, 100000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
     public int? Rent { get; set; }
-    public string Availability { get; set; } = PropertyDbModel.Avail_Draft;
-    
+
+
+    // Availability and units
+    public string? Availability { get; set; }
+
     [DataType(DataType.Date)]
     public DateTime? AvailableFrom { get; set; }
+
+    [Range(1, 10000, ErrorMessage = "Total units for a property must be between {1} and {2}.")]
+    public int? TotalUnits { get; set; }
+
+    public int? OccupiedUnits { get; set; }
+
+
+    // Tenant
     public int? UserWhoRented { get; set; }
-    
-    // Latitude and Longitude
-    public decimal? Lat { get; set; }
-    public decimal? Lon { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (AcceptsSingleTenant == false && AcceptsCouple == false && AcceptsFamily == false)
+        {
+            yield return new ValidationResult("At least one type of tenant must be selected");
+        }
+
+        if (Availability == AvailabilityState.AvailableSoon && AvailableFrom == null)
+        {
+            yield return new ValidationResult("Available From must be provided if property is Available Soon");
+        }
+
+        if (OccupiedUnits > TotalUnits)
+        {
+            yield return new ValidationResult(
+                "The number of occupied units must be less than or equal to the total units at the property.");
+        }
+    }
+
+    public int? AvailableUnits => TotalUnits - OccupiedUnits;
 
 
     public static PropertyViewModel FromDbModel(PropertyDbModel property)
@@ -73,7 +104,7 @@ public class PropertyViewModel : IValidatableObject
                 AddressLine3 = property.AddressLine3,
                 TownOrCity = property.TownOrCity,
                 County = property.County,
-                Postcode = property.Postcode,
+                Postcode = property.Postcode
             },
             AcceptsSingleTenant = property.AcceptsSingleTenant,
             AcceptsCouple = property.AcceptsCouple,
@@ -84,22 +115,10 @@ public class PropertyViewModel : IValidatableObject
             AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor,
             Availability = property.Availability,
             AvailableFrom = property.AvailableFrom,
-            UserWhoRented = property.RenterUserId
+            UserWhoRented = property.RenterUserId,
+            TotalUnits = property.TotalUnits,
+            OccupiedUnits = property.OccupiedUnits
         };
-    }
-
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-    {
-        if (AcceptsSingleTenant == false && AcceptsCouple == false && AcceptsFamily == false)
-        {
-            yield return new ValidationResult("At least one type of tenant must be selected");
-        }
-
-        if (Availability == PropertyDbModel.Avail_AvailableSoon && AvailableFrom == null)
-        {
-            yield return new ValidationResult("Available From must be provided if property is Available Soon");
-        }
-        
     }
 }
 

@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using BricksAndHearts.ViewModels;
 
 namespace BricksAndHearts.Database;
 
@@ -42,14 +43,14 @@ public class PropertyDbModel
     // Rent, deposits, availability and duration
     public int? Rent { get; set; }
 
-    public string Availability { get; set; } = Avail_Draft;
-    public const string Avail_Draft = "Draft";
-    public const string Avail_Available = "Available";
-    public const string Avail_AvailableSoon = "Available Soon";
-    public const string Avail_Occupied = "Occupied";
-    public const string Avail_Unavailable = "Unavailable";
-    
+    // Availability and units
+    public string Availability { get; set; } = AvailabilityState.Draft;
+    public int TotalUnits { get; set; } = 1;
+    public int OccupiedUnits { get; set; }
+
     [DataType(DataType.Date)]
     public DateTime? AvailableFrom { get; set; } = null;
+
+    // Tenant
     public int? RenterUserId { get; set; } = null;
 }

@@ -1,5 +1,4 @@
-﻿@using BricksAndHearts.Database
-@using Microsoft.AspNetCore.Mvc.TagHelpers
+﻿@using Microsoft.AspNetCore.Mvc.TagHelpers
 @model PropertyViewModel
 
 @{
@@ -14,10 +13,13 @@
         <div class="col-7 border p-2">
             <p>@Model.Address.AddressLine1</p>
             <p>Avaibility status: @Model.Availability</p>
-            @if (Model.Availability == PropertyDbModel.Avail_AvailableSoon)
+            @if (Model.Availability == AvailabilityState.AvailableSoon)
             {
                 <p>Available from: @Model.AvailableFrom!.Value.ToString("dd/MM/yyyy")</p>
             }
+            <p>Total units: @Model.TotalUnits</p>
+            <p>Occupied units: @Model.OccupiedUnits</p>
+            <p>Available units: @Model.AvailableUnits</p>
         </div>
     </div>
     <div class="row mb-3">
@@ -87,7 +89,7 @@
             </table>
         </div>
     </div>
-    @Html.ActionLink("Property images", "ListPropertyImages", "Property", new { propertyId = Model.PropertyId }, 
+    @Html.ActionLink("Property images", "ListPropertyImages", "Property", new { propertyId = Model.PropertyId },
         new { @class = "btn btn-primary" })
     <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#deleteModal">
         Delete Property

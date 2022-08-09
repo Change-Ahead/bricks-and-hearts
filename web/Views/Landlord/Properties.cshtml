@@ -21,11 +21,14 @@ else
         <th scope="col">#</th>
         <th scope="col">Address</th>
         <th scope="col">Type</th>
-        <th scope="col"># of Bedrooms</th>
+        <th scope="col">Bedrooms</th>
         <th scope="col">Created</th>
         <th scope="col">Rent (pcm)</th>
         <th scope="col">Availability</th>
         <th scope="col">Description</th>
+        <th scope="col">Total units</th>
+        <th scope="col">Occupied units</th>
+        <th scope="col">Available units</th>
         <th scope="col"></th>
     </tr>
     </thead>
@@ -52,6 +55,9 @@ else
             <td>@prop.Rent</td>
             <td>@prop.Availability</td>
             <td>@prop.Description</td>
+            <td>@prop.TotalUnits</td>
+            <td>@prop.OccupiedUnits</td>
+            <td>@prop.AvailableUnits</td>
             <td>@Html.ActionLink("View", "ViewProperty", "Property", new { propertyId = prop.PropertyId })</td>
         </tr>
         i++;

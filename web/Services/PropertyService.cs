@@ -65,16 +65,15 @@ public class PropertyService : IPropertyService
             AcceptsWithoutGuarantor = createModel.AcceptsWithoutGuarantor,
 
             Rent = createModel.Rent,
-            Availability = createModel.Availability,
+
+            Availability = createModel.Availability ?? AvailabilityState.Draft,
+            TotalUnits = createModel.TotalUnits ?? 1,
+            OccupiedUnits = createModel.OccupiedUnits ?? 0
         };
-        if (createModel.Availability == PropertyDbModel.Avail_AvailableSoon)
-        {
-            dbModel.AvailableFrom = createModel.AvailableFrom;
-        }
-        else
-        {
-            dbModel.AvailableFrom = null;
-        }
+
+        dbModel.AvailableFrom = createModel.Availability == AvailabilityState.AvailableSoon
+            ? createModel.AvailableFrom
+            : null;
 
         // Add the new property to the database
         _dbContext.Properties.Add(dbModel);
@@ -113,13 +112,27 @@ public class PropertyService : IPropertyService
         dbModel.AcceptsWithoutGuarantor = updateModel.AcceptsWithoutGuarantor ?? dbModel.AcceptsWithoutGuarantor;
 
         dbModel.Rent = updateModel.Rent ?? dbModel.Rent;
-        dbModel.Availability = updateModel.Availability;
-        if (updateModel.Availability == PropertyDbModel.Avail_AvailableSoon)
+
+        dbModel.TotalUnits = updateModel.TotalUnits ?? dbModel.TotalUnits;
+        dbModel.OccupiedUnits = updateModel.OccupiedUnits ?? dbModel.OccupiedUnits;
+
+        // Occupied state takes precedence over attempted update
+        // If no update, fallback to current value as usual
+        dbModel.Availability = dbModel.OccupiedUnits == dbModel.TotalUnits
+            ? AvailabilityState.Occupied
+            : updateModel.Availability ?? dbModel.Availability;
+
+        if (dbModel.Availability == AvailabilityState.AvailableSoon)
         {
-            dbModel.AvailableFrom = updateModel.AvailableFrom;
+            if (updateModel.Availability == AvailabilityState.AvailableSoon)
+            {
+                // If update succeeds in making the property "available soon", then use its from date
+                dbModel.AvailableFrom = updateModel.AvailableFrom;
+            }
         }
         else
         {
+            // If we're not "available soon" then don't have a from date
             dbModel.AvailableFrom = null;
         }
 
@@ -155,7 +168,7 @@ public class PropertyService : IPropertyService
         var userLandlordId = currentUser.LandlordId;
         return propertyLandlordId == userLandlordId;
     }
-    
+
     public List<PropertyDbModel> SortProperties(string? by)
     {
         List<PropertyDbModel> properties;
@@ -164,19 +177,26 @@ public class PropertyService : IPropertyService
             properties = _dbContext.Properties.OrderBy(m => m.RenterUserId).ToList();
         }
         else if (by == "Rent")
+        {
             properties = _dbContext.Properties.OrderBy(m => m.Rent).ToList();
-        else {
+        }
+        else
+        {
             properties = _dbContext.Properties.ToList();
         }
+
         return properties;
     }
-    
+
     public PropertyCountModel CountProperties()
     {
-        PropertyCountModel propertyCounts = new PropertyCountModel();
-        propertyCounts.RegisteredProperties = _dbContext.Properties.Count();
-        propertyCounts.LiveProperties = _dbContext.Properties.Count(p => p.Availability != PropertyDbModel.Avail_Draft && p.Landlord.CharterApproved);
-        propertyCounts.AvailableProperties = _dbContext.Properties.Count(p => p.Availability == PropertyDbModel.Avail_Available);
+        var propertyCounts = new PropertyCountModel
+        {
+            RegisteredProperties = _dbContext.Properties.Count(),
+            LiveProperties = _dbContext.Properties.Count(p =>
+                p.Availability != AvailabilityState.Draft && p.Landlord.CharterApproved),
+            AvailableProperties = _dbContext.Properties.Count(p => p.Availability == AvailabilityState.Available)
+        };
         return propertyCounts;
     }
 }
