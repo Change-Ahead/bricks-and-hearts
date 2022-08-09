@@ -48,13 +48,13 @@ public class PropertyViewModel : IValidatableObject
 
 
     // Availability and units
-    public string? Availability { get; set; } = AvailabilityState.Draft;
+    public string? Availability { get; set; }
 
     [DataType(DataType.Date)]
     public DateTime? AvailableFrom { get; set; }
 
     [Range(1, 10000, ErrorMessage = "Total units for a property must be between {1} and {2}.")]
-    public int? TotalUnits { get; set; } = 1;
+    public int? TotalUnits { get; set; }
 
     public int? OccupiedUnits { get; set; }
 

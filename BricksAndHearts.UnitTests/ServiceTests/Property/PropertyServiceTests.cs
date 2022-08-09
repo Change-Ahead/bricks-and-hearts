@@ -1,7 +1,10 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FluentAssertions;
+using Microsoft.Data.SqlClient;
+using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ServiceTests.Property;
@@ -103,6 +106,120 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         property.IsIncomplete.Should().BeFalse();
         property.AcceptsBenefits.Should().BeFalse();
         context.Properties.Count().Should().Be(propertiesBeforeCount);
+    }
+
+    [Fact]
+    public void UpdateProperty_SetsStateToOccupied_IfAllUnitsOccupied()
+    {
+        // Arrange
+        using var context = Fixture.CreateWriteContext();
+        var service = new PropertyService(context);
+
+        var propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
+        var propertyUpdate = new PropertyViewModel { OccupiedUnits = propertyDb.TotalUnits };
+
+        // Act
+        service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
+        context.ChangeTracker.Clear();
+
+        // Assert
+        propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
+        propertyDb.Availability.Should().Be(AvailabilityState.Occupied);
+        propertyDb.OccupiedUnits.Should().Be(propertyDb.TotalUnits);
+    }
+
+    [Fact]
+    public void UpdateProperty_Fails_OccupiedGreaterThanTotal()
+    {
+        // Arrange
+        using var context = Fixture.CreateWriteContext();
+        var service = new PropertyService(context);
+
+        var propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
+        var propertyUpdate = new PropertyViewModel { OccupiedUnits = propertyDb.TotalUnits + 1 };
+
+        // Act
+        var act = () => service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
+        context.ChangeTracker.Clear();
+
+        // Assert
+        act.Should().Throw<DbUpdateException>().WithInnerException<SqlException>()
+            .WithMessage("The UPDATE statement conflicted with the CHECK constraint \"OccupiedUnits\".*");
+    }
+
+    [Fact]
+    public void UpdateProperty_UpdatesAvailableFromDate_WhenAvailableSoon()
+    {
+        // Arrange
+        using var context = Fixture.CreateWriteContext();
+        var service = new PropertyService(context);
+
+        var date = DateTime.Now;
+        var propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
+        var propertyUpdate = new PropertyViewModel
+        {
+            Availability = AvailabilityState.AvailableSoon,
+            AvailableFrom = date
+        };
+
+        // Act
+        service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
+        context.ChangeTracker.Clear();
+
+        // Assert
+        propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
+        propertyDb.Availability.Should().Be(AvailabilityState.AvailableSoon);
+        propertyDb.AvailableFrom.Should().Be(date);
+    }
+
+    [Fact]
+    public void UpdateProperty_DoesntChangeAvailableFromDate_WhenOccupiedStateOverrides()
+    {
+        // Arrange
+        using var context = Fixture.CreateWriteContext();
+        var service = new PropertyService(context);
+
+        var date = DateTime.Now;
+        var propertyDb = context.Properties.Single(p => p.AddressLine1 == "AvailableSoon Property");
+        var propertyUpdate = new PropertyViewModel
+        {
+            AvailableFrom = date
+        };
+
+        // Act
+        service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
+        context.ChangeTracker.Clear();
+
+        // Assert
+        propertyDb = context.Properties.Single(p => p.AddressLine1 == "AvailableSoon Property");
+        propertyDb.Availability.Should().Be(AvailabilityState.AvailableSoon);
+        propertyDb.AvailableFrom.Should().NotBe(date).And.Be(DateTime.MinValue);
+    }
+
+    [Fact]
+    public void UpdateProperty_SetsAvailableFromDateToNull_WhenOccupiedStateOverrides()
+    {
+        // Arrange
+        using var context = Fixture.CreateWriteContext();
+        var service = new PropertyService(context);
+
+        var date = DateTime.Now;
+        var propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
+        var propertyUpdate = new PropertyViewModel
+        {
+            OccupiedUnits = propertyDb.TotalUnits,
+            Availability = AvailabilityState.AvailableSoon,
+            AvailableFrom = date
+        };
+
+        // Act
+        service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
+        context.ChangeTracker.Clear();
+
+        // Assert
+        propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
+        propertyDb.Availability.Should().Be(AvailabilityState.Occupied);
+        propertyDb.AvailableFrom.Should().BeNull();
     }
 
     #endregion

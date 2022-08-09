@@ -66,7 +66,7 @@ public class PropertyService : IPropertyService
 
             Rent = createModel.Rent,
 
-            Availability = createModel.Availability,
+            Availability = createModel.Availability ?? AvailabilityState.Draft,
             TotalUnits = createModel.TotalUnits ?? 1,
             OccupiedUnits = createModel.OccupiedUnits ?? 0
         };

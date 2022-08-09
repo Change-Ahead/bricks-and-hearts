@@ -27,7 +27,8 @@ public class PropertyControllerTestsBase : ControllerTestsBase
         Logger = A.Fake<ILogger<PropertyController>>();
         var httpContext = new DefaultHttpContext();
         var tempData = new TempDataDictionary(httpContext, A.Fake<ITempDataProvider>());
-        UnderTest = new PropertyController(PropertyService, AzureMapsApiService, Logger, AzureStorage){TempData = tempData};
+        UnderTest = new PropertyController(PropertyService, AzureMapsApiService, Logger, AzureStorage)
+            { TempData = tempData };
     }
 
     protected PropertyViewModel CreateExamplePropertyViewModel()
@@ -47,7 +48,9 @@ public class PropertyControllerTestsBase : ControllerTestsBase
             NumOfBedrooms = 2,
             Rent = 1200,
             Description = "Description",
-            CreationTime = DateTime.Now
+            CreationTime = DateTime.Now,
+            TotalUnits = 5,
+            OccupiedUnits = 2
         };
     }
 

@@ -1,4 +1,5 @@
-﻿using BricksAndHearts.Database;
+﻿using System;
+using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
 using Microsoft.Extensions.Configuration;
 
@@ -51,7 +52,9 @@ public class TestDatabaseFixture
                     CreateCompleteProperty(),
                     CreateIncompleteProperty(),
                     CreateAvailableProperty(),
-                    CreateDraftProperty()
+                    CreateDraftProperty(),
+                    CreateMultiUnitProperty(),
+                    CreateAvailableSoonProperty()
                 );
 
                 context.Tenants.AddRange(
@@ -250,7 +253,9 @@ public class TestDatabaseFixture
             TownOrCity = "Complete Town",
             County = "Complete County",
             Postcode = "CB2 1LA",
-            Availability = AvailabilityState.Occupied
+            Availability = AvailabilityState.Occupied,
+            TotalUnits = 1,
+            OccupiedUnits = 1
         };
     }
 
@@ -265,7 +270,7 @@ public class TestDatabaseFixture
             TownOrCity = "Incomplete Town",
             County = "Incomplete County",
             Postcode = "CB2 1LA",
-            Availability = AvailabilityState.Occupied
+            Availability = AvailabilityState.Draft
         };
     }
 
@@ -281,6 +286,39 @@ public class TestDatabaseFixture
             County = "Available County",
             Postcode = "CB2 1LA",
             Availability = AvailabilityState.Available
+        };
+    }
+
+    private PropertyDbModel CreateAvailableSoonProperty()
+    {
+        return new PropertyDbModel
+        {
+            LandlordId = 1,
+            IsIncomplete = true,
+            AddressLine1 = "AvailableSoon Property",
+            AddressLine2 = "Available Street",
+            TownOrCity = "Available Town",
+            County = "Available County",
+            Postcode = "CB2 1LA",
+            Availability = AvailabilityState.AvailableSoon,
+            AvailableFrom = DateTime.MinValue
+        };
+    }
+
+    private PropertyDbModel CreateMultiUnitProperty()
+    {
+        return new PropertyDbModel
+        {
+            LandlordId = 1,
+            IsIncomplete = true,
+            AddressLine1 = "MultiUnit Property",
+            AddressLine2 = "Available Street",
+            TownOrCity = "Available Town",
+            County = "Available County",
+            Postcode = "CB2 1LA",
+            Availability = AvailabilityState.Available,
+            TotalUnits = 5,
+            OccupiedUnits = 0
         };
     }
 
