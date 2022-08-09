@@ -8,15 +8,10 @@ function setValue(elementId, value) {
 }
 
 function checkIfSelectedValueIsTarget(target){
-    if ($("#Select :selected").val() == target)
-    {
-        $("#ifTrue").show();
-        $("#ifFalse").hide();
-    }
-    else
-    {
-        $("#ifTrue").hide();
-        $("#ifFalse").show();
+    if ($("#availabilitySelect :selected").val() == target) {
+        $("#availableFromInput").show();
+    } else {
+        $("#availableFromInput").hide();
     }
 }
 

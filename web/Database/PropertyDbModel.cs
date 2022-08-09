@@ -43,8 +43,10 @@ public class PropertyDbModel
     // Rent, deposits, availability and duration
     public int? Rent { get; set; }
 
-    // Availability
+    // Availability and units
     public string Availability { get; set; } = AvailabilityState.Draft;
+    public int TotalUnits { get; set; } = 1;
+    public int OccupiedUnits { get; set; }
 
     [DataType(DataType.Date)]
     public DateTime? AvailableFrom { get; set; } = null;

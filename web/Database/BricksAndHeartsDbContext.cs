@@ -19,7 +19,7 @@ public class BricksAndHeartsDbContext : DbContext
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.UseSqlServer(_config.GetValue<string>("DBConnectionString"));
-        optionsBuilder.LogTo(Console.WriteLine, minimumLevel: LogLevel.Information);
+        optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -44,6 +44,8 @@ public class BricksAndHeartsDbContext : DbContext
         modelBuilder.Entity<PropertyDbModel>()
             .Property(l => l.Lon)
             .HasPrecision(12, 9);
+        modelBuilder.Entity<PropertyDbModel>()
+            .HasCheckConstraint("OccupiedUnits", "[OccupiedUnits] <= [TotalUnits]");
     }
 
     public static void MigrateDatabase(WebApplication app)

@@ -65,7 +65,10 @@ public class PropertyService : IPropertyService
             AcceptsWithoutGuarantor = createModel.AcceptsWithoutGuarantor,
 
             Rent = createModel.Rent,
+
             Availability = createModel.Availability,
+            TotalUnits = createModel.TotalUnits ?? 1,
+            OccupiedUnits = createModel.OccupiedUnits ?? 0
         };
 
         dbModel.AvailableFrom = createModel.Availability == AvailabilityState.AvailableSoon
@@ -109,11 +112,34 @@ public class PropertyService : IPropertyService
         dbModel.AcceptsWithoutGuarantor = updateModel.AcceptsWithoutGuarantor ?? dbModel.AcceptsWithoutGuarantor;
 
         dbModel.Rent = updateModel.Rent ?? dbModel.Rent;
-        dbModel.Availability = updateModel.Availability;
 
-        dbModel.AvailableFrom = updateModel.Availability == AvailabilityState.AvailableSoon
-            ? updateModel.AvailableFrom
-            : null;
+        dbModel.TotalUnits = updateModel.TotalUnits ?? dbModel.TotalUnits;
+        dbModel.OccupiedUnits = updateModel.OccupiedUnits ?? dbModel.OccupiedUnits;
+
+        // Occupied state takes precedence over attempted update
+        // If no update, fallback to current value as usual
+        dbModel.Availability = dbModel.OccupiedUnits == dbModel.TotalUnits
+            ? AvailabilityState.Occupied
+            : updateModel.Availability ?? dbModel.Availability;
+
+        if (dbModel.Availability == AvailabilityState.AvailableSoon)
+        {
+            if (updateModel.Availability == AvailabilityState.AvailableSoon)
+            {
+                // If update succeeds in making the property "available soon", then use its from date
+                dbModel.AvailableFrom = updateModel.AvailableFrom;
+            }
+            else
+            {
+                // Keep date the same if we're not updating it here
+                dbModel.AvailableFrom = dbModel.AvailableFrom;
+            }
+        }
+        else
+        {
+            // If we're not "available soon" then don't have a from date
+            dbModel.AvailableFrom = null;
+        }
 
         dbModel.IsIncomplete = isIncomplete;
         _dbContext.SaveChanges();
@@ -156,7 +182,9 @@ public class PropertyService : IPropertyService
             properties = _dbContext.Properties.OrderBy(m => m.RenterUserId).ToList();
         }
         else if (by == "Rent")
+        {
             properties = _dbContext.Properties.OrderBy(m => m.Rent).ToList();
+        }
         else
         {
             properties = _dbContext.Properties.ToList();
