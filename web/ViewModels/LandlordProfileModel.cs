@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
 
 namespace BricksAndHearts.ViewModels;
@@ -39,8 +38,6 @@ public class LandlordProfileModel
     [DisplayName("Type of landlord")]
     public string LandlordType { get; set; } = string.Empty;
 
-    public bool LandlordProvidedCharterStatus { get; set; }
-
     public string? MembershipId { get; set; }
 
     public bool CharterApproved { get; set; }
@@ -51,42 +48,23 @@ public class LandlordProfileModel
 
     [DisplayName("For / not for profit")]
     public bool IsLandlordForProfit { get; set; }
-    public int NumOfProperties { get; set; }
 
-    public static LandlordProfileModel FromDbModel(LandlordDbModel landlord, BricksAndHeartsUser user)
-    {
-        return new LandlordProfileModel
-        {
-            LandlordId = landlord.Id,
-            CompanyName = landlord.CompanyName,
-            Email = landlord.Email,
-            FirstName = landlord.FirstName,
-            LastName = landlord.LastName,
-            Phone = landlord.Phone,
-            Title = landlord.Title,
-            LandlordType = landlord.LandlordType,
-            LandlordProvidedCharterStatus = landlord.LandlordProvidedCharterStatus,
-            MembershipId = landlord.MembershipId,
-            CharterApproved = landlord.CharterApproved,
-            IsLandlordForProfit = landlord.IsLandlordForProfit,
-            NumOfProperties = landlord.Properties.Count,
-            InviteLink = landlord.InviteLink
-        };
-    }
+    public int NumOfProperties { get; set; }
 
     public static LandlordProfileModel FromDbModel(LandlordDbModel landlord)
     {
         return new LandlordProfileModel
         {
             LandlordId = landlord.Id,
-            CompanyName = landlord.CompanyName,
-            Email = landlord.Email,
+
+            Title = landlord.Title,
             FirstName = landlord.FirstName,
             LastName = landlord.LastName,
+            Email = landlord.Email,
             Phone = landlord.Phone,
-            Title = landlord.Title,
+            CompanyName = landlord.CompanyName,
             LandlordType = landlord.LandlordType,
-            LandlordProvidedCharterStatus = landlord.LandlordProvidedCharterStatus,
+            MembershipId = landlord.MembershipId,
             CharterApproved = landlord.CharterApproved,
             IsLandlordForProfit = landlord.IsLandlordForProfit,
             NumOfProperties = landlord.Properties.Count,

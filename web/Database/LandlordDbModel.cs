@@ -16,13 +16,9 @@ public class LandlordDbModel
     //Type of landlord
     public string LandlordType { get; set; } = null!;
 
-    //Whether the landlord claims to have signed the charter
-    public bool LandlordProvidedCharterStatus { get; set; } = false;
-    
+    // Charter approval
     public string? MembershipId { get; set; }
-
-    //Whether the charter has been approved by an admin
-    public bool CharterApproved { get; set; } = false;
+    public bool CharterApproved { get; set; }
     public DateTime? ApprovalTime { get; set; }
     public int? ApprovalAdminId { get; set; }
 
@@ -30,6 +26,6 @@ public class LandlordDbModel
     public virtual List<PropertyDbModel> Properties { get; set; } = new();
 
     public string? InviteLink { get; set; } = null; //Nullable & initialised as null as it should be the default value
-    
+
     public bool IsLandlordForProfit { get; set; }
 }

@@ -71,22 +71,20 @@
         <div class="col-1"></div>
         <div class="col-md-5">
             <div class="form-group my-3">
-                <label asp-for="LandlordProvidedCharterStatus" class="form-label">Charter status</label>
-                <select asp-for="LandlordProvidedCharterStatus" class="form-select" required
+                <label for="Select" class="form-label">Charter status</label>
+                <select class="form-select" required
                         id="Select" onclick="checkIfSelectedValueIsTarget('true')">
-                    <option selected disabled value="">Charter Status</option>
-                    <option value="true">Already approved</option>
-                    <option value="false">Not yet approved</option>
+                    <!option @(Model.MembershipId != null ? "selected" : "") value="true">Already approved</!option>
+                    <!option @(Model.MembershipId == null ? "selected" : "") value="false">Not yet approved</!option>
                 </select>
-                <span asp-validation-for="LandlordProvidedCharterStatus" class="text-danger"></span>
             </div>
 
-            <div id="ifTrue" class="form-group my-3" style="@(Model.LandlordProvidedCharterStatus ? "" : "display: none;")">
-                <label asp-for="MembershipId" class="form-label">Membership id</label>
+            <div id="ifTrue" class="form-group my-3" style="@(Model.MembershipId == null ? "display: none;" : "")">
+                <label asp-for="MembershipId" class="form-label">Membership ID</label>
                 <input asp-for="MembershipId" class="form-control empty"/>
                 <span asp-validation-for="MembershipId" class="text-danger"></span>
             </div>
-            <div id="ifFalse" style="@(!Model.LandlordProvidedCharterStatus ? "" : "display: none;")">
+            <div id="ifFalse" style="@(Model.MembershipId != null ? "display: none;" : "")">
                 ChangeAhead require your participation in a charter system.<br/>
                 Please get in touch with ChangeAhead if you are not sure what this means.
             </div>

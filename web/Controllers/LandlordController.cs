@@ -125,7 +125,7 @@ public class LandlordController : AbstractController
             return StatusCode(404);
         }
 
-        var viewModel = LandlordProfileModel.FromDbModel(landlord, user);
+        var viewModel = LandlordProfileModel.FromDbModel(landlord);
         return View("Profile", viewModel);
     }
 
@@ -223,7 +223,7 @@ public class LandlordController : AbstractController
             return StatusCode(403);
         }
 
-        return View("EditProfilePage", LandlordProfileModel.FromDbModel(landlordFromDb, user));
+        return View("EditProfilePage", LandlordProfileModel.FromDbModel(landlordFromDb));
     }
 
     [HttpPost]
@@ -324,7 +324,7 @@ public class LandlordController : AbstractController
             return StatusCode(404);
         }
 
-        var viewModel = LandlordProfileModel.FromDbModel(landlord, user);
+        var viewModel = LandlordProfileModel.FromDbModel(landlord);
         return View("Dashboard", viewModel);
     }
 
