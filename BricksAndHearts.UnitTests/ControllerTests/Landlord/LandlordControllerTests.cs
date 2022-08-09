@@ -68,7 +68,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     }
 
     [Fact]
-    public void EditProfilePage_CalledUsingUserId_ReturnsEditProfileViewWithLandlordProfile()
+    public async void EditProfilePage_CalledUsingUserId_ReturnsEditProfileViewWithLandlordProfile()
     {
         // Arrange 
         var adminUser = CreateAdminUser();
@@ -76,14 +76,14 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var landlordProfileModel = CreateTestLandlordProfileModel();
 
         // Act
-        var result = UnderTest.EditProfilePage(landlordProfileModel.LandlordId).Result as ViewResult;
+        var result = await UnderTest.EditProfilePage(landlordProfileModel.LandlordId) as ViewResult;
 
         // Assert   
         result!.Model.Should().BeOfType<LandlordProfileModel>();
     }
 
     [Fact]
-    public void EditProfilePage_CalledUsingInvalidId_Returns404Error()
+    public async void EditProfilePage_CalledUsingInvalidId_Returns404Error()
     {
         // Arrange 
         var adminUser = CreateAdminUser();
@@ -92,28 +92,28 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         A.CallTo(() => LandlordService.GetLandlordIfExistsFromId(A<int>._)).Returns(fakeNullLandlord);
 
         // Act
-        var result = UnderTest.EditProfilePage(1000).Result;
+        var result = await UnderTest.EditProfilePage(1000);
 
         // Assert   
         result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(404);
     }
 
     [Fact]
-    public void EditProfilePage_CalledUsingNonAdmin_Returns403Error()
+    public async void EditProfilePage_CalledUsingNonAdmin_Returns403Error()
     {
         // Arrange 
         var landlordUser = CreateLandlordUser();
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         // Act
-        var result = UnderTest.EditProfilePage(1000).Result;
+        var result = await UnderTest.EditProfilePage(1000);
 
         // Assert   
         result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(403);
     }
 
     [Fact]
-    public void EditProfileUpdate_CalledUsingLandlordDatabaseModel_ReturnsProfileViewWithLandlordProfile()
+    public async void EditProfileUpdate_CalledUsingLandlordDatabaseModel_ReturnsProfileViewWithLandlordProfile()
     {
         // Arrange 
         var adminUser = CreateAdminUser();
@@ -125,14 +125,14 @@ public class LandlordControllerTests : LandlordControllerTestsBase
             .Returns(ILandlordService.LandlordRegistrationResult.Success);
 
         // Act
-        var result = UnderTest.EditProfileUpdate(landlordProfileModel).Result;
+        var result = await UnderTest.EditProfileUpdate(landlordProfileModel);
 
         // Assert   
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().BeEquivalentTo("Profile");
     }
 
     [Fact]
-    public void
+    public async void
         EditProfileUpdate_CalledUsingLandlordDatabaseModelWithDuplicateEmail_ReturnsEditProfileViewWithLandlordProfile()
     {
         // Arrange 
@@ -143,7 +143,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         A.CallTo(() => LandlordService.CheckForDuplicateMembershipId(landlordProfileModel)).Returns(false);
 
         // Act
-        var result = UnderTest.EditProfileUpdate(landlordProfileModel).Result as ViewResult;
+        var result = await UnderTest.EditProfileUpdate(landlordProfileModel) as ViewResult;
 
         // Assert   
         result!.Model.Should().BeOfType<LandlordProfileModel>();
@@ -151,7 +151,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     }
     
     [Fact]
-    public void
+    public async void
         EditProfileUpdate_CalledUsingLandlordDatabaseModelWithDuplicateMembershipId_ReturnsEditProfileViewWithLandlordProfile()
     {
         // Arrange 
@@ -162,7 +162,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         A.CallTo(() => LandlordService.CheckForDuplicateMembershipId(landlordProfileModel)).Returns(true);
 
         // Act
-        var result = UnderTest.EditProfileUpdate(landlordProfileModel).Result as ViewResult;
+        var result = await UnderTest.EditProfileUpdate(landlordProfileModel) as ViewResult;
 
         // Assert   
         result!.Model.Should().BeOfType<LandlordProfileModel>();
@@ -170,7 +170,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     }
 
     [Fact]
-    public void EditProfileUpdate_CalledUsingNonAdmin_Returns403Error()
+    public async void EditProfileUpdate_CalledUsingNonAdmin_Returns403Error()
     {
         // Arrange
         var landlordUser = CreateLandlordUser();
@@ -178,14 +178,14 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var invalidLandlordModel = CreateInvalidLandlordProfileModel();
 
         // Act
-        var result = UnderTest.EditProfileUpdate(invalidLandlordModel).Result;
+        var result = await UnderTest.EditProfileUpdate(invalidLandlordModel);
 
         // Assert   
         result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(403);
     }
 
     [Fact]
-    public void EditProfileUpdate_CalledUsingInvalidModel_Returns404Error()
+    public async void EditProfileUpdate_CalledUsingInvalidModel_Returns404Error()
     {
         // Arrange
         var landlordUser = CreateLandlordUser();
@@ -194,7 +194,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var invalidLandlordModel = CreateInvalidLandlordProfileModel();
 
         // Act
-        var result = UnderTest.EditProfileUpdate(invalidLandlordModel).Result;
+        var result = await UnderTest.EditProfileUpdate(invalidLandlordModel);
 
         // Assert   
         result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(404);

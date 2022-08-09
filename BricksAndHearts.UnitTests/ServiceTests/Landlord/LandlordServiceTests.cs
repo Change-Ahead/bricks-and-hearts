@@ -25,29 +25,29 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     //RegisterLandlord can't be tested as it uses a transaction
 
     [Fact]
-    public void GetLandlordIfExistsFromId_ReturnsLandlord_WithUniqueId()
+    public async void GetLandlordIfExistsFromId_ReturnsLandlord_WithUniqueId()
     {
         // Arrange
-        using var context = Fixture.CreateReadContext();
+        await using var context = Fixture.CreateReadContext();
         var service = new LandlordService(context);
 
         // Act
-        var result = service.GetLandlordIfExistsFromId(4).Result;
+        var result = await service.GetLandlordIfExistsFromId(4);
 
         // Assert
         result.Should().BeOfType<LandlordDbModel>().Which.Id.Should().Be(4);
     }
 
     [Fact]
-    public void GetLandlordIfExistsFromId_ReturnsNull_WithInvalidId()
+    public async void GetLandlordIfExistsFromId_ReturnsNull_WithInvalidId()
     {
         // Arrange
-        using var context = Fixture.CreateReadContext();
+        await using var context = Fixture.CreateReadContext();
         var service = new LandlordService(context);
 
         // Act
-        var result = service.GetLandlordIfExistsFromId(1000).Result;
-        var result2 = service.GetLandlordIfExistsFromId(null).Result;
+        var result = await service.GetLandlordIfExistsFromId(1000);
+        var result2 = await service.GetLandlordIfExistsFromId(null);
 
         // Assert
         result.Should().BeNull();
@@ -55,14 +55,14 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     }
 
     [Fact]
-    public void GetLandlordIfExistsWithProperties_ReturnsLandlord_WithUniqueId()
+    public async void GetLandlordIfExistsWithProperties_ReturnsLandlord_WithUniqueId()
     {
         // Arrange
-        using var context = Fixture.CreateReadContext();
+        await using var context = Fixture.CreateReadContext();
         var service = new LandlordService(context);
 
         // Act
-        var result = service.GetLandlordIfExistsWithProperties(1).Result;
+        var result = await service.GetLandlordIfExistsWithProperties(1);
 
         // Assert
         result.Should().BeOfType<LandlordDbModel>().Which.Id.Should().Be(1);
@@ -70,15 +70,15 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     }
     
     [Fact]
-    public void GetLandlordIfExistsWithProperties_ReturnsNull_WithInvalidId()
+    public async void GetLandlordIfExistsWithProperties_ReturnsNull_WithInvalidId()
     {
         // Arrange
-        using var context = Fixture.CreateReadContext();
+        await using var context = Fixture.CreateReadContext();
         var service = new LandlordService(context);
 
         // Act
-        var result = service.GetLandlordIfExistsFromId(1000).Result;
-        var result2 = service.GetLandlordIfExistsFromId(null).Result;
+        var result = await service.GetLandlordIfExistsFromId(1000);
+        var result2 = await service.GetLandlordIfExistsFromId(null);
 
         // Assert
         result.Should().BeNull();
@@ -86,45 +86,45 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     }
     
     [Fact]
-    public void ApproveLandlord_ReturnsSorry_ForNonexistentLandlord()
+    public async void ApproveLandlord_ReturnsSorry_ForNonexistentLandlord()
     {
         // Arrange
-        using var context = Fixture.CreateReadContext();
+        await using var context = Fixture.CreateReadContext();
         var service = new LandlordService(context);
         var user = A.Fake<BricksAndHeartsUser>();
 
         // Act
-        var result = service.ApproveLandlord(1000, user).Result;
+        var result = await service.ApproveLandlord(1000, user);
 
         // Assert
         result.Should().BeOfType<string>().Which.Should().Be("Sorry, it appears that no landlord with this ID exists");
     }
     
     [Fact]
-    public void ApproveLandlord_ReturnsCharterAlreadyApproved_ForLandlordWithCharterPreApproved()
+    public async void ApproveLandlord_ReturnsCharterAlreadyApproved_ForLandlordWithCharterPreApproved()
     {
         // Arrange
-        using var context = Fixture.CreateReadContext();
+        await using var context = Fixture.CreateReadContext();
         var service = new LandlordService(context);
         var user = A.Fake<BricksAndHeartsUser>();
 
         // Act
-        var result = service.ApproveLandlord(1, user).Result;
+        var result = await service.ApproveLandlord(1, user);
 
         // Assert
         result.Should().BeOfType<string>().Which.Should().Be("The Landlord Charter for Landlord1Approved Landlord1Sur has already been approved.");
     }
 
     [Fact]
-    public void ApproveLandlord_ReturnsCharterApproved_ForLandlordWithUnapprovedCharter()
+    public async void ApproveLandlord_ReturnsCharterApproved_ForLandlordWithUnapprovedCharter()
     {
         // Arrange
-        using var context = Fixture.CreateWriteContext();
+        await using var context = Fixture.CreateWriteContext();
         var service = new LandlordService(context);
         var user = A.Fake<BricksAndHeartsUser>();
 
         // Act
-        var result = service.ApproveLandlord(2, user).Result;
+        var result = await service.ApproveLandlord(2, user);
         
         // Before assert we need to clear the context's change tracker so that the following database queries actually
         // query the database, as if this were a new context. This should be done for all write tests.
@@ -139,10 +139,10 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
 
 
     [Fact]
-    public void FindLandlordWithInviteLink_ReturnsLinkedLandlord_WithValidLink()
+    public async void FindLandlordWithInviteLink_ReturnsLinkedLandlord_WithValidLink()
     {
         // Arrange
-        using var context = Fixture.CreateReadContext();
+        await using var context = Fixture.CreateReadContext();
         var service = new LandlordService(context);
 
         // Act
@@ -153,10 +153,10 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     }
     
     [Fact]
-    public void FindLandlordWithInviteLink_ReturnsNull_WithInvalidLink()
+    public async void FindLandlordWithInviteLink_ReturnsNull_WithInvalidLink()
     {
         // Arrange
-        using var context = Fixture.CreateReadContext();
+        await using var context = Fixture.CreateReadContext();
         var service = new LandlordService(context);
 
         // Act
@@ -167,15 +167,15 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
     }
     
     [Fact]
-    public void EditLandlordDetails_UpdatesLandlord_WithNewLandlordDetails()
+    public async void EditLandlordDetails_UpdatesLandlord_WithNewLandlordDetails()
     {
         // Arrange
-        using var context = Fixture.CreateWriteContext();
+        await using var context = Fixture.CreateWriteContext();
         var service = new LandlordService(context);
         var landlordToEdit = Fixture.CreateLandlordWithEditedEmail("NewEmail@Boring.com");
 
         // Act
-        var result = service.EditLandlordDetails(landlordToEdit).Result;
+        var result = await service.EditLandlordDetails(landlordToEdit);
         
         // Before assert we need to clear the context's change tracker so that the following database queries actually
         // query the database, as if this were a new context. This should be done for all write tests.

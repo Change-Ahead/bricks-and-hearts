@@ -77,14 +77,14 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     }
 
     [Fact]
-    public void GetAdminLists_GetsListOfCurrentAndPendingAdmins_ForAdminUser()
+    public async void GetAdminLists_GetsListOfCurrentAndPendingAdmins_ForAdminUser()
     {
         // Arrange
-        using var context = Fixture.CreateReadContext();
+        await using var context = Fixture.CreateReadContext();
         var service = new AdminService(context,null!);
 
         // Act
-        var result = service.GetAdminLists().Result;
+        var result = await service.GetAdminLists();
 
         // Assert
 
@@ -93,14 +93,14 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     }
     
     [Fact]
-    public void GetTenantList_GetsListOfTenants()
+    public async void GetTenantList_GetsListOfTenants()
     {
         // Arrange
-        using var context = Fixture.CreateReadContext();
+        await using var context = Fixture.CreateReadContext();
         var service = new AdminService(context,null!);
 
         // Act
-        var result = service.GetTenantList().Result;
+        var result = await service.GetTenantList();
 
         // Assert
 
@@ -108,14 +108,14 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     }
 
     [Fact]
-    public void GetLandlordDisplayList_CalledWithApproved_ReturnsApprovedLandlords()
+    public async void GetLandlordDisplayList_CalledWithApproved_ReturnsApprovedLandlords()
     {
         // Arrange
-        using var context = Fixture.CreateReadContext();
+        await using var context = Fixture.CreateReadContext();
         var service = new AdminService(context,null!);
 
         // Act
-        var result = service.GetLandlordDisplayList("Approved").Result;
+        var result = await service.GetLandlordDisplayList("Approved");
 
         // Assert
         result.Should().BeOfType<List<LandlordDbModel>>().And.Subject.Where(u => u.CharterApproved).Should()
@@ -123,14 +123,14 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     }
     
     [Fact]
-    public void GetLandlordDisplayList_CalledWithUnapproved_ReturnsUnapprovedLandlords()
+    public async void GetLandlordDisplayList_CalledWithUnapproved_ReturnsUnapprovedLandlords()
     {
         // Arrange
-        using var context = Fixture.CreateReadContext();
+        await using var context = Fixture.CreateReadContext();
         var service = new AdminService(context,null!);
 
         // Act
-        var result = service.GetLandlordDisplayList("Unapproved").Result;
+        var result = await service.GetLandlordDisplayList("Unapproved");
 
         // Assert
         result.Should().BeOfType<List<LandlordDbModel>>().And.Subject.Where(u => u.CharterApproved == false).Should()
@@ -138,14 +138,14 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     }
     
     [Fact]
-    public void GetLandlordDisplayList_CalledWithNothing_ReturnsAllLandlords()
+    public async void GetLandlordDisplayList_CalledWithNothing_ReturnsAllLandlords()
     {
         // Arrange
-        using var context = Fixture.CreateReadContext();
+        await using var context = Fixture.CreateReadContext();
         var service = new AdminService(context,null!);
 
         // Act
-        var result = service.GetLandlordDisplayList("").Result;
+        var result = await service.GetLandlordDisplayList("");
         
         // Assert
         result.Should().BeOfType<List<LandlordDbModel>>().And.Subject.Should().HaveCount(context.Landlords.Count());

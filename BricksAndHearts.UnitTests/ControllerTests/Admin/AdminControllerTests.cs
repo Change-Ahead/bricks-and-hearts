@@ -56,13 +56,13 @@ public class AdminControllerTests : AdminControllerTestsBase
     }
 
     [Fact]
-    public void GetAdminList_ReturnsViewWithAdminListModel()
+    public async void GetAdminList_ReturnsViewWithAdminListModel()
     {
         // Arrange
         MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
 
         // Act
-        var result = UnderTest.GetAdminList().Result as ViewResult;
+        var result = await UnderTest.GetAdminList() as ViewResult;
 
         // Assert
         result!.ViewData.Model.Should().BeOfType<AdminListModel>();
