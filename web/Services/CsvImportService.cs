@@ -1,16 +1,15 @@
 ﻿using System.Data;
-using System.Diagnostics;
 using BricksAndHearts.Database;
+using BricksAndHearts.ViewModels;
+using LINQtoCSV;
 using Microsoft.EntityFrameworkCore;
 
 namespace BricksAndHearts.Services;
 
 public interface ICsvImportService
 {
-    public (int[] columnOrder, (List<string> FlashTypes, List<string> FlashMessages)) CheckIfImportWorks(IFormFile csvFile);
-
-    public Task<(List<string> FlashTypes, List<string> FlashMessages)> ImportTenants(IFormFile csvFile,
-        int[] columnOrder, (List<string> flashTypes, List<string> flashMessages) flashResponse);
+    public (List<string> FlashTypes, List<string> FlashMessages) CheckIfImportWorks(IFormFile csvFile);
+    public Task<(List<string> FlashTypes, List<string> FlashMessages)> ImportTenants(IFormFile csvFile, (List<string> flashTypes, List<string> flashMessages) flashResponse);
 }
 
 public class CsvImportService : ICsvImportService
@@ -24,122 +23,111 @@ public class CsvImportService : ICsvImportService
         _dbContext = dbContext;
     }
 
-    public (int[], (List<string>, List<string>)) CheckIfImportWorks(IFormFile csvFile)
+    public (List<string>, List<string>) CheckIfImportWorks(IFormFile csvFile)
     {
+        List<string> flashTypes = new(),
+            flashMessages = new();
         var headerLine = "";
         using (var streamReader = new StreamReader(csvFile.OpenReadStream()))
         {
             headerLine = streamReader.ReadLine();
         }
+        
         var headers = headerLine!.Split(",");
-
-        var columnOrder = Enumerable.Repeat(-1, typeof(TenantDbModel).GetProperties().Count()).ToArray();
-        var checkUse = new bool[headers.Count()];
-        List<string> flashTypes = new(), flashMessages = new();
-
-        //align database properties with csv file columns
-        for (var i = 1; i < typeof(TenantDbModel).GetProperties().Count(); i++)
+        var databaseHeaders = new List<string>();
+        
+        //check for missing columns in csv file
+        foreach (var dataProp in typeof(TenantUploadModel).GetProperties())
         {
-            var dataProp = typeof(TenantDbModel).GetProperties()[i];
-            for (var j = 0; j < headers.Length; j++)
-                if (dataProp.Name == headers[j])
-                {
-                    columnOrder[i] = j;
-                    checkUse[j] = true;
-                }
-
-            if (columnOrder[i] == -1)
+            if (!headers.Contains(dataProp.Name) && dataProp.Name != "Id")
             {
-                _logger.LogWarning($"Column {dataProp.Name} is missing.");
+                _logger.LogWarning($"Missing column: {dataProp.Name}");
                 flashTypes.Add("danger");
                 flashMessages.Add(
                     $"Import has failed because column {dataProp.Name} is missing. Please add this column to your records before attempting to import them.");
             }
+            databaseHeaders.Add(dataProp.Name);
         }
 
         //check for extra columns in csv file
-        for (var k = 0; k < checkUse.Length; k++)
-            if (!checkUse[k] && headers[k] != "")
+        foreach (var header in headers)
+        {
+            if (!databaseHeaders.Contains(header))
             {
-                _logger.LogWarning($"Extra column: {headers[k]}");
+                _logger.LogWarning($"Extra column: {header}");
                 flashTypes.Add("warning");
                 flashMessages.Add(
-                    $"The column {headers[k]} does not exist in the database. All data in this column has been ignored.");
+                    $"The column {header} does not exist in the database. All data in this column has been ignored.");
             }
-
-        return (columnOrder, (flashTypes, flashMessages));
+        }
+        return (flashTypes, flashMessages);
     }
 
-    public async Task<(List<string> FlashTypes, List<string> FlashMessages)> ImportTenants(IFormFile csvFile,
-        int[] columnOrder, (List<string> flashTypes, List<string> flashMessages) flashResponse)
+    public async Task<(List<string> FlashTypes, List<string> FlashMessages)> ImportTenants(IFormFile csvFile, (List<string> flashTypes, List<string> flashMessages) flashResponse)
     {
-        List<string> flashTypes = flashResponse.flashTypes,
-            flashMessages = flashResponse.flashMessages;
+        CsvFileDescription csvFileDescription = new CsvFileDescription
+        {
+            SeparatorChar = ',',
+            FirstLineHasColumnNames = true,
+            IgnoreUnknownColumns = true
+        };
+        CsvContext csvContext = new CsvContext();
+        StreamReader streamReader = new StreamReader(csvFile.OpenReadStream());
+        IEnumerable<TenantUploadModel> list = csvContext.Read<TenantUploadModel>(streamReader, csvFileDescription);
+        
+        List<string> flashTypes = flashResponse.flashTypes, flashMessages = flashResponse.flashMessages;
         await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
         {
-            using (var streamReader = new StreamReader(csvFile.OpenReadStream()))
+            foreach (var tenant in _dbContext.Tenants)
             {
-                var currentLine = streamReader.ReadLine();
-                currentLine = streamReader.ReadLine();
-                while (currentLine != null)
+                _dbContext.Tenants.Remove(tenant);
+            }
+            
+            foreach (TenantUploadModel tenant in list)
+            {
+                if (tenant.Name == null)
                 {
-                    var entries = currentLine.Split(",");
-                    var dbModel = new TenantDbModel();
-                    for (var i = 1; i < typeof(TenantDbModel).GetProperties().Count(); i++)
+                    _logger.LogWarning($"Name is missing from record {tenant.Email}.");
+                    flashTypes.Add("danger");
+                    flashMessages.Add($"Name is missing from record {tenant.Email}. This record has not been added to the database. Please add a name to this tenant in order to import their information.");
+                }
+                else
+                {
+                    TenantDbModel dbTenant = new TenantDbModel();
+                    foreach (var uploadProp in typeof(TenantUploadModel).GetProperties())
                     {
-                        var prop = typeof(TenantDbModel).GetProperties()[i];
-                        var key = columnOrder[i];
-                        if (entries[key] != "")
+                        if (uploadProp.GetValue(tenant) is not null)
                         {
-                            //Boolean fields
-                            if (prop.PropertyType == typeof(bool?))
+                            var dataProp = typeof(TenantDbModel).GetProperty(uploadProp.Name);
+                            if (dataProp!.PropertyType == typeof(bool?))
                             {
-                                var boolInput = entries[key].ToUpper();
-                                if (boolInput == "TRUE" || boolInput == "YES" || boolInput == "1")
+                                bool isBool = bool.TryParse(uploadProp.GetValue(tenant)!.ToString(), out bool boolData);
+                                if (isBool)
                                 {
-                                    prop.SetValue(dbModel, true);
-                                }
-                                else if (boolInput == "FALSE" || boolInput == "NO" || boolInput == "0")
-                                {
-                                    prop.SetValue(dbModel, false);
+                                    dataProp.SetValue(dbTenant, boolData);
                                 }
                                 else
                                 {
-                                    _logger.LogWarning($"Invalid input for {prop.Name} in record for {dbModel.Name}.");
+                                    _logger.LogWarning(
+                                        $"Invalid input for {uploadProp.Name} in record for {tenant.Name}.");
                                     flashTypes.Add("danger");
                                     flashMessages.Add(
-                                        $"Invalid input in record for tenant {dbModel.Name}: '{prop.Name}' cannot be '{entries[key]}', as it must be a Boolean value (true/false).");
+                                        $"Invalid input in record for tenant {tenant.Name}: '{uploadProp.Name}' cannot be '{uploadProp.GetValue(tenant)!.ToString()}' as this is the wrong data type.");
+
                                 }
                             }
-
-                            //String fields
                             else
                             {
-                                prop.SetValue(dbModel, entries[key]);
+                                dataProp.SetValue(dbTenant, uploadProp.GetValue(tenant));
                             }
                         }
                     }
-
-                    if (dbModel.Name == null)
-                    {
-                        _logger.LogWarning($"Name is missing from record {currentLine}.");
-                        flashTypes.Add("danger");
-                        flashMessages.Add(
-                            $"Name is missing from record {currentLine}. This record has not been added to the database. Please add a name to this tenant in order to import their information.");
-                    }
-                    else
-                    {
-                        _dbContext.Tenants.Add(dbModel);
-                    }
-
-                    await _dbContext.SaveChangesAsync();
-                    currentLine = streamReader.ReadLine();
+                    _dbContext.Tenants.Add(dbTenant);
                 }
+                _dbContext.SaveChanges();
             }
-
             await transaction.CommitAsync();
         }
-
         return (flashTypes, flashMessages);
     }
 }

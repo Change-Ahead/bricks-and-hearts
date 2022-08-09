@@ -3,6 +3,7 @@
 using BricksAndHearts.Auth;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
+using LINQtoCSV;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -216,11 +217,9 @@ public class AdminController : AbstractController
         if (csvFile.Length == 0)
         {
             FlashMessage(_logger,
-                ($"{fileName} has length zero.", "danger",
-                    $"{fileName} contains no data. Please upload a file containing the tenant data you would like to import."));
+                ($"{fileName} has length zero.", "danger", $"{fileName} contains no data. Please upload a file containing the tenant data you would like to import."));
             return RedirectToAction(nameof(TenantList));
         }
-
         if (fileName.Substring(fileName.Length - 3) != "csv")
         {
             FlashMessage(_logger,
@@ -228,21 +227,20 @@ public class AdminController : AbstractController
                     $"{fileName} is not a CSV file. Please upload your data as a CSV file."));
             return RedirectToAction(nameof(TenantList));
         }
-
-        var (columnOrder, flashResponse) = _csvImportService.CheckIfImportWorks(csvFile);
+        
+        var flashResponse = _csvImportService.CheckIfImportWorks(csvFile);
         if (flashResponse.FlashTypes.Contains("danger"))
         {
             FlashMultipleMessages(flashResponse.FlashTypes, flashResponse.FlashMessages);
             return RedirectToAction(nameof(TenantList));
         }
-
-        var furtherFlashResponse = await _csvImportService.ImportTenants(csvFile, columnOrder, flashResponse);
+        var furtherFlashResponse = await _csvImportService.ImportTenants(csvFile, flashResponse);
+        
         if (furtherFlashResponse.FlashMessages.Count() == 0)
         {
             FlashMessage(_logger,
                 ("Successfuly imported all tenant data.", "success", "Successfully imported all tenant data."));
         }
-
         FlashMultipleMessages(furtherFlashResponse.FlashTypes, furtherFlashResponse.FlashMessages);
         return RedirectToAction(nameof(TenantList));
     }
