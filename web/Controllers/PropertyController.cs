@@ -52,12 +52,23 @@ public class PropertyController : AbstractController
 
         if (propertyId != 0)
         {
-            newPropertyModel = PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(propertyId));
+            var property = _propertyService.GetPropertyByPropertyId(propertyId);
+            if (property == null)
+            {
+                return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
+            }
+
+            newPropertyModel = PropertyViewModel.FromDbModel(property);
         }
         else
         {
             newPropertyModel.PropertyId = propertyId;
             newPropertyModel.LandlordId = (int)landlordId;
+        }
+
+        if (!(GetCurrentUser().IsAdmin || GetCurrentUser().LandlordId == newPropertyModel.LandlordId))
+        {
+            return StatusCode(403);
         }
 
         // Show the form for this step
@@ -72,6 +83,11 @@ public class PropertyController : AbstractController
         newPropertyModel.PropertyId = propertyId;
 
         // Show the form for this step
+        if (!(GetCurrentUser().IsAdmin || GetCurrentUser().LandlordId == newPropertyModel.LandlordId))
+        {
+            return StatusCode(403);
+        }
+
         return View("EditProperty", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
     }
 
@@ -120,6 +136,11 @@ public class PropertyController : AbstractController
             // Update the property's record with the values entered at this step
             _propertyService.UpdateProperty(property.Id, newPropertyModel);
             return RedirectToAction("AddNewProperty_Continue", new { step = step + 1, propertyId = property.Id });
+        }
+
+        if (!(GetCurrentUser().IsAdmin || GetCurrentUser().LandlordId == newPropertyModel.LandlordId))
+        {
+            return StatusCode(403);
         }
 
         // Update the property's record with the final set of values
@@ -177,6 +198,11 @@ public class PropertyController : AbstractController
             return View("EditProperty", new AddNewPropertyViewModel { Step = step + 1, Property = newProperty });
         }
 
+        if (!(GetCurrentUser().IsAdmin || GetCurrentUser().LandlordId == newPropertyModel.LandlordId))
+        {
+            return StatusCode(403);
+        }
+
         // Finished adding property, so go to View Properties page
         return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
     }
@@ -212,7 +238,7 @@ public class PropertyController : AbstractController
             return StatusCode(404);
         }
 
-        if ((GetCurrentUser().IsAdmin == false) & (GetCurrentUser().LandlordId != propDB.LandlordId))
+        if (GetCurrentUser().IsAdmin == false && GetCurrentUser().LandlordId != propDB.LandlordId)
         {
             _logger.LogWarning("You do not have access to any property with ID {PropertyId}.", propertyId);
             return StatusCode(404);
