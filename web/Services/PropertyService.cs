@@ -67,14 +67,10 @@ public class PropertyService : IPropertyService
             Rent = createModel.Rent,
             Availability = createModel.Availability,
         };
-        if (createModel.Availability == PropertyDbModel.Avail_AvailableSoon)
-        {
-            dbModel.AvailableFrom = createModel.AvailableFrom;
-        }
-        else
-        {
-            dbModel.AvailableFrom = null;
-        }
+
+        dbModel.AvailableFrom = createModel.Availability == AvailabilityState.AvailableSoon
+            ? createModel.AvailableFrom
+            : null;
 
         // Add the new property to the database
         _dbContext.Properties.Add(dbModel);
@@ -114,14 +110,10 @@ public class PropertyService : IPropertyService
 
         dbModel.Rent = updateModel.Rent ?? dbModel.Rent;
         dbModel.Availability = updateModel.Availability;
-        if (updateModel.Availability == PropertyDbModel.Avail_AvailableSoon)
-        {
-            dbModel.AvailableFrom = updateModel.AvailableFrom;
-        }
-        else
-        {
-            dbModel.AvailableFrom = null;
-        }
+
+        dbModel.AvailableFrom = updateModel.Availability == AvailabilityState.AvailableSoon
+            ? updateModel.AvailableFrom
+            : null;
 
         dbModel.IsIncomplete = isIncomplete;
         _dbContext.SaveChanges();
@@ -155,7 +147,7 @@ public class PropertyService : IPropertyService
         var userLandlordId = currentUser.LandlordId;
         return propertyLandlordId == userLandlordId;
     }
-    
+
     public List<PropertyDbModel> SortProperties(string? by)
     {
         List<PropertyDbModel> properties;
@@ -165,18 +157,23 @@ public class PropertyService : IPropertyService
         }
         else if (by == "Rent")
             properties = _dbContext.Properties.OrderBy(m => m.Rent).ToList();
-        else {
+        else
+        {
             properties = _dbContext.Properties.ToList();
         }
+
         return properties;
     }
-    
+
     public PropertyCountModel CountProperties()
     {
-        PropertyCountModel propertyCounts = new PropertyCountModel();
-        propertyCounts.RegisteredProperties = _dbContext.Properties.Count();
-        propertyCounts.LiveProperties = _dbContext.Properties.Count(p => p.Availability != PropertyDbModel.Avail_Draft && p.Landlord.CharterApproved);
-        propertyCounts.AvailableProperties = _dbContext.Properties.Count(p => p.Availability == PropertyDbModel.Avail_Available);
+        var propertyCounts = new PropertyCountModel
+        {
+            RegisteredProperties = _dbContext.Properties.Count(),
+            LiveProperties = _dbContext.Properties.Count(p =>
+                p.Availability != AvailabilityState.Draft && p.Landlord.CharterApproved),
+            AvailableProperties = _dbContext.Properties.Count(p => p.Availability == AvailabilityState.Available)
+        };
         return propertyCounts;
     }
 }

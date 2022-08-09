@@ -1,4 +1,5 @@
 ﻿using BricksAndHearts.Database;
+using BricksAndHearts.ViewModels;
 using Microsoft.Extensions.Configuration;
 
 namespace BricksAndHearts.UnitTests.ServiceTests;
@@ -249,7 +250,7 @@ public class TestDatabaseFixture
             TownOrCity = "Complete Town",
             County = "Complete County",
             Postcode = "CB2 1LA",
-            Availability = PropertyDbModel.Avail_Occupied
+            Availability = AvailabilityState.Occupied
         };
     }
 
@@ -264,10 +265,10 @@ public class TestDatabaseFixture
             TownOrCity = "Incomplete Town",
             County = "Incomplete County",
             Postcode = "CB2 1LA",
-            Availability = PropertyDbModel.Avail_Occupied
+            Availability = AvailabilityState.Occupied
         };
     }
-    
+
     private PropertyDbModel CreateAvailableProperty()
     {
         return new PropertyDbModel
@@ -279,10 +280,10 @@ public class TestDatabaseFixture
             TownOrCity = "Available Town",
             County = "Available County",
             Postcode = "CB2 1LA",
-            Availability = PropertyDbModel.Avail_Available
+            Availability = AvailabilityState.Available
         };
     }
-    
+
     private PropertyDbModel CreateDraftProperty()
     {
         return new PropertyDbModel
@@ -294,7 +295,7 @@ public class TestDatabaseFixture
             TownOrCity = "Draft Town",
             County = "Draft County",
             Postcode = "CB2 1LA",
-            Availability = PropertyDbModel.Avail_Draft
+            Availability = AvailabilityState.Draft
         };
     }
 

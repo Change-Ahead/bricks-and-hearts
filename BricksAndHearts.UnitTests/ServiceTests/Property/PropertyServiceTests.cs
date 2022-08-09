@@ -1,5 +1,4 @@
 ﻿using System.Linq;
-using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FluentAssertions;
@@ -147,9 +146,9 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         var registeredCount = context.Properties.Count();
         result.RegisteredProperties.Should().Be(registeredCount);
         var liveCount =
-            context.Properties.Count(p => p.Availability != PropertyDbModel.Avail_Draft && p.Landlord.CharterApproved);
+            context.Properties.Count(p => p.Availability != AvailabilityState.Draft && p.Landlord.CharterApproved);
         result.LiveProperties.Should().Be(liveCount);
-        var availableCount = context.Properties.Count(p => p.Availability == PropertyDbModel.Avail_Available);
+        var availableCount = context.Properties.Count(p => p.Availability == AvailabilityState.Available);
         result.AvailableProperties.Should().Be(availableCount);
     }
 
