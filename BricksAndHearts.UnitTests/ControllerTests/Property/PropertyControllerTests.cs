@@ -333,11 +333,13 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(null);
 
         var landlordUser = CreateLandlordUser();
+        landlordUser.LandlordId = 1;
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         var formResultModel = new PropertyViewModel
         {
-            Address = new PropertyAddress()
+            Address = new PropertyAddress(),
+            LandlordId = 1
         };
 
         // Act
@@ -357,6 +359,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(null);
 
         var landlordUser = CreateLandlordUser();
+        landlordUser.LandlordId = 1;
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         var formResultModel = new PropertyViewModel
@@ -365,7 +368,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
             {
                 AddressLine1 = "Line 1",
                 Postcode = "Postcode"
-            }
+            },
+            LandlordId = 1
         };
         A.CallTo(() => AzureMapsApiService.AutofillAddress(formResultModel))
             .Returns(Task.Run(() => formResultModel));
@@ -376,9 +380,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Assert
         A.CallTo(() => PropertyService.AddNewProperty(1, formResultModel, true)).MustHaveHappened();
         A.CallTo(() => PropertyService.UpdateProperty(1, formResultModel, true)).MustNotHaveHappened();
-        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("AddNewProperty_Continue");
-        result.Should().BeOfType<RedirectToActionResult>().Which.RouteValues.Should().ContainKey("step").WhoseValue
-            .Should().Be(2);
+        result.Should().BeOfType<ViewResult>().Which.ViewName.Should().Be("AddNewProperty");
     }
 
     [Theory]
@@ -424,9 +426,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Assert
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
         A.CallTo(() => PropertyService.UpdateProperty(1, formResultModel, A<bool>._)).MustHaveHappened();
-        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("AddNewProperty_Continue");
-        result.Should().BeOfType<RedirectToActionResult>().Which.RouteValues.Should().ContainKey("step").WhoseValue
-            .Should().Be(step + 1);
+        result.Should().BeOfType<ViewResult>().Which.ViewName.Should().Be("AddNewProperty");
     }
 
     [Fact]
@@ -434,15 +434,19 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     {
         // Arrange
         var landlordUser = CreateLandlordUser();
+        landlordUser.LandlordId = 1;
         MakeUserPrincipalInController(landlordUser, UnderTest);
+        var fakePropertyDbModel = CreateExamplePropertyDbModel();
+        fakePropertyDbModel.Landlord.Id = 1;
 
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(fakePropertyDbModel);
         var formResultModel = CreateExamplePropertyViewModel();
 
         // Act
         var result = await UnderTest.AddNewProperty_Continue(AddNewPropertyViewModel.MaximumStep, 1, formResultModel);
 
         // Assert
-        A.CallTo(() => PropertyService.UpdateProperty(0, formResultModel, A<bool>._)).MustHaveHappened();
+        A.CallTo(() => PropertyService.UpdateProperty(1, formResultModel, A<bool>._)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
     }
 
@@ -568,9 +572,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Assert
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
         A.CallTo(() => PropertyService.UpdateProperty(1, formResultModel, A<bool>._)).MustHaveHappened();
-        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("EditProperty_Continue");
-        result.Should().BeOfType<RedirectToActionResult>().Which.RouteValues.Should().ContainKey("step").WhoseValue
-            .Should().Be(step + 1);
+        result.Should().BeOfType<ViewResult>().Which.ViewName.Should().Be("EditProperty");
     }
 
     [Fact]

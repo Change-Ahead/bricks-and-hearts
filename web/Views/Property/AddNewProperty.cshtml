@@ -38,7 +38,7 @@
 
 <form method="post" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@Model.Step" asp-route-propertyId="@Model.Property?.PropertyId" asp-route-landlordId="@Model.Property?.LandlordId">
     <partial name=@("_AddFormStep" + Model.Step) model="Model.Property"/>
-
+    <input asp-for="Property!.LandlordId" type="hidden" id="landlordId" name="landlordId" value="@Model.Property!.LandlordId">
     <div class="row my-4">
         <div class="col-auto">
             @if (Model.Step < AddNewPropertyViewModel.MaximumStep)

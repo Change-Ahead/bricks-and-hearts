@@ -11,9 +11,6 @@ public interface IPropertyService
     public void UpdateProperty(int propertyId, PropertyViewModel updateModel, bool isIncomplete = true);
     public void DeleteProperty(PropertyDbModel property);
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId);
-    public void ChangePropertyToIncomplete(PropertyDbModel property);
-    public void ChangePropertyToComplete(PropertyDbModel property);
-
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId);
     public List<PropertyDbModel> SortProperties(string by);
     public PropertyCountModel CountProperties();
@@ -152,18 +149,6 @@ public class PropertyService : IPropertyService
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId)
     {
         return _dbContext.Properties.SingleOrDefault(p => p.Id == propertyId);
-    }
-
-    public void ChangePropertyToIncomplete(PropertyDbModel property)
-    {
-        property.IsIncomplete = true;
-        _dbContext.SaveChanges();
-    }
-
-    public void ChangePropertyToComplete(PropertyDbModel property)
-    {
-        property.IsIncomplete = false;
-        _dbContext.SaveChanges();
     }
 
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId)
