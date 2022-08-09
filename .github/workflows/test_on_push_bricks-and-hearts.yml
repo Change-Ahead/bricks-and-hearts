@@ -38,9 +38,6 @@ jobs:
           dotnet-version: '6.0.x'
           include-prerelease: true
 
-      - name: Build with dotnet
-        run: dotnet build -warnaserror
-
       # Substitute entries in appsettings.json for CI
       - name: App Settings variable substitution
         uses: microsoft/variable-substitution@v1
@@ -49,5 +46,8 @@ jobs:
         env:
           TestDBConnectionString: 'Server=localhost,1433;Database=BricksAndHeartsTest;User Id=SA;Password=JdMsKZPBBA8kVFXVrj8d;'
 
+      - name: Build with dotnet
+        run: dotnet build -warnaserror
+
       - name: Test with dotnet
-        run: dotnet test --no-build -l "console;verbosity=detailed" --blame-hang-timeout 120000
+        run: dotnet test
