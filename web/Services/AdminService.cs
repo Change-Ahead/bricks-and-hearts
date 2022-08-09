@@ -152,24 +152,24 @@ public class AdminService : IAdminService
 
     public async Task<List<TenantDbModel>> GetTenantDbModelsFromFilter(bool[] filterArray)
     {
-        var tenantList = from tenants in _dbContext.Tenants select tenants;
+        var tenantQuery = from tenants in _dbContext.Tenants select tenants;
         for (var currentFilter = 0; currentFilter < filterArray.Length; currentFilter++)
         {
             if (filterArray[currentFilter])
             {
-                tenantList = currentFilter switch
+                tenantQuery = currentFilter switch
                 {
-                    0 => tenantList.Where(t => t.Type == "Single"),
-                    1 => tenantList.Where(t => t.Type == "Couple"),
-                    2 => tenantList.Where(t => t.Type == "Family"),
-                    3 => tenantList.Where(t => t.HasPet == true),
-                    4 => tenantList.Where(t => t.ETT == true),
-                    5 => tenantList.Where(t => t.UniversalCredit == true),
-                    6 => tenantList.Where(t => t.Over35 == true),
-                    _ => tenantList
+                    0 => tenantQuery.Where(t => t.Type == "Single"),
+                    1 => tenantQuery.Where(t => t.Type == "Couple"),
+                    2 => tenantQuery.Where(t => t.Type == "Family"),
+                    3 => tenantQuery.Where(t => t.HasPet == true),
+                    4 => tenantQuery.Where(t => t.ETT == true),
+                    5 => tenantQuery.Where(t => t.UniversalCredit == true),
+                    6 => tenantQuery.Where(t => t.Over35 == true),
+                    _ => tenantQuery
                 };
             }
         }
-        return await tenantList.ToListAsync();
+        return await tenantQuery.ToListAsync();
     }
 }

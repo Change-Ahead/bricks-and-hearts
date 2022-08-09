@@ -255,4 +255,54 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         // Assert
         service.Invoking(y => y.DeleteExistingInviteLink(1)).Should().Throw<Exception>();
     }
+
+    [Fact]
+    public async void GetTenantDbModelsFromFilter_ReturnsFilteredTenantList_WithCorrectFilter()
+    {
+        // Arrange
+        await using var context = Fixture.CreateReadContext();
+        var service = new AdminService(context,null!);
+        var filterArr = new [] { true, false, false, false, true, true, false };
+
+        // Act
+        var result = await service.GetTenantDbModelsFromFilter(filterArr);
+
+        // Assert
+        result.Should().BeOfType<List<TenantDbModel>>();
+        result.Count.Should().Be(context.Tenants.Where(t => t.ETT == true)
+                                                .Where(t => t.UniversalCredit == true)
+                                                .Count(t => t.Type == "Single"));
+    }
+    
+    [Fact]
+    public async void GetTenantDbModelsFromFilter_ReturnsAllTenants_WithNoFilter()
+    {
+        // Arrange
+        await using var context = Fixture.CreateReadContext();
+        var service = new AdminService(context,null!);
+        var filterArr = new bool[7];
+
+        // Act
+        var result = await service.GetTenantDbModelsFromFilter(filterArr);
+
+        // Assert
+        result.Should().BeOfType<List<TenantDbModel>>();
+        result.Count.Should().Be(context.Tenants.Count());
+    }
+    
+    [Fact]
+    public async void GetTenantDbModelsFromFilter_ReturnsNoTenants_WithAllFilter()
+    {
+        // Arrange
+        await using var context = Fixture.CreateReadContext();
+        var service = new AdminService(context,null!);
+        var filterArr = new []{true,true,true,true,true,true,true};
+
+        // Act
+        var result = await service.GetTenantDbModelsFromFilter(filterArr);
+
+        // Assert
+        result.Should().BeOfType<List<TenantDbModel>>();
+        result.Count.Should().Be(0);
+    }
 }
