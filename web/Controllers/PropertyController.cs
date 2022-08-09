@@ -79,7 +79,13 @@ public class PropertyController : AbstractController
     [HttpGet("edit/step/{step:int}")]
     public ActionResult EditProperty_Continue([FromRoute] int step, int propertyId)
     {
-        var newPropertyModel = PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(propertyId));
+        var property = _propertyService.GetPropertyByPropertyId(propertyId);
+        if (property == null)
+        {
+            return StatusCode(404);
+        }
+
+        var newPropertyModel = PropertyViewModel.FromDbModel(property);
         newPropertyModel.PropertyId = propertyId;
 
         // Show the form for this step
