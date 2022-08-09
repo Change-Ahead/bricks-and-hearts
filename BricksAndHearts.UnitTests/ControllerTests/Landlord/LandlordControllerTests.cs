@@ -57,13 +57,31 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
-        var landlord = CreateLandlordUser();
+        var landlordUser = CreateLandlordUser();
+        var landlordProfile = new LandlordProfileModel { LandlordId = landlordUser.Id };
 
         // Act
-        var result = await UnderTest.ApproveCharter(landlord.Id) as ViewResult;
+        var result = await UnderTest.ApproveCharter(landlordProfile) as ViewResult;
 
         // Assert
-        A.CallTo(() => LandlordService.ApproveLandlord(landlord.Id, adminUser)).MustHaveHappened();
+        A.CallTo(() => LandlordService.ApproveLandlord(landlordUser.Id, adminUser, null)).MustHaveHappened();
+        UnderTest.TempData["FlashMessage"].Should().Be("");
+    }
+
+    [Fact]
+    public async void ApproveCharter_CallsApproveLandlord_AndUpdatesMembershipId()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        var landlordUser = CreateLandlordUser();
+        var landlordProfile = new LandlordProfileModel { LandlordId = landlordUser.Id, MembershipId = "abc" };
+
+        // Act
+        var result = await UnderTest.ApproveCharter(landlordProfile) as ViewResult;
+
+        // Assert
+        A.CallTo(() => LandlordService.ApproveLandlord(landlordUser.Id, adminUser, "abc")).MustHaveHappened();
         UnderTest.TempData["FlashMessage"].Should().Be("");
     }
 
@@ -149,7 +167,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         result!.Model.Should().BeOfType<LandlordProfileModel>();
         result.Should().BeOfType<ViewResult>().Which.ViewName!.Should().BeEquivalentTo("EditProfilePage");
     }
-    
+
     [Fact]
     public void
         EditProfileUpdate_CalledUsingLandlordDatabaseModelWithDuplicateMembershipId_ReturnsEditProfileViewWithLandlordProfile()
