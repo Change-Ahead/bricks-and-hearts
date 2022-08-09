@@ -94,6 +94,13 @@
     <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#deleteModal">
         Delete Property
     </button>
+    <br/>
+    <br/>
+    @if (User.IsInRole("Admin"))
+    {
+        @Html.ActionLink("Get Public View Link", "GetPublicViewLink", "Property", new { propertyId = Model.PropertyId }, 
+            new { @class = "btn btn-primary" })   
+    }
 </div>
 
 

@@ -165,6 +165,9 @@ namespace BricksAndHearts.Migrations
                     b.Property<string>("PropertyType")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PublicViewLink")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("Rent")
                         .HasColumnType("int");
 

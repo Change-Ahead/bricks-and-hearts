@@ -53,4 +53,7 @@ public class PropertyDbModel
 
     // Tenant
     public int? RenterUserId { get; set; } = null;
+    
+    // Suffix to append to url for public view
+    public string? PublicViewLink { get; set; }
 }
