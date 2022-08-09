@@ -102,7 +102,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         // Assert
         context.ChangeTracker.Clear();
 
-        result.Should().Be($"Successfully approved landlord charter for {landlord.FirstName} {landlord.LastName}.");
+        result.Should().Be(ILandlordService.ApproveLandlordResult.Success);
 
         landlord = context.Landlords.Single(l => l.Email == "test.landlord2@gmail.com");
         landlord.CharterApproved.Should().BeTrue();

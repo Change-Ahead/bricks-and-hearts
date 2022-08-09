@@ -146,7 +146,7 @@
             <form method="post" asp-controller="Landlord" asp-action="ApproveCharter">
                 <div class="modal-body">
                     <label asp-for="MembershipId" class="form-label">Membership ID</label>
-                    <input type="text" asp-for="MembershipId" value="@(Model.MembershipId ?? "")" class="form-control">
+                    <input type="text" asp-for="MembershipId" value="@(Model.MembershipId ?? "")" class="form-control" required>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>

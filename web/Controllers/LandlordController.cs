@@ -146,10 +146,39 @@ public class LandlordController : AbstractController
     [HttpPost]
     public async Task<ActionResult> ApproveCharter(LandlordProfileModel landlord)
     {
+        if (landlord.MembershipId == null)
+        {
+            var message = "Membership ID is required.";
+            FlashMessage(_logger, (message, "warning", message));
+            return RedirectToAction("Profile", "Landlord", new { Id = landlord.LandlordId!.Value });
+        }
+
         var user = GetCurrentUser();
-        var flashMessageBody =
-            await _landlordService.ApproveLandlord(landlord.LandlordId!.Value, user, landlord.MembershipId);
-        FlashMessage(_logger, ("Charter status updated successfully", "success", flashMessageBody));
+        var result = await _landlordService.ApproveLandlord(landlord.LandlordId!.Value, user, landlord.MembershipId);
+
+        string flashMessageBody,
+            flashMessageType;
+        switch (result)
+        {
+            case ILandlordService.ApproveLandlordResult.ErrorLandlordNotFound:
+                flashMessageBody = "Sorry, it appears that no landlord with this ID exists.";
+                flashMessageType = "warning";
+                break;
+            case ILandlordService.ApproveLandlordResult.ErrorAlreadyApproved:
+                flashMessageBody = "The charter for this landlord has already been approved.";
+                flashMessageType = "warning";
+                break;
+            case ILandlordService.ApproveLandlordResult.Success:
+                flashMessageBody = "Successfully approved landlord charter.";
+                flashMessageType = "success";
+                break;
+            default:
+                flashMessageBody = "Unknown error occurred.";
+                flashMessageType = "warning";
+                break;
+        }
+
+        FlashMessage(_logger, (flashMessageBody, flashMessageType, flashMessageBody));
         return RedirectToAction("Profile", "Landlord", new { Id = landlord.LandlordId.Value });
     }
 

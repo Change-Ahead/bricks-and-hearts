@@ -23,6 +23,13 @@ public interface ILandlordService
         Success
     }
 
+    public enum ApproveLandlordResult
+    {
+        ErrorLandlordNotFound,
+        ErrorAlreadyApproved,
+        Success
+    }
+
     public Task<(LandlordRegistrationResult result, LandlordDbModel? dbModel)> RegisterLandlord(
         LandlordProfileModel createModel,
         BricksAndHeartsUser user);
@@ -37,7 +44,7 @@ public interface ILandlordService
     public Task<LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel);
     public bool CheckForDuplicateEmail(LandlordProfileModel editModel);
     public bool CheckForDuplicateMembershipId(LandlordProfileModel editModel);
-    public Task<string> ApproveLandlord(int landlordId, BricksAndHeartsUser user, string? membershipId = null);
+    public Task<ApproveLandlordResult> ApproveLandlord(int landlordId, BricksAndHeartsUser user, string membershipId);
     public LandlordDbModel? FindLandlordWithInviteLink(string inviteLink);
 
     public Task<LinkUserWithLandlordResult> LinkExistingLandlordWithUser(
@@ -177,25 +184,27 @@ public class LandlordService : ILandlordService
         return (ILandlordService.LandlordRegistrationResult.Success, dbModel);
     }
 
-    public async Task<string> ApproveLandlord(int landlordId, BricksAndHeartsUser user, string? membershipId = null)
+    public async Task<ILandlordService.ApproveLandlordResult> ApproveLandlord(int landlordId, BricksAndHeartsUser user,
+        string membershipId)
     {
         var landlord = await GetLandlordIfExistsFromId(landlordId);
         if (landlord is null)
         {
-            return "Sorry, it appears that no landlord with this ID exists";
+            return ILandlordService.ApproveLandlordResult.ErrorLandlordNotFound;
         }
 
         if (landlord.CharterApproved)
         {
-            return $"The landlord charter for {landlord.FirstName} {landlord.LastName} has already been approved.";
+            return ILandlordService.ApproveLandlordResult.ErrorAlreadyApproved;
         }
 
         landlord.CharterApproved = true;
         landlord.ApprovalTime = DateTime.Now;
         landlord.ApprovalAdminId = user.Id;
-        if (membershipId != null) landlord.MembershipId = membershipId;
+        landlord.MembershipId = membershipId;
+
         await _dbContext.SaveChangesAsync();
-        return $"Successfully approved landlord charter for {landlord.FirstName} {landlord.LastName}.";
+        return ILandlordService.ApproveLandlordResult.Success;
     }
 
     public LandlordDbModel? FindLandlordWithInviteLink(string inviteLink)

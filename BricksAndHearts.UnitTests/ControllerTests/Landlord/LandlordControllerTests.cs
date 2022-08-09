@@ -58,31 +58,33 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
         var landlordUser = CreateLandlordUser();
-        var landlordProfile = new LandlordProfileModel { LandlordId = landlordUser.Id };
+        var landlordProfile = new LandlordProfileModel { LandlordId = landlordUser.Id, MembershipId = "abc" };
+        A.CallTo(() => LandlordService.ApproveLandlord(landlordUser.Id, adminUser, "abc"))
+            .Returns(ILandlordService.ApproveLandlordResult.Success);
 
         // Act
-        var result = await UnderTest.ApproveCharter(landlordProfile) as ViewResult;
+        await UnderTest.ApproveCharter(landlordProfile);
 
         // Assert
-        A.CallTo(() => LandlordService.ApproveLandlord(landlordUser.Id, adminUser, null)).MustHaveHappened();
-        UnderTest.TempData["FlashMessage"].Should().Be("");
+        A.CallTo(() => LandlordService.ApproveLandlord(landlordUser.Id, adminUser, "abc")).MustHaveHappened();
+        UnderTest.TempData["FlashMessage"].Should().Be("Successfully approved landlord charter.");
     }
 
     [Fact]
-    public async void ApproveCharter_CallsApproveLandlord_AndUpdatesMembershipId()
+    public async void ApproveCharter_WithoutMembershipId_DisplaysErrorMessage()
     {
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
         var landlordUser = CreateLandlordUser();
-        var landlordProfile = new LandlordProfileModel { LandlordId = landlordUser.Id, MembershipId = "abc" };
+        var landlordProfile = new LandlordProfileModel { LandlordId = landlordUser.Id };
 
         // Act
-        var result = await UnderTest.ApproveCharter(landlordProfile) as ViewResult;
+        await UnderTest.ApproveCharter(landlordProfile);
 
         // Assert
-        A.CallTo(() => LandlordService.ApproveLandlord(landlordUser.Id, adminUser, "abc")).MustHaveHappened();
-        UnderTest.TempData["FlashMessage"].Should().Be("");
+        A.CallTo(() => LandlordService.ApproveLandlord(landlordUser.Id, adminUser, null!)).MustNotHaveHappened();
+        UnderTest.TempData["FlashMessage"].Should().Be("Membership ID is required.");
     }
 
     [Fact]
