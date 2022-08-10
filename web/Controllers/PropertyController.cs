@@ -12,7 +12,6 @@ namespace BricksAndHearts.Controllers;
 public class PropertyController : AbstractController
 {
     private readonly IPropertyService _propertyService;
-    private readonly IPostcodeApiService _postcodeApiService;
     private readonly IAzureMapsApiService _azureMapsApiService;
     private readonly ILogger<PropertyController> _logger;
     private readonly IAzureStorage _azureStorage;
@@ -23,7 +22,6 @@ public class PropertyController : AbstractController
         _azureMapsApiService = azureMapsApiService;
         _logger = logger;
         _azureStorage = azureStorage;
-        _postcodeApiService = postcodeApiService;
     }
 
     [HttpPost]
@@ -485,7 +483,7 @@ public class PropertyController : AbstractController
     [HttpGet("SortPropertiesByLocation")]
     public async Task<IActionResult> SortPropertiesByLocation(string postcode, int page = 1, int propPerPage = 10)
     {
-        var properties = await _postcodeApiService.SortPropertiesByLocation(postcode);
+        var properties = await _propertyService.SortPropertiesByLocation(postcode);
 
         if (properties == null)
         {

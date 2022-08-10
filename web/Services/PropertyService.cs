@@ -1,6 +1,7 @@
 using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace BricksAndHearts.Services;
 
@@ -15,15 +16,19 @@ public interface IPropertyService
     public List<PropertyDbModel> SortProperties(string by);
     public PropertyCountModel CountProperties();
     string? CreateNewPublicViewLink(int propertyId);
+    public Task<List<PropertyDbModel>?> SortPropertiesByLocation(string postalCode);
+
 }
 
 public class PropertyService : IPropertyService
 {
     private readonly BricksAndHeartsDbContext _dbContext;
+    private readonly IPostcodeApiService _postcodeApiService;
 
-    public PropertyService(BricksAndHeartsDbContext dbContext)
+    public PropertyService(BricksAndHeartsDbContext dbContext, IPostcodeApiService postcodeApiService)
     {
         _dbContext = dbContext;
+        _postcodeApiService = postcodeApiService;
     }
 
     public List<PropertyDbModel> GetPropertiesByLandlord(int landlordId)

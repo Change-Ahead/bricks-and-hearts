@@ -1,10 +1,18 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Http;
+using System.Threading.Tasks;
+using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
+using FakeItEasy;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ServiceTests.Property;
@@ -27,7 +35,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
-        var service = new PropertyService(context);
+        var service = new PropertyService(context, null!);
 
         // Act
         var propertiesByLandlord = service.GetPropertiesByLandlord(landlordId);
@@ -47,7 +55,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         await using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context);
+        var service = new PropertyService(context, null!);
         var propertiesBeforeCount = context.Properties.Count();
         var createModel = new PropertyViewModel
         {
@@ -81,7 +89,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         await using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context);
+        var service = new PropertyService(context, null!);
         var propertiesBeforeCount = context.Properties.Count();
         var deleteModel = context.Properties.Single(u => u.Id == 1);
 
@@ -104,7 +112,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         await using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context);
+        var service = new PropertyService(context, null!);
         context.Properties.Single(u => u.Id == 1).AcceptsBenefits = true;
         var propertiesBeforeCount = context.Properties.Count();
         var updateModel = new PropertyViewModel
@@ -136,7 +144,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context);
+        var service = new PropertyService(context, null!);
 
         var propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
         var propertyUpdate = new PropertyViewModel { OccupiedUnits = propertyDb.TotalUnits };
@@ -156,7 +164,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context);
+        var service = new PropertyService(context, null!);
 
         var propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
         var propertyUpdate = new PropertyViewModel { OccupiedUnits = propertyDb.TotalUnits + 1 };
@@ -175,7 +183,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context);
+        var service = new PropertyService(context, null!);
 
         var date = DateTime.Now;
         var propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
@@ -200,7 +208,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context);
+        var service = new PropertyService(context, null!);
 
         var date = DateTime.Now;
         var propertyDb = context.Properties.Single(p => p.AddressLine1 == "AvailableSoon Property");
@@ -224,7 +232,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context);
+        var service = new PropertyService(context, null!);
 
         var date = DateTime.Now;
         var propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
@@ -254,7 +262,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
-        var service = new PropertyService(context);
+        var service = new PropertyService(context, null!);
 
         // Act
         var result = service.CountProperties();
@@ -279,7 +287,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         await using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context);
+        var service = new PropertyService(context, null!);
         var adminUser = CreateAdminUser();
         adminUser.LandlordId = 50;
 
@@ -297,7 +305,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         await using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context);
+        var service = new PropertyService(context, null!);
         var adminUser = CreateAdminUser();
         adminUser.LandlordId = 50;
 
@@ -316,7 +324,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         await using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context);
+        var service = new PropertyService(context, null!);
         var landlordUser = CreateLandlordUser();
         landlordUser.LandlordId = 50;
 
@@ -335,7 +343,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         await using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context);
+        var service = new PropertyService(context, null!);
         var landlordUser = CreateLandlordUser();
         landlordUser.LandlordId = 50;
 
@@ -361,7 +369,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
-        var service = new PropertyService(context);
+        var service = new PropertyService(context, null!);
 
         // Act
         var property = service.GetPropertyByPropertyId(propertyId)!;
@@ -376,7 +384,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
-        var service = new PropertyService(context);
+        var service = new PropertyService(context, null!);
         var propertyId = context.Properties.Count() + 1; //One more than highest propertyID
 
         // Act
@@ -393,7 +401,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context);
+        var service = new PropertyService(context, null!);
 
         // Act
         var result = service.CreateNewPublicViewLink(1);
@@ -401,5 +409,74 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         // Assert
         result.Should().NotBeNullOrEmpty();
         context.Properties.Single(p => p.Id == 1).PublicViewLink.Should().Be(result);
+    }
+    
+    [Fact]
+    public async void SortPropertiesByLocation_WhenCalledWithInvalidPostcode_ReturnsNull()
+    {
+        // Arrange
+        var logger = A.Fake<ILogger<PostcodeApiService>>();
+        var messageHandler = A.Fake<HttpMessageHandler>();
+        const string postcode = "eeeeee";
+        var responseBody = string.Empty;
+        var response = new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.NotFound,
+            Content = new StringContent(responseBody)
+        };
+        // Slightly icky because "SendAsync" is protected
+        A.CallTo(messageHandler).Where(c => c.Method.Name == "SendAsync").WithReturnType<Task<HttpResponseMessage>>().Returns(response);
+        var httpClient = new HttpClient(messageHandler);
+        var postcodeApiService = new PostcodeApiService(logger, null!, httpClient);
+        var service = new PropertyService(null!, postcodeApiService);
+
+        // Act
+        var result = await service.SortPropertiesByLocation(postcode);
+        
+        // Assert
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public async void SortPropertiesByLocation_WhenCalledWithValidPostcode_ReturnPropertiesSorted()
+    {
+        // Arrange
+        await using var context = Fixture.CreateReadContext();
+        var logger = A.Fake<ILogger<PostcodeApiService>>();
+        var messageHandler = A.Fake<HttpMessageHandler>();
+        const string postcode = "eh11ad";
+        var responseBody = await File.ReadAllTextAsync($"{AppDomain.CurrentDomain.BaseDirectory}/../../../ServiceTests/Api/PostcodeioApiResponse.json");
+        var response = new HttpResponseMessage
+        {
+            StatusCode = HttpStatusCode.OK,
+            Content = new StringContent(responseBody)
+        };
+        // Slightly icky because "SendAsync" is protected
+        A.CallTo(messageHandler).Where(c => c.Method.Name == "SendAsync").WithReturnType<Task<HttpResponseMessage>>().Returns(response);
+        var httpClient = new HttpClient(messageHandler);
+        var postcodeApiService = new PostcodeApiService(logger, context, httpClient);
+        var service = new PropertyService(context, postcodeApiService);
+        
+        
+        // Act
+        var result = await service.SortPropertiesByLocation(postcode);
+        
+        // Assert
+        var correctList = new List<PropertyDbModel>
+        {
+            context.Properties.Single(p => p.TownOrCity == "Leeds"),
+            context.Properties.Single(p => p.TownOrCity == "Peterborough"),
+            context.Properties.Single(p => p.TownOrCity == "London"),
+            context.Properties.Single(p => p.TownOrCity == "Brighton"),
+        };
+        var propertyDbModelList = result!.FindAll(p => p.LandlordId == 3);
+        propertyDbModelList.Should().NotBeNullOrEmpty();
+        propertyDbModelList.Should().HaveCount(4);
+        var i = 0;
+        while (i < 4)
+        {
+            propertyDbModelList[i].Should().BeEquivalentTo(correctList[i]);
+            i++;
+        }
     }
 }

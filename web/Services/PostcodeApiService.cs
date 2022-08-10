@@ -1,13 +1,14 @@
 ﻿using BricksAndHearts.Database;
-using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 
 namespace BricksAndHearts.Services;
 
 public interface IPostcodeApiService
 {
-    public Task<List<PropertyDbModel>?> SortPropertiesByLocation(string postalCode);
-}
+    public Task<string> MakeApiRequestToPostcodeApi(string postalCode);
+    public PostcodeioResponseModel TurnResponseBodyToModel(string responseBody);
+}    
+
 
 public class PostcodeApiService : IPostcodeApiService
 {
@@ -15,14 +16,11 @@ public class PostcodeApiService : IPostcodeApiService
     private readonly ILogger<PostcodeApiService> _logger;
     private readonly BricksAndHeartsDbContext _dbContext;
 
-    public PostcodeApiService(ILogger<PostcodeApiService> logger, BricksAndHeartsDbContext dbContext, HttpClient? client = null)
+    public PostcodeApiService(ILogger<PostcodeApiService> logger, BricksAndHeartsDbContext dbContext, HttpClient client)
     {
         _logger = logger;
         _dbContext = dbContext;
-        if (client != null)
-        {
-            _client = client;
-        }
+        _client = client;
     }
 
     public async Task<string> MakeApiRequestToPostcodeApi(string postalCode)
@@ -57,41 +55,5 @@ public class PostcodeApiService : IPostcodeApiService
         var postcodeResponse =
             JsonConvert.DeserializeObject<PostcodeioResponseModel>(responseBody);
         return postcodeResponse!;
-    }
-
-    public async Task<List<PropertyDbModel>?> SortPropertiesByLocation(string postalCode)
-    {
-        var responseBody = await MakeApiRequestToPostcodeApi(postalCode);
-        var model = TurnResponseBodyToModel(responseBody);
-        if (model.Result == null || model.Result.Lat == null || model.Result.Lon == null)
-        {
-            return null;
-        }
-
-        var properties = _dbContext.Properties
-            // This is a simpler method using pythagoras, not too accurate
-            /*.FromSqlInterpolated(
-                @$"
-                SELECT *
-                FROM dbo.Property
-                WHERE Lon is not NULL and Lat is not NULL
-                ORDER BY ((Lat-{model.Result.Lat})*(Lat-{model.Result.Lat})) + ((Lon - {model.Result.Lon})*(Lon - {model.Result.Lon})) ASC");
-            */
-            // This is a more complicated method, if things break, use method 1 and try again
-            .FromSqlInterpolated(
-                @$"SELECT *, (
-                  6371 * acos (
-                  cos ( radians({model.Result.Lat}) )
-                  * cos( radians( Lat ) )
-                  * cos( radians( Lon ) - radians({model.Result.Lon}) )
-                  + sin ( radians({model.Result.Lat}) )
-                  * sin( radians( Lat ) )
-                    )
-                ) AS distance 
-                FROM dbo.Property
-                ORDER BY distance
-                "
-                );
-            return properties.ToList();
     }
 }
