@@ -17,3 +17,9 @@ function checkIfSelectedValueIsTarget(target){
     }
 }
 
+function copyLinkToClipboard(linkToCopy){
+    // Copy the text passed into the function
+    console.log(window.location.origin,"/invite/",linkToCopy)
+    console.log(window.location.origin+"/invite/"+linkToCopy)
+    navigator.clipboard.writeText(linkToCopy);
+}

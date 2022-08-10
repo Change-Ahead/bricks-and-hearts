@@ -4,6 +4,7 @@ using BricksAndHearts.Auth;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using LINQtoCSV;
+using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -130,7 +131,7 @@ public class AdminController : AbstractController
                 flashMessageBody = "Landlord already has an invite link";
             }
 
-            FlashMessage(_logger, (flashMessageBody, "success", flashMessageBody + $": {inviteLink}"));
+            FlashMessage(_logger, (flashMessageBody, "success", flashMessageBody + $": {(HttpContext.Request.IsHttps ? "https" : "http")}://{HttpContext.Request.Host}/invite/{inviteLink}"));
         }
 
         return RedirectToAction("Profile", "Landlord", new { id = landlordId });
