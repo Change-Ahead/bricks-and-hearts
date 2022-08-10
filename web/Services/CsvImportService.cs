@@ -57,7 +57,7 @@ public class CsvImportService : ICsvImportService
                 _logger.LogWarning($"Extra column: {header}");
                 flashTypes.Add("warning");
                 flashMessages.Add(
-                    $"The column {header} does not exist in the database. All data in this column has been ignored.");
+                    $"The column \"{header}\" does not exist in the database. All data in this column has been ignored.");
             }
         }
         return (flashTypes, flashMessages);
@@ -82,14 +82,16 @@ public class CsvImportService : ICsvImportService
             {
                 _dbContext.Tenants.Remove(tenant);
             }
-            
+
+            int lineNo = 0;
             foreach (TenantUploadModel tenant in list)
             {
+                lineNo += 1;
                 if (tenant.Name == null)
                 {
                     _logger.LogWarning($"Name is missing from record {tenant.Email}.");
                     flashTypes.Add("danger");
-                    flashMessages.Add($"Name is missing from record {tenant.Email}. This record has not been added to the database. Please add a name to this tenant in order to import their information.");
+                    flashMessages.Add($"Name is missing from record on line {lineNo} (email address provided is {tenant.Email}). This record has not been added to the database. Please add a name to this tenant in order to import their information.");
                 }
                 else
                 {
@@ -113,7 +115,6 @@ public class CsvImportService : ICsvImportService
                                     flashTypes.Add("danger");
                                     flashMessages.Add(
                                         $"Invalid input in record for tenant {tenant.Name}: '{uploadProp.Name}' cannot be '{uploadProp.GetValue(tenant)!.ToString()}' as this is the wrong data type.");
-
                                 }
                             }
                             else

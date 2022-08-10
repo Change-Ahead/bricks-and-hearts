@@ -207,6 +207,13 @@ public class AdminController : AbstractController
     
     [Authorize(Roles = "Admin")]
     [HttpPost]
+    public ActionResult GetSampleTenantCSV()
+    {
+        return File("~/TenantImportCSVTemplate.csv", "text/csv");
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
     public async Task<ActionResult> ImportTenants(IFormFile csvFile)
     {
         if (csvFile == null)
