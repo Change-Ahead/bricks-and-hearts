@@ -15,10 +15,10 @@ namespace BricksAndHearts.Controllers;
 public class AdminController : AbstractController
 {
     private readonly IAdminService _adminService;
-    private readonly ICsvImportService _csvImportService;
     private readonly ILandlordService _landlordService;
-    private readonly ILogger<AdminController> _logger;
     private readonly IPropertyService _propertyService;
+    private readonly ICsvImportService _csvImportService;
+    private readonly ILogger<AdminController> _logger;
 
     public AdminController(ILogger<AdminController> logger, IAdminService adminService,
         ILandlordService landlordService, IPropertyService propertyService, ICsvImportService csvImportService)
@@ -77,15 +77,49 @@ public class AdminController : AbstractController
 
         return RedirectToAction(nameof(AdminDashboard));
     }
+    
+    private void LoggerAlreadyAdminWarning(ILogger logger, BricksAndHeartsUser user)
+    {
+        FlashMessage(logger,
+            ($"User {user.Id} already an admin",
+                "danger",
+                "Already an admin"));
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    public ActionResult AcceptAdminRequest(int userToAcceptId)
+    {
+        if (_adminService.GetUserFromId(userToAcceptId) == null)
+        {
+            return View("Error", new ErrorViewModel());
+        }
+
+        _adminService.ApproveAdminAccessRequest(userToAcceptId);
+
+        return RedirectToAction("GetAdminList");
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    public ActionResult RejectAdminRequest(int userToRejectId)
+    {
+        if (_adminService.GetUserFromId(userToRejectId) == null)
+        {
+            return View("Error", new ErrorViewModel());
+        }
+        
+        _adminService.RejectAdminAccessRequest(userToRejectId);
+
+        return RedirectToAction("GetAdminList");
+    }
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<ActionResult> GetAdminList()
     {
         var adminLists = await _adminService.GetAdminLists();
-
-        var adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
-
+        AdminListModel adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
         return View("AdminList", adminListModel);
     }
 
@@ -166,38 +200,7 @@ public class AdminController : AbstractController
 
         return RedirectToAction("Profile", "Landlord", new { id = landlordId });
     }
-
-    private void LoggerAlreadyAdminWarning(ILogger logger, BricksAndHeartsUser user)
-    {
-        FlashMessage(logger,
-            ($"User {user.Id} already an admin",
-                "danger",
-                "Already an admin"));
-    }
-
-    [Authorize(Roles = "Admin")]
-    [HttpPost]
-    public ActionResult AcceptAdminRequest(int userToAcceptId)
-    {
-        if (_adminService.GetUserFromId(userToAcceptId) == null)
-        {
-            return View("Error", new ErrorViewModel());
-        }
-
-        _adminService.ApproveAdminAccessRequest(userToAcceptId);
-
-        return RedirectToAction("GetAdminList");
-    }
-
-    [Authorize(Roles = "Admin")]
-    [HttpPost]
-    public ActionResult RejectAdminRequest(int userToAcceptId)
-    {
-        _adminService.RejectAdminAccessRequest(userToAcceptId);
-
-        return RedirectToAction("GetAdminList");
-    }
-
+    
     [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetFilteredTenants(TenantListModel tenantListModel)

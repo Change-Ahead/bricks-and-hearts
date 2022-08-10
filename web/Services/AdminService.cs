@@ -1,4 +1,4 @@
-using System.Data;
+﻿using System.Data;
 using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
 using Microsoft.EntityFrameworkCore;
@@ -7,19 +7,26 @@ namespace BricksAndHearts.Services;
 
 public interface IAdminService
 {
+    public UserDbModel? GetUserFromId(int userId);
+    
+    //Admin Access
     public void RequestAdminAccess(BricksAndHeartsUser user);
     public void CancelAdminAccessRequest(BricksAndHeartsUser user);
+    public void ApproveAdminAccessRequest(int userId);
+    public void RejectAdminAccessRequest(int userId);
+    
+    //Information Lists
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
     public Task<List<LandlordDbModel>> GetLandlordDisplayList(string approvalStatus);
     public Task<List<TenantDbModel>> GetTenantList();
+    public Task<List<TenantDbModel>> GetTenantDbModelsFromFilter(string[] filterArray);
+    
+    //Invite Links
     public UserDbModel? FindUserByLandlordId(int landlordId);
     public string? FindExistingInviteLink(int landlordId);
     public string CreateNewInviteLink(int landlordId);
     public void DeleteExistingInviteLink(int landlordId);
-    public void ApproveAdminAccessRequest(int userId);
-    public void RejectAdminAccessRequest(int userId);
-    public UserDbModel GetUserFromId(int userId);
-    public Task<List<TenantDbModel>> GetTenantDbModelsFromFilter(string[] filterArray);
+    
 }
 
 public class AdminService : IAdminService
@@ -33,6 +40,12 @@ public class AdminService : IAdminService
         _dbContext = dbContext;
     }
 
+    public UserDbModel? GetUserFromId(int userId)
+    {
+        UserDbModel userFromId = _dbContext.Users.SingleOrDefault(u => u.Id == userId)!;
+        return userFromId;
+    }
+    
     public void RequestAdminAccess(BricksAndHeartsUser user)
     {
         var userRecord = _dbContext.Users.Single(u => u.Id == user.Id);
@@ -45,6 +58,23 @@ public class AdminService : IAdminService
         var userRecord = _dbContext.Users.Single(u => u.Id == user.Id);
         userRecord.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
+    }
+    
+    public void ApproveAdminAccessRequest(int userId)
+    {
+        var userToAdmin = _dbContext.Users.Single(u => u.Id == userId);
+        userToAdmin.IsAdmin = true;
+        userToAdmin.HasRequestedAdmin = false;
+        _dbContext.SaveChanges();
+        _logger.LogInformation("Admin request approved");
+    }
+
+    public void RejectAdminAccessRequest(int userId)
+    {
+        var userToAdmin = _dbContext.Users.Single(u => u.Id == userId);
+        userToAdmin.HasRequestedAdmin = false;
+        _dbContext.SaveChanges();
+        _logger.LogInformation("Admin request rejected");
     }
 
     public async Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists()
@@ -71,85 +101,15 @@ public class AdminService : IAdminService
         {
             "Unapproved" => await _dbContext.Landlords.Where(u => u.CharterApproved == false).ToListAsync(),
             "Approved" => await _dbContext.Landlords.Where(u => u.CharterApproved == true).ToListAsync(),
-            _ => await _dbContext.Landlords.ToListAsync()
+            _ => await _dbContext.Landlords.ToListAsync(),
         };
     }
-
+    
     public async Task<List<TenantDbModel>> GetTenantList()
     {
         return await _dbContext.Tenants.ToListAsync();
     }
-
-    public UserDbModel? FindUserByLandlordId(int landlordId)
-    {
-        return _dbContext.Users.SingleOrDefault(u => u.LandlordId == landlordId);
-    }
-
-    public string? FindExistingInviteLink(int landlordId)
-    {
-        // Find landlord in db (assumes existence)
-        var landlord = _dbContext.Landlords.Single(u => u.Id == landlordId);
-        // Get existing invite link (if exists)
-        return !string.IsNullOrEmpty(landlord.InviteLink) ? landlord.InviteLink : null;
-    }
-
-    public string CreateNewInviteLink(int landlordId)
-    {
-        // Find landlord in db (assumes existence)
-        var landlord = _dbContext.Landlords.Single(u => u.Id == landlordId);
-        // Should not have existing link
-        if (!string.IsNullOrEmpty(landlord.InviteLink))
-        {
-            throw new Exception("Landlord should not have existing invite link!");
-        }
-
-        var g = Guid.NewGuid();
-        var inviteLink = g.ToString();
-        landlord.InviteLink = inviteLink;
-        _dbContext.SaveChanges();
-        return inviteLink;
-    }
-
-    public void DeleteExistingInviteLink(int landlordId)
-    {
-        // Find landlord in db (assumes existence)
-        var landlord = _dbContext.Landlords.Single(u => u.Id == landlordId);
-        // Should have existing link
-        if (string.IsNullOrEmpty(landlord.InviteLink))
-        {
-            throw new Exception("Landlord should have existing invite link!");
-        }
-
-        // Delete
-        landlord.InviteLink = null;
-        _dbContext.SaveChanges();
-    }
-
-    public void ApproveAdminAccessRequest(int userId)
-    {
-        var userToAdmin = _dbContext.Users.Single(u => u.Id == userId);
-
-        userToAdmin.IsAdmin = true;
-        userToAdmin.HasRequestedAdmin = false;
-        _dbContext.SaveChanges();
-        _logger.LogInformation("Admin request approved");
-    }
-
-    public void RejectAdminAccessRequest(int userId)
-    {
-        var userToAdmin = _dbContext.Users.Single(u => u.Id == userId);
-
-        userToAdmin.HasRequestedAdmin = false;
-        _dbContext.SaveChanges();
-        _logger.LogInformation("Admin request rejected");
-    }
-
-    public UserDbModel GetUserFromId(int userId)
-    {
-        var userFromId = _dbContext.Users.SingleOrDefault(u => u.Id == userId)!;
-        return userFromId;
-    }
-
+    
     public async Task<List<TenantDbModel>> GetTenantDbModelsFromFilter(string[] filterArray)
     {
         var tenantQuery = from tenants in _dbContext.Tenants select tenants;
@@ -177,5 +137,43 @@ public class AdminService : IAdminService
             }
         }
         return await tenantQuery.ToListAsync();
+    }
+
+    public UserDbModel? FindUserByLandlordId(int landlordId)
+    {
+        return _dbContext.Users.SingleOrDefault(u => u.LandlordId == landlordId);
+    }
+
+    public string? FindExistingInviteLink(int landlordId)
+    {
+        var landlord = _dbContext.Landlords.Single(u => u.Id == landlordId);
+        return !string.IsNullOrEmpty(landlord.InviteLink) ? landlord.InviteLink : null;
+    }
+
+    public string CreateNewInviteLink(int landlordId)
+    {
+        var landlord = _dbContext.Landlords.Single(u => u.Id == landlordId);
+        if (!string.IsNullOrEmpty(landlord.InviteLink))
+        {
+            throw new Exception("Landlord should not have existing invite link!");
+        }
+
+        var g = Guid.NewGuid();
+        var inviteLink = g.ToString();
+        landlord.InviteLink = inviteLink;
+        _dbContext.SaveChanges();
+        return inviteLink;
+    }
+
+    public void DeleteExistingInviteLink(int landlordId)
+    {
+        var landlord = _dbContext.Landlords.Single(u => u.Id == landlordId);
+        if (string.IsNullOrEmpty(landlord.InviteLink))
+        {
+            throw new Exception("Landlord should have existing invite link!");
+        }
+
+        landlord.InviteLink = null;
+        _dbContext.SaveChanges();
     }
 }
