@@ -165,7 +165,8 @@ public class AdminService : IAdminService
                     3 => tenantQuery.Where(t => t.HasPet == true),
                     4 => tenantQuery.Where(t => t.ETT == true),
                     5 => tenantQuery.Where(t => t.UniversalCredit == true),
-                    6 => tenantQuery.Where(t => t.Over35 == true),
+                    6 => tenantQuery.Where(t => t.HousingBenefits == true),
+                    7 => tenantQuery.Where(t => t.Over35 == true),
                     _ => tenantQuery
                 };
             }

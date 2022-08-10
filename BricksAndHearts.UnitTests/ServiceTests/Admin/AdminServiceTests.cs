@@ -262,7 +262,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         // Arrange
         await using var context = Fixture.CreateReadContext();
         var service = new AdminService(context,null!);
-        var filterArr = new [] { true, false, false, false, true, true, false };
+        var filterArr = new [] { true, false, false, false, true, true, false, false };
 
         // Act
         var result = await service.GetTenantDbModelsFromFilter(filterArr);
@@ -280,7 +280,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         // Arrange
         await using var context = Fixture.CreateReadContext();
         var service = new AdminService(context,null!);
-        var filterArr = new bool[7];
+        var filterArr = new bool[8];
 
         // Act
         var result = await service.GetTenantDbModelsFromFilter(filterArr);
@@ -296,7 +296,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         // Arrange
         await using var context = Fixture.CreateReadContext();
         var service = new AdminService(context,null!);
-        var filterArr = new []{true,true,true,true,true,true,true};
+        var filterArr = new []{true,true,true,true,true,true,true,true};
 
         // Act
         var result = await service.GetTenantDbModelsFromFilter(filterArr);
