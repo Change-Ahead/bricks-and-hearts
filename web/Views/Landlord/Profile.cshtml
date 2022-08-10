@@ -37,18 +37,24 @@
         <div class="mb-4">
             <div class="d-flex">
                 <h3 class="font-h3 d-inline-block">Address</h3>
-                <a class="bi bi-pencil ms-auto"></a>
+                <a class="bi bi-pencil ms-auto" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(1);"></a>
             </div>
             <table class="table">
                 <tr>
                     <th class="w-25">Address</th>
                     <td>
-                        Softwire,<br/>
-                        Charter House,<br/>
-                        62-64 Hills Rd,<br/>
-                        Cambridge,<br/>
-                        Cambridgeshire<br/>
-                        CB2 1LA<br/>
+                        <div>@Model.Address.AddressLine1,</div>
+                        @if (Model.Address.AddressLine2 != null)
+                        {
+                            <div>@Model.Address.AddressLine2,</div>
+                        }
+                        @if (Model.Address.AddressLine3 != null)
+                        {
+                            <div>@Model.Address.AddressLine3,</div>
+                        }
+                        <div>@Model.Address.TownOrCity,</div>
+                        <div>@Model.Address.County,</div>
+                        <div>@Model.Address.Postcode,</div>
                     </td>
                 </tr>
                 <tr>
