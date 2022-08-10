@@ -15,9 +15,9 @@ public interface ICsvImportService
 public class CsvImportService : ICsvImportService
 {
     private readonly BricksAndHeartsDbContext _dbContext;
-    private readonly ILogger<AdminService> _logger;
+    private readonly ILogger<CsvImportService> _logger;
 
-    public CsvImportService(BricksAndHeartsDbContext dbContext, ILogger<AdminService> logger)
+    public CsvImportService(BricksAndHeartsDbContext dbContext, ILogger<CsvImportService> logger)
     {
         _logger = logger;
         _dbContext = dbContext;
