@@ -96,33 +96,62 @@ public class CsvImportService : ICsvImportService
                 else
                 {
                     TenantDbModel dbTenant = new TenantDbModel();
-                    foreach (var uploadProp in typeof(TenantUploadModel).GetProperties())
+                    dbTenant.Name = tenant.Name;
+                    dbTenant.Email = tenant.Email;
+                    dbTenant.Phone = tenant.Phone;
+                    dbTenant.Postcode = tenant.Postcode;
+                    dbTenant.Type = tenant.Type;
+
+                    if (Boolean.TryParse(tenant.HasPet, out bool boolHasPet)|| tenant.HasPet is null)
                     {
-                        if (uploadProp.GetValue(tenant) is not null)
-                        {
-                            var dataProp = typeof(TenantDbModel).GetProperty(uploadProp.Name);
-                            if (dataProp!.PropertyType == typeof(bool?))
-                            {
-                                bool isBool = bool.TryParse(uploadProp.GetValue(tenant)!.ToString(), out bool boolData);
-                                if (isBool)
-                                {
-                                    dataProp.SetValue(dbTenant, boolData);
-                                }
-                                else
-                                {
-                                    _logger.LogWarning(
-                                        $"Invalid input for {uploadProp.Name} in record for {tenant.Name}.");
-                                    flashTypes.Add("danger");
-                                    flashMessages.Add(
-                                        $"Invalid input in record for tenant {tenant.Name}: '{uploadProp.Name}' cannot be '{uploadProp.GetValue(tenant)!.ToString()}' as this is the wrong data type.");
-                                }
-                            }
-                            else
-                            {
-                                dataProp.SetValue(dbTenant, uploadProp.GetValue(tenant));
-                            }
-                        }
+                        dbTenant.HasPet = boolHasPet;
                     }
+                    else
+                    {
+                        flashTypes.Add("danger");
+                        flashMessages.Add(InvalidInputMessage(tenant.Name, "HasPet", tenant.HasPet));
+                    }
+                    
+                    if (Boolean.TryParse(tenant.ETT, out bool boolETT)|| tenant.ETT is null)
+                    {
+                        dbTenant.ETT = boolETT;
+                    }
+                    else
+                    {
+                        flashTypes.Add("danger");
+                        flashMessages.Add(InvalidInputMessage(tenant.Name, "ETT", tenant.ETT));
+                    }
+                    
+                    if (Boolean.TryParse(tenant.UniversalCredit, out bool boolUniversalCredit)|| tenant.UniversalCredit is null)
+                    {
+                        dbTenant.UniversalCredit = boolUniversalCredit;
+                    }
+                    else
+                    {
+                        flashTypes.Add("danger");
+                        flashMessages.Add(InvalidInputMessage(tenant.Name, "UniversalCredit", tenant.UniversalCredit));
+                    }
+                    
+                    if (Boolean.TryParse(tenant.HousingBenefits, out bool boolHousingBenefits)|| tenant.HousingBenefits is null)
+                    {
+                        dbTenant.HousingBenefits = boolHousingBenefits;
+                    }
+                    else
+                    {
+                        flashTypes.Add("danger");
+                        flashMessages.Add(InvalidInputMessage(tenant.Name, "HousingBenefits", tenant.HousingBenefits));
+                    }
+                    
+                    if (Boolean.TryParse(tenant.Over35, out bool boolOver35)|| tenant.Over35 is null)
+                    {
+                        dbTenant.Over35 = boolOver35;
+                    }
+                    else
+                    {
+                        flashTypes.Add("danger");
+                        flashMessages.Add(InvalidInputMessage(tenant.Name, "Over35", tenant.Over35));
+                    }
+
                     _dbContext.Tenants.Add(dbTenant);
                 }
                 _dbContext.SaveChanges();
@@ -130,5 +159,12 @@ public class CsvImportService : ICsvImportService
             await transaction.CommitAsync();
         }
         return (flashTypes, flashMessages);
+    }
+
+    private string InvalidInputMessage(string tenantName, string propName, string propValue)
+    {
+        _logger.LogWarning($"Invalid input for {propName} in record for {tenantName}.");
+        return $"Invalid input in record for tenant {tenantName}: '{propName}' cannot be '{propValue}' as this is the wrong data type.";
+
     }
 }

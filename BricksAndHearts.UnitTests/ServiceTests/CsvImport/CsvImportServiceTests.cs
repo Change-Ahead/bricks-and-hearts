@@ -58,7 +58,7 @@ public class CsvImportServiceTests : IClassFixture<TestDatabaseFixture>
 
         // Assert
         flashResponse.Item1.Should().Contain("warning");
-        flashResponse.Item2.Should().Contain("The column Extra does not exist in the database. All data in this column has been ignored.");
+        flashResponse.Item2.Should().Contain("The column \"Extra\" does not exist in the database. All data in this column has been ignored.");
     }
     
     [Fact]

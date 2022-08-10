@@ -20,8 +20,6 @@ public interface IAdminService
     public void RejectAdminAccessRequest(int userId);
     public UserDbModel GetUserFromId(int userId);
     public Task<List<TenantDbModel>> GetTenantDbModelsFromFilter(string[] filterArray);
-    public (int[] columnOrder, (List<string> FlashTypes, List<string> FlashMessages)) CheckIfImportWorks(IFormFile csvFile);
-    public Task<(List<string> FlashTypes, List<string> FlashMessages)> ImportTenants(IFormFile csvFile, int[] columnOrder, (List<string> flashTypes, List<string> flashMessages) flashResponse);
 }
 
 public class AdminService : IAdminService
@@ -52,6 +50,19 @@ public class AdminService : IAdminService
     public async Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists()
     {
         return (await GetCurrentAdmins(), await GetPendingAdmins());
+    }
+    
+    private async Task<List<UserDbModel>> GetCurrentAdmins()
+    {
+        var currentAdmins = await _dbContext.Users.Where(u => u.IsAdmin == true).ToListAsync();
+        return currentAdmins;
+    }
+
+    private async Task<List<UserDbModel>> GetPendingAdmins()
+    {
+        var pendingAdmins =
+            await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
+        return pendingAdmins;
     }
 
     public async Task<List<LandlordDbModel>> GetLandlordDisplayList(string approvalStatus)
@@ -166,19 +177,5 @@ public class AdminService : IAdminService
             }
         }
         return await tenantQuery.ToListAsync();
-    }
-    
-    public (int[], (List<string>, List<string>)) CheckIfImportWorks(IFormFile csvFile)
-    private async Task<List<UserDbModel>> GetCurrentAdmins()
-    {
-        var currentAdmins = await _dbContext.Users.Where(u => u.IsAdmin == true).ToListAsync();
-        return currentAdmins;
-    }
-
-    private async Task<List<UserDbModel>> GetPendingAdmins()
-    {
-        var pendingAdmins =
-            await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
-        return pendingAdmins;
     }
 }
