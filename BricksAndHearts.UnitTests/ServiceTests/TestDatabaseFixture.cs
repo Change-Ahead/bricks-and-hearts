@@ -196,7 +196,13 @@ public class TestDatabaseFixture
             Phone = "01189998819991197253",
             LandlordType = "Non profit",
             CharterApproved = true,
-            MembershipId = "member1"
+            MembershipId = "member1",
+            AddressLine1 = "adr1",
+            AddressLine2 = "adr2",
+            AddressLine3 = "adr3",
+            TownOrCity = "city",
+            County = "county",
+            Postcode = "cb2 1la"
         };
     }
 
@@ -210,7 +216,13 @@ public class TestDatabaseFixture
             Title = "Mr",
             Phone = "01189998819991197253",
             LandlordType = "Non profit",
-            CharterApproved = false
+            CharterApproved = false,
+            AddressLine1 = "adr1",
+            AddressLine2 = "adr2",
+            AddressLine3 = "adr3",
+            TownOrCity = "city",
+            County = "county",
+            Postcode = "cb2 1la"
         };
     }
 
@@ -225,7 +237,13 @@ public class TestDatabaseFixture
             Phone = "01189998819991197253",
             LandlordType = "Non profit",
             CharterApproved = true,
-            InviteLink = "InvitimusLinkimus"
+            InviteLink = "InvitimusLinkimus",
+            AddressLine1 = "adr1",
+            AddressLine2 = "adr2",
+            AddressLine3 = "adr3",
+            TownOrCity = "city",
+            County = "county",
+            Postcode = "cb2 1la"
         };
     }
 
@@ -240,7 +258,13 @@ public class TestDatabaseFixture
             Phone = "004",
             LandlordType = "Non profit",
             CharterApproved = true,
-            InviteLink = "invite-unlinked-landlord"
+            InviteLink = "invite-unlinked-landlord",
+            AddressLine1 = "adr1",
+            AddressLine2 = "adr2",
+            AddressLine3 = "adr3",
+            TownOrCity = "city",
+            County = "county",
+            Postcode = "cb2 1la"
         };
     }
 
