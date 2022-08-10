@@ -497,10 +497,15 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     {
         // Arrange
         var landlordUser = CreateLandlordUser();
+        landlordUser.LandlordId = 1;
         MakeUserPrincipalInController(landlordUser, UnderTest);
+        var prop = A.Fake<PropertyDbModel>();
+        prop.LandlordId = 1;
+        prop.Id = 1;
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(prop);
 
         // Act
-        var result = UnderTest.EditProperty(landlordUser.Id) as ViewResult;
+        var result = UnderTest.EditProperty(1) as ViewResult;
 
         // Assert
         result!.ViewName.Should().Be("EditProperty");

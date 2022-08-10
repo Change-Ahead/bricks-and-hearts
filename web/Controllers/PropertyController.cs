@@ -62,26 +62,13 @@ public class PropertyController : AbstractController
             return RedirectToAction("Error", "Home", new { status = 404 });
         }
 
+        if (!(GetCurrentUser().IsAdmin || GetCurrentUser().LandlordId == model.LandlordId))
+        {
+            return StatusCode(403);
+        }
+
         var propertyViewModel = PropertyViewModel.FromDbModel(model);
         return View(propertyViewModel);
-    }
-
-    public PropertyViewModel UpdatePropertyViewModel(PropertyViewModel oldModel, PropertyViewModel updateModel)
-    {
-        // Update fields if they have been set (i.e. not null) in updateModel
-        // Otherwise use the value we currently have in the database
-        oldModel.Address.AddressLine1 = updateModel.Address.AddressLine1 ?? oldModel.Address.AddressLine1;
-        oldModel.Address.AddressLine2 = updateModel.Address.AddressLine2 ?? oldModel.Address.AddressLine2;
-        oldModel.Address.AddressLine3 = updateModel.Address.AddressLine3 ?? oldModel.Address.AddressLine3;
-        oldModel.Address.TownOrCity = updateModel.Address.TownOrCity ?? oldModel.Address.TownOrCity;
-        oldModel.Address.County = updateModel.Address.County ?? oldModel.Address.County;
-        oldModel.Address.Postcode = updateModel.Address.Postcode ?? oldModel.Address.Postcode;
-        oldModel.PropertyType = updateModel.PropertyType ?? oldModel.PropertyType;
-        oldModel.NumOfBedrooms = updateModel.NumOfBedrooms ?? oldModel.NumOfBedrooms;
-        oldModel.Rent = updateModel.Rent ?? oldModel.Rent;
-        oldModel.Description = updateModel.Description ?? oldModel.Description;
-
-        return oldModel;
     }
 
     [Authorize(Roles = "Admin")]
@@ -277,6 +264,12 @@ public class PropertyController : AbstractController
         var property = _propertyService.GetPropertyByPropertyId(propertyId);
 
         var propertyViewModel = PropertyViewModel.FromDbModel(property!);
+
+        if (!(GetCurrentUser().IsAdmin || GetCurrentUser().LandlordId == propertyViewModel.LandlordId))
+        {
+            return StatusCode(403);
+        }
+
         // Start at step 1
         return View("EditProperty", new AddNewPropertyViewModel { Step = 1, Property = propertyViewModel });
     }
