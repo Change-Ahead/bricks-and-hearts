@@ -134,7 +134,7 @@ public class PropertyController : AbstractController
     public ActionResult AddNewProperty_Continue([FromRoute] int step, [FromQuery] int propertyId,
         int? landlordId = null)
     {
-        var newPropertyModel = new PropertyViewModel { Address = new PropertyAddress() };
+        var newPropertyModel = new PropertyViewModel { Address = new AddressModel() };
         landlordId ??= GetCurrentUser().LandlordId!.Value;
 
         if (propertyId != 0)

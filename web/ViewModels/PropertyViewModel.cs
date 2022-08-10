@@ -13,7 +13,7 @@ public class PropertyViewModel : IValidatableObject
 
 
     // Location
-    public PropertyAddress Address { get; set; } = new();
+    public AddressModel Address { get; set; } = new();
     public decimal? Lat { get; set; }
     public decimal? Lon { get; set; }
 
@@ -100,7 +100,7 @@ public class PropertyViewModel : IValidatableObject
             Description = property.Description,
             Lat = property.Lat,
             Lon = property.Lon,
-            Address = new PropertyAddress
+            Address = new AddressModel
             {
                 AddressLine1 = property.AddressLine1,
                 AddressLine2 = property.AddressLine2,
@@ -122,27 +122,4 @@ public class PropertyViewModel : IValidatableObject
             OccupiedUnits = property.OccupiedUnits
         };
     }
-}
-
-public class PropertyAddress
-{
-    [StringLength(10000)]
-    public string? AddressLine1 { get; set; }
-
-    [StringLength(10000)]
-    public string? AddressLine2 { get; set; }
-
-    [StringLength(10000)]
-    public string? AddressLine3 { get; set; }
-
-    [StringLength(10000)]
-    public string? TownOrCity { get; set; }
-
-    [StringLength(10000)]
-    public string? County { get; set; }
-
-    [RegularExpression(
-        @"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})",
-        ErrorMessage = "Please enter a valid postcode")]
-    public string? Postcode { get; set; }
 }
