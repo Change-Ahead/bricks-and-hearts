@@ -2,7 +2,7 @@
 
 namespace BricksAndHearts.Services;
 
-public class PostcodeApiResponseModel
+public class AzureMapsResponseModel
 {
     [JsonProperty("results")]
     public List<Results>? ListOfResults { get; set; }
