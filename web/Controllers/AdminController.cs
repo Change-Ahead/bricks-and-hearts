@@ -1,7 +1,6 @@
 #region
 
 using BricksAndHearts.Auth;
-using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -187,5 +186,13 @@ public class AdminController : AbstractController
         _adminService.RejectAdminAccessRequest(userToAcceptId);
 
         return RedirectToAction("GetAdminList");
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public async Task<IActionResult> GetFilteredTenants(TenantListModel tenantListModel)
+    {
+        tenantListModel.TenantList = await _adminService.GetTenantDbModelsFromFilter(tenantListModel.Filters);
+        return View("TenantList", tenantListModel);
     }
 }

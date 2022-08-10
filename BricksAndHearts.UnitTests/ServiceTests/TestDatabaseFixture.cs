@@ -58,7 +58,8 @@ public class TestDatabaseFixture
                 );
 
                 context.Tenants.AddRange(
-                    CreateTenant()
+                    CreateTenant(),
+                    CreateFalseTenant()
                 );
 
                 context.SaveChanges();
@@ -356,7 +357,21 @@ public class TestDatabaseFixture
         return new TenantDbModel
         {
             Name = "Example Tenant",
-            Email = "exampletenant@gmail.com"
+            Email = "exampletenant@gmail.com",
+            Type = "Single",
+            HasPet = false,
+            ETT = true,
+            UniversalCredit = true
+        };
+    }
+    
+    private TenantDbModel CreateFalseTenant()
+    {
+        return new TenantDbModel
+        {
+            Name = "Example Tenant",
+            Email = "exampletenant@gmail.com",
+            Type = "Single"
         };
     }
 

@@ -6,6 +6,63 @@
 
 <h2>Tenant List</h2>
 
+<form method="get" asp-controller="Admin" asp-action="GetFilteredTenants">
+
+    <div class="row g-3">
+        <div class="col-auto d-grid">
+            <label asp-for="Filters[0]" class="form-label">Tenant type</label>
+            <select asp-for="Filters[0]" class="form-select">
+                <option value="all">All</option>
+                <option value="Single">Single tenant</option>
+                <option value="Couple">Couple</option>
+                <option value="Family">Family</option>
+            </select>
+        </div>
+        <div class="col-auto d-grid">
+            <label asp-for="Filters[1]" class="form-label">Has pet</label>
+            <select asp-for="Filters[1]" class="form-select">
+                <option value="all">All</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+        <div class="col-auto d-grid">
+            <label asp-for="Filters[2]" class="form-label">In ETT</label>
+            <select asp-for="Filters[2]" class="form-select">
+                <option value="all">All</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+        <div class="col-auto d-grid">
+            <label asp-for="Filters[3]" class="form-label">On universal credit</label>
+            <select asp-for="Filters[3]" class="form-select">
+                <option value="all">All</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+        <div class="col-auto d-grid">
+            <label asp-for="Filters[4]" class="form-label">On benefits</label>
+            <select asp-for="Filters[4]" class="form-select">
+                <option value="all">All</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+        <div class="col-auto d-grid">
+            <label asp-for="Filters[5]" class="form-label">Over 35</label>
+            <select asp-for="Filters[5]" class="form-select">
+                <option value="all">All</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
+        </div>
+    </div>
+    
+    <input type="submit" value="Filter" class="btn btn-large btn-primary mb-3"/>
+</form>
+
 <table class="table table-hover">
     <thead>
     <tr>

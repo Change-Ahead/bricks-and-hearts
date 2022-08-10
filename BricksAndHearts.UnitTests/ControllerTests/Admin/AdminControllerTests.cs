@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
@@ -66,5 +68,21 @@ public class AdminControllerTests : AdminControllerTestsBase
 
         // Assert
         result!.ViewData.Model.Should().BeOfType<AdminListModel>();
+    }
+
+    [Fact]
+    public void GetFilteredTenants_WithCorrectInput_CallsGetTenantDbModelsFromFilter()
+    {
+        // Arrange
+        MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
+        var fakeTenantListModel = A.Fake<TenantListModel>();
+
+        // Act
+        A.CallTo(() => AdminService.GetTenantDbModelsFromFilter(fakeTenantListModel.Filters)).Returns(A.Fake<List<TenantDbModel>>());
+        var result = UnderTest.GetFilteredTenants(fakeTenantListModel).Result;
+        
+        // Assert
+        A.CallTo(() => AdminService.GetTenantDbModelsFromFilter(fakeTenantListModel.Filters)).MustHaveHappened();
+        result.Should().BeOfType<ViewResult>().Which.Model.Should().Be(fakeTenantListModel);
     }
 }
