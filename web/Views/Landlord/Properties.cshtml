@@ -58,11 +58,21 @@ else
             <td>@prop.TotalUnits</td>
             <td>@prop.OccupiedUnits</td>
             <td>@prop.AvailableUnits</td>
-            <td>@Html.ActionLink("View", "ViewProperty", "Property", new { propertyId = prop.PropertyId })</td>
+            <td>
+                <a class="btn btn-primary position-relative" href="@Url.Action("ViewProperty", "Property", new { propertyId = prop.PropertyId })">
+                    View
+                    @if (prop.IsIncomplete)
+                    {
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
+                            <i class="bi bi-circle-half"></i> Incomplete
+                            <span class="visually-hidden">Property is incomplete</span>
+                        </span>
+                    }
+                </a>
+            </td>
         </tr>
         i++;
     }
     </tbody>
 </table>
-
-@Html.ActionLink("Add new property", "AddNewProperty_Begin", "Property", null, new { @class = "btn btn-primary" })
+<a class="btn btn-primary" href="@Url.Action("AddNewProperty_Begin", "Property", new { Model.Owner?.LandlordId })">Add new property</a> @*Add landlord ID*@

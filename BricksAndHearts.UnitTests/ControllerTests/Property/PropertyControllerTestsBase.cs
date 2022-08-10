@@ -13,11 +13,11 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Property;
 
 public class PropertyControllerTestsBase : ControllerTestsBase
 {
-    protected readonly IPropertyService PropertyService;
     protected readonly IAzureMapsApiService AzureMapsApiService;
     protected readonly IAzureStorage AzureStorage;
-    protected readonly PropertyController UnderTest;
     protected readonly ILogger<PropertyController> Logger;
+    protected readonly IPropertyService PropertyService;
+    protected readonly PropertyController UnderTest;
 
     protected PropertyControllerTestsBase()
     {
@@ -64,7 +64,8 @@ public class PropertyControllerTestsBase : ControllerTestsBase
             Postcode = "SW1A 2AA",
             NumOfBedrooms = 2,
             Rent = 750,
-            Description = "Property description"
+            Description = "Property description",
+            Landlord = A.Fake<LandlordDbModel>()
         };
     }
 

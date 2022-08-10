@@ -1,0 +1,55 @@
+﻿@model AddNewPropertyViewModel
+
+@{
+    ViewData["Title"] = "Add Property";
+}
+
+<h1>Edit property</h1>
+
+<hr/>
+
+@if (Model.Step > 1)
+{
+    <div class="mb-4">
+        <a asp-controller="Property" asp-action="EditProperty_Continue" asp-route-step="@(Model.Step - 1)" asp-route-propertyId="@Model.Property?.PropertyId" asp-route-landlordId="@Model.Property?.LandlordId" class="link-secondary"> Back </a>
+    </div>
+}
+
+<form method="post" class="w-50" asp-controller="Property" asp-action="EditProperty_Continue" asp-route-step="@Model.Step" asp-route-propertyId="@Model.Property?.PropertyId" asp-route-landlordId="@Model.Property?.LandlordId">
+    <partial name=@("_AddFormStep" + Model.Step) model="Model.Property"/>
+
+    <div class="mt-4">
+        @if (Model.Step < AddNewPropertyViewModel.MaximumStep)
+        {
+            <input type="submit" value="Save and continue" class="btn btn-primary"/>
+        }
+        else
+        {
+            <input type="submit" value="Submit" class="btn btn-success"/>
+        }
+        <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#cancelModal">
+            Stop Editing
+        </button>
+    </div>
+</form>
+
+<!-- Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="cancelModalLabel">Stop editing property</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to stop editing this property? All progress up to this point will be saved.
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <form method="post" asp-controller="Property" asp-action="EditProperty_Cancel" asp-route-landlordId="@Model.Property?.LandlordId">
+                    <input type="submit" value="Stop Editing" class="btn btn-danger"/>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

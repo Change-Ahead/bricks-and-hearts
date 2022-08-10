@@ -9,10 +9,10 @@
     {
         var flashMessages = TempData["MultipleFlashMessages"] as string[];
         var flashTypes = TempData["MultipleFlashTypes"] as string[];
-        for (int i = 0; i < flashMessages!.Length; i++)
+        for (var i = 0; i < flashMessages!.Length; i++)
         {
             <div class="alert alert-@flashTypes![i]" role="alert">
-            @flashMessages[i]
+                @flashMessages[i]
             </div>
         }
     }
@@ -35,7 +35,7 @@
     <div>Please upload images of the property</div>
     <input type="hidden" id="propertyId" name="propertyId" value=@Model.PropertyId>
     <input name="images" type="file" multiple accept="image/*">
-    <input type="submit" value="Upload Image" />
+    <input type="submit" value="Upload Image"/>
 }
 
 <!-- Modal -->

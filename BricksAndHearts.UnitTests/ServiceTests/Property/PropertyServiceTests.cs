@@ -74,6 +74,29 @@ public class PropertyServiceTests : PropertyServiceTestsBase
 
     #endregion
 
+    #region DeleteProperty
+
+    [Fact]
+    public async void DeleteProperty_DeletesProperty()
+    {
+        // Arrange
+        await using var context = Fixture.CreateWriteContext();
+        var service = new PropertyService(context);
+        var propertiesBeforeCount = context.Properties.Count();
+        var deleteModel = context.Properties.Single(u => u.Id == 1);
+
+        // Act
+        service.DeleteProperty(deleteModel);
+        context.ChangeTracker.Clear();
+
+        // Assert
+        context.Properties.Count(u => u.Id == 1).Should().Be(0);
+        context.Properties.Count().Should().Be(propertiesBeforeCount - 1);
+    }
+
+    #endregion
+
+
     #region UpdateProperty
 
     [Fact]
@@ -220,28 +243,6 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
         propertyDb.Availability.Should().Be(AvailabilityState.Occupied);
         propertyDb.AvailableFrom.Should().BeNull();
-    }
-
-    #endregion
-
-    #region DeleteProperty
-
-    [Fact]
-    public async void DeleteProperty_DeletesProperty()
-    {
-        // Arrange
-        await using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context);
-        var propertiesBeforeCount = context.Properties.Count();
-        var deleteModel = context.Properties.Single(u => u.Id == 1);
-
-        // Act
-        service.DeleteProperty(deleteModel);
-        context.ChangeTracker.Clear();
-
-        // Assert
-        context.Properties.Count(u => u.Id == 1).Should().Be(0);
-        context.Properties.Count().Should().Be(propertiesBeforeCount - 1);
     }
 
     #endregion

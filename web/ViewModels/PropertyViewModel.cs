@@ -26,6 +26,7 @@ public class PropertyViewModel : IValidatableObject
     [DisplayName("Number of bedrooms")]
     public int? NumOfBedrooms { get; set; }
 
+    public bool IsIncomplete { get; set; }
 
     // Descriptions
     [StringLength(20000)]
@@ -39,6 +40,7 @@ public class PropertyViewModel : IValidatableObject
     public bool? AcceptsPets { get; set; }
     public bool? AcceptsBenefits { get; set; }
     public bool? AcceptsNotEET { get; set; }
+
     public bool? AcceptsWithoutGuarantor { get; set; }
 
 
@@ -46,8 +48,7 @@ public class PropertyViewModel : IValidatableObject
     [Range(0, 100000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
     public int? Rent { get; set; }
 
-
-    // Availability and units
+// Availability and units
     public string? Availability { get; set; }
 
     [DataType(DataType.Date)]
@@ -61,6 +62,8 @@ public class PropertyViewModel : IValidatableObject
 
     // Tenant
     public int? UserWhoRented { get; set; }
+
+    public int? AvailableUnits => TotalUnits - OccupiedUnits;
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
@@ -81,8 +84,6 @@ public class PropertyViewModel : IValidatableObject
         }
     }
 
-    public int? AvailableUnits => TotalUnits - OccupiedUnits;
-
 
     public static PropertyViewModel FromDbModel(PropertyDbModel property)
     {
@@ -94,6 +95,8 @@ public class PropertyViewModel : IValidatableObject
             NumOfBedrooms = property.NumOfBedrooms,
             CreationTime = property.CreationTime,
             Rent = property.Rent,
+            UserWhoRented = property.RenterUserId,
+            IsIncomplete = property.IsIncomplete,
             Description = property.Description,
             Lat = property.Lat,
             Lon = property.Lon,
@@ -115,7 +118,6 @@ public class PropertyViewModel : IValidatableObject
             AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor,
             Availability = property.Availability,
             AvailableFrom = property.AvailableFrom,
-            UserWhoRented = property.RenterUserId,
             TotalUnits = property.TotalUnits,
             OccupiedUnits = property.OccupiedUnits
         };
