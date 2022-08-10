@@ -28,7 +28,8 @@
         <th scope="col">Description</th>
         <th scope="col">Availability</th>
         <th scope="col">Available From</th>
-        <th scope="col">Landlord's profile</th>
+        <th scope="col">Property page</th>
+        <th scope="col">Landlord profile</th>
     </tr>
     </thead>
     <tbody>
@@ -51,6 +52,11 @@
                 <td></td>
             }
             
+            <td>
+                <a type="button" class="btn btn-outline-primary" value="@property.PropertyId" href="@Url.Action("ViewProperty", "Property", new { id = property.PropertyId })">
+                    <i class="bi bi-house"></i>
+                </a>
+            </td>
             <td>
                 <a type="button" class="btn btn-outline-primary" value="@property.LandlordId" href="@Url.Action("Profile", "Landlord", new { id = property.LandlordId })">
                     <i class="bi bi-person"></i>

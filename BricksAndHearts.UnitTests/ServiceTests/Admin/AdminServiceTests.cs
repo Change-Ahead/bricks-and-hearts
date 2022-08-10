@@ -128,21 +128,6 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     }
     
     [Fact]
-    public void GetTenantList_GetsListOfTenants()
-    {
-        // Arrange
-        using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context);
-
-        // Act
-        var result = service.GetTenantList().Result;
-
-        // Assert
-
-        result.Should().BeOfType<List<TenantDbModel>>().And.Subject.Should().HaveCount(context.Tenants.Count());
-    }
-
-    [Fact]
     public void GetLandlordDisplayList_CalledWithApproved_ReturnsApprovedLandlords()
     {
         // Arrange
@@ -184,6 +169,55 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         
         // Assert
         result.Should().BeOfType<List<LandlordDbModel>>().And.Subject.Should().HaveCount(context.Landlords.Count());
+    }
+    
+    [Fact]
+    public void GetTenantList_GetsListOfTenants()
+    {
+        // Arrange
+        using var context = Fixture.CreateReadContext();
+        var service = new AdminService(context);
+
+        // Act
+        var result = service.GetTenantList().Result;
+
+        // Assert
+
+        result.Should().BeOfType<List<TenantDbModel>>().And.Subject.Should().HaveCount(context.Tenants.Count());
+    }
+    
+    [Fact]
+    public async void GetTenantDbModelsFromFilter_ReturnsFilteredTenantList_WithCorrectFilter()
+    {
+        // Arrange
+        await using var context = Fixture.CreateReadContext();
+        var service = new AdminService(context);
+        var filterArr = new [] { "single", "all", "true", "true", "all", "all"};
+
+        // Act
+        var result = await service.GetTenantDbModelsFromFilter(filterArr);
+
+        // Assert
+        result.Should().BeOfType<List<TenantDbModel>>();
+        result.Count.Should().Be(context.Tenants.Where(t => t.ETT == true)
+            .Where(t => t.UniversalCredit == true)
+            .Count(t => t.Type == "Single"));
+    }
+    
+    [Fact]
+    public async void GetTenantDbModelsFromFilter_ReturnsAllTenants_WithNoFilter()
+    {
+        // Arrange
+        await using var context = Fixture.CreateReadContext();
+        var service = new AdminService(context);
+        var filterArr = new string[]{"all","all","all","all","all","all"};
+
+        // Act
+        var result = await service.GetTenantDbModelsFromFilter(filterArr);
+
+        // Assert
+        result.Should().BeOfType<List<TenantDbModel>>();
+        result.Count.Should().Be(context.Tenants.Count());
     }
 
     [Fact]
@@ -285,39 +319,5 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
 
         // Assert
         service.Invoking(y => y.DeleteExistingInviteLink(1)).Should().Throw<Exception>();
-    }
-
-    [Fact]
-    public async void GetTenantDbModelsFromFilter_ReturnsFilteredTenantList_WithCorrectFilter()
-    {
-        // Arrange
-        await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context,null!);
-        var filterArr = new [] { "single", "all", "true", "true", "all", "all"};
-
-        // Act
-        var result = await service.GetTenantDbModelsFromFilter(filterArr);
-
-        // Assert
-        result.Should().BeOfType<List<TenantDbModel>>();
-        result.Count.Should().Be(context.Tenants.Where(t => t.ETT == true)
-                                                .Where(t => t.UniversalCredit == true)
-                                                .Count(t => t.Type == "Single"));
-    }
-    
-    [Fact]
-    public async void GetTenantDbModelsFromFilter_ReturnsAllTenants_WithNoFilter()
-    {
-        // Arrange
-        await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context,null!);
-        var filterArr = new string[]{"all","all","all","all","all","all"};
-
-        // Act
-        var result = await service.GetTenantDbModelsFromFilter(filterArr);
-
-        // Assert
-        result.Should().BeOfType<List<TenantDbModel>>();
-        result.Count.Should().Be(context.Tenants.Count());
     }
 }

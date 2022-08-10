@@ -245,7 +245,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Profile");
-        UnderTest.TempData["FlashMessage"].Should().Be("Successfully created a new invite link: new link");
+        UnderTest.TempData["FlashMessage"].Should().Be("Successfully created a new invite link: http:///invite/new link");
     }
     
     [Fact]
@@ -267,7 +267,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Profile");
-        UnderTest.TempData["FlashMessage"].Should().Be("Landlord already has an invite link: existing link");
+        UnderTest.TempData["FlashMessage"].Should().Be("Landlord already has an invite link: http:///invite/existing link");
     }
     
         [Fact]

@@ -3,8 +3,6 @@
 using BricksAndHearts.Auth;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
-using LINQtoCSV;
-using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -127,6 +125,14 @@ public class AdminController : AbstractController
         tenantListModel.TenantList = await _adminService.GetTenantList();
         return View(tenantListModel);
     }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public async Task<IActionResult> GetFilteredTenants(TenantListModel tenantListModel)
+    {
+        tenantListModel.TenantList = await _adminService.GetTenantDbModelsFromFilter(tenantListModel.Filters);
+        return View("TenantList", tenantListModel);
+    }
 
     [Authorize(Roles = "Admin")]
     [HttpPost]
@@ -187,15 +193,7 @@ public class AdminController : AbstractController
 
         return RedirectToAction("Profile", "Landlord", new { id = landlordId });
     }
-    
-    [Authorize(Roles = "Admin")]
-    [HttpGet]
-    public async Task<IActionResult> GetFilteredTenants(TenantListModel tenantListModel)
-    {
-        tenantListModel.TenantList = await _adminService.GetTenantDbModelsFromFilter(tenantListModel.Filters);
-        return View("TenantList", tenantListModel);
-    }
-    
+
     [Authorize(Roles = "Admin")]
     [HttpPost]
     public ActionResult GetSampleTenantCSV()

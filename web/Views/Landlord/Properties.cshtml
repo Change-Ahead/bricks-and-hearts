@@ -38,8 +38,7 @@ else
     }
     @foreach (var prop in Model.Properties)
     {
-        <tr class="clickable"
-            onclick="location.href = '@Url.Action("ViewProperty", "Property", new { propertyId = prop!.PropertyId })'">
+        <tr>
             <th scope="row">@i</th>
             <td>
                 @prop.Address.AddressLine1,
