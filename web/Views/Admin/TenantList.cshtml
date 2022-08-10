@@ -6,41 +6,60 @@
 
 <h2>Tenant List</h2>
 
-<form method="post" asp-controller="Admin" asp-action="ReceiveTenantFilterList">
+<form method="get" asp-controller="Admin" asp-action="GetFilteredTenants">
+
     <div class="row g-3">
         <div class="col-auto d-grid">
-            @Html.CheckBoxFor(t => t.Filters[0], new { @class = "btn-check" })
-            <label asp-for="Filters[0]" class="btn btn-outline-blue shadow-none pill-check">Single tenant</label>
+            <label asp-for="Filters[0]" class="form-label">Tenant type</label>
+            <select asp-for="Filters[0]" class="form-select">
+                <option value="all">All</option>
+                <option value="Single">Single tenant</option>
+                <option value="Couple">Couple</option>
+                <option value="Family">Family</option>
+            </select>
         </div>
         <div class="col-auto d-grid">
-            @Html.CheckBoxFor(t => t.Filters[1], new { @class = "btn-check" })
-            <label asp-for="Filters[1]" class="btn btn-outline-blue shadow-none pill-check">Couple</label>
+            <label asp-for="Filters[1]" class="form-label">Has pet</label>
+            <select asp-for="Filters[1]" class="form-select">
+                <option value="all">All</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
         </div>
         <div class="col-auto d-grid">
-            @Html.CheckBoxFor(t => t.Filters[2], new { @class = "btn-check" })
-            <label asp-for="Filters[2]" class="btn btn-outline-blue shadow-none pill-check">Family</label>
+            <label asp-for="Filters[2]" class="form-label">In ETT</label>
+            <select asp-for="Filters[2]" class="form-select">
+                <option value="all">All</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
         </div>
         <div class="col-auto d-grid">
-            @Html.CheckBoxFor(t => t.Filters[3], new { @class = "btn-check" })
-            <label asp-for="Filters[3]" class="btn btn-outline-blue shadow-none pill-check">Pet owner</label>
+            <label asp-for="Filters[3]" class="form-label">On universal credit</label>
+            <select asp-for="Filters[3]" class="form-select">
+                <option value="all">All</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
         </div>
         <div class="col-auto d-grid">
-            @Html.CheckBoxFor(t => t.Filters[4], new { @class = "btn-check" })
-            <label asp-for="Filters[4]" class="btn btn-outline-blue shadow-none pill-check">Is in ETT</label>
+            <label asp-for="Filters[4]" class="form-label">On benefits</label>
+            <select asp-for="Filters[4]" class="form-select">
+                <option value="all">All</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
         </div>
         <div class="col-auto d-grid">
-            @Html.CheckBoxFor(t => t.Filters[5], new { @class = "btn-check" })
-            <label asp-for="Filters[5]" class="btn btn-outline-blue shadow-none pill-check">Credit</label>
-        </div>
-        <div class="col-auto d-grid">
-            @Html.CheckBoxFor(t => t.Filters[6], new { @class = "btn-check" })
-            <label asp-for="Filters[6]" class="btn btn-outline-blue shadow-none pill-check">Benefits</label>
-        </div>
-        <div class="col-auto d-grid">
-            @Html.CheckBoxFor(t => t.Filters[7], new { @class = "btn-check" })
-            <label asp-for="Filters[7]" class="btn btn-outline-blue shadow-none pill-check">Is over 35</label>
+            <label asp-for="Filters[5]" class="form-label">Over 35</label>
+            <select asp-for="Filters[5]" class="form-select">
+                <option value="all">All</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+            </select>
         </div>
     </div>
+    
     <input type="submit" value="Filter" class="btn btn-large btn-primary mb-3"/>
 </form>
 

@@ -19,7 +19,7 @@ public interface IAdminService
     public void ApproveAdminAccessRequest(int userId);
     public void RejectAdminAccessRequest(int userId);
     public UserDbModel GetUserFromId(int userId);
-    public Task<List<TenantDbModel>> GetTenantDbModelsFromFilter(bool[] filterArray);
+    public Task<List<TenantDbModel>> GetTenantDbModelsFromFilter(string[] filterArray);
 }
 
 public class AdminService : IAdminService
@@ -150,23 +150,28 @@ public class AdminService : IAdminService
         return userFromId;
     }
 
-    public async Task<List<TenantDbModel>> GetTenantDbModelsFromFilter(bool[] filterArray)
+    public async Task<List<TenantDbModel>> GetTenantDbModelsFromFilter(string[] filterArray)
     {
         var tenantQuery = from tenants in _dbContext.Tenants select tenants;
-        for (var currentFilter = 0; currentFilter < filterArray.Length; currentFilter++)
+        for (var currentFilterNo = 0; currentFilterNo < filterArray.Length; currentFilterNo++)
         {
-            if (filterArray[currentFilter])
+            var filterToCheck = filterArray[currentFilterNo];
+            if (filterToCheck != "all")
             {
-                tenantQuery = currentFilter switch
+                tenantQuery = currentFilterNo switch
                 {
-                    0 => tenantQuery.Where(t => t.Type == "Single"),
-                    1 => tenantQuery.Where(t => t.Type == "Couple"),
-                    2 => tenantQuery.Where(t => t.Type == "Family"),
-                    3 => tenantQuery.Where(t => t.HasPet == true),
-                    4 => tenantQuery.Where(t => t.ETT == true),
-                    5 => tenantQuery.Where(t => t.UniversalCredit == true),
-                    6 => tenantQuery.Where(t => t.HousingBenefits == true),
-                    7 => tenantQuery.Where(t => t.Over35 == true),
+                    0 => filterToCheck switch
+                    {
+                        "Single" => tenantQuery.Where(t => t.Type == "Single"),
+                        "Couple" => tenantQuery.Where(t => t.Type == "Couple"),
+                        "Family" => tenantQuery.Where(t => t.Type == "Family"),
+                        _ => tenantQuery
+                    },
+                    1 => tenantQuery.Where(t => t.HasPet == Convert.ToBoolean(filterToCheck)),
+                    2 => tenantQuery.Where(t => t.ETT == Convert.ToBoolean(filterToCheck)),
+                    3 => tenantQuery.Where(t => t.UniversalCredit == Convert.ToBoolean(filterToCheck)),
+                    4 => tenantQuery.Where(t => t.HousingBenefits == Convert.ToBoolean(filterToCheck)),
+                    5 => tenantQuery.Where(t => t.Over35 == Convert.ToBoolean(filterToCheck)),
                     _ => tenantQuery
                 };
             }

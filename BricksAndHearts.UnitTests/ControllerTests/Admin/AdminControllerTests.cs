@@ -69,22 +69,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         // Assert
         result!.ViewData.Model.Should().BeOfType<AdminListModel>();
     }
-    
-        
-    [Fact]
-    public void ReceiveTenantFilterList_Always_RedirectsToGetFilteredTenants()
-    {
-        // Arrange
-        MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
-        var fakeTenantListModel = A.Fake<TenantListModel>();
-        
-        // Act
-        var result = UnderTest.ReceiveTenantFilterList(fakeTenantListModel);
-            
-        // Assert
-        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("GetFilteredTenants");
-    }
-    
+
     [Fact]
     public void GetFilteredTenants_WithCorrectInput_CallsGetTenantDbModelsFromFilter()
     {

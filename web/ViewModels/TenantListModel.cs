@@ -5,5 +5,5 @@ public class TenantListModel
 {
     public List<TenantDbModel>? TenantList { get; set; }
 
-    public bool[] Filters { get; set; } = new bool[8];
+    public string[] Filters { get; set; } = new string[6];
 }

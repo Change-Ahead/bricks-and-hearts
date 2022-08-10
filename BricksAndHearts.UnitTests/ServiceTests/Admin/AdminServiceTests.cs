@@ -262,7 +262,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         // Arrange
         await using var context = Fixture.CreateReadContext();
         var service = new AdminService(context,null!);
-        var filterArr = new [] { true, false, false, false, true, true, false, false };
+        var filterArr = new [] { "single", "all", "true", "true", "all", "all"};
 
         // Act
         var result = await service.GetTenantDbModelsFromFilter(filterArr);
@@ -280,7 +280,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         // Arrange
         await using var context = Fixture.CreateReadContext();
         var service = new AdminService(context,null!);
-        var filterArr = new bool[8];
+        var filterArr = new string[]{"all","all","all","all","all","all"};
 
         // Act
         var result = await service.GetTenantDbModelsFromFilter(filterArr);
@@ -288,21 +288,5 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         // Assert
         result.Should().BeOfType<List<TenantDbModel>>();
         result.Count.Should().Be(context.Tenants.Count());
-    }
-    
-    [Fact]
-    public async void GetTenantDbModelsFromFilter_ReturnsNoTenants_WithAllFilter()
-    {
-        // Arrange
-        await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context,null!);
-        var filterArr = new []{true,true,true,true,true,true,true,true};
-
-        // Act
-        var result = await service.GetTenantDbModelsFromFilter(filterArr);
-
-        // Assert
-        result.Should().BeOfType<List<TenantDbModel>>();
-        result.Count.Should().Be(0);
     }
 }

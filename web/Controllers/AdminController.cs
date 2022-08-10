@@ -189,13 +189,6 @@ public class AdminController : AbstractController
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpPost]
-    public IActionResult ReceiveTenantFilterList([FromForm] TenantListModel tenantListModel)
-    {
-        return RedirectToAction("GetFilteredTenants", tenantListModel);
-    }
-
-    [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> GetFilteredTenants(TenantListModel tenantListModel)
     {
