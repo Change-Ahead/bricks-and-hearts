@@ -51,9 +51,9 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> RegisterPost([FromForm] LandlordProfileModel createModel)
     {
         // This does checks based on the annotations (e.g. [Required]) on LandlordProfileModel
-        if (!ModelState.IsValid)
+        if (!ModelState.IsValid || !TryValidateModel(createModel.Address, nameof(AddressModel)))
         {
-            return View("Register");
+            return View("Register", createModel);
         }
 
         var user = GetCurrentUser();
@@ -235,7 +235,7 @@ public class LandlordController : AbstractController
     public async Task<ActionResult> EditProfileUpdate([FromForm] LandlordProfileModel editModel)
     {
         var user = GetCurrentUser();
-        if (!ModelState.IsValid)
+        if (!ModelState.IsValid || !TryValidateModel(editModel.Address, nameof(AddressModel)))
         {
             return StatusCode(404);
         }
