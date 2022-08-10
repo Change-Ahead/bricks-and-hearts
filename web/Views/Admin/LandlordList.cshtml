@@ -38,7 +38,7 @@
             <td>@landlord.FirstName</td>
             <td>@landlord.LastName</td>
             <td>@landlord.CompanyName</td>
-            @if (landlord.LandlordProvidedCharterStatus)
+            @if (landlord.MembershipId != null)
             {
                 <td>Yes</td>
             }

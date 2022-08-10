@@ -125,7 +125,7 @@ public class LandlordController : AbstractController
             return StatusCode(404);
         }
 
-        var viewModel = LandlordProfileModel.FromDbModel(landlord, user);
+        var viewModel = LandlordProfileModel.FromDbModel(landlord);
         return View("Profile", viewModel);
     }
 
@@ -166,6 +166,10 @@ public class LandlordController : AbstractController
                 break;
             case ILandlordService.ApproveLandlordResult.ErrorAlreadyApproved:
                 flashMessageBody = "The charter for this landlord has already been approved.";
+                flashMessageType = "warning";
+                break;
+            case ILandlordService.ApproveLandlordResult.ErrorDuplicateMembershipId:
+                flashMessageBody = "This membership ID already exists for another user.";
                 flashMessageType = "warning";
                 break;
             case ILandlordService.ApproveLandlordResult.Success:
@@ -223,7 +227,7 @@ public class LandlordController : AbstractController
             return StatusCode(403);
         }
 
-        return View("EditProfilePage", LandlordProfileModel.FromDbModel(landlordFromDb, user));
+        return View("EditProfilePage", LandlordProfileModel.FromDbModel(landlordFromDb));
     }
 
     [HttpPost]
@@ -324,7 +328,7 @@ public class LandlordController : AbstractController
             return StatusCode(404);
         }
 
-        var viewModel = LandlordProfileModel.FromDbModel(landlord, user);
+        var viewModel = LandlordProfileModel.FromDbModel(landlord);
         return View("Dashboard", viewModel);
     }
 

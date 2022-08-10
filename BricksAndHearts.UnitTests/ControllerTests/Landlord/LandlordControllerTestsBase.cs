@@ -26,7 +26,8 @@ public class LandlordControllerTestsBase : ControllerTestsBase
         MailService = A.Fake<IMailService>();
         var httpContext = new DefaultHttpContext();
         var tempData = new TempDataDictionary(httpContext, A.Fake<ITempDataProvider>());
-        UnderTest = new LandlordController(Logger, LandlordService, PropertyService, MailService){TempData = tempData};
+        UnderTest = new LandlordController(Logger, LandlordService, PropertyService, MailService)
+            { TempData = tempData };
     }
 
     protected PropertyViewModel CreateExamplePropertyViewModel()
@@ -61,8 +62,7 @@ public class LandlordControllerTestsBase : ControllerTestsBase
             CompanyName = "John Doe",
             Email = "test.email@gmail.com",
             CharterApproved = false,
-            LandlordType = "some data",
-            LandlordProvidedCharterStatus = false
+            LandlordType = "some data"
         };
     }
 
@@ -75,8 +75,7 @@ public class LandlordControllerTestsBase : ControllerTestsBase
             LastName = "Doe",
             CompanyName = "John Doe",
             CharterApproved = false,
-            LandlordType = "some data",
-            LandlordProvidedCharterStatus = false
+            LandlordType = "some data"
         };
     }
 }

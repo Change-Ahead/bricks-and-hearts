@@ -27,6 +27,7 @@ public interface ILandlordService
     {
         ErrorLandlordNotFound,
         ErrorAlreadyApproved,
+        ErrorDuplicateMembershipId,
         Success
     }
 
@@ -77,12 +78,8 @@ public class LandlordService : ILandlordService
             Phone = createModel.Phone,
             LandlordType = createModel.LandlordType,
             IsLandlordForProfit = createModel.IsLandlordForProfit,
-            LandlordProvidedCharterStatus = createModel.LandlordProvidedCharterStatus,
+            MembershipId = createModel.MembershipId
         };
-        if (createModel.LandlordProvidedCharterStatus)
-        {
-            dbModel.MembershipId = createModel.MembershipId;
-        }
 
         await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
         {
@@ -148,12 +145,8 @@ public class LandlordService : ILandlordService
             Phone = createModel.Phone,
             LandlordType = createModel.LandlordType,
             IsLandlordForProfit = createModel.IsLandlordForProfit,
-            LandlordProvidedCharterStatus = createModel.LandlordProvidedCharterStatus,
+            MembershipId = createModel.MembershipId
         };
-        if (createModel.LandlordProvidedCharterStatus)
-        {
-            dbModel.MembershipId = createModel.MembershipId;
-        }
 
         await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
         {
@@ -198,6 +191,12 @@ public class LandlordService : ILandlordService
             return ILandlordService.ApproveLandlordResult.ErrorAlreadyApproved;
         }
 
+        if (CheckForDuplicateMembershipId(new LandlordProfileModel
+                { LandlordId = landlordId, MembershipId = membershipId }))
+        {
+            return ILandlordService.ApproveLandlordResult.ErrorDuplicateMembershipId;
+        }
+
         landlord.CharterApproved = true;
         landlord.ApprovalTime = DateTime.Now;
         landlord.ApprovalAdminId = user.Id;
@@ -224,15 +223,7 @@ public class LandlordService : ILandlordService
         landlordToEdit.Phone = editModel.Phone;
         landlordToEdit.LandlordType = editModel.LandlordType;
         landlordToEdit.IsLandlordForProfit = editModel.IsLandlordForProfit;
-        landlordToEdit.LandlordProvidedCharterStatus = editModel.LandlordProvidedCharterStatus;
-        if (editModel.LandlordProvidedCharterStatus)
-        {
-            landlordToEdit.MembershipId = editModel.MembershipId;
-        }
-        else
-        {
-            landlordToEdit.MembershipId = null;
-        }
+        landlordToEdit.MembershipId = editModel.MembershipId;
 
         await _dbContext.SaveChangesAsync();
         return ILandlordService.LandlordRegistrationResult.Success;
@@ -248,7 +239,7 @@ public class LandlordService : ILandlordService
     public bool CheckForDuplicateMembershipId(LandlordProfileModel editModel)
     {
         var editedLandlord = _dbContext.Landlords.Single(l => l.Id == editModel.LandlordId);
-        if (!editModel.LandlordProvidedCharterStatus)
+        if (editModel.MembershipId == null)
         {
             return false;
         }
