@@ -32,11 +32,9 @@ public interface IAdminService
 public class AdminService : IAdminService
 {
     private readonly BricksAndHeartsDbContext _dbContext;
-    private readonly ILogger<AdminService> _logger;
 
-    public AdminService(BricksAndHeartsDbContext dbContext, ILogger<AdminService> logger)
+    public AdminService(BricksAndHeartsDbContext dbContext)
     {
-        _logger = logger;
         _dbContext = dbContext;
     }
 
@@ -62,19 +60,26 @@ public class AdminService : IAdminService
     
     public void ApproveAdminAccessRequest(int userId)
     {
-        var userToAdmin = _dbContext.Users.Single(u => u.Id == userId);
+        var userToAdmin = _dbContext.Users.SingleOrDefault(u => u.Id == userId);
+        if (userToAdmin == null)
+        {
+            throw new Exception($"No user found with id {userId}");
+        }
         userToAdmin.IsAdmin = true;
         userToAdmin.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
-        _logger.LogInformation("Admin request approved");
     }
 
     public void RejectAdminAccessRequest(int userId)
     {
-        var userToAdmin = _dbContext.Users.Single(u => u.Id == userId);
+        var userToAdmin = _dbContext.Users.SingleOrDefault(u => u.Id == userId);
+        if (userToAdmin == null)
+        {
+            throw new Exception($"No user found with id {userId}");
+        }
+        
         userToAdmin.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
-        _logger.LogInformation("Admin request rejected");
     }
 
     public async Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists()
@@ -84,8 +89,7 @@ public class AdminService : IAdminService
     
     private async Task<List<UserDbModel>> GetCurrentAdmins()
     {
-        var currentAdmins = await _dbContext.Users.Where(u => u.IsAdmin == true).ToListAsync();
-        return currentAdmins;
+        return await _dbContext.Users.Where(u => u.IsAdmin == true).ToListAsync();
     }
 
     private async Task<List<UserDbModel>> GetPendingAdmins()

@@ -19,27 +19,11 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     }
 
     [Fact]
-    public async void GetAdminLists_OnlyGetsAdmins()
-    {
-        // Arrange
-        await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, null!);
-
-        var adminUser = context.Users.Single(u => u.GoogleUserName == "AdminUser");
-
-        // Act
-        var adminLists = await service.GetAdminLists();
-
-        // Assert
-        adminLists.CurrentAdmins.Should().OnlyContain(u => u.Id == adminUser.Id);
-    }
-
-    [Fact]
     public void RequestAdminAccess_SetsHasRequestedAdminToTrue_ForCorrectUser()
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new AdminService(context, null!);
+        var service = new AdminService(context);
 
         var nonAdminUser = context.Users.Single(u => u.GoogleUserName == "NonAdminUser");
         var adminUser = context.Users.Single(u => u.GoogleUserName == "AdminUser");
@@ -61,19 +45,54 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new AdminService(context, null!);
+        var service = new AdminService(context);
 
         var requestedAdminUser = context.Users.Single(u => u.GoogleUserName == "NonAdminUser");
 
         // Act
         service.CancelAdminAccessRequest(new BricksAndHeartsUser(requestedAdminUser, null!, null!));
-
-        // Before assert we need to clear the context's change tracker so that the following database queries actually
-        // query the database, as if this were a new context. This should be done for all write tests.
+        
         context.ChangeTracker.Clear();
 
         // Assert
         context.Users.Single(u => u.Id == requestedAdminUser.Id).HasRequestedAdmin.Should().BeFalse();
+    }
+    
+    [Fact]
+    public void ApproveAdminAccessRequest_SetsIsAdminToTrueAndHasRequestedAdminAccessToFalse_ForCorrectUser()
+    {
+        // Arrange
+        using var context = Fixture.CreateWriteContext();
+        var service = new AdminService(context);
+
+        var nonAdminUser = context.Users.Single(u => u.GoogleUserName == "NonAdminUser");
+
+        // Act
+        service.ApproveAdminAccessRequest(nonAdminUser.Id);
+        
+        context.ChangeTracker.Clear();
+
+        // Assert
+        context.Users.Single(u => u.Id == nonAdminUser.Id).IsAdmin.Should().BeTrue();
+        context.Users.Single(u => u.Id == nonAdminUser.Id).HasRequestedAdmin.Should().BeFalse();
+    }
+    
+    [Fact]
+    public void RejectAdminAccessRequest_SetsHasRequestedAdminAccessToFalse_ForCorrectUser()
+    {
+        // Arrange
+        using var context = Fixture.CreateWriteContext();
+        var service = new AdminService(context);
+
+        var nonAdminUser = context.Users.Single(u => u.GoogleUserName == "NonAdminUser");
+
+        // Act
+        service.ApproveAdminAccessRequest(nonAdminUser.Id);
+        
+        context.ChangeTracker.Clear();
+
+        // Assert
+        context.Users.Single(u => u.Id == nonAdminUser.Id).HasRequestedAdmin.Should().BeFalse();
     }
 
     [Fact]
@@ -81,7 +100,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context,null!);
+        var service = new AdminService(context);
 
         // Act
         var result = service.GetAdminLists().Result;
@@ -93,11 +112,27 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     }
     
     [Fact]
+    public async void GetAdminLists_OnlyGetsAdmins()
+    {
+        // Arrange
+        await using var context = Fixture.CreateReadContext();
+        var service = new AdminService(context);
+
+        var adminUser = context.Users.Single(u => u.GoogleUserName == "AdminUser");
+
+        // Act
+        var adminLists = await service.GetAdminLists();
+
+        // Assert
+        adminLists.CurrentAdmins.Should().OnlyContain(u => u.Id == adminUser.Id);
+    }
+    
+    [Fact]
     public void GetTenantList_GetsListOfTenants()
     {
         // Arrange
         using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context,null!);
+        var service = new AdminService(context);
 
         // Act
         var result = service.GetTenantList().Result;
@@ -112,7 +147,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context,null!);
+        var service = new AdminService(context);
 
         // Act
         var result = service.GetLandlordDisplayList("Approved").Result;
@@ -127,7 +162,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context,null!);
+        var service = new AdminService(context);
 
         // Act
         var result = service.GetLandlordDisplayList("Unapproved").Result;
@@ -142,7 +177,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context,null!);
+        var service = new AdminService(context);
 
         // Act
         var result = service.GetLandlordDisplayList("").Result;
@@ -156,7 +191,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context,null!);
+        var service = new AdminService(context);
         var approvedLandlord = Fixture.CreateApprovedLandlordUser();
         
         // Act
@@ -173,7 +208,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context,null!);
+        var service = new AdminService(context);
 
         // Act
         var result = service.FindUserByLandlordId(1000);
@@ -188,7 +223,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context,null!);
+        var service = new AdminService(context);
 
         // Act
         var result = service.FindExistingInviteLink(3);
@@ -202,7 +237,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context,null!);
+        var service = new AdminService(context);
 
         // Assert
         service.Invoking(y => y.CreateNewInviteLink(3)).Should().Throw<Exception>();
@@ -213,13 +248,11 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new AdminService(context,null!);
+        var service = new AdminService(context);
 
         // Act
         var result = service.CreateNewInviteLink(1);
 
-        // Before assert we need to clear the context's change tracker so that the following database queries actually
-        // query the database, as if this were a new context. This should be done for all write tests.
         context.ChangeTracker.Clear();
 
         // Assert
@@ -232,13 +265,11 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new AdminService(context,null!);
+        var service = new AdminService(context);
 
         // Act
         service.DeleteExistingInviteLink(3);
 
-        // Before assert we need to clear the context's change tracker so that the following database queries actually
-        // query the database, as if this were a new context. This should be done for all write tests.
         context.ChangeTracker.Clear();
 
         // Assert
@@ -250,7 +281,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context,null!);
+        var service = new AdminService(context);
 
         // Assert
         service.Invoking(y => y.DeleteExistingInviteLink(1)).Should().Throw<Exception>();

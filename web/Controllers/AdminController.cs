@@ -67,14 +67,11 @@ public class AdminController : AbstractController
         if (user.IsAdmin)
         {
             LoggerAlreadyAdminWarning(_logger, user);
-
             return RedirectToAction(nameof(AdminDashboard));
         }
 
         _adminService.CancelAdminAccessRequest(user);
-
         FlashRequestSuccess(_logger, user, "cancelled admin access request");
-
         return RedirectToAction(nameof(AdminDashboard));
     }
     
@@ -90,13 +87,8 @@ public class AdminController : AbstractController
     [HttpPost]
     public ActionResult AcceptAdminRequest(int userToAcceptId)
     {
-        if (_adminService.GetUserFromId(userToAcceptId) == null)
-        {
-            return View("Error", new ErrorViewModel());
-        }
-
         _adminService.ApproveAdminAccessRequest(userToAcceptId);
-
+        _logger.LogInformation($"Admin request of user {userToAcceptId} approved by user {GetCurrentUser().Id}");
         return RedirectToAction("GetAdminList");
     }
 
@@ -104,13 +96,8 @@ public class AdminController : AbstractController
     [HttpPost]
     public ActionResult RejectAdminRequest(int userToRejectId)
     {
-        if (_adminService.GetUserFromId(userToRejectId) == null)
-        {
-            return View("Error", new ErrorViewModel());
-        }
-        
         _adminService.RejectAdminAccessRequest(userToRejectId);
-
+        _logger.LogInformation($"Admin request of user {userToRejectId} rejected by user {GetCurrentUser().Id}");
         return RedirectToAction("GetAdminList");
     }
 
@@ -146,7 +133,7 @@ public class AdminController : AbstractController
     public ActionResult GetInviteLink(int landlordId)
     {
         var user = _adminService.FindUserByLandlordId(landlordId);
-        if (user != null) // If landlord already linked to user
+        if (user != null)
         {
             var flashMessageBody = $"Landlord already linked to user {user.GoogleUserName}";
             FlashMessage(_logger, (flashMessageBody, "warning", flashMessageBody));
@@ -176,7 +163,7 @@ public class AdminController : AbstractController
     public ActionResult RenewInviteLink(int landlordId)
     {
         var user = _adminService.FindUserByLandlordId(landlordId);
-        if (user != null) // If landlord already linked to user
+        if (user != null)
         {
             TempData["InviteLinkMessage"] = $"Landlord already linked to user {user.GoogleUserName}";
         }

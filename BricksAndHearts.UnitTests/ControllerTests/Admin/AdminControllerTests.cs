@@ -125,75 +125,35 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("AdminDashboard");
     }
-    
+
     [Fact]
-    public void AcceptAdminRequest_OnInvalidUserId_CallsGetUserFromIdAndReturnsErrorView()
+    public void AcceptAdminRequest_CallsGetUserFromThenCallsApproveAdminAccessRequestAndRedirectsToGetAdminList()
     {
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
-        A.CallTo(() => AdminService.GetUserFromId(1)).Returns(null);
-
-        // Act
-        var result = UnderTest.AcceptAdminRequest(1) as ViewResult;
-
-        // Assert
-        A.CallTo(() => AdminService.GetUserFromId(1)).MustHaveHappened();
-        A.CallTo(() => AdminService.ApproveAdminAccessRequest(1)).MustNotHaveHappened();
-        result!.ViewData.Model.Should().BeOfType<ErrorViewModel>();
-    }
-    
-    [Fact]
-    public void AcceptAdminRequest_OnValidUserId_CallsGetUserFromThenCallsApproveAdminAccessRequestAndRedirectsToGetAdminList()
-    {
-        // Arrange
-        var adminUser = CreateAdminUser();
-        MakeUserPrincipalInController(adminUser, UnderTest);
-        var userDbModel = CreateUserDbModel(false, false);
-        A.CallTo(() => AdminService.GetUserFromId(1)).Returns(userDbModel);
 
         // Act
         var result = UnderTest.AcceptAdminRequest(1) as RedirectToActionResult;
 
         // Assert
-        A.CallTo(() => AdminService.GetUserFromId(1)).MustHaveHappened();
         A.CallTo(() => AdminService.ApproveAdminAccessRequest(1)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("GetAdminList");
     }
-    
-    [Fact]
-    public void RejectAdminRequest_OnInvalidUserId_CallsRejectAdminAccessRequestAndRedirectsToGetAdminList()
-    {
-        // Arrange
-        var adminUser = CreateAdminUser();
-        MakeUserPrincipalInController(adminUser, UnderTest);
-        A.CallTo(() => AdminService.GetUserFromId(1)).Returns(null);
 
-        // Act
-        var result = UnderTest.RejectAdminRequest(1) as ViewResult;
-
-        // Assert
-        A.CallTo(() => AdminService.GetUserFromId(1)).MustHaveHappened();
-        A.CallTo(() => AdminService.RejectAdminAccessRequest(1)).MustNotHaveHappened();
-        result!.ViewData.Model.Should().BeOfType<ErrorViewModel>();
-    }
-    
     [Fact]
     public void RejectAdminRequest_OnValidUserId_CallsGetUserFromThenCallsRejectAdminAccessRequestAndRedirectsToGetAdminList()
     {
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
-        var userDbModel = CreateUserDbModel(false, false);
-        A.CallTo(() => AdminService.GetUserFromId(1)).Returns(userDbModel);
 
         // Act
         var result = UnderTest.RejectAdminRequest(1) as RedirectToActionResult;
 
         // Assert
-        A.CallTo(() => AdminService.GetUserFromId(1)).MustHaveHappened();
         A.CallTo(() => AdminService.RejectAdminAccessRequest(1)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
