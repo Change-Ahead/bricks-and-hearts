@@ -1,0 +1,2 @@
+﻿Name,Email,Phone,Postcode,Type,HasPet,ETT,UniversalCredit,HousingBenefits,Over35
+Example Person,persona@gmail.com,01304 676838,cb39aj,Single,TRUE,TRUE,TRUE,TRUE,FALSE

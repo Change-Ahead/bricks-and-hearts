@@ -1,6 +1,6 @@
-﻿using BricksAndHearts.Auth;
+using System.Data;
+using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
-using BricksAndHearts.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace BricksAndHearts.Services;
@@ -51,6 +51,19 @@ public class AdminService : IAdminService
     {
         return (await GetCurrentAdmins(), await GetPendingAdmins());
     }
+    
+    private async Task<List<UserDbModel>> GetCurrentAdmins()
+    {
+        var currentAdmins = await _dbContext.Users.Where(u => u.IsAdmin == true).ToListAsync();
+        return currentAdmins;
+    }
+
+    private async Task<List<UserDbModel>> GetPendingAdmins()
+    {
+        var pendingAdmins =
+            await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
+        return pendingAdmins;
+    }
 
     public async Task<List<LandlordDbModel>> GetLandlordDisplayList(string approvalStatus)
     {
@@ -58,10 +71,10 @@ public class AdminService : IAdminService
         {
             "Unapproved" => await _dbContext.Landlords.Where(u => u.CharterApproved == false).ToListAsync(),
             "Approved" => await _dbContext.Landlords.Where(u => u.CharterApproved == true).ToListAsync(),
-            _ => await _dbContext.Landlords.ToListAsync(),
+            _ => await _dbContext.Landlords.ToListAsync()
         };
     }
-    
+
     public async Task<List<TenantDbModel>> GetTenantList()
     {
         return await _dbContext.Tenants.ToListAsync();
@@ -112,33 +125,20 @@ public class AdminService : IAdminService
         _dbContext.SaveChanges();
     }
 
-    private async Task<List<UserDbModel>> GetCurrentAdmins()
-    {
-        var currentAdmins = await _dbContext.Users.Where(u => u.IsAdmin == true).ToListAsync();
-        return currentAdmins;
-    }
-
-    private async Task<List<UserDbModel>> GetPendingAdmins()
-    {
-        var pendingAdmins =
-            await _dbContext.Users.Where(u => u.IsAdmin == false && u.HasRequestedAdmin).ToListAsync();
-        return pendingAdmins;
-    }
-    
     public void ApproveAdminAccessRequest(int userId)
     {
         var userToAdmin = _dbContext.Users.Single(u => u.Id == userId);
-        
+
         userToAdmin.IsAdmin = true;
         userToAdmin.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
         _logger.LogInformation("Admin request approved");
     }
-    
+
     public void RejectAdminAccessRequest(int userId)
     {
         var userToAdmin = _dbContext.Users.Single(u => u.Id == userId);
-        
+
         userToAdmin.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
         _logger.LogInformation("Admin request rejected");
@@ -146,7 +146,7 @@ public class AdminService : IAdminService
 
     public UserDbModel GetUserFromId(int userId)
     {
-        UserDbModel userFromId = _dbContext.Users.SingleOrDefault(u => u.Id == userId)!;
+        var userFromId = _dbContext.Users.SingleOrDefault(u => u.Id == userId)!;
         return userFromId;
     }
 

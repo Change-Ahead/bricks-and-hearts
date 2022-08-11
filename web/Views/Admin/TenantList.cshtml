@@ -4,6 +4,20 @@
     ViewData["Title"] = "Tenant List";
 }
 
+@{
+    if (TempData["MultipleFlashMessages"] != null)
+    {
+        var flashMessages = TempData["MultipleFlashMessages"] as string[];
+        var flashTypes = TempData["MultipleFlashTypes"] as string[];
+        for (int i = 0; i < flashMessages!.Length; i++)
+        {
+            <div class="alert alert-@flashTypes![i]" role="alert">
+            @flashMessages[i]
+            </div>
+        }
+    }
+}
+
 <h2>Tenant List</h2>
 
 <form method="get" asp-controller="Admin" asp-action="GetFilteredTenants">
@@ -96,3 +110,22 @@
     }
     </tbody>
 </table>
+
+<h2>Importing tenant information</h2>
+
+@using (Html.BeginForm("ImportTenants", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+{
+    <div>Please upload a CSV file containing tenant information. This information will replace all existing tenant records.</div>
+    <input name="csvFile" type="file" accept="file">
+    <input type="submit" value="Import Tenants" />
+}
+
+<p></p>
+<p>Below is a CSV file which you may use as a template for the tenant data you wish to import. The first row is filled in as an example.</p>
+<p>Please do not change the column headings, or your data will not be recognised as aligning with the fields stored in the database.</p>
+<p>Data imported is case sensitive and registers white space. Certain fields require a Boolean input (TRUE or FALSE). Any field except for the tenant's name may be left blank.</p>
+
+@using (Html.BeginForm("GetSampleTenantCSV", "Admin", FormMethod.Post))
+{
+    <button type="submit" class="btn btn-primary">Download sample Tenant Data CSV</button>
+}

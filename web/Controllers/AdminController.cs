@@ -3,6 +3,7 @@
 using BricksAndHearts.Auth;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
+using LINQtoCSV;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,16 +14,19 @@ namespace BricksAndHearts.Controllers;
 public class AdminController : AbstractController
 {
     private readonly IAdminService _adminService;
+    private readonly ICsvImportService _csvImportService;
     private readonly ILandlordService _landlordService;
-    private readonly IPropertyService _propertyService;
     private readonly ILogger<AdminController> _logger;
+    private readonly IPropertyService _propertyService;
 
-    public AdminController(ILogger<AdminController> logger, IAdminService adminService, ILandlordService landlordService, IPropertyService propertyService)
+    public AdminController(ILogger<AdminController> logger, IAdminService adminService,
+        ILandlordService landlordService, IPropertyService propertyService, ICsvImportService csvImportService)
     {
         _logger = logger;
         _adminService = adminService;
         _landlordService = landlordService;
         _propertyService = propertyService;
+        _csvImportService = csvImportService;
     }
 
     [HttpGet]
@@ -30,8 +34,13 @@ public class AdminController : AbstractController
     public IActionResult AdminDashboard()
     {
         var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
-        var viewModel = new AdminDashboardViewModel(_landlordService.CountLandlords(), _propertyService.CountProperties());
-        if (isAuthenticated) viewModel.CurrentUser = GetCurrentUser();
+        var viewModel =
+            new AdminDashboardViewModel(_landlordService.CountLandlords(), _propertyService.CountProperties());
+        if (isAuthenticated)
+        {
+            viewModel.CurrentUser = GetCurrentUser();
+        }
+
         return View(viewModel);
     }
 
@@ -74,7 +83,7 @@ public class AdminController : AbstractController
     {
         var adminLists = await _adminService.GetAdminLists();
 
-        AdminListModel adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
+        var adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
 
         return View("AdminList", adminListModel);
     }
@@ -83,16 +92,16 @@ public class AdminController : AbstractController
     [HttpGet]
     public async Task<IActionResult> LandlordList(string? approvalStatus = "")
     {
-        LandlordListModel landlordListModel = new LandlordListModel();
+        var landlordListModel = new LandlordListModel();
         landlordListModel.LandlordDisplayList = await _adminService.GetLandlordDisplayList(approvalStatus!);
         return View(landlordListModel);
     }
-    
+
     [Authorize(Roles = "Admin")]
     [HttpGet]
     public async Task<IActionResult> TenantList()
     {
-        TenantListModel tenantListModel = new TenantListModel();
+        var tenantListModel = new TenantListModel();
         tenantListModel.TenantList = await _adminService.GetTenantList();
         return View(tenantListModel);
     }
@@ -194,5 +203,52 @@ public class AdminController : AbstractController
     {
         tenantListModel.TenantList = await _adminService.GetTenantDbModelsFromFilter(tenantListModel.Filters);
         return View("TenantList", tenantListModel);
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    public ActionResult GetSampleTenantCSV()
+    {
+        return File("~/TenantImportCSVTemplate.csv", "text/csv");
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    public async Task<ActionResult> ImportTenants(IFormFile csvFile)
+    {
+        if (csvFile == null)
+        {
+            return RedirectToAction(nameof(TenantList));
+        }
+        var fileName = csvFile.FileName;
+        if (csvFile.Length == 0)
+        {
+            FlashMessage(_logger,
+                ($"{fileName} has length zero.", "danger", $"{fileName} contains no data. Please upload a file containing the tenant data you would like to import."));
+            return RedirectToAction(nameof(TenantList));
+        }
+        if (fileName.Substring(fileName.Length - 3) != "csv")
+        {
+            FlashMessage(_logger,
+                ($"{fileName} not a CSV file.", "danger",
+                    $"{fileName} is not a CSV file. Please upload your data as a CSV file."));
+            return RedirectToAction(nameof(TenantList));
+        }
+        
+        var flashResponse = _csvImportService.CheckIfImportWorks(csvFile);
+        if (flashResponse.FlashTypes.Contains("danger"))
+        {
+            FlashMultipleMessages(flashResponse.FlashTypes, flashResponse.FlashMessages);
+            return RedirectToAction(nameof(TenantList));
+        }
+        var furtherFlashResponse = await _csvImportService.ImportTenants(csvFile, flashResponse);
+        
+        if (furtherFlashResponse.FlashMessages.Count() == 0)
+        {
+            FlashMessage(_logger,
+                ("Successfuly imported all tenant data.", "success", "Successfully imported all tenant data."));
+        }
+        FlashMultipleMessages(furtherFlashResponse.FlashTypes, furtherFlashResponse.FlashMessages);
+        return RedirectToAction(nameof(TenantList));
     }
 }
