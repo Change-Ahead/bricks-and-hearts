@@ -261,6 +261,12 @@ public class LandlordController : AbstractController
             return View("EditProfilePage", editModel);
         }
 
+        if (editModel.MembershipId == null)
+        {
+            // If membership ID is removed, also unapprove charter
+            await _landlordService.UnapproveLandlord(editModel.LandlordId!.Value);
+        }
+
         await _landlordService.EditLandlordDetails(editModel);
         _logger.LogInformation("Successfully edited landlord for landlord {LandlordId}", editModel.LandlordId);
         return RedirectToAction("Profile", new { id = editModel.LandlordId });

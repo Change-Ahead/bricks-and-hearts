@@ -46,6 +46,7 @@ public interface ILandlordService
     public bool CheckForDuplicateEmail(LandlordProfileModel editModel);
     public bool CheckForDuplicateMembershipId(LandlordProfileModel editModel);
     public Task<ApproveLandlordResult> ApproveLandlord(int landlordId, BricksAndHeartsUser user, string membershipId);
+    public Task UnapproveLandlord(int landlordId);
     public LandlordDbModel? FindLandlordWithInviteLink(string inviteLink);
 
     public Task<LinkUserWithLandlordResult> LinkExistingLandlordWithUser(
@@ -216,6 +217,21 @@ public class LandlordService : ILandlordService
 
         await _dbContext.SaveChangesAsync();
         return ILandlordService.ApproveLandlordResult.Success;
+    }
+
+    public async Task UnapproveLandlord(int landlordId)
+    {
+        var landlord = await GetLandlordIfExistsFromId(landlordId);
+        if (landlord is null)
+        {
+            return;
+        }
+
+        landlord.CharterApproved = false;
+        landlord.ApprovalTime = null;
+        landlord.ApprovalAdminId = null;
+
+        await _dbContext.SaveChangesAsync();
     }
 
     public LandlordDbModel? FindLandlordWithInviteLink(string inviteLink)
