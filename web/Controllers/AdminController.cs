@@ -112,7 +112,7 @@ public class AdminController : AbstractController
     [HttpGet]
     public async Task<IActionResult> LandlordList(LandlordListModel landlordListModel)
     {
-        landlordListModel.LandlordList = await _adminService.GetLandlordList(landlordListModel.Filters);
+        landlordListModel.LandlordList = await _adminService.GetLandlordList(landlordListModel);
         return View(landlordListModel);
     }
 

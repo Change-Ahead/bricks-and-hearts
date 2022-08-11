@@ -67,9 +67,6 @@ namespace BricksAndHearts.Migrations
                     b.Property<string>("InviteLink")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("IsAssigned")
-                        .HasColumnType("bit");
-
                     b.Property<bool>("IsLandlordForProfit")
                         .HasColumnType("bit");
 

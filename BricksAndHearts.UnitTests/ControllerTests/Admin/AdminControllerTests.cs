@@ -186,7 +186,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         var result = await UnderTest.LandlordList(landlordListModel) as ViewResult;
 
         // Assert
-        A.CallTo(() => AdminService.GetLandlordList(landlordListModel.Filters)).MustHaveHappened();
+        A.CallTo(() => AdminService.GetLandlordList(landlordListModel)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<LandlordListModel?>();
     }
     
