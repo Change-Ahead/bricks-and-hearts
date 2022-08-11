@@ -17,7 +17,7 @@
     }
 </div>
 
-<table class="table table-hover">
+<table class="table">
     <thead>
     <tr>
         <th scope="col">Address</th>
@@ -28,8 +28,8 @@
         <th scope="col">Description</th>
         <th scope="col">Availability</th>
         <th scope="col">Available From</th>
-        <th scope="col">Property page</th>
-        <th scope="col">Landlord profile</th>
+        <th scope="col">Landlord's profile</th>
+        <th scope="col">Property information</th>
     </tr>
     </thead>
     <tbody>
@@ -53,13 +53,20 @@
             }
             
             <td>
-                <a type="button" class="btn btn-outline-primary" value="@property.PropertyId" href="@Url.Action("ViewProperty", "Property", new { id = property.PropertyId })">
-                    <i class="bi bi-house"></i>
+                <a type="button" class="btn btn-outline-primary" href="@Url.Action("Profile", "Landlord", new { id = property.LandlordId })">
+                    <i class="bi bi-person"></i>
                 </a>
             </td>
             <td>
-                <a type="button" class="btn btn-outline-primary" value="@property.LandlordId" href="@Url.Action("Profile", "Landlord", new { id = property.LandlordId })">
-                    <i class="bi bi-person"></i>
+                <a class="btn btn-outline-primary position-relative" href="@Url.Action("ViewProperty", "Property", new { propertyId = property.PropertyId })">
+                    <i class="bi bi-house"></i>
+                    @if (property.IsIncomplete)
+                    {
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
+                            <i class="bi bi-circle-half"></i> Incomplete
+                            <span class="visually-hidden">Property is incomplete</span>
+                        </span>
+                    }
                 </a>
             </td>
         </tr>
@@ -74,14 +81,14 @@
 
 @if (Model.Page > 1)
 {
-    <a type="button" class="btn btn-outline-primary" value="Previous" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page - 1, propPerPage = Model.PropPerPage })">
+    <a type="button" class="btn btn-outline-primary" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page - 1, propPerPage = Model.PropPerPage })">
         <i class="previous"> Previous </i>
     </a>
 }
 
 @if (Model.Page <= Model.Total/Model.PropPerPage)
 {
-    <a type="button" class="btn btn-outline-primary" value="Next" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page + 1, propPerPage = Model.PropPerPage })">
+    <a type="button" class="btn btn-outline-primary" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page + 1, propPerPage = Model.PropPerPage })">
         <i class="bi"> Next </i>
     </a>
 }
