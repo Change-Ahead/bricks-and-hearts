@@ -4,6 +4,7 @@ using System.Linq;
 using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
+using BricksAndHearts.ViewModels;
 using FluentAssertions;
 using Xunit;
 
@@ -126,98 +127,81 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         // Assert
         adminLists.CurrentAdmins.Should().OnlyContain(u => u.Id == adminUser.Id);
     }
-    
+
     [Fact]
-    public void GetLandlordDisplayList_CalledWithApproved_ReturnsApprovedLandlords()
-    {
-        // Arrange
-        using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context);
-
-        // Act
-        var result = service.GetLandlordDisplayList("Approved").Result;
-
-        // Assert
-        result.Should().BeOfType<List<LandlordDbModel>>().And.Subject.Where(u => u.CharterApproved).Should()
-            .HaveCount(result.Count);
-    }
-    
-    [Fact]
-    public void GetLandlordDisplayList_CalledWithUnapproved_ReturnsUnapprovedLandlords()
-    {
-        // Arrange
-        using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context);
-
-        // Act
-        var result = service.GetLandlordDisplayList("Unapproved").Result;
-
-        // Assert
-        result.Should().BeOfType<List<LandlordDbModel>>().And.Subject.Where(u => u.CharterApproved == false).Should()
-            .HaveCount(result.Count);
-    }
-    
-    [Fact]
-    public void GetLandlordDisplayList_CalledWithNothing_ReturnsAllLandlords()
-    {
-        // Arrange
-        using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context);
-
-        // Act
-        var result = service.GetLandlordDisplayList("").Result;
-        
-        // Assert
-        result.Should().BeOfType<List<LandlordDbModel>>().And.Subject.Should().HaveCount(context.Landlords.Count());
-    }
-    
-    [Fact]
-    public void GetTenantList_GetsListOfTenants()
-    {
-        // Arrange
-        using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context);
-
-        // Act
-        var result = service.GetTenantList().Result;
-
-        // Assert
-
-        result.Should().BeOfType<List<TenantDbModel>>().And.Subject.Should().HaveCount(context.Tenants.Count());
-    }
-    
-    [Fact]
-    public async void GetTenantDbModelsFromFilter_ReturnsFilteredTenantList_WithCorrectFilter()
+    public async void LandlordList_CalledWithNoFilter_ReturnsAllLandlords()
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
         var service = new AdminService(context);
-        var filterArr = new [] { "single", "all", "true", "true", "all", "all"};
+        var landlordListModel = new LandlordListModel();
 
         // Act
-        var result = await service.GetTenantDbModelsFromFilter(filterArr);
+        var result = await service.GetLandlordList(landlordListModel);
+
+        // Assert
+        result.Should().BeOfType<List<LandlordDbModel>>();
+        result.Count.Should().Be(context.Landlords.Count());
+    }
+    
+    [Fact]
+    public async void LandlordList_CalledWithFilters_ReturnsCorrectlyFilteredLandlordList()
+    {
+        // Arrange
+        await using var context = Fixture.CreateReadContext();
+        var service = new AdminService(context);
+        var landlordListModel = new LandlordListModel
+        {
+            IsApproved = true,
+            IsAssigned = false
+        };
+
+        // Act
+        var result = await service.GetLandlordList(landlordListModel);
+
+        // Assert
+        result.Should().BeOfType<List<LandlordDbModel>>();
+        result.Count.Should().Be(context.Landlords.Where(l => l.CharterApproved == true)
+            .Count(l => context.Users.SingleOrDefault(u => u.LandlordId == l.Id) == null));
+    }
+
+    [Fact]
+    public async void TenantList_CalledWithNoFilter_ReturnsAllTenants()
+    {
+        // Arrange
+        await using var context = Fixture.CreateReadContext();
+        var service = new AdminService(context);
+        var tenantListModel = new TenantListModel();
+
+        // Act
+        var result = await service.GetTenantList(tenantListModel.Filter);
+
+        // Assert
+        result.Should().BeOfType<List<TenantDbModel>>();
+        result.Count.Should().Be(context.Tenants.Count());
+    }
+    
+    [Fact]
+    public async void TenantList_CalledWithFilters_ReturnsCorrectlyFilteredTenantList()
+    {
+        // Arrange
+        await using var context = Fixture.CreateReadContext();
+        var service = new AdminService(context);
+        var filter = new TenantListFilter
+        {
+            Type = "single",
+            ETT = true,
+            UniversalCredit = true
+        };
+
+        // Act
+        var result = await service.GetTenantList(filter);
 
         // Assert
         result.Should().BeOfType<List<TenantDbModel>>();
         result.Count.Should().Be(context.Tenants.Where(t => t.ETT == true)
             .Where(t => t.UniversalCredit == true)
             .Count(t => t.Type == "Single"));
-    }
-    
-    [Fact]
-    public async void GetTenantDbModelsFromFilter_ReturnsAllTenants_WithNoFilter()
-    {
-        // Arrange
-        await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context);
-        var filterArr = new string[]{"all","all","all","all","all","all"};
-
-        // Act
-        var result = await service.GetTenantDbModelsFromFilter(filterArr);
-
-        // Assert
-        result.Should().BeOfType<List<TenantDbModel>>();
-        result.Count.Should().Be(context.Tenants.Count());
     }
 
     [Fact]

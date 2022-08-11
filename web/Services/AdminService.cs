@@ -1,5 +1,6 @@
 using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
+using BricksAndHearts.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace BricksAndHearts.Services;
@@ -16,9 +17,8 @@ public interface IAdminService
     
     //Information Lists
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
-    public Task<List<LandlordDbModel>> GetLandlordDisplayList(string approvalStatus);
-    public Task<List<TenantDbModel>> GetTenantList();
-    public Task<List<TenantDbModel>> GetTenantDbModelsFromFilter(string[] filterArray);
+    public Task<List<LandlordDbModel>> GetLandlordList(LandlordListModel landlordListModel);
+    public Task<List<TenantDbModel>> GetTenantList(TenantListFilter filter);
     
     //Invite Links
     public UserDbModel? FindUserByLandlordId(int landlordId);
@@ -98,46 +98,49 @@ public class AdminService : IAdminService
         return pendingAdmins;
     }
 
-    public async Task<List<LandlordDbModel>> GetLandlordDisplayList(string approvalStatus)
+    public async Task<List<LandlordDbModel>> GetLandlordList(LandlordListModel landlordListModel)
     {
-        return approvalStatus switch
+        var landlordQuery = _dbContext.Landlords.AsQueryable();
+        if (landlordListModel.IsApproved != null)
         {
-            "Unapproved" => await _dbContext.Landlords.Where(u => u.CharterApproved == false).ToListAsync(),
-            "Approved" => await _dbContext.Landlords.Where(u => u.CharterApproved == true).ToListAsync(),
-            _ => await _dbContext.Landlords.ToListAsync(),
+            landlordQuery = landlordQuery.Where(l => l.CharterApproved == landlordListModel.IsApproved);
+        }
+        if (landlordListModel.IsAssigned != null)
+        {
+            landlordQuery = landlordQuery.Where(l => _dbContext.Users.Any(u => u.LandlordId == l.Id) == landlordListModel.IsAssigned);
+        }
+        return await landlordQuery.ToListAsync();
+    }
+    
+    public async Task<List<TenantDbModel>> GetTenantList(TenantListFilter filter)
+    {
+        var tenantQuery = _dbContext.Tenants.AsQueryable();
+        tenantQuery = filter.Type switch
+        {
+            "Single" => tenantQuery.Where(t => t.Type == "Single"),
+            "Couple" => tenantQuery.Where(t => t.Type == "Couple"),
+            "Family" => tenantQuery.Where(t => t.Type == "Family"),
+            _ => tenantQuery
         };
-    }
-    
-    public async Task<List<TenantDbModel>> GetTenantList()
-    {
-        return await _dbContext.Tenants.ToListAsync();
-    }
-    
-    public async Task<List<TenantDbModel>> GetTenantDbModelsFromFilter(string[] filterArray)
-    {
-        var tenantQuery = from tenants in _dbContext.Tenants select tenants;
-        for (var currentFilterNo = 0; currentFilterNo < filterArray.Length; currentFilterNo++)
+        if (filter.HasPet != null)
         {
-            var filterToCheck = filterArray[currentFilterNo];
-            if (filterToCheck != "all")
-            {
-                tenantQuery = currentFilterNo switch
-                {
-                    0 => filterToCheck switch
-                    {
-                        "Single" => tenantQuery.Where(t => t.Type == "Single"),
-                        "Couple" => tenantQuery.Where(t => t.Type == "Couple"),
-                        "Family" => tenantQuery.Where(t => t.Type == "Family"),
-                        _ => tenantQuery
-                    },
-                    1 => tenantQuery.Where(t => t.HasPet == Convert.ToBoolean(filterToCheck)),
-                    2 => tenantQuery.Where(t => t.ETT == Convert.ToBoolean(filterToCheck)),
-                    3 => tenantQuery.Where(t => t.UniversalCredit == Convert.ToBoolean(filterToCheck)),
-                    4 => tenantQuery.Where(t => t.HousingBenefits == Convert.ToBoolean(filterToCheck)),
-                    5 => tenantQuery.Where(t => t.Over35 == Convert.ToBoolean(filterToCheck)),
-                    _ => tenantQuery
-                };
-            }
+            tenantQuery = tenantQuery.Where(t => t.HasPet == filter.HasPet);
+        }
+        if (filter.ETT != null)
+        {
+            tenantQuery = tenantQuery.Where(t => t.ETT == filter.ETT);
+        }
+        if (filter.UniversalCredit != null)
+        {
+            tenantQuery = tenantQuery.Where(t => t.UniversalCredit == filter.UniversalCredit);
+        }
+        if (filter.HousingBenefits != null)
+        {
+            tenantQuery = tenantQuery.Where(t => t.HousingBenefits == filter.HousingBenefits);
+        }
+        if (filter.Over35 != null)
+        {
+            tenantQuery = tenantQuery.Where(t => t.Over35 == filter.Over35);
         }
         return await tenantQuery.ToListAsync();
     }
