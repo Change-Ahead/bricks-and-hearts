@@ -158,7 +158,9 @@ public class AdminController : AbstractController
                 flashMessageBody = "Landlord already has an invite link";
             }
 
-            FlashMessage(_logger, (flashMessageBody, "success", flashMessageBody + $": {(HttpContext.Request.IsHttps ? "https" : "http")}://{HttpContext.Request.Host}/invite/{inviteLink}"));
+            FlashMessage(_logger, (flashMessageBody, "success", flashMessageBody + $": {(HttpContext.Request.IsHttps ? "https" : "http")}" +
+                                                                                    $"://{HttpContext.Request.Host}" +
+                                                                                    $"/invite/{inviteLink}"));
         }
 
         return RedirectToAction("Profile", "Landlord", new { id = landlordId });
