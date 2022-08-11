@@ -53,7 +53,7 @@
             }
             
             <td>
-                <a type="button" class="btn btn-outline-primary" value="@property.LandlordId" href="@Url.Action("Profile", "Landlord", new { id = property.LandlordId })">
+                <a type="button" class="btn btn-outline-primary" href="@Url.Action("Profile", "Landlord", new { id = property.LandlordId })">
                     <i class="bi bi-person"></i>
                 </a>
             </td>
@@ -81,14 +81,14 @@
 
 @if (Model.Page > 1)
 {
-    <a type="button" class="btn btn-outline-primary" value="Previous" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page - 1, propPerPage = Model.PropPerPage })">
+    <a type="button" class="btn btn-outline-primary" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page - 1, propPerPage = Model.PropPerPage })">
         <i class="previous"> Previous </i>
     </a>
 }
 
 @if (Model.Page <= Model.Total/Model.PropPerPage)
 {
-    <a type="button" class="btn btn-outline-primary" value="Next" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page + 1, propPerPage = Model.PropPerPage })">
+    <a type="button" class="btn btn-outline-primary" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page + 1, propPerPage = Model.PropPerPage })">
         <i class="bi"> Next </i>
     </a>
 }
