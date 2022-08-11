@@ -52,7 +52,7 @@ public class PropertyController : AbstractController
 
     [HttpGet]
     [Route("/property/{propertyId:int}/view")]
-    public ActionResult ViewProperty(int propertyId)
+    public async Task<ActionResult> ViewProperty(int propertyId)
     {
         var model = _propertyService.GetPropertyByPropertyId(propertyId);
         if (model == null)
@@ -67,7 +67,12 @@ public class PropertyController : AbstractController
         }
 
         var propertyViewModel = PropertyViewModel.FromDbModel(model);
-        return View(propertyViewModel);
+
+        var fileNames = await _azureStorage.ListFileNames("property", propertyId);
+        var imageFiles = GetFilesFromFileNames(fileNames, propertyId);
+        var propertyDetailsModel = new PropertyDetailsViewModel { Property = propertyViewModel, Images = imageFiles };
+
+        return View(propertyDetailsModel);
     }
 
     [Authorize(Roles = "Admin")]
@@ -468,7 +473,7 @@ public class PropertyController : AbstractController
         }
 
         await _azureStorage.DeleteFile("property", propertyId, fileName);
-        return RedirectToAction("ListPropertyImages", "Property", new { propertyId });
+        return RedirectToAction("ViewProperty", "Property", new { propertyId });
     }
 
     #endregion
