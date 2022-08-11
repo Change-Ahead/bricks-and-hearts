@@ -205,7 +205,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
     }
 
     [Fact]
-    public void EditProfileUpdate_CalledUsingInvalidModel_Returns404Error()
+    public void EditProfileUpdate_CalledUsingInvalidModel_ReturnsEditPageView()
     {
         // Arrange
         var landlordUser = CreateLandlordUser();
@@ -214,10 +214,12 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var invalidLandlordModel = CreateInvalidLandlordProfileModel();
 
         // Act
-        var result = UnderTest.EditProfileUpdate(invalidLandlordModel).Result;
+        var result = UnderTest.EditProfileUpdate(invalidLandlordModel).Result as ViewResult;
 
-        // Assert   
-        result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(404);
+        // Assert
+        result!.Model.Should().BeOfType<LandlordProfileModel>();
+        result.Should().BeOfType<ViewResult>().Which.ViewName.Should().BeEquivalentTo("EditProfilePage");
+        UnderTest.ModelState.IsValid.Should().BeFalse();
     }
 
     [Fact]

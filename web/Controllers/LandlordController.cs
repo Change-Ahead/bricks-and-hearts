@@ -237,7 +237,7 @@ public class LandlordController : AbstractController
         var user = GetCurrentUser();
         if (!ModelState.IsValid || !TryValidateModel(editModel.Address, nameof(AddressModel)))
         {
-            return StatusCode(404);
+            return View("EditProfilePage", editModel);
         }
 
         if (user.LandlordId != editModel.LandlordId && !user.IsAdmin)
