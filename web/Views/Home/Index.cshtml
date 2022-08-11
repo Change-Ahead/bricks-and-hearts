@@ -3,30 +3,78 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Bricks & Hearts</h1>
-    <p>Welcome to Bricks & Hearts.</p>
-    <p>Under construction for <a href="https://www.changeahead.org.uk/">Change Ahead</a></p>
-    <p style="max-width: 800px; margin-left: auto; margin-right: auto">This is a (work in progress) portal for landlords to manage properties they would like to make available to disadvantaged tenants looking for social housing.</p>
-    @{
-        if (Model.IsLoggedIn)
-        {
-            <p>
-                Logged in as @Model.UserName
-            </p>
-            if (Model.IsRegisteredAsLandlord)
-            {
-                <a class="btn btn-primary" asp-controller="Landlord" asp-action="MyProfile">Go to profile</a>
-            }
-            else
-            {
-                <a class="btn btn-success" asp-controller="Landlord" asp-action="RegisterGet">Register as a Landlord</a>
-            }
-            <a class="btn btn-success" asp-controller="Admin" asp-action="AdminDashboard">Admin Dashboard</a>
-        }
-        else
-        {
-            <a class="btn btn-primary" href="@Url.Action("Google", "Login")">Login with Google</a>
-        }
-    }
-</div>
+
+@if (Model.IsLoggedIn)
+{
+    <div class="container-fluid text-center">
+        <div class="row mb-4">
+            <h2>Welcome to</h2>
+            <statistics class="display-4">Bricks & Hearts</statistics>
+        </div>
+        <div class="row mb-4">
+            <h1>Sign up as</h1>
+        </div>
+        <div class="row mb-4"></div>
+        <div class="row">
+            <div class="col"></div>
+            <div class="col-3 d-flex justify-content-center">
+                <div class="card card-home rounded-custom">
+                    <div class="card-body"></div>
+                    <i class="bi bi-person bi-register"></i>
+                    <div class="card-body"></div>
+                    <div class="card-text-home rounded-custom">
+                        <p></p>
+                        <a class="btn btn-outline-blue stretched-link" asp-controller="Landlord" asp-action="RegisterGet">Landlord</a>
+                        <p class="card-text font-smallBody">List your properies and be matched with potential tenants.</p>
+                    </div>    
+                </div>
+            </div>
+            <div class="col-3 d-flex justify-content-center">
+                <div class="card card-home rounded-custom">
+                    <div class="card-body"></div>
+                    <i class="bi bi-person bi-register"></i>
+                    <div class="card-body"></div>
+                    <div class="card-text-home rounded-custom">
+                        <p></p>
+                        @using (Html.BeginForm("RequestAdminAccess", "Admin", FormMethod.Post))
+                        {
+                            <button type="submit" class="btn btn-outline-blue stretched-link">Admin</button>
+                        }
+                        <p class="card-text font-smallBody">View all landlords, properties and tenants and create matches.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col"></div>
+        </div>    
+    </div>
+}
+
+ else
+{
+    <div class="container-fluid text-center">
+        <div class="row mb-4">
+            <h2>Welcome to</h2>
+            <statistics class="display-4">Bricks & Hearts</statistics>
+        </div>
+        <div class="row mb-4">
+            <h1>Please sign in with Google</h1>
+        </div>
+        <div class="row mb-4"></div>
+        <div class="row">
+            <div class="col"></div>
+            <div class="col-3 d-flex justify-content-center">
+                <div class="card card-home rounded-custom">
+                    <div class="card-body"></div>
+                    <i class="bi bi-person bi-register"></i>
+                    <div class="card-body"></div>
+                    <div class="card-text-home rounded-custom">
+                        <p></p>
+                        <a class="btn btn-outline-blue stretched-link" href="@Url.Action("Google", "Login")">Login with Google</a>
+                    </div>    
+                </div>
+            </div>
+            <div class="col"></div>
+        </div>    
+    </div>
+    
+}

@@ -17,11 +17,23 @@ public class HomeController : AbstractController
     public IActionResult Index()
     {
         var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
+        if (isAuthenticated)
+        {
+            var user = GetCurrentUser();
+            if (user.IsAdmin)
+            {
+                return RedirectToAction("AdminDashboard", "Admin");
+            }
+
+            if (user.LandlordId != null)
+            {
+                return RedirectToAction("MyDashboard", "Landlord");
+            }
+        }
         var model = new HomeViewModel
         {
             IsLoggedIn = isAuthenticated,
             UserName = User.Identity?.Name,
-            IsRegisteredAsLandlord = isAuthenticated && GetCurrentUser().LandlordId != null
         };
         return View(model);
     }

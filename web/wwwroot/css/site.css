@@ -115,6 +115,28 @@ body {
     border-color: var(--red);
 }
 
+.card-home{
+    width: 80%;
+    height: 120%;
+    background-color: var(--blue);
+}
+
+.bi-register{
+    font-size: 85px;
+    background-color: var(--blue);
+    color: var(--white)
+}
+
+.card-text-home{
+    width: 100%;
+    height: 40%;
+    background-color: var(--white)
+}
+
+.rounded-custom {
+    border-radius: 10px;
+}
+
 .form-control, .form-select, .input-group {
     border-color: var(--blue);
     height: 64px;
