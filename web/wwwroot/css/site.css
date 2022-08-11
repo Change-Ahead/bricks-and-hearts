@@ -30,13 +30,7 @@ a, .nav-link {
     }
 }
 
-html {
-    position: relative;
-    min-height: 100%;
-}
-
 body {
-    margin-bottom: 60px;
     background-image: url("images/backgroundHouses.jpg");
     background-color: rgba(255, 255, 255, 0.97);
     background-blend-mode: lighten;
