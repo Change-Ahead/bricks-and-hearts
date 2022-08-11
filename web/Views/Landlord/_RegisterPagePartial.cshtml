@@ -103,7 +103,7 @@
             <div class="form-group my-3">
                 <label for="Select" class="form-label">Charter status</label>
                 <select class="form-select" required
-                        id="Select" onclick="checkIfSelectedValueIsTarget('true')">
+                        id="Select" onclick="checkIfSelectedValueIsTarget('true'); clearMembershipIdIfFalse()">
                     <!option @(Model.MembershipId != null ? "selected" : "") value="true">Already approved</!option>
                     <!option @(Model.MembershipId == null ? "selected" : "") value="false">Not yet approved</!option>
                 </select>
