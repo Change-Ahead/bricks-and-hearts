@@ -338,7 +338,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         var formResultModel = new PropertyViewModel
         {
-            Address = new PropertyAddress(),
+            Address = new AddressModel(),
             LandlordId = 1
         };
 
@@ -364,7 +364,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         var formResultModel = new PropertyViewModel
         {
-            Address = new PropertyAddress
+            Address = new AddressModel
             {
                 AddressLine1 = "Line 1",
                 Postcode = "Postcode"

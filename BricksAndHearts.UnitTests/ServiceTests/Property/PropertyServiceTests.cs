@@ -51,7 +51,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         var propertiesBeforeCount = context.Properties.Count();
         var createModel = new PropertyViewModel
         {
-            Address = new PropertyAddress
+            Address = new AddressModel
             {
                 AddressLine1 = "AddNewProperty_AddsNewProperty",
                 County = "Cambridgeshire",
@@ -109,7 +109,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         var propertiesBeforeCount = context.Properties.Count();
         var updateModel = new PropertyViewModel
         {
-            Address = new PropertyAddress
+            Address = new AddressModel
             {
                 AddressLine1 = "UpdateProperty_UpdatesProperty1",
                 County = "Cambridgeshire",
@@ -387,17 +387,17 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     }
 
     #endregion
-    
+
     [Fact]
     public void CreateNewPublicViewLink_UpdateDatabase()
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
         var service = new PropertyService(context);
-        
+
         // Act
         var result = service.CreateNewPublicViewLink(1);
-        
+
         // Assert
         result.Should().NotBeNullOrEmpty();
         context.Properties.Single(p => p.Id == 1).PublicViewLink.Should().Be(result);

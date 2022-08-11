@@ -6,7 +6,7 @@ namespace BricksAndHearts.ViewModels;
 
 public class LandlordProfileModel
 {
-    [DisplayName("Id")]
+    [DisplayName("ID")]
     public int? LandlordId { get; set; }
 
     [Required]
@@ -16,13 +16,16 @@ public class LandlordProfileModel
 
     [Required]
     [StringLength(255)]
-    [DisplayName("First Name")]
+    [DisplayName("First name")]
     public string FirstName { get; set; } = string.Empty;
 
     [Required]
     [StringLength(255)]
-    [DisplayName("Last Name")]
+    [DisplayName("Last name")]
     public string LastName { get; set; } = string.Empty;
+
+    [Required]
+    public AddressModel Address { get; set; } = new();
 
     [StringLength(1000)]
     [DisplayName("Company")]
@@ -68,7 +71,16 @@ public class LandlordProfileModel
             CharterApproved = landlord.CharterApproved,
             IsLandlordForProfit = landlord.IsLandlordForProfit,
             NumOfProperties = landlord.Properties.Count,
-            InviteLink = landlord.InviteLink
+            InviteLink = landlord.InviteLink,
+            Address = new AddressModel
+            {
+                AddressLine1 = landlord.AddressLine1,
+                AddressLine2 = landlord.AddressLine2,
+                AddressLine3 = landlord.AddressLine3,
+                TownOrCity = landlord.TownOrCity,
+                County = landlord.County,
+                Postcode = landlord.Postcode
+            }
         };
     }
 }

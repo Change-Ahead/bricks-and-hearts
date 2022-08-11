@@ -1,9 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using BricksAndHearts.Controllers;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
 using Microsoft.Extensions.Logging;
 
@@ -28,20 +32,22 @@ public class LandlordControllerTestsBase : ControllerTestsBase
         var tempData = new TempDataDictionary(httpContext, A.Fake<ITempDataProvider>());
         UnderTest = new LandlordController(Logger, LandlordService, PropertyService, MailService)
             { TempData = tempData };
+        // Fixes NullReferenceException when calling TryValidateModel()
+        UnderTest.ObjectValidator = new CustomObjectValidator();
     }
 
     protected PropertyViewModel CreateExamplePropertyViewModel()
     {
         return new PropertyViewModel
         {
-            Address = new PropertyAddress
+            Address = new AddressModel
             {
                 AddressLine1 = "Adr1",
                 AddressLine2 = "Adr2",
                 AddressLine3 = "Adr3",
                 TownOrCity = "City",
                 County = "County",
-                Postcode = "Postcode"
+                Postcode = "CB21LA"
             },
             PropertyType = "Type",
             NumOfBedrooms = 2,
@@ -62,7 +68,16 @@ public class LandlordControllerTestsBase : ControllerTestsBase
             CompanyName = "John Doe",
             Email = "test.email@gmail.com",
             CharterApproved = false,
-            LandlordType = "some data"
+            LandlordType = "some data",
+            Address = new AddressModel
+            {
+                AddressLine1 = "Adr1",
+                AddressLine2 = "Adr2",
+                AddressLine3 = "Adr3",
+                TownOrCity = "City",
+                County = "County",
+                Postcode = "CB21LA"
+            }
         };
     }
 
@@ -75,7 +90,38 @@ public class LandlordControllerTestsBase : ControllerTestsBase
             LastName = "Doe",
             CompanyName = "John Doe",
             CharterApproved = false,
-            LandlordType = "some data"
+            LandlordType = "some data",
+            Address = new AddressModel
+            {
+                AddressLine1 = "Adr1",
+                AddressLine2 = "Adr2",
+                AddressLine3 = "Adr3",
+                TownOrCity = "City",
+                County = "County",
+                Postcode = "CB21LA"
+            }
         };
+    }
+
+    public class CustomObjectValidator : IObjectModelValidator
+    {
+        public void Validate(ActionContext actionContext, ValidationStateDictionary? validationState, string prefix,
+            object? model)
+        {
+            var context = new ValidationContext(model!, serviceProvider: null, items: null);
+            var results = new List<ValidationResult>();
+
+            bool isValid = Validator.TryValidateObject(
+                model!, context, results,
+                validateAllProperties: true
+            );
+
+            if (!isValid)
+                results.ForEach(r =>
+                {
+                    // Add validation errors to the ModelState
+                    actionContext.ModelState.AddModelError("", r.ErrorMessage!);
+                });
+        }
     }
 }

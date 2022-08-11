@@ -78,7 +78,13 @@ public class LandlordService : ILandlordService
             Phone = createModel.Phone,
             LandlordType = createModel.LandlordType,
             IsLandlordForProfit = createModel.IsLandlordForProfit,
-            MembershipId = createModel.MembershipId
+            MembershipId = createModel.MembershipId,
+            AddressLine1 = createModel.Address.AddressLine1!,
+            AddressLine2 = createModel.Address.AddressLine2,
+            AddressLine3 = createModel.Address.AddressLine3,
+            TownOrCity = createModel.Address.TownOrCity!,
+            County = createModel.Address.County!,
+            Postcode = createModel.Address.Postcode!
         };
 
         await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
@@ -145,7 +151,13 @@ public class LandlordService : ILandlordService
             Phone = createModel.Phone,
             LandlordType = createModel.LandlordType,
             IsLandlordForProfit = createModel.IsLandlordForProfit,
-            MembershipId = createModel.MembershipId
+            MembershipId = createModel.MembershipId,
+            AddressLine1 = createModel.Address.AddressLine1!,
+            AddressLine2 = createModel.Address.AddressLine2,
+            AddressLine3 = createModel.Address.AddressLine3,
+            TownOrCity = createModel.Address.TownOrCity!,
+            County = createModel.Address.County!,
+            Postcode = createModel.Address.Postcode!
         };
 
         await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
@@ -224,6 +236,12 @@ public class LandlordService : ILandlordService
         landlordToEdit.LandlordType = editModel.LandlordType;
         landlordToEdit.IsLandlordForProfit = editModel.IsLandlordForProfit;
         landlordToEdit.MembershipId = editModel.MembershipId;
+        landlordToEdit.AddressLine1 = editModel.Address.AddressLine1!;
+        landlordToEdit.AddressLine2 = editModel.Address.AddressLine2;
+        landlordToEdit.AddressLine3 = editModel.Address.AddressLine3;
+        landlordToEdit.TownOrCity = editModel.Address.TownOrCity!;
+        landlordToEdit.County = editModel.Address.County!;
+        landlordToEdit.Postcode = editModel.Address.Postcode!;
 
         await _dbContext.SaveChangesAsync();
         return ILandlordService.LandlordRegistrationResult.Success;

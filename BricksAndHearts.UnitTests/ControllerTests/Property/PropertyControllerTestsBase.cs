@@ -35,7 +35,7 @@ public class PropertyControllerTestsBase : ControllerTestsBase
     {
         return new PropertyViewModel
         {
-            Address = new PropertyAddress
+            Address = new AddressModel
             {
                 AddressLine1 = "Adr1",
                 AddressLine2 = "Adr2",

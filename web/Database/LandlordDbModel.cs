@@ -13,6 +13,14 @@ public class LandlordDbModel
     public string Email { get; set; } = null!;
     public string Phone { get; set; } = null!;
 
+    // Address
+    public string AddressLine1 { get; set; } = null!;
+    public string? AddressLine2 { get; set; }
+    public string? AddressLine3 { get; set; }
+    public string TownOrCity { get; set; } = null!;
+    public string County { get; set; } = null!;
+    public string Postcode { get; set; } = null!;
+
     //Type of landlord
     public string LandlordType { get; set; } = null!;
 
