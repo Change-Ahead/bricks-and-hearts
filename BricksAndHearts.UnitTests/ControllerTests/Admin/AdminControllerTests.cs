@@ -180,12 +180,13 @@ public class AdminControllerTests : AdminControllerTestsBase
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
-
+        var landlordListModel = new LandlordListModel();
+        
         // Act
-        var result = await UnderTest.LandlordList() as ViewResult;
+        var result = await UnderTest.LandlordList(landlordListModel) as ViewResult;
 
         // Assert
-        A.CallTo(() => AdminService.GetLandlordList("")).MustHaveHappened();
+        A.CallTo(() => AdminService.GetLandlordList(landlordListModel.Filters)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<LandlordListModel?>();
     }
     
@@ -195,12 +196,13 @@ public class AdminControllerTests : AdminControllerTestsBase
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
+        var tenantListModel = new TenantListModel();
 
         // Act
-        var result = await UnderTest.TenantList() as ViewResult;
+        var result = await UnderTest.TenantList(tenantListModel) as ViewResult;
 
         // Assert
-        A.CallTo(() => AdminService.GetTenantList()).MustHaveHappened();
+        A.CallTo(() => AdminService.GetTenantList(tenantListModel.Filters)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<TenantListModel?>();
     }
     
@@ -270,7 +272,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         UnderTest.TempData["FlashMessage"].Should().Be("Landlord already has an invite link: http:///invite/existing link");
     }
     
-        [Fact]
+    [Fact]
     public void RenewInviteLink_CalledOnLinkedLandlord_CallsFindUserByLandlordIdAndRedirectsToLandlordProfileWithFLash()
     {
         // Arrange
@@ -338,22 +340,6 @@ public class AdminControllerTests : AdminControllerTestsBase
         UnderTest.TempData["InviteLinkMessage"].Should().Be("Successfully created a new invite link :)");
     }
 
-    [Fact]
-    public void GetFilteredTenants_WithCorrectInput_CallsGetTenantDbModelsFromFilter()
-    {
-        // Arrange
-        MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
-        var fakeTenantListModel = A.Fake<TenantListModel>();
-
-        // Act
-        A.CallTo(() => AdminService.GetTenantDbModelsFromFilter(fakeTenantListModel.Filters)).Returns(A.Fake<List<TenantDbModel>>());
-        var result = UnderTest.GetFilteredTenants(fakeTenantListModel).Result;
-        
-        // Assert
-        A.CallTo(() => AdminService.GetTenantDbModelsFromFilter(fakeTenantListModel.Filters)).MustHaveHappened();
-        result.Should().BeOfType<ViewResult>().Which.Model.Should().Be(fakeTenantListModel);
-    }
-    
     [Fact]
     public async void ImportTenants_WhenCalledWithEmptyFile_RedirectsToTenantListWithErrorFlashMessage()
     {
