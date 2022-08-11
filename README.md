@@ -23,3 +23,5 @@ dotnet run --project web
 ```
 
 Or launch from your IDE, e.g. Rider.
+
+Copyright © 2022 Change Ahead, the trading name of Homeless To Wellness Ltd.
