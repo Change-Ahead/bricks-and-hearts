@@ -1,39 +1,31 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using BricksAndHearts.Database;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace BricksAndHearts.ViewModels.PropertyInput;
 
 public class PropertyInputModelStep5 : PropertyInputModelBase
 {
-    public PropertyInputModelStep5(PropertyDbModel property)
+    [ValidateNever]
+    public HousingRequirementModel HousingRequirementModel { get; set; } = new();
+
+    public override void PropertyInputModelStepInitialiser(PropertyDbModel property)
     {
-        AcceptsSingleTenant = property.AcceptsSingleTenant;
-        AcceptsCouple = property.AcceptsCouple;
-        AcceptsFamily = property.AcceptsFamily;
-        AcceptsPets = property.AcceptsPets;
-        AcceptsBenefits = property.AcceptsBenefits;
-        AcceptsNotEET = property.AcceptsNotEET;
-        AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor;
+        HousingRequirementModel.AcceptsSingleTenant = property.AcceptsSingleTenant;
+        HousingRequirementModel.AcceptsCouple = property.AcceptsCouple;
+        HousingRequirementModel.AcceptsFamily = property.AcceptsFamily;
+        HousingRequirementModel.AcceptsPets = property.AcceptsPets;
+        HousingRequirementModel.AcceptsBenefits = property.AcceptsBenefits;
+        HousingRequirementModel.AcceptsNotEET = property.AcceptsNotEET;
+        HousingRequirementModel.AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor;
     }
 
-    [Required]
-    public bool? AcceptsWithoutGuarantor { get; set; }
-
-    [Required]
-    public bool? AcceptsNotEET { get; set; }
-
-    [Required]
-    public bool? AcceptsBenefits { get; set; }
-
-    [Required]
-    public bool? AcceptsPets { get; set; }
-
-    [Required]
-    public bool? AcceptsFamily { get; set; }
-
-    [Required]
-    public bool? AcceptsCouple { get; set; }
-
-    [Required]
-    public bool? AcceptsSingleTenant { get; set; }
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (HousingRequirementModel.AcceptsSingleTenant == false && HousingRequirementModel.AcceptsCouple == false &&
+            HousingRequirementModel.AcceptsFamily == false)
+        {
+            yield return new ValidationResult("At least one type of tenant must be selected");
+        }
+    }
 }

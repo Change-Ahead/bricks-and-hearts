@@ -3,7 +3,7 @@
 <h1 class="font-h1">Property details</h1>
 
 <div asp-validation-summary="All" class="text-danger"></div>
-<form method="post" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@Model.Step" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId">
+<form method="post" asp-controller="Property" asp-action="PropertyInputStepThree" asp-route-propertyId="@Model.PropertyId" asp-route-operationType="@(Model.IsEdit ? "edit" : "add")">
 
     <div class="my-4 py-3">
         <label class="form-label mb-3">What is your property type?</label>
@@ -43,5 +43,8 @@
         <input asp-for="Step3!.NumOfBedrooms" class="form-control" required/>
         <span asp-validation-for="Step3!.NumOfBedrooms" class="text-danger"></span>
     </div>
+    <input type="hidden" asp-for="LandlordId" value="@Model.LandlordId"/>
+    <input type="hidden" asp-for="PropertyId" value="@Model.PropertyId"/>
+    <input type="hidden" asp-for="Step" value="@Model.Step"/>
     <partial name=@("_PropertyFormButtons") model="Model"/>
 </form>

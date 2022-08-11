@@ -464,7 +464,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         // Act
-        var result = await UnderTest.AddNewProperty_Cancel(1);
+        var result = await UnderTest.PropertyInputCancel(1);
 
         // Assert
         A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustHaveHappened();
@@ -483,7 +483,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         // Act
-        var result = await UnderTest.AddNewProperty_Cancel(1);
+        var result = await UnderTest.PropertyInputCancel(1);
 
         // Assert
         A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustNotHaveHappened();

@@ -11,12 +11,12 @@
 @if (Model.Step > 1)
 {
     <div class="mb-4">
-        <a asp-controller="Property" asp-action="EditProperty_Continue" asp-route-step="@(Model.Step - 1)" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId" class="link-secondary"> Back </a>
+        @*QQQ back button leads to cancel*@
+        <a asp-controller="Property" asp-action="PropertyInputCancel" asp-route-step="@(Model.Step - 1)" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId" class="link-secondary"> Back </a>
     </div>
 }
 
-@* QQQ <form method="post" class="w-50" asp-controller="Property" asp-action="EditProperty_Continue" asp-route-step="@Model.Step" asp-route-propertyId="@Model.Property?.PropertyId" asp-route-landlordId="@Model.Property?.LandlordId"> *@
-<partial name=@("_AddFormStep" + Model.Step) model="Model"/>
+<partial name=@("_PropertyInputFormStep" + Model.Step) model="Model"/>
 
 <div class="mt-4">
     @if (Model.Step < PropertyInputFormViewModel.MaximumStep)
@@ -45,7 +45,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <form method="post" asp-controller="Property" asp-action="EditProperty_Cancel" asp-route-landlordId="@Model.LandlordId">
+                <form method="post" asp-controller="Property" asp-action="PropertyInputCancel" asp-route-landlordId="@Model.LandlordId">
                     <input type="submit" value="Stop Editing" class="btn btn-danger"/>
                 </form>
             </div>

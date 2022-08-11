@@ -1,3 +1,8 @@
-﻿namespace BricksAndHearts.ViewModels.PropertyInput;
+﻿using BricksAndHearts.Database;
 
-public abstract class PropertyInputModelBase { }
+namespace BricksAndHearts.ViewModels.PropertyInput;
+
+public abstract class PropertyInputModelBase
+{
+    public abstract void PropertyInputModelStepInitialiser(PropertyDbModel property);
+}

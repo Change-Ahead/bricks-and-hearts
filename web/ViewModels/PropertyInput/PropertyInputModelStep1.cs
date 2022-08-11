@@ -5,9 +5,7 @@ namespace BricksAndHearts.ViewModels.PropertyInput;
 
 public class PropertyInputModelStep1 : PropertyInputModelBase
 {
-    public static readonly int MaximumStep = 6;
-
-    public PropertyInputModelStep1(PropertyDbModel property)
+    public override void PropertyInputModelStepInitialiser(PropertyDbModel property)
     {
         Address = new AddressModel
         {
@@ -20,7 +18,6 @@ public class PropertyInputModelStep1 : PropertyInputModelBase
         };
     }
 
-    public int Step { get; set; } = 1;
 
     [Required]
     public AddressModel Address { get; set; }

@@ -1,6 +1,5 @@
 ﻿@model PropertyInputFormViewModel
 
-<input asp-for="@Model.LandlordId" type="hidden" id="landlordId" name="landlordId" value="@Model.LandlordId">
 <div class="row my-4">
     <div class="col-auto">
         @if (Model.Step < PropertyInputFormViewModel.MaximumStep)
@@ -17,4 +16,47 @@
             Cancel
         </button>
     </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
+    @if (Model.IsEdit == false)
+    {
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelModalLabel">Cancel adding new property</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to cancel adding this property? All progress up to this point will be lost.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <form method="post" asp-controller="Property" asp-action="PropertyInputCancel" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId" asp-route-operationType="@(Model.IsEdit ? "edit" : "add")">
+                        <input type="submit" value="Cancel" class="btn btn-danger"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="cancelModalLabel">Stop editing property</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Are you sure you want to stop editing this property? All progress up to this point will be saved.
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <form method="post" asp-controller="Property" asp-action="PropertyInputCancel" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId" asp-route-operationType="@(Model.IsEdit ? "edit" : "add")">
+                        <input type="submit" value="Stop Editing" class="btn btn-danger"/>
+                    </form>
+                </div>
+            </div>
+        </div>
+    }
 </div>

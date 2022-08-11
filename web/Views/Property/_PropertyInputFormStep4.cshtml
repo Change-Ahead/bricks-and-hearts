@@ -3,12 +3,15 @@
 <h1 class="font-h1">Property description</h1>
 
 <div asp-validation-summary="All" class="text-danger"></div>
-<form method="post" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@Model.Step" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId">
+<form method="post" asp-controller="Property" asp-route-step="@Model.Step" asp-route-propertyId="@Model.PropertyId" asp-route-operationType="@(Model.IsEdit ? "edit" : "add")">
 
     <div class="my-3">
         <label asp-for="Step4!.Description" class="form-label">Description</label>
         <textarea asp-for="Step4!.Description" class="form-control textarea-description" rows="12" required></textarea>
         <span asp-validation-for="Step4!.Description" class="text-danger"></span>
     </div>
+    <input type="hidden" asp-for="LandlordId" value="@Model.LandlordId"/>
+    <input type="hidden" asp-for="PropertyId" value="@Model.PropertyId"/>
+    <input type="hidden" asp-for="Step" value="@Model.Step"/>
     <partial name=@("_PropertyFormButtons") model="Model"/>
 </form>

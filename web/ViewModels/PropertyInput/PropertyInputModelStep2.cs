@@ -4,7 +4,7 @@ namespace BricksAndHearts.ViewModels.PropertyInput;
 
 public class PropertyInputModelStep2 : PropertyInputModelBase
 {
-    public PropertyInputModelStep2(PropertyDbModel property)
+    public override void PropertyInputModelStepInitialiser(PropertyDbModel property)
     {
         Address = new AddressModel
         {

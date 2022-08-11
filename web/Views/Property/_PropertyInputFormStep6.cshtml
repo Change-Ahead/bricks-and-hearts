@@ -2,7 +2,7 @@
 @model PropertyInputFormViewModel
 
 <h1 class="font-h1">Rent, deposits, availability, and duration</h1>
-<form method="post" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@Model.Step" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId">
+<form method="post" asp-controller="Property" asp-action="PropertyInputStepSix" asp-route-propertyId="@Model.PropertyId" asp-route-operationType="@(Model.IsEdit ? "edit" : "add")">
 
     <div asp-validation-summary="All" class="text-danger"></div>
     <div class="my-4 py-3">
@@ -40,5 +40,8 @@
         <label asp-for="Step6!.TotalUnits" class="form-label">Number of units available in this property</label>
         <input asp-for="Step6!.TotalUnits" class="form-control" required>
     </div>
+    <input type="hidden" asp-for="LandlordId" value="@Model.LandlordId"/>
+    <input type="hidden" asp-for="PropertyId" value="@Model.PropertyId"/>
+    <input type="hidden" asp-for="Step" value="@Model.Step"/>
     <partial name=@("_PropertyFormButtons") model="Model"/>
 </form>
