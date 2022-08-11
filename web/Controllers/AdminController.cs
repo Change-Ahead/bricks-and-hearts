@@ -120,7 +120,7 @@ public class AdminController : AbstractController
     [HttpGet]
     public async Task<IActionResult> TenantList(TenantListModel tenantListModel)
     {
-        tenantListModel.TenantList = await _adminService.GetTenantList(tenantListModel.Filters);
+        tenantListModel.TenantList = await _adminService.GetTenantList(tenantListModel.Filter);
         return View("TenantList", tenantListModel);
     }
 

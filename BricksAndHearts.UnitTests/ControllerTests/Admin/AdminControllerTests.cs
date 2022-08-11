@@ -202,7 +202,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         var result = await UnderTest.TenantList(tenantListModel) as ViewResult;
 
         // Assert
-        A.CallTo(() => AdminService.GetTenantList(tenantListModel.Filters)).MustHaveHappened();
+        A.CallTo(() => AdminService.GetTenantList(tenantListModel.Filter)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<TenantListModel?>();
     }
     

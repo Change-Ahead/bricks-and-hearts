@@ -12,19 +12,30 @@
 @using (Html.BeginForm("LandlordList", "Admin", FormMethod.Get))
 {
     <div class="row g-3">
+
         <div class="col-auto d-grid">
-            <select class="form-select" id="Approved" name="Approved">
-                <option selected>Filter by approval status</option>
-                <option value="true">Display approved landlords</option>
-                <option value="false">Display unapproved landlords</option>
-            </select>
+            @Html.DropDownListFor(
+                model => model.IsApproved,
+                new List<SelectListItem>
+                {
+                    new("Display approved landlords", "true"),
+                    new("Display unapproved landlords", "false")
+                }, 
+                "Filter by approval status",
+                new { @class="form-select" }
+                )
         </div>
         <div class="col-auto d-grid">
-            <select class="form-select" id="Assigned" name="Assigned">
-                <option selected>Filter by assignment status</option>
-                <option value="true">Display assigned landlords</option>
-                <option value="false">Display unassigned landlords</option>
-            </select>
+            @Html.DropDownListFor(
+                model => model.IsAssigned,
+                new List<SelectListItem>
+                {
+                    new("Display assigned landlords", "true"),
+                    new("Display unassigned landlords", "false")
+                }, 
+                "Filter by assignment status",
+                new { @class="form-select" }
+                )
         </div>
         <div class="col-auto d-grid">
             <button type="submit" class="btn btn-primary">Display results</button>

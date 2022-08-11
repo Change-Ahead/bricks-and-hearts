@@ -152,8 +152,8 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         var service = new AdminService(context);
         var landlordListModel = new LandlordListModel
         {
-            Approved = true,
-            Assigned = false
+            IsApproved = true,
+            IsAssigned = false
         };
 
         // Act
@@ -174,7 +174,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         var tenantListModel = new TenantListModel();
 
         // Act
-        var result = await service.GetTenantList(tenantListModel.Filters);
+        var result = await service.GetTenantList(tenantListModel.Filter);
 
         // Assert
         result.Should().BeOfType<List<TenantDbModel>>();
@@ -187,10 +187,15 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         // Arrange
         await using var context = Fixture.CreateReadContext();
         var service = new AdminService(context);
-        var filterArr = new [] { "single", "all", "true", "true", "all", "all"};
+        var filter = new TenantListFilter
+        {
+            Type = "single",
+            ETT = true,
+            UniversalCredit = true
+        };
 
         // Act
-        var result = await service.GetTenantList(filterArr);
+        var result = await service.GetTenantList(filter);
 
         // Assert
         result.Should().BeOfType<List<TenantDbModel>>();

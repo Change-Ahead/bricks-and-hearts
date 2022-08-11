@@ -4,6 +4,6 @@ namespace BricksAndHearts.ViewModels;
 public class LandlordListModel
 {
     public List<LandlordDbModel>? LandlordList { get; set; }
-    public bool? Approved { get; set; }
-    public bool? Assigned { get; set; }
+    public bool? IsApproved { get; set; }
+    public bool? IsAssigned { get; set; }
 }
