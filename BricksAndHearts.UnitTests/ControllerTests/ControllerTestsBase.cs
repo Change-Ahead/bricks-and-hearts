@@ -22,6 +22,33 @@ public class ControllerTestsBase
     }
     
     // Create a user that is logged into Google but is not a landlord or admin
+    protected UserDbModel CreateUserDbModel(bool isAdmin, bool isLandlord)
+    {
+        var userDbModel = new UserDbModel()
+        {
+            Id = 1,
+            GoogleUserName = "John Doe",
+            GoogleEmail = "test.email@gmail.com",
+            IsAdmin = isAdmin,
+        };
+        if (isLandlord)
+        {
+            userDbModel.LandlordId = 1;
+            var landlordDbModel = new LandlordDbModel()
+            {
+                Id = 1,
+                FirstName = "John",
+                LastName = "Doe",
+                User = userDbModel
+            };
+        }
+        else
+        {
+            userDbModel.LandlordId = null;
+        }
+        return userDbModel;
+    }
+    
     protected BricksAndHeartsUser CreateUnregisteredUser()
     {
         var userDbModel = new UserDbModel()
@@ -35,6 +62,21 @@ public class ControllerTestsBase
 
         var unregisteredUser = new BricksAndHeartsUser(userDbModel, new List<Claim>(), "google");
         return unregisteredUser;
+    }
+    
+    protected BricksAndHeartsUser CreateNonAdminNonLandlordUser()
+    {
+        var userDbModel = new UserDbModel()
+        {
+            Id = 1,
+            GoogleUserName = "John Doe",
+            GoogleEmail = "test.email@gmail.com",
+            IsAdmin = false,
+            LandlordId = null
+        };
+
+        var nonAdminNonLandlordUser = new BricksAndHeartsUser(userDbModel, new List<Claim>(), "google");
+        return nonAdminNonLandlordUser;
     }
     
     protected BricksAndHeartsUser CreateAdminUser()

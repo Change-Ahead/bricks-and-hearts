@@ -12,7 +12,7 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Admin;
 public class AdminControllerTests : AdminControllerTestsBase
 {
     [Fact]
-    public void Index_WhenCalledByAnonymousUser_ReturnsViewWithLoginLink()
+    public void AdminDashboard_WhenCalledByAnonymousUser_ReturnsViewWithLoginLink()
     {
         // Arrange
         UnderTest.ControllerContext = new ControllerContext
@@ -27,9 +27,155 @@ public class AdminControllerTests : AdminControllerTestsBase
         result!.ViewData.Model.Should().BeOfType<AdminDashboardViewModel>()
             .Which.CurrentUser.Should().BeNull();
     }
+    
+    [Fact]
+    public void AdminDashboard_WhenCalledByNonAdminUser_ReturnsViewWithLoginLink()
+    {
+        // Arrange
+        var nonAdminNonLandlordUser = CreateNonAdminNonLandlordUser();
+        MakeUserPrincipalInController(nonAdminNonLandlordUser, UnderTest);
+
+        // Act
+        var result = UnderTest.AdminDashboard() as ViewResult;
+
+        // Assert
+        result!.ViewData.Model.Should().BeOfType<AdminDashboardViewModel>()
+            .Which.CurrentUser!.IsAdmin.Should().Be(false);
+    }
+    
+    [Fact]
+    public void AdminDashboard_WhenCalledByAdminUser_ReturnsViewWithLoginLink()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+
+        // Act
+        var result = UnderTest.AdminDashboard() as ViewResult;
+
+        // Assert
+        result!.ViewData.Model.Should().BeOfType<AdminDashboardViewModel>()
+            .Which.CurrentUser!.IsAdmin.Should().Be(true);
+    }
 
     [Fact]
-    public async void LandlordList_WhenCalled_CallsGetLandlordListAndReturnsLandlordListView()
+    public void RequestAdminAccess_WhenCalledByNonAdmin_CallsRequestAdminAccessAndRedirectsToAdminDashboard()
+    {
+        // Arrange
+        var nonAdminNonLandlordUser = CreateNonAdminNonLandlordUser();
+        MakeUserPrincipalInController(nonAdminNonLandlordUser, UnderTest);
+
+        // Act
+        var result = UnderTest.RequestAdminAccess() as RedirectToActionResult;
+
+        // Assert
+        A.CallTo(() => AdminService.RequestAdminAccess(nonAdminNonLandlordUser)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("AdminDashboard");
+    }
+    
+    [Fact]
+    public void RequestAdminAccess_WhenCalledByAdmin_RedirectsToAdminDashboardView()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+
+        // Act
+        var result = UnderTest.RequestAdminAccess() as RedirectToActionResult;
+
+        // Assert
+        A.CallTo(() => AdminService.RequestAdminAccess(adminUser)).MustNotHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("AdminDashboard");
+    }
+    
+    [Fact]
+    public void CancelAdminAccess_WhenCalledByNonAdmin_CallsCancelAdminAccessRequestAndRedirectsToAdminDashboard()
+    {
+        // Arrange
+        var nonAdminNonLandlordUser = CreateNonAdminNonLandlordUser();
+        MakeUserPrincipalInController(nonAdminNonLandlordUser, UnderTest);
+
+        // Act
+        var result = UnderTest.CancelAdminAccessRequest() as RedirectToActionResult;
+
+        // Assert
+        A.CallTo(() => AdminService.CancelAdminAccessRequest(nonAdminNonLandlordUser)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("AdminDashboard");
+    }
+    
+    [Fact]
+    public void CancelAdminAccess_WhenCalledByAdmin_RedirectsToAdminDashboardView()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+
+        // Act
+        var result = UnderTest.CancelAdminAccessRequest() as RedirectToActionResult;
+
+        // Assert
+        A.CallTo(() => AdminService.CancelAdminAccessRequest(adminUser)).MustNotHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("AdminDashboard");
+    }
+
+    [Fact]
+    public void AcceptAdminRequest_CallsGetUserFromThenCallsApproveAdminAccessRequestAndRedirectsToGetAdminList()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+
+        // Act
+        var result = UnderTest.AcceptAdminRequest(1) as RedirectToActionResult;
+
+        // Assert
+        A.CallTo(() => AdminService.ApproveAdminAccessRequest(1)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("GetAdminList");
+    }
+
+    [Fact]
+    public void RejectAdminRequest_OnValidUserId_CallsGetUserFromThenCallsRejectAdminAccessRequestAndRedirectsToGetAdminList()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+
+        // Act
+        var result = UnderTest.RejectAdminRequest(1) as RedirectToActionResult;
+
+        // Assert
+        A.CallTo(() => AdminService.RejectAdminAccessRequest(1)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("GetAdminList");
+    }
+
+    [Fact]
+    public void GetAdminList_CallsGetAdminListsAndReturnsViewWithAdminListModel()
+    {
+        // Arrange
+        MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
+
+        // Act
+        var result = UnderTest.GetAdminList().Result as ViewResult;
+
+        // Assert
+        A.CallTo(() => AdminService.GetAdminLists()).MustHaveHappened();
+        result!.ViewData.Model.Should().BeOfType<AdminListModel>();
+    }
+    
+    [Fact]
+    public async void LandlordList_CallsGetLandlordListAndReturnsLandlordListView()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -44,7 +190,7 @@ public class AdminControllerTests : AdminControllerTestsBase
     }
     
     [Fact]
-    public async void TenantList_WhenCalled_CallsGetTenantListAndReturnsTenantListView()
+    public async void TenantList_CallsGetTenantListAndReturnsTenantListView()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -57,19 +203,139 @@ public class AdminControllerTests : AdminControllerTestsBase
         A.CallTo(() => AdminService.GetTenantList()).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<TenantListModel?>();
     }
-
+    
     [Fact]
-    public void GetAdminList_WhenCalled_CallsGetAdminListsAndReturnsViewWithAdminListModel()
+    public void GetInviteLink_CalledOnLinkedLandlord_CallsFindUserByLandlordIdAndRedirectsToLandlordProfileWithWarningFLash()
     {
         // Arrange
-        MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        var landlordUser = CreateUserDbModel(false, true);
+        A.CallTo(() => AdminService.FindUserByLandlordId(1)).Returns(landlordUser);
 
         // Act
-        var result = UnderTest.GetAdminList().Result as ViewResult;
+        var result = UnderTest.GetInviteLink(1) as RedirectToActionResult;
 
         // Assert
-        A.CallTo(() => AdminService.GetAdminLists()).MustHaveHappened();
-        result!.ViewData.Model.Should().BeOfType<AdminListModel>();
+        A.CallTo(() => AdminService.FindUserByLandlordId(1)).MustHaveHappened();
+        A.CallTo(() => AdminService.FindExistingInviteLink(1)).MustNotHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("Profile");
+        UnderTest.TempData["FlashMessage"].Should().Be($"Landlord already linked to user {landlordUser.GoogleUserName}");
+    }
+    
+    [Fact]
+    public void GetInviteLink_CalledOnUnlinkedLandlordWithoutExistingLink_CallsFindExistingInviteLinkThenCallsCreateNewInviteLinkAndRedirectsToLandlordProfileWithSuccessFlash()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        A.CallTo(() => AdminService.FindUserByLandlordId(1)).Returns(null);
+        A.CallTo(() => AdminService.FindExistingInviteLink(1)).Returns(null);
+        A.CallTo(() => AdminService.CreateNewInviteLink(1)).Returns("new link");
+
+        // Act
+        var result = UnderTest.GetInviteLink(1) as RedirectToActionResult;
+
+        // Assert
+        A.CallTo(() => AdminService.FindUserByLandlordId(1)).MustHaveHappened();
+        A.CallTo(() => AdminService.FindExistingInviteLink(1)).MustHaveHappened();
+        A.CallTo(() => AdminService.CreateNewInviteLink(1)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("Profile");
+        UnderTest.TempData["FlashMessage"].Should().Be("Successfully created a new invite link: http:///invite/new link");
+    }
+    
+    [Fact]
+    public void GetInviteLink_CalledOnUnlinkedLandlordWithExistingLink_CallsFindExistingInviteLinkAndRedirectsToLandlordProfileWithSuccessFlash()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        A.CallTo(() => AdminService.FindUserByLandlordId(1)).Returns(null);
+        A.CallTo(() => AdminService.FindExistingInviteLink(1)).Returns("existing link");
+
+        // Act
+        var result = UnderTest.GetInviteLink(1) as RedirectToActionResult;
+
+        // Assert
+        A.CallTo(() => AdminService.FindUserByLandlordId(1)).MustHaveHappened();
+        A.CallTo(() => AdminService.FindExistingInviteLink(1)).MustHaveHappened();
+        A.CallTo(() => AdminService.CreateNewInviteLink(1)).MustNotHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("Profile");
+        UnderTest.TempData["FlashMessage"].Should().Be("Landlord already has an invite link: http:///invite/existing link");
+    }
+    
+        [Fact]
+    public void RenewInviteLink_CalledOnLinkedLandlord_CallsFindUserByLandlordIdAndRedirectsToLandlordProfileWithFLash()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        var landlordUser = CreateUserDbModel(false, true);
+        A.CallTo(() => AdminService.FindUserByLandlordId(1)).Returns(landlordUser);
+
+        // Act
+        var result = UnderTest.RenewInviteLink(1) as RedirectToActionResult;
+
+        // Assert
+        A.CallTo(() => AdminService.FindUserByLandlordId(1)).MustHaveHappened();
+        A.CallTo(() => AdminService.FindExistingInviteLink(1)).MustNotHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("Profile");
+        UnderTest.TempData["InviteLinkMessage"].Should().Be($"Landlord already linked to user {landlordUser.GoogleUserName}");
+    }
+    
+    [Fact]
+    public void RenewInviteLink_CalledOnUnlinkedLandlordWithoutExistingLink_CallsFindExistingInviteLinkThenCallsCreateNewInviteLinkAndRedirectsToLandlordProfileWithSuccessFlash()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        A.CallTo(() => AdminService.FindUserByLandlordId(1)).Returns(null);
+        A.CallTo(() => AdminService.FindExistingInviteLink(1)).Returns(null);
+        A.CallTo(() => AdminService.CreateNewInviteLink(1)).Returns("new link");
+
+        // Act
+        var result = UnderTest.RenewInviteLink(1) as RedirectToActionResult;
+
+        // Assert
+        A.CallTo(() => AdminService.FindUserByLandlordId(1)).MustHaveHappened();
+        A.CallTo(() => AdminService.FindExistingInviteLink(1)).MustHaveHappened();
+        A.CallTo(() => AdminService.DeleteExistingInviteLink(1)).MustNotHaveHappened();
+        A.CallTo(() => AdminService.CreateNewInviteLink(1)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("Profile");
+        UnderTest.TempData["InviteLinkMessage"].Should().Be("No existing invite link. Successfully created a new invite link :)");
+    }
+    
+    [Fact]
+    public void RenewInviteLink_CalledOnUnlinkedLandlordWithExistingLink_CallsFindExistingInviteLinkThenCallsDeleteExistingLinkThenCallsCreateNewInviteLinkAndRedirectsToLandlordProfileWithSuccessFlash()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        A.CallTo(() => AdminService.FindUserByLandlordId(1)).Returns(null);
+        A.CallTo(() => AdminService.FindExistingInviteLink(1)).Returns("existing link");
+
+        // Act
+        var result = UnderTest.RenewInviteLink(1) as RedirectToActionResult;
+
+        // Assert
+        A.CallTo(() => AdminService.FindUserByLandlordId(1)).MustHaveHappened();
+        A.CallTo(() => AdminService.FindExistingInviteLink(1)).MustHaveHappened();
+        A.CallTo(() => AdminService.DeleteExistingInviteLink(1)).MustHaveHappened();
+        A.CallTo(() => AdminService.CreateNewInviteLink(1)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("Profile");
+        UnderTest.TempData["InviteLinkMessage"].Should().Be("Successfully created a new invite link :)");
     }
 
     [Fact]

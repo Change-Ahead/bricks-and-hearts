@@ -3,8 +3,6 @@
 using BricksAndHearts.Auth;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
-using LINQtoCSV;
-using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,10 +13,10 @@ namespace BricksAndHearts.Controllers;
 public class AdminController : AbstractController
 {
     private readonly IAdminService _adminService;
-    private readonly ICsvImportService _csvImportService;
     private readonly ILandlordService _landlordService;
-    private readonly ILogger<AdminController> _logger;
     private readonly IPropertyService _propertyService;
+    private readonly ICsvImportService _csvImportService;
+    private readonly ILogger<AdminController> _logger;
 
     public AdminController(ILogger<AdminController> logger, IAdminService adminService,
         ILandlordService landlordService, IPropertyService propertyService, ICsvImportService csvImportService)
@@ -67,15 +65,38 @@ public class AdminController : AbstractController
         if (user.IsAdmin)
         {
             LoggerAlreadyAdminWarning(_logger, user);
-
             return RedirectToAction(nameof(AdminDashboard));
         }
 
         _adminService.CancelAdminAccessRequest(user);
-
         FlashRequestSuccess(_logger, user, "cancelled admin access request");
-
         return RedirectToAction(nameof(AdminDashboard));
+    }
+    
+    private void LoggerAlreadyAdminWarning(ILogger logger, BricksAndHeartsUser user)
+    {
+        FlashMessage(logger,
+            ($"User {user.Id} already an admin",
+                "danger",
+                "Already an admin"));
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    public ActionResult AcceptAdminRequest(int userToAcceptId)
+    {
+        _adminService.ApproveAdminAccessRequest(userToAcceptId);
+        _logger.LogInformation($"Admin request of user {userToAcceptId} approved by user {GetCurrentUser().Id}");
+        return RedirectToAction("GetAdminList");
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    public ActionResult RejectAdminRequest(int userToRejectId)
+    {
+        _adminService.RejectAdminAccessRequest(userToRejectId);
+        _logger.LogInformation($"Admin request of user {userToRejectId} rejected by user {GetCurrentUser().Id}");
+        return RedirectToAction("GetAdminList");
     }
 
     [Authorize(Roles = "Admin")]
@@ -83,9 +104,7 @@ public class AdminController : AbstractController
     public async Task<ActionResult> GetAdminList()
     {
         var adminLists = await _adminService.GetAdminLists();
-
-        var adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
-
+        AdminListModel adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
         return View("AdminList", adminListModel);
     }
 
@@ -106,13 +125,21 @@ public class AdminController : AbstractController
         tenantListModel.TenantList = await _adminService.GetTenantList();
         return View(tenantListModel);
     }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public async Task<IActionResult> GetFilteredTenants(TenantListModel tenantListModel)
+    {
+        tenantListModel.TenantList = await _adminService.GetTenantDbModelsFromFilter(tenantListModel.Filters);
+        return View("TenantList", tenantListModel);
+    }
 
     [Authorize(Roles = "Admin")]
     [HttpPost]
     public ActionResult GetInviteLink(int landlordId)
     {
         var user = _adminService.FindUserByLandlordId(landlordId);
-        if (user != null) // If landlord already linked to user
+        if (user != null)
         {
             var flashMessageBody = $"Landlord already linked to user {user.GoogleUserName}";
             FlashMessage(_logger, (flashMessageBody, "warning", flashMessageBody));
@@ -142,7 +169,7 @@ public class AdminController : AbstractController
     public ActionResult RenewInviteLink(int landlordId)
     {
         var user = _adminService.FindUserByLandlordId(landlordId);
-        if (user != null) // If landlord already linked to user
+        if (user != null)
         {
             TempData["InviteLinkMessage"] = $"Landlord already linked to user {user.GoogleUserName}";
         }
@@ -167,45 +194,6 @@ public class AdminController : AbstractController
         return RedirectToAction("Profile", "Landlord", new { id = landlordId });
     }
 
-    private void LoggerAlreadyAdminWarning(ILogger logger, BricksAndHeartsUser user)
-    {
-        FlashMessage(logger,
-            ($"User {user.Id} already an admin",
-                "danger",
-                "Already an admin"));
-    }
-
-    [Authorize(Roles = "Admin")]
-    [HttpPost]
-    public ActionResult AcceptAdminRequest(int userToAcceptId)
-    {
-        if (_adminService.GetUserFromId(userToAcceptId) == null)
-        {
-            return View("Error", new ErrorViewModel());
-        }
-
-        _adminService.ApproveAdminAccessRequest(userToAcceptId);
-
-        return RedirectToAction("GetAdminList");
-    }
-
-    [Authorize(Roles = "Admin")]
-    [HttpPost]
-    public ActionResult RejectAdminRequest(int userToAcceptId)
-    {
-        _adminService.RejectAdminAccessRequest(userToAcceptId);
-
-        return RedirectToAction("GetAdminList");
-    }
-
-    [Authorize(Roles = "Admin")]
-    [HttpGet]
-    public async Task<IActionResult> GetFilteredTenants(TenantListModel tenantListModel)
-    {
-        tenantListModel.TenantList = await _adminService.GetTenantDbModelsFromFilter(tenantListModel.Filters);
-        return View("TenantList", tenantListModel);
-    }
-    
     [Authorize(Roles = "Admin")]
     [HttpPost]
     public ActionResult GetSampleTenantCSV()

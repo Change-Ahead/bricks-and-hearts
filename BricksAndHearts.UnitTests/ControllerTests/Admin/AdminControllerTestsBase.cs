@@ -12,9 +12,9 @@ public class AdminControllerTestsBase : ControllerTestsBase
 {
     protected readonly ILogger<AdminController> Logger;
     protected readonly IAdminService AdminService;
-    protected readonly ICsvImportService CsvImportService;
     protected readonly ILandlordService LandlordService;
     protected readonly IPropertyService PropertyService;
+    protected readonly ICsvImportService CsvImportService;
     protected readonly AdminController UnderTest;
 
     protected AdminControllerTestsBase()
