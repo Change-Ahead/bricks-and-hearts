@@ -20,7 +20,11 @@
 
 <h2>Tenant List</h2>
 
-<form method="get" asp-controller="Admin" asp-action="TenantList">
+<div class="dropdown-button">
+     <a class="btn btn-primary mb-3" data-bs-toggle="collapse" href="#dropdown-contents" role="button" aria-expanded="false" aria-controls="dropdown-contents"><i class="bi bi-arrow-90deg-down"></i> Filter</a>
+</div>
+<div class="collapse" id="dropdown-contents">
+    <form method="get" asp-controller="Admin" asp-action="TenantList">
 
     <div class="row g-3">
         <div class="col-auto d-grid">
