@@ -134,6 +134,10 @@
         <button type="submit" class="btn btn-primary"><i class="bi bi-link"></i> Get invite link</button>
     }
 }
+@if (Model.InviteLink != null)
+{
+    <a class="btn btn-primary my-3" type="button" id="copyBtn" onclick="copyLinkToClipboard('@Model.InviteLink');"><i class="bi bi-files"></i> Copy invite link</a>
+}
 
 <!-- Modal -->
 <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
