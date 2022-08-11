@@ -136,7 +136,7 @@
 }
 @if (Model.InviteLink != null)
 {
-    <a class="btn btn-primary my-3" type="button" onclick="copyLinkToClipboard(@(Model.InviteLink));"><i class="bi bi-files"></i> Copy invite link</a>
+    <a class="btn btn-primary my-3" type="button" id="copyBtn" onclick="copyLinkToClipboard('@Model.InviteLink');"><i class="bi bi-files"></i> Copy invite link</a>
 }
 
 <!-- Modal -->
