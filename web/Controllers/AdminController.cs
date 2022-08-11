@@ -110,27 +110,17 @@ public class AdminController : AbstractController
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
-    public async Task<IActionResult> LandlordList(string? approvalStatus = "")
+    public async Task<IActionResult> LandlordList(LandlordListModel landlordListModel)
     {
-        var landlordListModel = new LandlordListModel();
-        landlordListModel.LandlordDisplayList = await _adminService.GetLandlordDisplayList(approvalStatus!);
+        landlordListModel.LandlordList = await _adminService.GetLandlordList(landlordListModel.Filters);
         return View(landlordListModel);
     }
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
-    public async Task<IActionResult> TenantList()
+    public async Task<IActionResult> TenantList(TenantListModel tenantListModel)
     {
-        var tenantListModel = new TenantListModel();
-        tenantListModel.TenantList = await _adminService.GetTenantList();
-        return View(tenantListModel);
-    }
-    
-    [Authorize(Roles = "Admin")]
-    [HttpGet]
-    public async Task<IActionResult> GetFilteredTenants(TenantListModel tenantListModel)
-    {
-        tenantListModel.TenantList = await _adminService.GetTenantDbModelsFromFilter(tenantListModel.Filters);
+        tenantListModel.TenantList = await _adminService.GetTenantList(tenantListModel.Filters);
         return View("TenantList", tenantListModel);
     }
 

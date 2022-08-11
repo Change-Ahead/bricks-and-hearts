@@ -16,9 +16,8 @@ public interface IAdminService
     
     //Information Lists
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
-    public Task<List<LandlordDbModel>> GetLandlordDisplayList(string approvalStatus);
-    public Task<List<TenantDbModel>> GetTenantList();
-    public Task<List<TenantDbModel>> GetTenantDbModelsFromFilter(string[] filterArray);
+    public Task<List<LandlordDbModel>> GetLandlordList(string[] filterArray);
+    public Task<List<TenantDbModel>> GetTenantList(string[] filterArray);
     
     //Invite Links
     public UserDbModel? FindUserByLandlordId(int landlordId);
@@ -98,22 +97,33 @@ public class AdminService : IAdminService
         return pendingAdmins;
     }
 
-    public async Task<List<LandlordDbModel>> GetLandlordDisplayList(string approvalStatus)
+    public async Task<List<LandlordDbModel>> GetLandlordList(string[] filterArray)
     {
-        return approvalStatus switch
+        var landlordQuery = from landlords in _dbContext.Landlords select landlords;
+        for (var currentFilterNo = 0; currentFilterNo < filterArray.Length; currentFilterNo++)
         {
-            "Unapproved" => await _dbContext.Landlords.Where(u => u.CharterApproved == false).ToListAsync(),
-            "Approved" => await _dbContext.Landlords.Where(u => u.CharterApproved == true).ToListAsync(),
-            _ => await _dbContext.Landlords.ToListAsync(),
-        };
+            var filterToCheck = filterArray[currentFilterNo];
+            landlordQuery = currentFilterNo switch
+            {
+                0 => filterToCheck switch
+                {
+                    "Approved" => landlordQuery.Where(l => l.CharterApproved == true),
+                    "Unapproved" => landlordQuery.Where(l => l.CharterApproved == false),
+                    _ => landlordQuery
+                },
+                1 => filterToCheck switch
+                {
+                    "Assigned" => landlordQuery.Where(l => _dbContext.Users.SingleOrDefault(u => u.LandlordId == l.Id) != null),
+                    "Unassigned" => landlordQuery.Where(l => _dbContext.Users.SingleOrDefault(u => u.LandlordId == l.Id) == null),
+                    _ => landlordQuery
+                },
+                _ => landlordQuery
+            };
+        }
+        return await landlordQuery.ToListAsync();
     }
     
-    public async Task<List<TenantDbModel>> GetTenantList()
-    {
-        return await _dbContext.Tenants.ToListAsync();
-    }
-    
-    public async Task<List<TenantDbModel>> GetTenantDbModelsFromFilter(string[] filterArray)
+    public async Task<List<TenantDbModel>> GetTenantList(string[] filterArray)
     {
         var tenantQuery = from tenants in _dbContext.Tenants select tenants;
         for (var currentFilterNo = 0; currentFilterNo < filterArray.Length; currentFilterNo++)

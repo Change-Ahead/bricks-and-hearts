@@ -5,5 +5,5 @@ public class TenantListModel
 {
     public List<TenantDbModel>? TenantList { get; set; }
 
-    public string[] Filters { get; set; } = new string[6];
+    public string[] Filters { get; set; } = new string[6]{"all", "all", "all", "all", "all", "all"};
 }
