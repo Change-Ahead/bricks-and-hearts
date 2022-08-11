@@ -221,11 +221,7 @@ public class LandlordService : ILandlordService
 
     public async Task UnapproveLandlord(int landlordId)
     {
-        var landlord = await GetLandlordIfExistsFromId(landlordId);
-        if (landlord is null)
-        {
-            return;
-        }
+        var landlord = _dbContext.Landlords.Single(l => l.Id == landlordId);
 
         landlord.CharterApproved = false;
         landlord.ApprovalTime = null;
