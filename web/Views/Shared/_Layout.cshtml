@@ -1,6 +1,6 @@
 ﻿@using BricksAndHearts.Auth
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-100">
 
 <head>
     <meta charset="utf-8"/>
@@ -14,7 +14,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body class="d-flex flex-column h-100">
 <header>
     <nav class="navbar navbar-primary navbar-expand-sm navbar-light border-bottom bg-white box-shadow">
         <div class="container-fluid">
@@ -81,8 +81,9 @@
     }
 </header>
 
-<div class="container mt-3 pb-4">
-    <main role="main">
+
+<main role="main">
+    <div class="container mt-3 pb-4">
         @if (TempData["FlashMessage"] != null)
         {
         @* uses warning as the default alert colour if there's no value in TempData["FlashType"] *@
@@ -91,10 +92,11 @@
             </div>
         }
         @RenderBody()
-    </main>
-</div>
+    </div>
+</main>
 
-<footer class="border-top footer text-muted bg-white">
+
+<footer class="mt-auto py-3 border-top footer text-muted bg-white">
     <div class="container">
         <div class="nav">
             <span class="navbar-text me-3">&copy; 2022 - Bricks & Hearts</span>
