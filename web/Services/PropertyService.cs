@@ -61,13 +61,13 @@ public class PropertyService : IPropertyService
 
             Description = createModel.Description,
 
-            AcceptsSingleTenant = createModel.AcceptsSingleTenant,
-            AcceptsCouple = createModel.AcceptsCouple,
-            AcceptsFamily = createModel.AcceptsFamily,
-            AcceptsPets = createModel.AcceptsPets,
-            AcceptsBenefits = createModel.AcceptsBenefits,
-            AcceptsNotEET = createModel.AcceptsNotEET,
-            AcceptsWithoutGuarantor = createModel.AcceptsWithoutGuarantor,
+            AcceptsSingleTenant = createModel.LandlordRequirements.AcceptsSingleTenant,
+            AcceptsCouple = createModel.LandlordRequirements.AcceptsCouple,
+            AcceptsFamily = createModel.LandlordRequirements.AcceptsFamily,
+            AcceptsPets = createModel.LandlordRequirements.AcceptsPets,
+            AcceptsBenefits = createModel.LandlordRequirements.AcceptsBenefits,
+            AcceptsNotEET = createModel.LandlordRequirements.AcceptsNotEET,
+            AcceptsWithoutGuarantor = createModel.LandlordRequirements.AcceptsWithoutGuarantor,
 
             Rent = createModel.Rent,
 
@@ -108,13 +108,13 @@ public class PropertyService : IPropertyService
 
         dbModel.Description = updateModel.Description ?? dbModel.Description;
 
-        dbModel.AcceptsSingleTenant = updateModel.AcceptsSingleTenant ?? dbModel.AcceptsSingleTenant;
-        dbModel.AcceptsCouple = updateModel.AcceptsCouple ?? dbModel.AcceptsCouple;
-        dbModel.AcceptsFamily = updateModel.AcceptsFamily ?? dbModel.AcceptsFamily;
-        dbModel.AcceptsPets = updateModel.AcceptsPets ?? dbModel.AcceptsPets;
-        dbModel.AcceptsBenefits = updateModel.AcceptsBenefits ?? dbModel.AcceptsBenefits;
-        dbModel.AcceptsNotEET = updateModel.AcceptsNotEET ?? dbModel.AcceptsNotEET;
-        dbModel.AcceptsWithoutGuarantor = updateModel.AcceptsWithoutGuarantor ?? dbModel.AcceptsWithoutGuarantor;
+        dbModel.AcceptsSingleTenant = updateModel.LandlordRequirements.AcceptsSingleTenant ?? dbModel.AcceptsSingleTenant;
+        dbModel.AcceptsCouple = updateModel.LandlordRequirements.AcceptsCouple ?? dbModel.AcceptsCouple;
+        dbModel.AcceptsFamily = updateModel.LandlordRequirements.AcceptsFamily ?? dbModel.AcceptsFamily;
+        dbModel.AcceptsPets = updateModel.LandlordRequirements.AcceptsPets ?? dbModel.AcceptsPets;
+        dbModel.AcceptsBenefits = updateModel.LandlordRequirements.AcceptsBenefits ?? dbModel.AcceptsBenefits;
+        dbModel.AcceptsNotEET = updateModel.LandlordRequirements.AcceptsNotEET ?? dbModel.AcceptsNotEET;
+        dbModel.AcceptsWithoutGuarantor = updateModel.LandlordRequirements.AcceptsWithoutGuarantor ?? dbModel.AcceptsWithoutGuarantor;
 
         dbModel.Rent = updateModel.Rent ?? dbModel.Rent;
 

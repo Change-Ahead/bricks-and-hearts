@@ -34,13 +34,7 @@ public class PublicPropertyViewModel
 
 
     // Tenant profile
-    public bool? AcceptsSingleTenant { get; set; }
-    public bool? AcceptsCouple { get; set; }
-    public bool? AcceptsFamily { get; set; }
-    public bool? AcceptsPets { get; set; }
-    public bool? AcceptsBenefits { get; set; }
-    public bool? AcceptsNotEET { get; set; }
-    public bool? AcceptsWithoutGuarantor { get; set; }
+    public HousingRequirementModel LandlordRequirements { get; set; } = new();
     
     // Rent, deposits, and duration
     [Range(0, 100000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
@@ -67,13 +61,16 @@ public class PublicPropertyViewModel
                 County = property.County,
                 Postcode = property.Postcode,
             },
-            AcceptsSingleTenant = property.AcceptsSingleTenant,
-            AcceptsCouple = property.AcceptsCouple,
-            AcceptsFamily = property.AcceptsFamily,
-            AcceptsPets = property.AcceptsPets,
-            AcceptsBenefits = property.AcceptsBenefits,
-            AcceptsNotEET = property.AcceptsNotEET,
-            AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor
+            LandlordRequirements = new HousingRequirementModel
+            {
+                AcceptsSingleTenant = property.AcceptsSingleTenant,
+                AcceptsCouple = property.AcceptsCouple,
+                AcceptsFamily = property.AcceptsFamily,
+                AcceptsPets = property.AcceptsPets,
+                AcceptsBenefits = property.AcceptsBenefits,
+                AcceptsNotEET = property.AcceptsNotEET,
+                AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor
+            }
         };
     }
 }

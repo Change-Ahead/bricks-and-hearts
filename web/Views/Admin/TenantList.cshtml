@@ -26,83 +26,107 @@
 <div class="collapse" id="dropdown-contents">
     <form method="get" asp-controller="Admin" asp-action="TenantList">
 
-    <div class="row g-3">
-        <div class="col-auto d-grid">
-            @Html.DropDownListFor(
-                model => model.Filter.Type,
-                new List<SelectListItem>
-                {
-                    new("Single", "Single"),
-                    new("Couple", "Couple"),
-                    new("Family", "Family")
-                }, 
-                "Filter by Tenant Type",
-                new { @class="form-select" }
-                )
+        <div class="row g-3">
+            <div class="col-auto d-grid">
+                @Html.DropDownListFor(
+                    model => model.Filter.AcceptsSingleTenant,
+                    new List<SelectListItem>
+                    {
+                        new("Only single tenants", "true"),
+                        new("No single tenants", "false")
+                    }, 
+                    "Filter by single tenant",
+                    new { @class="form-select" }
+                    )
+            </div>
+            <div class="col-auto d-grid">
+                @Html.DropDownListFor(
+                    model => model.Filter.AcceptsCouple,
+                    new List<SelectListItem>
+                    {
+                        new("Only couples", "true"),
+                        new("No couples", "false")
+                    }, 
+                    "Filter by couple",
+                    new { @class="form-select" }
+                    )
+            </div>
+            <div class="col-auto d-grid">
+                @Html.DropDownListFor(
+                    model => model.Filter.AcceptsFamily,
+                    new List<SelectListItem>
+                    {
+                        new("Only families", "true"),
+                        new("No families", "false")
+                    }, 
+                    "Filter by family",
+                    new { @class="form-select" }
+                    )
+            </div>
+            <div class="col-auto d-grid">
+                @Html.DropDownListFor(
+                    model => model.Filter.AcceptsPets,
+                    new List<SelectListItem>
+                    {
+                        new("Has pet", "true"),
+                        new("Does not have pet", "false")
+                    }, 
+                    "Filter by Pets",
+                    new { @class="form-select" }
+                    )
+            </div>
+            <div class="col-auto d-grid">
+                @Html.DropDownListFor(
+                    model => model.Filter.AcceptsNotEET,
+                    new List<SelectListItem>
+                    {
+                        new("In ETT", "true"),
+                        new("Not in ETT", "false")
+                    }, 
+                    "Filter by ETT",
+                    new { @class="form-select" }
+                    )
+            </div>
+            <div class="col-auto d-grid">
+                @Html.DropDownListFor(
+                    model => model.Filter.AcceptsCredit,
+                    new List<SelectListItem>
+                    {
+                        new("On Universal Credit", "true"),
+                        new("Not on Universal Credit", "false")
+                    }, 
+                    "Filter by Universal Credit",
+                    new { @class="form-select" }
+                    )
+            </div>
+            <div class="col-auto d-grid">
+                @Html.DropDownListFor(
+                    model => model.Filter.AcceptsBenefits,
+                    new List<SelectListItem>
+                    {
+                        new("On Housing Benefits", "true"),
+                        new("Not on Housing Benefits", "false")
+                    }, 
+                    "Filter by Housing Benefits",
+                    new { @class="form-select" }
+                    )
+            </div>
+            <div class="col-auto d-grid">
+                @Html.DropDownListFor(
+                    model => model.Filter.AcceptsOver35,
+                    new List<SelectListItem>
+                    {
+                        new("Over 35", "true"),
+                        new("35 or under", "false")
+                    }, 
+                    "Filter by Over 35",
+                    new { @class="form-select" }
+                    )
+            </div>
         </div>
-        <div class="col-auto d-grid">
-            @Html.DropDownListFor(
-                model => model.Filter.HasPet,
-                new List<SelectListItem>
-                {
-                    new("Has pet", "true"),
-                    new("Does not have pet", "false")
-                }, 
-                "Filter by Pets",
-                new { @class="form-select" }
-                )
-        </div>
-        <div class="col-auto d-grid">
-            @Html.DropDownListFor(
-                model => model.Filter.ETT,
-                new List<SelectListItem>
-                {
-                    new("In ETT", "true"),
-                    new("Not in ETT", "false")
-                }, 
-                "Filter by ETT",
-                new { @class="form-select" }
-                )
-        </div>
-        <div class="col-auto d-grid">
-            @Html.DropDownListFor(
-                model => model.Filter.UniversalCredit,
-                new List<SelectListItem>
-                {
-                    new("On Universal Credit", "true"),
-                    new("Not on Universal Credit", "false")
-                }, 
-                "Filter by Universal Credit",
-                new { @class="form-select" }
-                )
-        </div>
-        <div class="col-auto d-grid">
-            @Html.DropDownListFor(
-                model => model.Filter.HousingBenefits,
-                new List<SelectListItem>
-                {
-                    new("On Housing Benefits", "true"),
-                    new("Not on Housing Benefits", "false")
-                }, 
-                "Filter by Housing Benefits",
-                new { @class="form-select" }
-                )
-        </div>
-        <div class="col-auto d-grid">
-            @Html.DropDownListFor(
-                model => model.Filter.Over35,
-                new List<SelectListItem>
-                {
-                    new("Over 35", "true"),
-                    new("35 or under", "false")
-                }, 
-                "Filter by Over 35",
-                new { @class="form-select" }
-                )
-        </div>
-    </div>
-    <input type="submit" value="Filter" class="btn btn-large btn-primary mb-3"/>
-</form>
+        <input type="submit" value="Filter" class="btn btn-large btn-primary my-3"/>
+    </form>
+</div>
 
 <table class="table">
     <thead>
