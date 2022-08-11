@@ -1,0 +1,20 @@
+﻿@model PropertyInputFormViewModel
+
+<input asp-for="@Model.LandlordId" type="hidden" id="landlordId" name="landlordId" value="@Model.LandlordId">
+<div class="row my-4">
+    <div class="col-auto">
+        @if (Model.Step < PropertyInputFormViewModel.MaximumStep)
+        {
+            <input type="submit" value="Next" class="btn btn-large btn-primary mb-3"/>
+        }
+        else
+        {
+            <input type="submit" value="Submit" class="btn btn-submit btn-primary"/>
+        }
+    </div>
+    <div class="col-auto">
+        <button type="button" class="btn btn-large btn-outline-primary" data-bs-toggle="modal" data-bs-target="#cancelModal">
+            Cancel
+        </button>
+    </div>
+</div>

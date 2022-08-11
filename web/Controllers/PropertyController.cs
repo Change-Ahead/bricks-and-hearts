@@ -30,6 +30,8 @@ public class PropertyController : AbstractController
         _azureStorage = azureStorage;
     }
 
+    #region Misc
+
     [HttpPost]
     [Authorize(Roles = "Landlord, Admin")]
     public ActionResult DeleteProperty(int propertyId)
@@ -108,6 +110,44 @@ public class PropertyController : AbstractController
             new PropertyListModel(listOfProperties, properties.Count, null!, page, sortBy, target));
     }
 
+    [Authorize(Roles = "Admin")]
+    [HttpGet("/admin/get-public-view-link/{propertyId:int}")]
+    public ActionResult GetPublicViewLink(int propertyId)
+    {
+        var property = _propertyService.GetPropertyByPropertyId(propertyId);
+        if (property == null) // If property does not exist
+        {
+            var flashMessageBody = $"Property with ID: {propertyId} does not exist";
+            _logger.LogInformation(flashMessageBody);
+            AddFlashMessage("warning", flashMessageBody);
+        }
+        else
+        {
+            var publicViewLink = property.PublicViewLink;
+            string flashMessageBody;
+            if (string.IsNullOrEmpty(publicViewLink))
+            {
+                flashMessageBody = "Successfully created a new public view link";
+                publicViewLink = _propertyService.CreateNewPublicViewLink(propertyId);
+                _logger.LogInformation("Created public view link for property {PropertyId}: {PublicViewLink}",
+                    propertyId, publicViewLink);
+            }
+            else
+            {
+                flashMessageBody = "Property already has a public view link";
+            }
+
+            var baseUrl = HttpContext.Request.GetUri().Authority;
+            _logger.LogInformation(flashMessageBody);
+            AddFlashMessage("success",
+                flashMessageBody + ": " + baseUrl + $"/public/propertyid/{propertyId}/{publicViewLink}");
+        }
+
+        return RedirectToAction("ViewProperty", "Property", new { propertyId });
+    }
+
+    #endregion
+
     #region AddProperty
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -118,8 +158,8 @@ public class PropertyController : AbstractController
     }
 
     [Authorize(Roles = "Landlord, Admin")]
-    [HttpGet("add/step/{step:int}")]
-    public ActionResult AddNewProperty_Continue([FromRoute] int step, [FromQuery] int propertyId,
+    [HttpGet("add/step/1")]
+    public ActionResult AddNewProperty_Continue([FromRoute] int step, [FromQuery] int propertyId, //Step one
         int? landlordId = null)
     {
         var newPropertyModel = new PropertyViewModel { Address = new AddressModel() };
@@ -141,14 +181,20 @@ public class PropertyController : AbstractController
             newPropertyModel.LandlordId = (int)landlordId;
         }
 
-        if (!(GetCurrentUser().IsAdmin || GetCurrentUser().LandlordId == newPropertyModel.LandlordId))
+        if (OwnerOrAdminCheck(newPropertyModel))
         {
             return StatusCode(403);
         }
 
         // Show the form for this step
-        return View("AddNewProperty", new AddNewPropertyViewModel { Step = step, Property = newPropertyModel });
+        return View("AddNewProperty", new AddNewPropertyViewModel { Step = 1, Property = newPropertyModel });
     }
+
+    private bool OwnerOrAdminCheck(PropertyViewModel newPropertyModel)
+    {
+        return !GetCurrentUser().IsAdmin && GetCurrentUser().LandlordId != newPropertyModel.LandlordId;
+    }
+
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("add/step/{step:int}")]
@@ -171,7 +217,7 @@ public class PropertyController : AbstractController
 
         if (step == 1)
         {
-            if (!(GetCurrentUser().IsAdmin || GetCurrentUser().LandlordId == newPropertyModel.LandlordId))
+            if (OwnerOrAdminCheck(newPropertyModel))
             {
                 return StatusCode(403);
             }
@@ -199,7 +245,7 @@ public class PropertyController : AbstractController
             return StatusCode(404);
         }
 
-        if (!(GetCurrentUser().IsAdmin || GetCurrentUser().LandlordId == property.LandlordId))
+        if (OwnerOrAdminCheck(PropertyViewModel.FromDbModel(property)))
         {
             return StatusCode(403);
         }

@@ -1,0 +1,14 @@
+﻿@model PropertyInputFormViewModel
+
+<h1 class="font-h1">Property description</h1>
+
+<div asp-validation-summary="All" class="text-danger"></div>
+<form method="post" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@Model.Step" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId">
+
+    <div class="my-3">
+        <label asp-for="Step4!.Description" class="form-label">Description</label>
+        <textarea asp-for="Step4!.Description" class="form-control textarea-description" rows="12" required></textarea>
+        <span asp-validation-for="Step4!.Description" class="text-danger"></span>
+    </div>
+    <partial name=@("_PropertyFormButtons") model="Model"/>
+</form>

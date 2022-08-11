@@ -1,4 +1,4 @@
-﻿@model AddNewPropertyViewModel
+﻿@model PropertyInputFormViewModel
 
 @{
     ViewData["Title"] = "Add Property";
@@ -32,31 +32,13 @@
 @if (Model.Step > 1)
 {
     <div class="mb-4">
-        <a asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@(Model.Step - 1)" asp-route-propertyId="@Model.Property?.PropertyId" asp-route-landlordId="@Model.Property?.LandlordId">&lt; Back</a>
+        <a asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@(Model.Step - 1)" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId">&lt; Back</a>
     </div>
 }
 
-<form method="post" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@Model.Step" asp-route-propertyId="@Model.Property?.PropertyId" asp-route-landlordId="@Model.Property?.LandlordId">
-    <partial name=@("_AddFormStep" + Model.Step) model="Model.Property"/>
-    <input asp-for="Property!.LandlordId" type="hidden" id="landlordId" name="landlordId" value="@Model.Property!.LandlordId">
-    <div class="row my-4">
-        <div class="col-auto">
-            @if (Model.Step < AddNewPropertyViewModel.MaximumStep)
-            {
-                <input type="submit" value="Next" class="btn btn-large btn-primary mb-3"/>
-            }
-            else
-            {
-                <input type="submit" value="Submit" class="btn btn-submit btn-primary"/>
-            }
-        </div>
-        <div class="col-auto">
-            <button type="button" class="btn btn-large btn-outline-primary" data-bs-toggle="modal" data-bs-target="#cancelModal">
-                Cancel
-            </button>
-        </div>
-    </div>
-</form>
+@*// QQQ <form method="post" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@Model.Step" asp-route-propertyId="@Model.Property?.PropertyId" asp-route-landlordId="@Model.Property?.LandlordId">*@
+<partial name=@("_PropertyInputFormStep" + Model.Step) model="Model"/>
+
 
 <!-- Modal -->
 <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
@@ -71,7 +53,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <form method="post" asp-controller="Property" asp-action="AddNewProperty_Cancel" asp-route-id="@Model.Property?.PropertyId" asp-route-landlordId="@Model.Property?.LandlordId">
+                <form method="post" asp-controller="Property" asp-action="AddNewProperty_Cancel" asp-route-id="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId">
                     <input type="submit" value="Cancel" class="btn btn-danger"/>
                 </form>
             </div>

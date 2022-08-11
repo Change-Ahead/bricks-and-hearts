@@ -1,0 +1,18 @@
+﻿@model PropertyInputFormViewModel
+
+<h1 class="font-h1">Address</h1>
+<form method="post" asp-controller="Property" asp-action="AddNewProperty_Continue" asp-route-step="@Model.Step" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId">
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="my-3">
+        <label asp-for="Step1!.Address.AddressLine1" class="form-label">Address Line 1</label>
+        <input asp-for="Step1!.Address.AddressLine1" class="form-control" required/>
+        <span asp-validation-for="Step1!.Address!.AddressLine1" class="text-danger"></span>
+    </div>
+    <div class="my-3">
+        <label asp-for="Step1!.Address.Postcode" class="form-label">Postcode</label>
+        <input asp-for="Step1!.Address.Postcode" class="form-control" required/>
+        <span asp-validation-for="Step1!.Address.Postcode" class="text-danger"></span>
+    </div>
+    <partial name=@("_PropertyFormButtons") model="Model"/>
+</form>
