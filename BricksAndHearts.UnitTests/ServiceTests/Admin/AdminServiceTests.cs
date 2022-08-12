@@ -123,6 +123,24 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         // Assert
         context.Users.Single(u => u.Id == nonAdminUser.Id).HasRequestedAdmin.Should().BeFalse();
     }
+    
+    [Fact]
+    public void RemoveAdmin_SetsIsAdminToFalse_ForCorrectUser()
+    {
+        // Arrange
+        using var context = Fixture.CreateWriteContext();
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+
+        var adminUser = context.Users.Single(u => u.GoogleUserName == "AdminUser");
+
+        // Act
+        service.RemoveAdmin(adminUser.Id);
+
+        context.ChangeTracker.Clear();
+
+        // Assert
+        context.Users.Single(u => u.Id == adminUser.Id).IsAdmin.Should().BeFalse();
+    }
 
     [Fact]
     public void GetAdminLists_GetsListOfCurrentAndPendingAdmins_ForAdminUser()

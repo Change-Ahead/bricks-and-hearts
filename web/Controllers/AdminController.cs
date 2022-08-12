@@ -98,6 +98,22 @@ public class AdminController : AbstractController
         _logger.LogInformation($"Admin request of user {userToRejectId} rejected by user {GetCurrentUser().Id}");
         return RedirectToAction("GetAdminList");
     }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    public ActionResult RemoveAdmin(int userToRemoveId)
+    {
+        if (userToRemoveId != GetCurrentUser().Id)
+        {
+            _adminService.RemoveAdmin(userToRemoveId);
+            _logger.LogInformation($"Admin status of user {userToRemoveId} revoked by user {GetCurrentUser().Id}");
+        }
+        else
+        {
+            FlashMessage(_logger, ($"User {userToRemoveId} may not remove their own admin status", "warning", "You may not remove your own admin status"));
+        }
+        return RedirectToAction("GetAdminList");
+    }
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
