@@ -8,33 +8,35 @@ namespace BricksAndHearts.Services;
 public interface IAdminService
 {
     public UserDbModel? GetUserFromId(int userId);
-    
+
     //Admin Access
     public void RequestAdminAccess(BricksAndHeartsUser user);
     public void CancelAdminAccessRequest(BricksAndHeartsUser user);
     public void ApproveAdminAccessRequest(int userId);
     public void RejectAdminAccessRequest(int userId);
-    
+
     //Information Lists
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
     public Task<List<LandlordDbModel>> GetLandlordList(LandlordListModel landlordListModel);
+
     public Task<List<TenantDbModel>> GetTenantList(HousingRequirementModel filter);
-    
+
     //Invite Links
     public UserDbModel? FindUserByLandlordId(int landlordId);
     public string? FindExistingInviteLink(int landlordId);
     public string CreateNewInviteLink(int landlordId);
     public void DeleteExistingInviteLink(int landlordId);
-    
 }
 
 public class AdminService : IAdminService
 {
     private readonly BricksAndHeartsDbContext _dbContext;
+    private readonly ILogger<AdminService> _logger;
 
-    public AdminService(BricksAndHeartsDbContext dbContext)
+    public AdminService(BricksAndHeartsDbContext dbContext, ILogger<AdminService> logger)
     {
         _dbContext = dbContext;
+        _logger = logger;
     }
 
     public UserDbModel? GetUserFromId(int userId)
@@ -42,12 +44,18 @@ public class AdminService : IAdminService
         UserDbModel userFromId = _dbContext.Users.SingleOrDefault(u => u.Id == userId)!;
         return userFromId;
     }
-    
+
     public void RequestAdminAccess(BricksAndHeartsUser user)
     {
         var userRecord = _dbContext.Users.Single(u => u.Id == user.Id);
         userRecord.HasRequestedAdmin = true;
         _dbContext.SaveChanges();
+
+        if (!_dbContext.Users.Any(u => u.IsAdmin))
+        {
+            _logger.LogInformation("Automatically approved admin request for user {userName} ({userId})", user.Name, user.Id);
+            ApproveAdminAccessRequest(user.Id);
+        }
     }
 
     public void CancelAdminAccessRequest(BricksAndHeartsUser user)
@@ -56,7 +64,7 @@ public class AdminService : IAdminService
         userRecord.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
     }
-    
+
     public void ApproveAdminAccessRequest(int userId)
     {
         var userToAdmin = _dbContext.Users.SingleOrDefault(u => u.Id == userId);
@@ -64,6 +72,7 @@ public class AdminService : IAdminService
         {
             throw new Exception($"No user found with id {userId}");
         }
+
         userToAdmin.IsAdmin = true;
         userToAdmin.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
@@ -76,7 +85,7 @@ public class AdminService : IAdminService
         {
             throw new Exception($"No user found with id {userId}");
         }
-        
+
         userToAdmin.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
     }
@@ -85,7 +94,7 @@ public class AdminService : IAdminService
     {
         return (await GetCurrentAdmins(), await GetPendingAdmins());
     }
-    
+
     private async Task<List<UserDbModel>> GetCurrentAdmins()
     {
         return await _dbContext.Users.Where(u => u.IsAdmin == true).ToListAsync();
@@ -105,13 +114,15 @@ public class AdminService : IAdminService
         {
             landlordQuery = landlordQuery.Where(l => l.CharterApproved == landlordListModel.IsApproved);
         }
+
         if (landlordListModel.IsAssigned != null)
         {
             landlordQuery = landlordQuery.Where(l => _dbContext.Users.Any(u => u.LandlordId == l.Id) == landlordListModel.IsAssigned);
         }
+
         return await landlordQuery.ToListAsync();
     }
-    
+
     public async Task<List<TenantDbModel>> GetTenantList(HousingRequirementModel filters)
     {
         var tenantQuery = from tenants in _dbContext.Tenants select tenants;
@@ -147,6 +158,7 @@ public class AdminService : IAdminService
                 };
             }
         }
+
         return await tenantQuery.ToListAsync();
     }
 
