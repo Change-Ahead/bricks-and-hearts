@@ -187,11 +187,11 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         // Arrange
         await using var context = Fixture.CreateReadContext();
         var service = new AdminService(context);
-        var filter = new TenantListFilter
+        var filter = new HousingRequirementModel
         {
-            Type = "single",
-            ETT = true,
-            UniversalCredit = true
+            AcceptsSingleTenant = true,
+            AcceptsNotEET = true,
+            AcceptsCredit = true
         };
 
         // Act

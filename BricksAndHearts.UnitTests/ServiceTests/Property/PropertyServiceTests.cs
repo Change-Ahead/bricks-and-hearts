@@ -124,7 +124,10 @@ public class PropertyServiceTests : PropertyServiceTestsBase
                 TownOrCity = "Cambridge",
                 Postcode = "CB1 1DX"
             },
-            AcceptsBenefits = false
+            LandlordRequirements = new HousingRequirementModel
+            {
+                AcceptsBenefits = false
+            }
         };
 
         // Act

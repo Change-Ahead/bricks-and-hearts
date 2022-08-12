@@ -5,5 +5,5 @@ public class TenantListModel
 {
     public List<TenantDbModel>? TenantList { get; set; }
 
-    public TenantListFilter Filter { get; set; } = new TenantListFilter();
+    public HousingRequirementModel Filter { get; set; } = new ();
 }

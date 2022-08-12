@@ -18,7 +18,7 @@ public interface IAdminService
     //Information Lists
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
     public Task<List<LandlordDbModel>> GetLandlordList(LandlordListModel landlordListModel);
-    public Task<List<TenantDbModel>> GetTenantList(TenantListFilter filter);
+    public Task<List<TenantDbModel>> GetTenantList(HousingRequirementModel filter);
     
     //Invite Links
     public UserDbModel? FindUserByLandlordId(int landlordId);
@@ -112,35 +112,40 @@ public class AdminService : IAdminService
         return await landlordQuery.ToListAsync();
     }
     
-    public async Task<List<TenantDbModel>> GetTenantList(TenantListFilter filter)
+    public async Task<List<TenantDbModel>> GetTenantList(HousingRequirementModel filters)
     {
-        var tenantQuery = _dbContext.Tenants.AsQueryable();
-        tenantQuery = filter.Type switch
+        var tenantQuery = from tenants in _dbContext.Tenants select tenants;
+        var currentFilterNo = -1;
+        foreach (var filter in filters)
         {
-            "Single" => tenantQuery.Where(t => t.Type == "Single"),
-            "Couple" => tenantQuery.Where(t => t.Type == "Couple"),
-            "Family" => tenantQuery.Where(t => t.Type == "Family"),
-            _ => tenantQuery
-        };
-        if (filter.HasPet != null)
-        {
-            tenantQuery = tenantQuery.Where(t => t.HasPet == filter.HasPet);
-        }
-        if (filter.ETT != null)
-        {
-            tenantQuery = tenantQuery.Where(t => t.ETT == filter.ETT);
-        }
-        if (filter.UniversalCredit != null)
-        {
-            tenantQuery = tenantQuery.Where(t => t.UniversalCredit == filter.UniversalCredit);
-        }
-        if (filter.HousingBenefits != null)
-        {
-            tenantQuery = tenantQuery.Where(t => t.HousingBenefits == filter.HousingBenefits);
-        }
-        if (filter.Over35 != null)
-        {
-            tenantQuery = tenantQuery.Where(t => t.Over35 == filter.Over35);
+            currentFilterNo++;
+            if (filter != null)
+            {
+                tenantQuery = currentFilterNo switch
+                {
+                    0 => filter switch
+                    {
+                        true => tenantQuery.Where(t => t.Type == "Single"),
+                        false => tenantQuery.Where(t => t.Type != "Single")
+                    },
+                    1 => filter switch
+                    {
+                        true => tenantQuery.Where(t => t.Type == "Couple"),
+                        false => tenantQuery.Where(t => t.Type != "Couple")
+                    },
+                    2 => filter switch
+                    {
+                        true => tenantQuery.Where(t => t.Type == "Family"),
+                        false => tenantQuery.Where(t => t.Type != "Family")
+                    },
+                    3 => tenantQuery.Where(t => t.HasPet == filter),
+                    4 => tenantQuery.Where(t => t.ETT == filter),
+                    5 => tenantQuery.Where(t => t.UniversalCredit == filter),
+                    6 => tenantQuery.Where(t => t.HousingBenefits == filter),
+                    7 => tenantQuery.Where(t => t.Over35 == filter),
+                    _ => tenantQuery
+                };
+            }
         }
         return await tenantQuery.ToListAsync();
     }
