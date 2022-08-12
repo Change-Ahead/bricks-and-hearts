@@ -66,7 +66,18 @@
     }
     else
     {
-        <p>No images :(</p>
+        <div class="card mt-4">
+            <div class="card-body">
+                <form asp-action="AddPropertyImages" asp-controller="Property" method="post" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <input type="hidden" id="propertyId" name="propertyId" value="@Model.Property.PropertyId">
+                        <label for="imageUpload" class="form-label">Upload some images for this property</label>
+                        <input name="images" id="imageUpload" type="file" multiple accept="image/*" class="form-control h-auto">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Upload images</button>
+                </form>
+            </div>
+        </div>
     }
 
 </div>
@@ -102,8 +113,16 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-danger" data-bs-target="#deleteModal" data-bs-toggle="modal">Delete image</button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <form asp-action="AddPropertyImages" asp-controller="Property" method="post" enctype="multipart/form-data" class="me-auto">
+                    <input type="hidden" id="propertyId" name="propertyId" value="@Model.Property.PropertyId">
+                    <input name="images" type="file" multiple accept="image/*" class="form-control d-inline h-auto">
+                    <button type="submit" class="btn btn-primary">Upload images</button>
+                </form>
+                <button type="button" class="btn btn-danger" data-bs-target="#deleteModal" data-bs-toggle="modal">
+                    <i class="bi bi-trash"></i>
+                    Delete image
+                </button>
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -121,12 +140,15 @@
                 Are you sure you want to delete this image?
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                 <form method="post" asp-controller="Property" asp-action="DeletePropertyImage">
                     <input type="hidden" id="deletePropertyId" name="propertyId" value="@Model.Property.PropertyId">
                     <input type="hidden" id="deleteFileName" name="fileName" value="@(Model.Images.Count > 0 ? Model.Images[0].FileName : "")">
-                    <input type="submit" value="Delete" class="btn btn-danger"/>
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash"></i>
+                        Delete
+                    </button>
                 </form>
+                <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>

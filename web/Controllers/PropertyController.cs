@@ -16,7 +16,8 @@ public class PropertyController : AbstractController
     private readonly ILogger<PropertyController> _logger;
     private readonly IAzureStorage _azureStorage;
 
-    public PropertyController(IPropertyService propertyService, IAzureMapsApiService azureMapsApiService, ILogger<PropertyController> logger, IAzureStorage azureStorage, IPostcodeApiService postcodeApiService)
+    public PropertyController(IPropertyService propertyService, IAzureMapsApiService azureMapsApiService,
+        ILogger<PropertyController> logger, IAzureStorage azureStorage, IPostcodeApiService postcodeApiService)
     {
         _propertyService = propertyService;
         _azureMapsApiService = azureMapsApiService;
@@ -439,7 +440,7 @@ public class PropertyController : AbstractController
             }
         }
         
-        return RedirectToAction("ListPropertyImages", "Property", new { propertyId });
+        return RedirectToAction("ViewProperty", "Property", new { propertyId });
     }
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -493,7 +494,9 @@ public class PropertyController : AbstractController
 
         _logger.LogInformation("Successfully sorted by location");
         var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).ToList();
-        
-        return View("~/Views/Admin/PropertyList.cshtml", new PropertiesDashboardViewModel(listOfProperties.Skip((page-1)*propPerPage).Take(propPerPage).ToList(),  listOfProperties.Count, null! , page, "Location"));
+
+        return View("~/Views/Admin/PropertyList.cshtml",
+            new PropertiesDashboardViewModel(listOfProperties.Skip((page - 1) * propPerPage).Take(propPerPage).ToList(),
+                listOfProperties.Count, null!, page, "Location"));
     }
 }
