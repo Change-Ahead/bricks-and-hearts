@@ -1,6 +1,4 @@
-using System;
 using System.Collections.Generic;
-using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;

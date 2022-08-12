@@ -31,4 +31,15 @@ public class HousingRequirementModel : IEnumerable
     {
         return GetEnumerator();
     }
+
+    public List<bool?> GetList()
+    {
+        var listOfFilters = new List<bool?>();
+        foreach (var filter in this)
+        {
+            listOfFilters.Add(filter);
+        }
+
+        return listOfFilters;
+    }
 }
