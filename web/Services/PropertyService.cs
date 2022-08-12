@@ -65,8 +65,10 @@ public class PropertyService : IPropertyService
             AcceptsCouple = createModel.LandlordRequirements.AcceptsCouple,
             AcceptsFamily = createModel.LandlordRequirements.AcceptsFamily,
             AcceptsPets = createModel.LandlordRequirements.AcceptsPets,
+            AcceptsCredit = createModel.LandlordRequirements.AcceptsCredit,
             AcceptsBenefits = createModel.LandlordRequirements.AcceptsBenefits,
             AcceptsNotEET = createModel.LandlordRequirements.AcceptsNotEET,
+            AcceptsOver35 = createModel.LandlordRequirements.AcceptsOver35,
             AcceptsWithoutGuarantor = createModel.LandlordRequirements.AcceptsWithoutGuarantor,
 
             Rent = createModel.Rent,
@@ -112,8 +114,10 @@ public class PropertyService : IPropertyService
         dbModel.AcceptsCouple = updateModel.LandlordRequirements.AcceptsCouple ?? dbModel.AcceptsCouple;
         dbModel.AcceptsFamily = updateModel.LandlordRequirements.AcceptsFamily ?? dbModel.AcceptsFamily;
         dbModel.AcceptsPets = updateModel.LandlordRequirements.AcceptsPets ?? dbModel.AcceptsPets;
+        dbModel.AcceptsCredit = updateModel.LandlordRequirements.AcceptsCredit ?? dbModel.AcceptsCredit;
         dbModel.AcceptsBenefits = updateModel.LandlordRequirements.AcceptsBenefits ?? dbModel.AcceptsBenefits;
         dbModel.AcceptsNotEET = updateModel.LandlordRequirements.AcceptsNotEET ?? dbModel.AcceptsNotEET;
+        dbModel.AcceptsOver35 = updateModel.LandlordRequirements.AcceptsOver35 ?? dbModel.AcceptsOver35;
         dbModel.AcceptsWithoutGuarantor = updateModel.LandlordRequirements.AcceptsWithoutGuarantor ?? dbModel.AcceptsWithoutGuarantor;
 
         dbModel.Rent = updateModel.Rent ?? dbModel.Rent;

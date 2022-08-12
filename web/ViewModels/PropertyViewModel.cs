@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using BricksAndHearts.Database;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace BricksAndHearts.ViewModels;
 
@@ -34,6 +36,8 @@ public class PropertyViewModel : IValidatableObject
 
 
     // Tenant profile
+    // checks for this are done manually in the override
+    [ValidateNever]
     public HousingRequirementModel LandlordRequirements { get; set; } = new();
     
     // Rent, deposits, and duration
@@ -107,8 +111,10 @@ public class PropertyViewModel : IValidatableObject
                 AcceptsCouple = property.AcceptsCouple,
                 AcceptsFamily = property.AcceptsFamily,
                 AcceptsPets = property.AcceptsPets,
+                AcceptsCredit = property.AcceptsCredit,
                 AcceptsBenefits = property.AcceptsBenefits,
                 AcceptsNotEET = property.AcceptsNotEET,
+                AcceptsOver35 = property.AcceptsOver35,
                 AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor  
             },
             Availability = property.Availability,

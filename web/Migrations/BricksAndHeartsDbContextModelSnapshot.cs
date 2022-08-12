@@ -116,10 +116,16 @@ namespace BricksAndHearts.Migrations
                     b.Property<bool?>("AcceptsCouple")
                         .HasColumnType("bit");
 
+                    b.Property<bool?>("AcceptsCredit")
+                        .HasColumnType("bit");
+
                     b.Property<bool?>("AcceptsFamily")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("AcceptsNotEET")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("AcceptsOver35")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("AcceptsPets")
