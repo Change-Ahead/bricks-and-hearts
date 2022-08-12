@@ -14,6 +14,7 @@ public interface IAdminService
     public void CancelAdminAccessRequest(BricksAndHeartsUser user);
     public void ApproveAdminAccessRequest(int userId);
     public void RejectAdminAccessRequest(int userId);
+    public void RemoveAdmin(int userId);
 
     //Information Lists
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
@@ -87,6 +88,18 @@ public class AdminService : IAdminService
         }
 
         userToAdmin.HasRequestedAdmin = false;
+        _dbContext.SaveChanges();
+    }
+    
+    public void RemoveAdmin(int userId)
+    {
+        var userToUnAdmin = _dbContext.Users.SingleOrDefault(u => u.Id == userId);
+        if (userToUnAdmin == null)
+        {
+            throw new Exception($"No user found with id {userId}");
+        }
+
+        userToUnAdmin.IsAdmin = false;
         _dbContext.SaveChanges();
     }
 

@@ -9,7 +9,9 @@ public class TenantDbModel
     public string Name { get; set; } = null!;
     public string? Email { get; set; }
     public string? Phone { get; set; }
+    
     public string? Postcode { get; set; }
+    
     
     public string? Type { get; set; }
     public bool? HasPet { get; set; }

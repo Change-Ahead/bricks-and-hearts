@@ -126,7 +126,7 @@ public class AdminControllerTests : AdminControllerTestsBase
     }
 
     [Fact]
-    public void AcceptAdminRequest_CallsGetUserFromThenCallsApproveAdminAccessRequestAndRedirectsToGetAdminList()
+    public void AcceptAdminRequest_CallsApproveAdminAccessRequestAndRedirectsToGetAdminList()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -143,7 +143,7 @@ public class AdminControllerTests : AdminControllerTestsBase
     }
 
     [Fact]
-    public void RejectAdminRequest_OnValidUserId_CallsGetUserFromThenCallsRejectAdminAccessRequestAndRedirectsToGetAdminList()
+    public void RejectAdminRequest_CallsRejectAdminAccessRequestAndRedirectsToGetAdminList()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -154,6 +154,41 @@ public class AdminControllerTests : AdminControllerTestsBase
 
         // Assert
         A.CallTo(() => AdminService.RejectAdminAccessRequest(1)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("GetAdminList");
+    }
+    
+    [Fact]
+    public void RemoveAdmin_OnOwnUserId_RedirectsToGetAdminListWithFlash()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+
+        // Act
+        var result = UnderTest.RemoveAdmin(1) as RedirectToActionResult;
+
+        // Assert
+        A.CallTo(() => AdminService.RemoveAdmin(1)).MustNotHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("GetAdminList");
+        UnderTest.TempData["FlashMessage"].Should().Be("You may not remove your own admin status");
+    }
+    
+    [Fact]
+    public void RemoveAdmin_OnNonSelfUserId_CallsRemoveAdminAndRedirectsToGetAdminList()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+
+        // Act
+        var result = UnderTest.RemoveAdmin(2) as RedirectToActionResult;
+
+        // Assert
+        A.CallTo(() => AdminService.RemoveAdmin(2)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("GetAdminList");
