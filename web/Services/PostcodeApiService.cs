@@ -12,7 +12,7 @@ public interface IPostcodeApiService
 
 public class PostcodeApiService : IPostcodeApiService
 {
-    private readonly HttpClient _client = new();
+    private readonly HttpClient _client;
     private readonly ILogger<PostcodeApiService> _logger;
     private readonly BricksAndHeartsDbContext _dbContext;
 

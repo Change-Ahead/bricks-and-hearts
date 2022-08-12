@@ -12,19 +12,16 @@ public interface IAzureMapsApiService
 
 public class AzureMapsApiService : IAzureMapsApiService
 {
-    private readonly HttpClient _client = new();
+    private readonly HttpClient _client;
     private readonly ILogger<AzureMapsApiService> _logger;
     private readonly IOptions<AzureMapsOptions> _options;
 
     public AzureMapsApiService(ILogger<AzureMapsApiService> logger, IOptions<AzureMapsOptions> options,
-    HttpClient? client = null)
+    HttpClient client)
     {
         _logger = logger;
         _options = options;
-        if (client != null)
-        {
-            _client = client;
-        }
+        _client = client;
     }
 
     public async Task<string> MakeApiRequestToAzureMaps(string postalCode)

@@ -431,7 +431,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         var service = new PropertyService(null!, postcodeApiService);
 
         // Act
-        var result = await service.SortPropertiesByLocation(postcode);
+        var result = await service.SortPropertiesByLocation(postcode, 1, 10);
         
         // Assert
         result.Should().BeNull();
@@ -459,7 +459,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         
         
         // Act
-        var result = await service.SortPropertiesByLocation(postcode);
+        var result = await service.SortPropertiesByLocation(postcode, 1, 10);
         
         // Assert
         var correctList = new List<PropertyDbModel>

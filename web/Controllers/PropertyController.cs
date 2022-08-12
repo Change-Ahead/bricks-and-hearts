@@ -483,7 +483,7 @@ public class PropertyController : AbstractController
     [HttpGet("SortPropertiesByLocation")]
     public async Task<IActionResult> SortPropertiesByLocation(string postcode, int page = 1, int propPerPage = 10)
     {
-        var properties = await _propertyService.SortPropertiesByLocation(postcode);
+        var properties = await _propertyService.SortPropertiesByLocation(postcode, page, propPerPage);
 
         if (properties == null)
         {
@@ -491,12 +491,9 @@ public class PropertyController : AbstractController
             return RedirectToAction("SortProperties", "Property", new { sortBy = "Availability" });
         }
 
-        else
-        {
-            _logger.LogInformation("Successfully sorted by location");
-            var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).ToList();
+        _logger.LogInformation("Successfully sorted by location");
+        var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).ToList();
         
-            return View("~/Views/Admin/PropertyList.cshtml", new PropertiesDashboardViewModel(listOfProperties.Skip((page-1)*propPerPage).Take(propPerPage).ToList(),  listOfProperties.Count, null! , page, "Location"));
-        }
+        return View("~/Views/Admin/PropertyList.cshtml", new PropertiesDashboardViewModel(listOfProperties.Skip((page-1)*propPerPage).Take(propPerPage).ToList(),  listOfProperties.Count, null! , page, "Location"));
     }
 }

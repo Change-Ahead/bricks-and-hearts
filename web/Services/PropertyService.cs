@@ -16,7 +16,7 @@ public interface IPropertyService
     public List<PropertyDbModel> SortProperties(string by);
     public PropertyCountModel CountProperties();
     string? CreateNewPublicViewLink(int propertyId);
-    public Task<List<PropertyDbModel>?> SortPropertiesByLocation(string postalCode);
+    public Task<List<PropertyDbModel>?> SortPropertiesByLocation(string postalCode, int page, int perPage);
 
 }
 
@@ -213,7 +213,7 @@ public class PropertyService : IPropertyService
         return publicViewLink;
     }
     
-    public async Task<List<PropertyDbModel>?> SortPropertiesByLocation(string postalCode)
+    public async Task<List<PropertyDbModel>?> SortPropertiesByLocation(string postalCode, int page, int perPage)
     {
         var responseBody = await _postcodeApiService.MakeApiRequestToPostcodeApi(postalCode);
         var model = _postcodeApiService.TurnResponseBodyToModel(responseBody);
@@ -245,8 +245,10 @@ public class PropertyService : IPropertyService
                 FROM dbo.Property
                 WHERE Lon is not NULL and Lat is not NULL
                 ORDER BY distance
+                OFFSET {perPage * (page - 1)} ROWS
+                FETCH NEXT {perPage} ROWS ONLY
                 "
             );
-        return properties.ToList();
+        return await properties.ToListAsync();
     }
 }
