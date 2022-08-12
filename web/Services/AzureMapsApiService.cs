@@ -10,21 +10,18 @@ public interface IAzureMapsApiService
     public Task<PropertyViewModel> AutofillAddress(PropertyViewModel model);
 }
 
-public class AzureMapsAzureMapsApiService : IAzureMapsApiService
+public class AzureMapsApiService : IAzureMapsApiService
 {
-    private readonly HttpClient _client = new();
-    private readonly ILogger<AzureMapsAzureMapsApiService> _logger;
+    private readonly HttpClient _client;
+    private readonly ILogger<AzureMapsApiService> _logger;
     private readonly IOptions<AzureMapsOptions> _options;
 
-    public AzureMapsAzureMapsApiService(ILogger<AzureMapsAzureMapsApiService> logger, IOptions<AzureMapsOptions> options,
-    HttpClient? client = null)
+    public AzureMapsApiService(ILogger<AzureMapsApiService> logger, IOptions<AzureMapsOptions> options,
+    HttpClient client)
     {
         _logger = logger;
         _options = options;
-        if (client != null)
-        {
-            _client = client;
-        }
+        _client = client;
     }
 
     public async Task<string> MakeApiRequestToAzureMaps(string postalCode)
@@ -48,15 +45,15 @@ public class AzureMapsAzureMapsApiService : IAzureMapsApiService
         return responseBody;
     }
 
-    public PostcodeApiResponseModel TurnResponseBodyToModel(string responseBody)
+    public AzureMapsResponseModel TurnResponseBodyToModel(string responseBody)
     {
         if (string.IsNullOrEmpty(responseBody))
         {
-            return new PostcodeApiResponseModel();
+            return new AzureMapsResponseModel();
         }
 
         var postcodeResponse =
-            JsonConvert.DeserializeObject<PostcodeApiResponseModel>(responseBody);
+            JsonConvert.DeserializeObject<AzureMapsResponseModel>(responseBody);
         return postcodeResponse!;
     }
 
@@ -77,12 +74,30 @@ public class AzureMapsAzureMapsApiService : IAzureMapsApiService
         var postcodeResponse = TurnResponseBodyToModel(responseBody);
         if (postcodeResponse.ListOfResults == null || postcodeResponse.ListOfResults.Count < 1)
         {
+            var address = new AddressModel()
+            {
+                Postcode = model.Address.Postcode,
+                AddressLine1 = model.Address.AddressLine1
+            };
+            model = new PropertyViewModel()
+            {
+                Address = address
+            };
             return model;
         }
 
         var results = postcodeResponse.ListOfResults[0];
         if (results.Address == null)
         {
+            var address = new AddressModel()
+            {
+                Postcode = model.Address.Postcode,
+                AddressLine1 = model.Address.AddressLine1
+            };
+            model = new PropertyViewModel()
+            {
+                Address = address
+            };
             return model;
         }
 
@@ -90,22 +105,45 @@ public class AzureMapsAzureMapsApiService : IAzureMapsApiService
         {
             model.Address.AddressLine2 = results.Address["streetName"];
         }
+        else
+        {
+            model.Address.AddressLine2 = null;
+        }
+        
         if (results.Address.ContainsKey("municipality"))
         {
             model.Address.TownOrCity = results.Address["municipality"];
         }
+        else
+        {
+            model.Address.TownOrCity = null;
+        }
+        
         if (results.Address.ContainsKey("countrySecondarySubdivision"))
         {
             model.Address.County = results.Address["countrySecondarySubdivision"];
         }
+        else
+        {
+            model.Address.County = null;
+        }
+        
         if (results.LatLon != null && results.LatLon.ContainsKey("lat"))
         {
             model.Lat = results.LatLon["lat"];
+        }
+        else
+        {
+            model.Lat = null;
         }
 
         if (results.LatLon != null && results.LatLon.ContainsKey("lon"))
         {
             model.Lon = results.LatLon["lon"];
+        }
+        else
+        {
+            model.Lon = null;
         }
 
         return model;

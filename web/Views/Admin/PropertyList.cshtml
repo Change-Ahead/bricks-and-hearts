@@ -7,14 +7,25 @@
 <h2>All Properties List</h2>
 
 <div class="mb-3">
-    @using (Html.BeginForm("SortProperties", "Property", FormMethod.Get))
-    {
-        <select class="form-select" id="sortBy" name="sortBy">
-            <option value="Availability">Sort by availability</option>
-            <option value="Rent">Sort by rent</option>
-        </select>
-        <button type="submit" class="btn custom-btn-primary"> Display results </button>
-    }
+    <div class="row">
+        <div class="col-4">
+            @using (Html.BeginForm("SortProperties", "Property", FormMethod.Get))
+            {
+                <select class="form-select" id="sortBy" name="sortBy">
+                    <option value="Availability">Sort by availability</option>
+                    <option value="Rent">Sort by rent</option>
+                </select>
+                <button type="submit" class="btn custom-btn-primary"> Display results </button>
+            }
+        </div>
+        <div class="col-8">
+            @using (Html.BeginForm("SortPropertiesByLocation", "Property", FormMethod.Get))
+            {
+                <input class="form-control" id="postcode" name="postcode" required placeholder="Enter postcode to sort by location" pattern="([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"/>
+                <button type="submit" class="btn custom-btn-primary"> Sort </button>
+            }
+        </div>
+    </div>
 </div>
 
 <table class="table">

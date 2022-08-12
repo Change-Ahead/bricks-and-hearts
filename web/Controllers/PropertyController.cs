@@ -11,13 +11,12 @@ namespace BricksAndHearts.Controllers;
 [Route("/property")]
 public class PropertyController : AbstractController
 {
-    private readonly IAzureMapsApiService _azureMapsApiService;
-    private readonly IAzureStorage _azureStorage;
-    private readonly ILogger<PropertyController> _logger;
     private readonly IPropertyService _propertyService;
+    private readonly IAzureMapsApiService _azureMapsApiService;
+    private readonly ILogger<PropertyController> _logger;
+    private readonly IAzureStorage _azureStorage;
 
-    public PropertyController(IPropertyService propertyService, IAzureMapsApiService azureMapsApiService,
-        ILogger<PropertyController> logger, IAzureStorage azureStorage)
+    public PropertyController(IPropertyService propertyService, IAzureMapsApiService azureMapsApiService, ILogger<PropertyController> logger, IAzureStorage azureStorage, IPostcodeApiService postcodeApiService)
     {
         _propertyService = propertyService;
         _azureMapsApiService = azureMapsApiService;
@@ -479,4 +478,22 @@ public class PropertyController : AbstractController
     }
 
     #endregion
+
+    [Authorize(Roles = "Admin")]
+    [HttpGet("SortPropertiesByLocation")]
+    public async Task<IActionResult> SortPropertiesByLocation(string postcode, int page = 1, int propPerPage = 10)
+    {
+        var properties = await _propertyService.SortPropertiesByLocation(postcode, page, propPerPage);
+
+        if (properties == null)
+        {
+            FlashMessage(_logger,($"Failed to find postcode {postcode}","warning",$"Failed to sort property using postcode {postcode}: invalid postcode"));
+            return RedirectToAction("SortProperties", "Property", new { sortBy = "Availability" });
+        }
+
+        _logger.LogInformation("Successfully sorted by location");
+        var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).ToList();
+        
+        return View("~/Views/Admin/PropertyList.cshtml", new PropertiesDashboardViewModel(listOfProperties.Skip((page-1)*propPerPage).Take(propPerPage).ToList(),  listOfProperties.Count, null! , page, "Location"));
+    }
 }

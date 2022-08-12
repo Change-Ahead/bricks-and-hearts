@@ -46,7 +46,11 @@ public class TestDatabaseFixture
                     CreateCompleteProperty(1),
                     CreateCompleteProperty(1),
                     CreateCompleteProperty(2),
-                    CreateIncompleteProperty(2)
+                    CreateIncompleteProperty(2),
+                    CreateBrightonProperty(3),
+                    CreateLondonProperty(3),
+                    CreatePeterboroughProperty(3),
+                    CreateLeedsProperty(3)
                 );
                 context.Properties.AddRange(
                     CreateCompleteProperty(),
@@ -374,6 +378,66 @@ public class TestDatabaseFixture
             Postcode = "CB1 1DX",
             IsIncomplete = true
         };
+    }
+
+    private PropertyDbModel CreateBrightonProperty(int landlordId)
+    {
+        return new PropertyDbModel
+        {
+            LandlordId = landlordId,
+            AddressLine1 = "Brighton Property",
+            County = "East Sussex",
+            TownOrCity = "Brighton",
+            Postcode = "BN1 1AJ",
+            IsIncomplete = true,
+            Lat = (decimal?)50.821451,
+            Lon = (decimal?)-0.14256,
+        }; 
+    }
+    
+    private PropertyDbModel CreateLondonProperty(int landlordId)
+    {
+        return new PropertyDbModel
+        {
+            LandlordId = landlordId,
+            AddressLine1 = "London Property",
+            County = "Greater London",
+            TownOrCity = "London",
+            Postcode = "SE1 9BG",
+            IsIncomplete = true,
+            Lat = (decimal?)51.506543,
+            Lon = (decimal?)-0.087584
+        }; 
+    }
+    
+    private PropertyDbModel CreatePeterboroughProperty(int landlordId)
+    {
+        return new PropertyDbModel
+        {
+            LandlordId = landlordId,
+            AddressLine1 = "Peterborough Property",
+            County = "Cambridgeshire",
+            TownOrCity = "Peterborough",
+            Postcode = "PE1 1BF",
+            IsIncomplete = true,
+            Lat = (decimal?)52.571459,
+            Lon = (decimal?)-0.242008,
+        }; 
+    }
+    
+    private PropertyDbModel CreateLeedsProperty(int landlordId)
+    {
+        return new PropertyDbModel
+        {
+            LandlordId = landlordId,
+            AddressLine1 = "Leeds Property",
+            County = "West Yorkshire",
+            TownOrCity = "Leeds",
+            Postcode = "LS1 1AZ",
+            IsIncomplete = true,
+            Lat = (decimal?)53.796296,
+            Lon = (decimal?)-1.564095,
+        }; 
     }
 
     private TenantDbModel CreateTenant()
