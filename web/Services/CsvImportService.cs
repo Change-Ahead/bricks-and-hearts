@@ -1,4 +1,5 @@
 ﻿using System.Data;
+using System.Text.RegularExpressions;
 using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
 using LINQtoCSV;
@@ -100,7 +101,17 @@ public class CsvImportService : ICsvImportService
                     dbTenant.Name = tenant.Name;
                     dbTenant.Email = tenant.Email;
                     dbTenant.Phone = tenant.Phone;
-                    dbTenant.Postcode = tenant.Postcode;
+                    
+                    if (tenant.Postcode is null || Regex.IsMatch(tenant.Postcode, @"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"))
+                    {
+                        dbTenant.Postcode = tenant.Postcode;
+                    }
+                    else
+                    {
+                        flashTypes.Add("danger");
+                        flashMessages.Add(InvalidInputMessage(tenant.Name, "Postcode", tenant.Postcode!));
+                    }
+                    
                     dbTenant.Type = tenant.Type;
 
                     if (Boolean.TryParse(tenant.HasPet, out bool boolHasPet)|| tenant.HasPet is null)
@@ -165,7 +176,7 @@ public class CsvImportService : ICsvImportService
     private string InvalidInputMessage(string tenantName, string propName, string propValue)
     {
         _logger.LogWarning($"Invalid input for {propName} in record for {tenantName}.");
-        return $"Invalid input in record for tenant {tenantName}: '{propName}' cannot be '{propValue}' as this is the wrong data type.";
+        return $"Invalid input in record for tenant {tenantName}: '{propName}' cannot be '{propValue}' as this is the wrong data type. This input has been ignored.";
 
     }
 }
