@@ -271,10 +271,6 @@ input.invalid {
     display: none;
 }
 
-.bi {
-    cursor: pointer;
-}
-
 .pill-radio, .pill-check {
     border-radius: 0.75rem !important;
     height: 44px;
@@ -429,4 +425,24 @@ th {
 
 .modal-overlay {
     filter: brightness(50%);
+}
+
+.status-pill-live {
+    background-color: limegreen;
+    color: white;
+}
+
+.status-pill-draft {
+    background-color: gold;
+    color: black;
+}
+
+.status-pill-occupied {
+    background-color: var(--red);
+    color: white;
+}
+
+.status-pill-unavailable {
+    background-color: grey;
+    color: black;
 }
