@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using BricksAndHearts.Database;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace BricksAndHearts.ViewModels;
 
@@ -34,7 +35,9 @@ public class PublicPropertyViewModel
 
 
     // Tenant profile
-    public HousingRequirementModel LandlordRequirements { get; set; } = new();
+    // checks for this are done manually in the override
+    [ValidateNever]
+    public HousingRequirementModel? LandlordRequirements { get; set; } = new();
     
     // Rent, deposits, and duration
     [Range(0, 100000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
@@ -67,8 +70,10 @@ public class PublicPropertyViewModel
                 AcceptsCouple = property.AcceptsCouple,
                 AcceptsFamily = property.AcceptsFamily,
                 AcceptsPets = property.AcceptsPets,
+                AcceptsCredit = property.AcceptsCredit,
                 AcceptsBenefits = property.AcceptsBenefits,
                 AcceptsNotEET = property.AcceptsNotEET,
+                AcceptsOver35 = property.AcceptsOver35,
                 AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor
             }
         };
