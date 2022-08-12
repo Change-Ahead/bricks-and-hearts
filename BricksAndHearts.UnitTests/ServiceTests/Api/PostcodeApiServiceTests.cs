@@ -13,19 +13,19 @@ namespace BricksAndHearts.UnitTests.ServiceTests.Api;
 
 public class PostcodeApiServiceTests : IClassFixture<TestDatabaseFixture>
 {
-    private ILogger<PostcodeApiService> _logger;
+    private ILogger<PostcodeService> _logger;
     private HttpMessageHandler _messageHandler;
     private HttpClient _httpClient;
-    private PostcodeApiService _underTest;
+    private PostcodeService _underTest;
     private TestDatabaseFixture _fixture { get; }
 
     public PostcodeApiServiceTests(TestDatabaseFixture fixture)
     {
-        _logger = A.Fake<ILogger<PostcodeApiService>>();
+        _logger = A.Fake<ILogger<PostcodeService>>();
         _messageHandler = A.Fake<HttpMessageHandler>();
         _httpClient = new HttpClient(_messageHandler);
         _fixture = fixture;
-        _underTest = new PostcodeApiService(_logger, null!, _httpClient);
+        _underTest = new PostcodeService(_logger, null!, _httpClient);
     }
 
     [Fact]

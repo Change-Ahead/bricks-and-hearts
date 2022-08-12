@@ -10,6 +10,8 @@ public class PostcodeioResponseModel
 
 public class PostcodeResult
 {
+    [JsonProperty("postcode")] 
+    public string? Postcode { get; set; }
     [JsonProperty("latitude")] 
     public decimal? Lat { get; set; }
     [JsonProperty("longitude")] 

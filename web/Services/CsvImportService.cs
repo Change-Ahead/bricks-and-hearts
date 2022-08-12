@@ -11,18 +11,19 @@ public interface ICsvImportService
 {
     public (List<string> FlashTypes, List<string> FlashMessages) CheckIfImportWorks(IFormFile csvFile);
     public Task<(List<string> FlashTypes, List<string> FlashMessages)> ImportTenants(IFormFile csvFile);
+    public (List<string> FlashTypes, List<string> FlashMessages) AddLatLonToTenantDb();
 }
 
 public class CsvImportService : ICsvImportService
 {
     private readonly BricksAndHeartsDbContext _dbContext;
-    private readonly IPostcodeApiService _postcodeApiService;
+    private readonly IPostcodeService _postcodeService;
     private readonly ILogger<CsvImportService> _logger;
 
-    public CsvImportService(BricksAndHeartsDbContext dbContext, IPostcodeApiService postcodeApiService, ILogger<CsvImportService> logger)
+    public CsvImportService(BricksAndHeartsDbContext dbContext, IPostcodeService postcodeService, ILogger<CsvImportService> logger)
     {
         _logger = logger;
-        _postcodeApiService = postcodeApiService;
+        _postcodeService = postcodeService;
         _dbContext = dbContext;
     }
 
@@ -76,11 +77,12 @@ public class CsvImportService : ICsvImportService
         };
         var csvContext = new CsvContext();
         var streamReader = new StreamReader(csvFile.OpenReadStream());
-        IEnumerable<TenantUploadModel> tenantUploadList = csvContext.Read<TenantUploadModel>(streamReader, csvFileDescription);
-        
+        IEnumerable<TenantUploadModel> tenantUploadList =
+            csvContext.Read<TenantUploadModel>(streamReader, csvFileDescription);
+
         List<string> flashTypes = new(),
-            flashMessages = new();
-        List<string> postcodes = new List<string>();
+            flashMessages = new(),
+            postcodes = new();
         await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
         {
             foreach (var tenant in _dbContext.Tenants)
@@ -92,115 +94,112 @@ public class CsvImportService : ICsvImportService
             foreach (TenantUploadModel tenant in tenantUploadList)
             {
                 lineNo += 1;
-                if (tenant.Name == null)
+                var addTenantResponse = AddTenantToDb(tenant, lineNo);
+                flashTypes.AddRange(addTenantResponse.flashTypes);
+                flashMessages.AddRange(addTenantResponse.flashMessages);
+                if (addTenantResponse.postcode != "")
                 {
-                    _logger.LogWarning($"Name is missing from record {tenant.Email}.");
-                    flashTypes.Add("danger");
-                    flashMessages.Add($"Name is missing from record on line {lineNo} (email address provided is {tenant.Email}). This record has not been added to the database. Please add a name to this tenant in order to import their information.");
+                    postcodes.Add(addTenantResponse.postcode);
                 }
-                else
-                {
-                    TenantDbModel dbTenant = new TenantDbModel();
-                    dbTenant.Name = tenant.Name;
-                    dbTenant.Email = tenant.Email;
-                    dbTenant.Phone = tenant.Phone;
-
-                    if (tenant.Postcode is not null)
-                    {
-                        if (Regex.IsMatch(tenant.Postcode, @"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"))
-                        {
-                            tenant.Postcode =
-                                Regex.Replace(tenant.Postcode, @"^(\S+?)\s*?(\d\w\w)$", "$1 $2");
-                            tenant.Postcode = tenant.Postcode.ToUpper();
-                            dbTenant.Postcode = tenant.Postcode;
-                            postcodes.Add(tenant.Postcode);
-                        }
-                        else
-                        {
-                            flashTypes.Add("danger");
-                            flashMessages.Add(InvalidInputMessage(tenant.Name, "Postcode", tenant.Postcode!));
-                        }
-                    }
-
-                    dbTenant.Type = tenant.Type;
-
-                    if (Boolean.TryParse(tenant.HasPet, out bool boolHasPet)|| tenant.HasPet is null)
-                    {
-                        dbTenant.HasPet = boolHasPet;
-                    }
-                    else
-                    {
-                        flashTypes.Add("danger");
-                        flashMessages.Add(InvalidInputMessage(tenant.Name, "HasPet", tenant.HasPet));
-                    }
-                    
-                    if (Boolean.TryParse(tenant.ETT, out bool boolETT)|| tenant.ETT is null)
-                    {
-                        dbTenant.ETT = boolETT;
-                    }
-                    else
-                    {
-                        flashTypes.Add("danger");
-                        flashMessages.Add(InvalidInputMessage(tenant.Name, "ETT", tenant.ETT));
-                    }
-                    
-                    if (Boolean.TryParse(tenant.UniversalCredit, out bool boolUniversalCredit)|| tenant.UniversalCredit is null)
-                    {
-                        dbTenant.UniversalCredit = boolUniversalCredit;
-                    }
-                    else
-                    {
-                        flashTypes.Add("danger");
-                        flashMessages.Add(InvalidInputMessage(tenant.Name, "UniversalCredit", tenant.UniversalCredit));
-                    }
-                    
-                    if (Boolean.TryParse(tenant.HousingBenefits, out bool boolHousingBenefits)|| tenant.HousingBenefits is null)
-                    {
-                        dbTenant.HousingBenefits = boolHousingBenefits;
-                    }
-                    else
-                    {
-                        flashTypes.Add("danger");
-                        flashMessages.Add(InvalidInputMessage(tenant.Name, "HousingBenefits", tenant.HousingBenefits));
-                    }
-                    
-                    if (Boolean.TryParse(tenant.Over35, out bool boolOver35)|| tenant.Over35 is null)
-                    {
-                        dbTenant.Over35 = boolOver35;
-                    }
-                    else
-                    {
-                        flashTypes.Add("danger");
-                        flashMessages.Add(InvalidInputMessage(tenant.Name, "Over35", tenant.Over35));
-                    }
-
-                    _dbContext.Tenants.Add(dbTenant);
-                }
-                _dbContext.SaveChanges();
             }
+
             await transaction.CommitAsync();
-            
-            await GetLatLongForNewPostcodes(postcodes);
-            var tenantsWithPostcodesToConvert =
-                _dbContext.Tenants.Where(t => t.Postcode != null && t.Lat == null && t.Lon == null).ToList();
-            foreach (var tenant in tenantsWithPostcodesToConvert)
+        }
+
+        await _postcodeService.BulkAddPostcodesToDatabaseIfAbsent(postcodes);
+        return (flashTypes, flashMessages);
+    }
+    
+    private (List<string> flashTypes, List<string> flashMessages, string postcode) AddTenantToDb(TenantUploadModel tenant, int lineNo)
+    {
+        List<string> flashTypes = new(), flashMessages = new();
+        string postcode = "";
+        if (tenant.Name == null)
+        {
+            _logger.LogWarning($"Name is missing from record {tenant.Email}.");
+            flashTypes.Add("danger");
+            flashMessages.Add($"Name is missing from record on line {lineNo} (email address provided is {tenant.Email}). This record has not been added to the database. Please add a name to this tenant in order to import their information.");
+        }
+        else
+        {
+            TenantDbModel dbTenant = new TenantDbModel();
+            dbTenant.Name = tenant.Name;
+            dbTenant.Email = tenant.Email;
+            dbTenant.Phone = tenant.Phone;
+
+            if (tenant.Postcode is not null)
             {
-                var postcodeConversion = _dbContext.Postcodes.FirstOrDefault(p => p.Postcode == tenant.Postcode);
-                if (postcodeConversion == null||postcodeConversion.Lat == null||postcodeConversion.Lon == null)
+                postcode = _postcodeService.FormatPostcode(tenant.Postcode);
+                if (postcode != "")
                 {
-                    _logger.LogWarning($"Postcode {tenant.Postcode} is absent from Postcode table");
-                    flashTypes.Add("danger");
-                    flashMessages.Add($"Postcode {tenant.Postcode} cannot be converted to coordinates. This will affect the inclusion of tenant {tenant.Name} in the matching process.");
+                    dbTenant.Postcode = postcode;
                 }
                 else
                 {
-                    tenant.Lat = postcodeConversion.Lat;
-                    tenant.Lon = postcodeConversion.Lon;
-                    _dbContext.SaveChanges();
+                    flashTypes.Add("danger");
+                    flashMessages.Add(InvalidInputMessage(tenant.Name, "Postcode", tenant.Postcode!));
                 }
             }
+
+            dbTenant.Type = tenant.Type;
+
+            if (Boolean.TryParse(tenant.HasPet, out bool boolHasPet) || tenant.HasPet is null)
+            {
+                dbTenant.HasPet = boolHasPet;
+            }
+            else
+            {
+                flashTypes.Add("danger");
+                flashMessages.Add(InvalidInputMessage(tenant.Name, "HasPet", tenant.HasPet));
+            }
+
+            if (Boolean.TryParse(tenant.ETT, out bool boolETT) || tenant.ETT is null)
+            {
+                dbTenant.ETT = boolETT;
+            }
+            else
+            {
+                flashTypes.Add("danger");
+                flashMessages.Add(InvalidInputMessage(tenant.Name, "ETT", tenant.ETT));
+            }
+
+            if (Boolean.TryParse(tenant.UniversalCredit, out bool boolUniversalCredit) ||
+                tenant.UniversalCredit is null)
+            {
+                dbTenant.UniversalCredit = boolUniversalCredit;
+            }
+            else
+            {
+                flashTypes.Add("danger");
+                flashMessages.Add(InvalidInputMessage(tenant.Name, "UniversalCredit", tenant.UniversalCredit));
+            }
+
+            if (Boolean.TryParse(tenant.HousingBenefits, out bool boolHousingBenefits) ||
+                tenant.HousingBenefits is null)
+            {
+                dbTenant.HousingBenefits = boolHousingBenefits;
+            }
+            else
+            {
+                flashTypes.Add("danger");
+                flashMessages.Add(InvalidInputMessage(tenant.Name, "HousingBenefits", tenant.HousingBenefits));
+            }
+
+            if (Boolean.TryParse(tenant.Over35, out bool boolOver35) || tenant.Over35 is null)
+            {
+                dbTenant.Over35 = boolOver35;
+            }
+            else
+            {
+                flashTypes.Add("danger");
+                flashMessages.Add(InvalidInputMessage(tenant.Name, "Over35", tenant.Over35));
+            }
+
+            _dbContext.Tenants.Add(dbTenant);
         }
-        return (flashTypes, flashMessages);
+        
+        _dbContext.SaveChanges();
+        return (flashTypes, flashMessages, postcode);
     }
 
     private string InvalidInputMessage(string tenantName, string propName, string propValue)
@@ -209,31 +208,29 @@ public class CsvImportService : ICsvImportService
         return $"Invalid input in record for tenant {tenantName}: '{propName}' cannot be '{propValue}' as this is the wrong data type. This input has been ignored.";
 
     }
-
-    private async Task GetLatLongForNewPostcodes(List<string> postcodes)
+    
+    public (List<string> FlashTypes, List<string> FlashMessages) AddLatLonToTenantDb()
     {
-        foreach (string postcode in postcodes)
+        List<string> flashTypes = new(), flashMessages = new();
+        var tenantsWithPostcodesToConvert =
+            _dbContext.Tenants.Where(t => t.Postcode != null && t.Lat == null && t.Lon == null).ToList();
+        
+        foreach (var tenant in tenantsWithPostcodesToConvert)
         {
-            if (!_dbContext.Postcodes.Any(p => p.Postcode == postcode))
+            var postcodeDbModel = _dbContext.Postcodes.FirstOrDefault(p => p.Postcode == tenant.Postcode);
+            if (postcodeDbModel == null || postcodeDbModel.Lat == null || postcodeDbModel.Lon == null)
             {
-                var responseBody = await _postcodeApiService.MakeApiRequestToPostcodeApi(postcode);
-                var postcodeResponse = _postcodeApiService.TurnResponseBodyToModel(responseBody);
-                if (postcodeResponse.Result == null || postcodeResponse.Result.Lat == null || postcodeResponse.Result.Lon == null)
-                {
-                    _logger.LogWarning($"Postcode {postcode} cannot be converted to coordinates.");
-                }
-                else
-                {
-                    var postcodeConversion = new PostcodeDbModel()
-                    {
-                        Postcode = postcode,
-                        Lat = postcodeResponse.Result.Lat,
-                        Lon = postcodeResponse.Result.Lon,
-                    };
-                    _dbContext.Postcodes.Add(postcodeConversion);
-                    _dbContext.SaveChanges();
-                }
+                _logger.LogWarning($"Postcode {tenant.Postcode} is absent from Postcode table");
+                flashTypes.Add("danger");
+                flashMessages.Add($"Postcode {tenant.Postcode} cannot be converted to coordinates. This will affect the inclusion of tenant {tenant.Name} in the matching process.");
+            }
+            else
+            {
+                tenant.Lat = postcodeDbModel.Lat;
+                tenant.Lon = postcodeDbModel.Lon;
+                _dbContext.SaveChanges();
             }
         }
+        return (flashTypes, flashMessages);
     }
 }

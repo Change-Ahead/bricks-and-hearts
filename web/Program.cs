@@ -41,7 +41,7 @@ builder.Services.AddScoped<ICsvImportService, CsvImportService>();
 builder.Services.AddScoped<IMailService, MailService>();
 builder.Services.AddScoped<IAzureMapsApiService, AzureMapsApiService>();
 builder.Services.AddScoped<IAzureStorage, AzureStorage>();
-builder.Services.AddScoped<IPostcodeApiService, PostcodeApiService>();
+builder.Services.AddScoped<IPostcodeService, PostcodeService>();
 builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddOptions<AzureMapsOptions>()
     .Bind(builder.Configuration.GetSection(AzureMapsOptions.AzureMaps));

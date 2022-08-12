@@ -277,17 +277,24 @@ public class AdminController : AbstractController
             return RedirectToAction(nameof(TenantList));
         }
         
-        var furtherFlashResponse = await _csvImportService.ImportTenants(csvFile);
-        for (int i = 0; i < furtherFlashResponse.FlashMessages.Count(); i++)
+        flashResponse = await _csvImportService.ImportTenants(csvFile);
+        for (int i = 0; i < flashResponse.FlashMessages.Count(); i++)
         {
-            AddFlashMessage(furtherFlashResponse.FlashTypes[i],  furtherFlashResponse.FlashMessages[i]);
+            AddFlashMessage(flashResponse.FlashTypes[i],  flashResponse.FlashMessages[i]);
         }
         
-        if (furtherFlashResponse.FlashMessages.Count() == 0)
+        if (flashResponse.FlashMessages.Count() == 0)
         {
             _logger.LogInformation("Successfuly imported all tenant data.");
             AddFlashMessage("success", "Successfully imported all tenant data.");
         }
+        
+        flashResponse =  _csvImportService.AddLatLonToTenantDb();
+        for (int i = 0; i < flashResponse.FlashMessages.Count(); i++)
+        {
+            AddFlashMessage(flashResponse.FlashTypes[i],  flashResponse.FlashMessages[i]);
+        }
+        
         return RedirectToAction(nameof(TenantList));
     }
 }
