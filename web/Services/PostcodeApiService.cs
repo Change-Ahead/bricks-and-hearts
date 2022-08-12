@@ -1,5 +1,4 @@
-﻿using BricksAndHearts.Database;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace BricksAndHearts.Services;
 
@@ -14,12 +13,10 @@ public class PostcodeApiService : IPostcodeApiService
 {
     private readonly HttpClient _client;
     private readonly ILogger<PostcodeApiService> _logger;
-    private readonly BricksAndHeartsDbContext _dbContext;
 
-    public PostcodeApiService(ILogger<PostcodeApiService> logger, BricksAndHeartsDbContext dbContext, HttpClient client)
+    public PostcodeApiService(ILogger<PostcodeApiService> logger, HttpClient client)
     {
         _logger = logger;
-        _dbContext = dbContext;
         _client = client;
     }
 

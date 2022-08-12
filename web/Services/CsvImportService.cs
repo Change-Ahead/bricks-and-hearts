@@ -16,11 +16,13 @@ public interface ICsvImportService
 public class CsvImportService : ICsvImportService
 {
     private readonly BricksAndHeartsDbContext _dbContext;
+    private readonly IPostcodeApiService _postcodeApiService;
     private readonly ILogger<CsvImportService> _logger;
 
-    public CsvImportService(BricksAndHeartsDbContext dbContext, ILogger<CsvImportService> logger)
+    public CsvImportService(BricksAndHeartsDbContext dbContext, IPostcodeApiService postcodeApiService, ILogger<CsvImportService> logger)
     {
         _logger = logger;
+        _postcodeApiService = postcodeApiService;
         _dbContext = dbContext;
     }
 
@@ -78,6 +80,7 @@ public class CsvImportService : ICsvImportService
         
         List<string> flashTypes = new(),
             flashMessages = new();
+        List<string> postcodes = new List<string>();
         await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
         {
             foreach (var tenant in _dbContext.Tenants)
@@ -101,17 +104,24 @@ public class CsvImportService : ICsvImportService
                     dbTenant.Name = tenant.Name;
                     dbTenant.Email = tenant.Email;
                     dbTenant.Phone = tenant.Phone;
-                    
-                    if (tenant.Postcode is null || Regex.IsMatch(tenant.Postcode, @"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"))
+
+                    if (tenant.Postcode is not null)
                     {
-                        dbTenant.Postcode = tenant.Postcode;
+                        if (Regex.IsMatch(tenant.Postcode, @"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"))
+                        {
+                            tenant.Postcode =
+                                Regex.Replace(tenant.Postcode, @"^(\S+?)\s*?(\d\w\w)$", "$1 $2");
+                            tenant.Postcode = tenant.Postcode.ToUpper();
+                            dbTenant.Postcode = tenant.Postcode;
+                            postcodes.Add(tenant.Postcode);
+                        }
+                        else
+                        {
+                            flashTypes.Add("danger");
+                            flashMessages.Add(InvalidInputMessage(tenant.Name, "Postcode", tenant.Postcode!));
+                        }
                     }
-                    else
-                    {
-                        flashTypes.Add("danger");
-                        flashMessages.Add(InvalidInputMessage(tenant.Name, "Postcode", tenant.Postcode!));
-                    }
-                    
+
                     dbTenant.Type = tenant.Type;
 
                     if (Boolean.TryParse(tenant.HasPet, out bool boolHasPet)|| tenant.HasPet is null)
@@ -169,6 +179,26 @@ public class CsvImportService : ICsvImportService
                 _dbContext.SaveChanges();
             }
             await transaction.CommitAsync();
+            
+            await GetLatLongForNewPostcodes(postcodes);
+            var tenantsWithPostcodesToConvert =
+                _dbContext.Tenants.Where(t => t.Postcode != null && t.Lat == null && t.Lon == null).ToList();
+            foreach (var tenant in tenantsWithPostcodesToConvert)
+            {
+                var postcodeConversion = _dbContext.Postcodes.FirstOrDefault(p => p.Postcode == tenant.Postcode);
+                if (postcodeConversion == null||postcodeConversion.Lat == null||postcodeConversion.Lon == null)
+                {
+                    _logger.LogWarning($"Postcode {tenant.Postcode} is absent from Postcode table");
+                    flashTypes.Add("danger");
+                    flashMessages.Add($"Postcode {tenant.Postcode} cannot be converted to coordinates. This will affect the inclusion of tenant {tenant.Name} in the matching process.");
+                }
+                else
+                {
+                    tenant.Lat = postcodeConversion.Lat;
+                    tenant.Lon = postcodeConversion.Lon;
+                    _dbContext.SaveChanges();
+                }
+            }
         }
         return (flashTypes, flashMessages);
     }
@@ -178,5 +208,32 @@ public class CsvImportService : ICsvImportService
         _logger.LogWarning($"Invalid input for {propName} in record for {tenantName}.");
         return $"Invalid input in record for tenant {tenantName}: '{propName}' cannot be '{propValue}' as this is the wrong data type. This input has been ignored.";
 
+    }
+
+    private async Task GetLatLongForNewPostcodes(List<string> postcodes)
+    {
+        foreach (string postcode in postcodes)
+        {
+            if (!_dbContext.Postcodes.Any(p => p.Postcode == postcode))
+            {
+                var responseBody = await _postcodeApiService.MakeApiRequestToPostcodeApi(postcode);
+                var postcodeResponse = _postcodeApiService.TurnResponseBodyToModel(responseBody);
+                if (postcodeResponse.Result == null || postcodeResponse.Result.Lat == null || postcodeResponse.Result.Lon == null)
+                {
+                    _logger.LogWarning($"Postcode {postcode} cannot be converted to coordinates.");
+                }
+                else
+                {
+                    var postcodeConversion = new PostcodeDbModel()
+                    {
+                        Postcode = postcode,
+                        Lat = postcodeResponse.Result.Lat,
+                        Lon = postcodeResponse.Result.Lon,
+                    };
+                    _dbContext.Postcodes.Add(postcodeConversion);
+                    _dbContext.SaveChanges();
+                }
+            }
+        }
     }
 }
