@@ -3,14 +3,19 @@ imageCarousel.addEventListener('slide.bs.carousel', function (e) {
     setValue("deleteFileName", $("#carouselImage" + e.to).attr('alt'));
 });
 
-const deleteModal = document.getElementById('deleteModal');
+const deleteImageModal = document.getElementById('deleteImageModal');
 
-deleteModal.addEventListener('show.bs.modal', function () {
+deleteImageModal.addEventListener('show.bs.modal', function () {
     const imageModal = document.getElementById('imageModal');
     imageModal.classList.toggle("modal-overlay");
 });
 
-deleteModal.addEventListener('hide.bs.modal', function () {
+deleteImageModal.addEventListener('hide.bs.modal', function () {
     const imageModal = document.getElementById('imageModal');
     imageModal.classList.toggle("modal-overlay");
-})
+});
+
+function hidePlaceholder(imageId) {
+    $(imageId + "Placeholder").hide();
+    $(imageId).show();
+}

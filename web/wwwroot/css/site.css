@@ -392,17 +392,6 @@ th {
     }
 }
 
-.property-img-placeholder {
-    height: 100%;
-    border-radius: 0.5rem;
-    background-color: var(--paleBlue);
-}
-
-.property-img-placeholder .bi {
-    font-size: 5rem;
-    color: var(--blue);
-}
-
 .property-img-overlay {
     position: relative;
 }
@@ -444,5 +433,46 @@ th {
 
 .status-pill-unavailable {
     background-color: grey;
+    color: white;
+}
+
+.custom-card {
+    border-color: var(--paleBlue);
+    border-width: 2px;
+    border-radius: 1rem;
+}
+
+.mw-60 {
+    max-width: 60%;
+}
+
+.property-description {
+    white-space: pre-line;
+}
+
+#descriptionCollapse.collapse:not(.show) {
+    display: block;
+    height: 3rem;
+    overflow: hidden;
+}
+
+#descriptionCollapse.collapsing {
+    height: 3rem;
+}
+
+#descriptionCollapse + a.collapsed::after {
+    content: "Read more";
+}
+
+#descriptionCollapse + a:not(.collapsed)::after {
+    content: "Read less";
+}
+
+.placeholder-glow {
+    background-color: white;
+}
+
+.placeholder {
     color: black;
+    border-radius: 0.5rem;
 }
