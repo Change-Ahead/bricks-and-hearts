@@ -41,6 +41,7 @@
         <th scope="col">Available From</th>
         <th scope="col">Landlord's profile</th>
         <th scope="col">Property information</th>
+        <th scope="col">Matches</th>
     </tr>
     </thead>
     <tbody>
@@ -79,6 +80,10 @@
                         </span>
                     }
                 </a>
+            </td>
+            <td>
+                @Html.ActionLink("View matches", "TenantMatchList", "Admin", new { currentPropertyId = property.PropertyId}, 
+                            new { @class = "btn btn-primary" })
             </td>
         </tr>
     }

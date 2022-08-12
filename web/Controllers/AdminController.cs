@@ -140,6 +140,20 @@ public class AdminController : AbstractController
         tenantListModel.TenantList = await _adminService.GetTenantList(tenantListModel.Filter);
         return View("TenantList", tenantListModel);
     }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    [Route("{currentPropertyId:int}/Matches")]
+    public async Task<IActionResult> TenantMatchList(int currentPropertyId)
+    {
+        var currentProperty = PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(currentPropertyId)!);
+        
+        var tenantMatchListModel = new TenantMatchListModel{
+            TenantList = await _adminService.GetNearestTenantsToProperty(currentProperty),
+            CurrentProperty = currentProperty
+        };
+        return View("TenantMatchList", tenantMatchListModel);
+    }
 
     [Authorize(Roles = "Admin")]
     [HttpPost]

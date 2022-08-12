@@ -22,11 +22,14 @@ public interface IAdminService
 
     public Task<List<TenantDbModel>> GetTenantList(HousingRequirementModel filter);
 
+    public Task<List<TenantDbModel>> GetNearestTenantsToProperty(PropertyViewModel currentProperty);
+    
     //Invite Links
     public UserDbModel? FindUserByLandlordId(int landlordId);
     public string? FindExistingInviteLink(int landlordId);
     public string CreateNewInviteLink(int landlordId);
     public void DeleteExistingInviteLink(int landlordId);
+
 }
 
 public class AdminService : IAdminService
@@ -136,7 +139,7 @@ public class AdminService : IAdminService
         return await landlordQuery.ToListAsync();
     }
 
-    public async Task<List<TenantDbModel>> GetTenantList(HousingRequirementModel filters)
+    private IQueryable<TenantDbModel> GetFilteredTenantQuery(HousingRequirementModel filters)
     {
         var tenantQuery = from tenants in _dbContext.Tenants select tenants;
         var currentFilterNo = -1;
@@ -171,7 +174,19 @@ public class AdminService : IAdminService
                 };
             }
         }
+        return tenantQuery;
+    }
+    
+    public async Task<List<TenantDbModel>> GetTenantList(HousingRequirementModel filters)
+    {
+        return await GetFilteredTenantQuery(filters).ToListAsync();
+    }
 
+    public async Task<List<TenantDbModel>> GetNearestTenantsToProperty(PropertyViewModel currentProperty)
+    {
+        var tenantQuery = GetFilteredTenantQuery(currentProperty.LandlordRequirements);
+        //TODO: Currently orders by name, needs to order by distance from property. This depends on BNH-142 and others!
+        tenantQuery = tenantQuery.OrderBy(t => t.Name).Take(5);
         return await tenantQuery.ToListAsync();
     }
 
