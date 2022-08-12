@@ -40,7 +40,33 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
 
         // Assert
         context.Users.Single(u => u.Id == nonAdminUser.Id).HasRequestedAdmin.Should().BeTrue();
+        context.Users.Single(u => u.Id == nonAdminUser.Id).IsAdmin.Should().BeFalse();
         context.Users.Single(u => u.Id == adminUser.Id).HasRequestedAdmin.Should().BeFalse();
+    }
+
+    [Fact]
+    public void RequestAdminAccess_FirstUserToRequestAdminAccess_Granted()
+    {
+        // Arrange
+        using var context = Fixture.CreateWriteContext();
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+
+        var nonAdminUser = context.Users.Single(u => u.GoogleUserName == "NonAdminUser");
+        context.Users.Where(u => u.IsAdmin).ToList().ForEach(u => u.IsAdmin = false);
+        context.SaveChanges();
+        context.ChangeTracker.Clear();
+
+        // Act
+        service.RequestAdminAccess(new BricksAndHeartsUser(nonAdminUser, null!, null!));
+
+        // Before assert we need to clear the context's change tracker so that the following database queries actually
+        // query the database, as if this were a new context. This should be done for all write tests.
+        context.ChangeTracker.Clear();
+
+        // Assert
+        nonAdminUser = context.Users.Single(u => u.Id == nonAdminUser.Id);
+        nonAdminUser.HasRequestedAdmin.Should().BeFalse();
+        nonAdminUser.IsAdmin.Should().BeTrue();
     }
 
     [Fact]
