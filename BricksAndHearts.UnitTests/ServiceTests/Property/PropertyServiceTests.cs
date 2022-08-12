@@ -470,13 +470,6 @@ public class PropertyServiceTests : PropertyServiceTestsBase
             context.Properties.Single(p => p.TownOrCity == "Brighton"),
         };
         var propertyDbModelList = result!.FindAll(p => p.LandlordId == 3);
-        propertyDbModelList.Should().NotBeNullOrEmpty();
-        propertyDbModelList.Should().HaveCount(4);
-        var i = 0;
-        while (i < 4)
-        {
-            propertyDbModelList[i].Should().BeEquivalentTo(correctList[i]);
-            i++;
-        }
+        propertyDbModelList.Should().BeEquivalentTo(correctList, options => options.WithStrictOrdering());
     }
 }
