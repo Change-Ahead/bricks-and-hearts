@@ -473,10 +473,10 @@ public class PropertyController : AbstractController
         }
 
         _logger.LogInformation("Successfully sorted by location");
-        var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).ToList();
+        var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).Skip((page - 1) * propPerPage)
+            .Take(propPerPage).ToList();
 
         return View("~/Views/Admin/PropertyList.cshtml",
-            new PropertiesDashboardViewModel(listOfProperties.Skip((page - 1) * propPerPage).Take(propPerPage).ToList(),
-                listOfProperties.Count, null!, page, "Location"));
+            new PropertiesDashboardViewModel(listOfProperties, listOfProperties.Count, null!, page, "Location"));
     }
 }
