@@ -120,7 +120,7 @@ public class PropertyController : AbstractController
             var baseUrl = HttpContext.Request.GetUri().Authority;
             _logger.LogInformation(flashMessageBody);
             AddFlashMessage("success",
-                    flashMessageBody + ": " + baseUrl + $"/public/propertyid/{propertyId}/{publicViewLink}");
+                flashMessageBody + ": " + baseUrl + $"/public/propertyid/{propertyId}/{publicViewLink}");
         }
 
         return RedirectToAction("ViewProperty", "Property", new { propertyId });
@@ -376,27 +376,6 @@ public class PropertyController : AbstractController
 
     #region Images
 
-    [Authorize(Roles = "Landlord, Admin")]
-    [HttpGet]
-    public async Task<IActionResult> ListPropertyImages(int propertyId)
-    {
-        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
-        {
-            return StatusCode(403);
-        }
-
-        var fileNames = await _azureStorage.ListFileNames("property", propertyId);
-        var imageFiles = GetFilesFromFileNames(fileNames, propertyId);
-
-        var imageList = new ImageListViewModel
-        {
-            PropertyId = propertyId,
-            FileList = imageFiles
-        };
-
-        return View(imageList);
-    }
-
     public List<ImageFileUrlModel> GetFilesFromFileNames(List<string> fileNames, int propertyId)
     {
         return fileNames.Select(fileName =>
@@ -415,14 +394,15 @@ public class PropertyController : AbstractController
         {
             return StatusCode(403);
         }
-        
+
         foreach (var image in images)
         {
             var isImageResult = _azureStorage.IsImage(image.FileName);
             if (!isImageResult.isImage)
             {
                 _logger.LogInformation($"Failed to upload {image.FileName}: not in a recognised image format");
-                AddFlashMessage("danger", $"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: {isImageResult.imageExtString}");               
+                AddFlashMessage("danger",
+                    $"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: {isImageResult.imageExtString}");
             }
             else
             {
@@ -439,7 +419,7 @@ public class PropertyController : AbstractController
                 }
             }
         }
-        
+
         return RedirectToAction("ViewProperty", "Property", new { propertyId });
     }
 
@@ -488,7 +468,7 @@ public class PropertyController : AbstractController
         if (properties == null)
         {
             _logger.LogWarning($"Failed to find postcode {postcode}");
-            AddFlashMessage("warning",$"Failed to sort property using postcode {postcode}: invalid postcode");
+            AddFlashMessage("warning", $"Failed to sort property using postcode {postcode}: invalid postcode");
             return RedirectToAction("SortProperties", "Property", new { sortBy = "Availability" });
         }
 
