@@ -308,7 +308,16 @@ public class TestDatabaseFixture
             Phone = "01189998819991197253",
             LandlordType = "Non profit",
             CharterApproved = true,
-            InviteLink = "InvitimusLinkimus"
+            InviteLink = "InvitimusLinkimus",
+            Address = new AddressModel
+            {
+                AddressLine1 = "adr1",
+                AddressLine2 = "adr2",
+                AddressLine3 = "adr3",
+                TownOrCity = "city",
+                County = "county",
+                Postcode = "cb2 1la"
+            }
         };
     }
     
@@ -325,7 +334,16 @@ public class TestDatabaseFixture
             LandlordType = "Non profit",
             CharterApproved = true,
             MembershipId = $"Member-{memberId}",
-            InviteLink = "InvitimusLinkimus"
+            InviteLink = "InvitimusLinkimus",
+            Address = new AddressModel
+            {
+                AddressLine1 = "adr1",
+                AddressLine2 = "adr2",
+                AddressLine3 = "adr3",
+                TownOrCity = "city",
+                County = "county",
+                Postcode = "cb2 1la"
+            }
         };
     }
 
