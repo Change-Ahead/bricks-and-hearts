@@ -147,7 +147,6 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
-        using var context = Fixture.CreateReadContext();
         var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
 
         // Act
