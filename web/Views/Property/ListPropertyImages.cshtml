@@ -4,20 +4,6 @@
     ViewData["Title"] = "Image List";
 }
 
-@{
-    if (TempData["MultipleFlashMessages"] != null)
-    {
-        var flashMessages = TempData["MultipleFlashMessages"] as string[];
-        var flashTypes = TempData["MultipleFlashTypes"] as string[];
-        for (var i = 0; i < flashMessages!.Length; i++)
-        {
-            <div class="alert alert-@flashTypes![i]" role="alert">
-                @flashMessages[i]
-            </div>
-        }
-    }
-}
-
 <h2>Images available for property @Model.PropertyId</h2>
 
 @foreach (var file in Model.FileList!)

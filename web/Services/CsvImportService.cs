@@ -9,7 +9,7 @@ namespace BricksAndHearts.Services;
 public interface ICsvImportService
 {
     public (List<string> FlashTypes, List<string> FlashMessages) CheckIfImportWorks(IFormFile csvFile);
-    public Task<(List<string> FlashTypes, List<string> FlashMessages)> ImportTenants(IFormFile csvFile, (List<string> flashTypes, List<string> flashMessages) flashResponse);
+    public Task<(List<string> FlashTypes, List<string> FlashMessages)> ImportTenants(IFormFile csvFile);
 }
 
 public class CsvImportService : ICsvImportService
@@ -63,7 +63,7 @@ public class CsvImportService : ICsvImportService
         return (flashTypes, flashMessages);
     }
 
-    public async Task<(List<string> FlashTypes, List<string> FlashMessages)> ImportTenants(IFormFile csvFile, (List<string> flashTypes, List<string> flashMessages) flashResponse)
+    public async Task<(List<string> FlashTypes, List<string> FlashMessages)> ImportTenants(IFormFile csvFile)
     {
         CsvFileDescription csvFileDescription = new CsvFileDescription
         {
@@ -75,7 +75,8 @@ public class CsvImportService : ICsvImportService
         StreamReader streamReader = new StreamReader(csvFile.OpenReadStream());
         IEnumerable<TenantUploadModel> list = csvContext.Read<TenantUploadModel>(streamReader, csvFileDescription);
         
-        List<string> flashTypes = flashResponse.flashTypes, flashMessages = flashResponse.flashMessages;
+        List<string> flashTypes = new(),
+            flashMessages = new();
         await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
         {
             foreach (var tenant in _dbContext.Tenants)

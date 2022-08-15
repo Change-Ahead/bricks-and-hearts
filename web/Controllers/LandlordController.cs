@@ -101,7 +101,7 @@ public class LandlordController : AbstractController
 
             case ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord:
                 _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
-                TempData["FlashMessage"] = "Already registered!"; // This will be displayed on the Profile page
+                AddFlashMessage("warning", "Already registered");
                 return Redirect(Url.Action("MyProfile")!);
 
             default:
@@ -149,7 +149,8 @@ public class LandlordController : AbstractController
         if (landlord.MembershipId == null)
         {
             var message = "Membership ID is required.";
-            FlashMessage(_logger, (message, "warning", message));
+            _logger.LogInformation(message);
+            AddFlashMessage("warning", message);
             return RedirectToAction("Profile", "Landlord", new { Id = landlord.LandlordId!.Value });
         }
 
@@ -181,8 +182,9 @@ public class LandlordController : AbstractController
                 flashMessageType = "warning";
                 break;
         }
-
-        FlashMessage(_logger, (flashMessageBody, flashMessageType, flashMessageBody));
+        
+        _logger.LogInformation(flashMessageBody);
+        AddFlashMessage(flashMessageType, flashMessageBody);
         return RedirectToAction("Profile", "Landlord", new { Id = landlord.LandlordId.Value });
     }
 
@@ -302,16 +304,14 @@ public class LandlordController : AbstractController
         if (result == ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord)
         {
             _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
-            TempData["FlashMessage"] =
-                $"User already registered with landlord (landlordId = {user.LandlordId})"; // This will be displayed on the Profile page
+            AddFlashMessage("warning", $"User already registered with landlord (landlordId = {user.LandlordId})");
             return RedirectToAction(nameof(MyProfile));
         }
 
         if (result == ILandlordService.LinkUserWithLandlordResult.Success)
         {
             _logger.LogInformation("Successfully registered landlord with user {UserId}", user.Id);
-            TempData["FlashMessage"] =
-                $"User {user.Id} successfully linked with landlord (landlordId = {user.LandlordId})"; // This will be displayed on the Profile page
+            AddFlashMessage("success", $"User {user.Id} successfully linked with landlord (landlordId = {user.LandlordId})");
             return RedirectToAction(nameof(MyProfile));
         }
 

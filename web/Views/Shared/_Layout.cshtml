@@ -84,12 +84,18 @@
 
 <main role="main">
     <div class="container mt-3 pb-4">
-        @if (TempData["FlashMessage"] != null)
-        {
-        @* uses warning as the default alert colour if there's no value in TempData["FlashType"] *@
-            <div class="alert alert-@(TempData["FlashType"] ?? "warning")" role="alert">
-                @TempData["FlashMessage"]
-            </div>
+        @{
+            if (TempData["FlashMessages"] != null)
+            {
+                var flashMessages = TempData["FlashMessages"] as string[];
+                var flashTypes = TempData["FlashTypes"] as string[];
+                for (int i = 0; i < flashMessages!.Length; i++)
+                {
+                    <div class="alert alert-@flashTypes![i]" role="alert">
+                    @flashMessages[i]
+                    </div>
+                }
+            }
         }
         @RenderBody()
     </div>

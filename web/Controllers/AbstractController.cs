@@ -2,6 +2,7 @@
 
 using BricksAndHearts.Auth;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Azure;
 
 #endregion
 
@@ -16,24 +17,17 @@ public abstract class AbstractController : Controller
         return (BricksAndHeartsUser)User.Identity;
     }
 
-    protected void FlashRequestSuccess(ILogger logger, BricksAndHeartsUser user, string requestAction)
+    protected void AddFlashMessage(string flashType, string flashMessage)
     {
-        FlashMessage(logger,
-            ($"Successfully {requestAction} for user {user.Id}",
-                "success",
-                $"Successfully {requestAction}"));
-    }
-
-    protected void FlashMessage(ILogger logger, (string logInfo, string flashtype, string flashmessage) flash)
-    {
-        logger.LogInformation(flash.logInfo);
-        TempData["FlashType"] = flash.flashtype;
-        TempData["FlashMessage"] = flash.flashmessage;
-    }
-    
-    protected void FlashMultipleMessages(List<string> flashTypes, List<string> flashMessages)
-    {
-        TempData["MultipleFlashTypes"] = flashTypes;
-        TempData["MultipleFlashMessages"] = flashMessages;
+        if (TempData["FlashMessages"] == null||TempData["FlashTypes"] == null)
+        {
+            TempData["FlashTypes"] = new List<string>{flashType};
+            TempData["FlashMessages"] = new List<string> {flashMessage};
+        }
+        else
+        {
+            (TempData["FlashTypes"] as List<string>)!.Add(flashType);
+            (TempData["FlashMessages"] as List<string>)!.Add(flashMessage);
+        }
     }
 }
