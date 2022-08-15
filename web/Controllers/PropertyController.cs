@@ -92,7 +92,8 @@ public class PropertyController : AbstractController
         if (property == null) // If property does not exist
         {
             var flashMessageBody = $"Property with ID: {propertyId} does not exist";
-            FlashMessage(_logger, (flashMessageBody, "warning", flashMessageBody));
+            _logger.LogInformation(flashMessageBody);
+            AddFlashMessage("warning", flashMessageBody);
         }
         else
         {
@@ -111,9 +112,9 @@ public class PropertyController : AbstractController
             }
 
             var baseUrl = HttpContext.Request.GetUri().Authority;
-            FlashMessage(_logger,
-                (flashMessageBody, "success",
-                    flashMessageBody + ": " + baseUrl + $"/public/propertyid/{propertyId}/{publicViewLink}"));
+            _logger.LogInformation(flashMessageBody);
+            AddFlashMessage("success",
+                    flashMessageBody + ": " + baseUrl + $"/public/propertyid/{propertyId}/{publicViewLink}");
         }
 
         return RedirectToAction("ViewProperty", "Property", new { propertyId });
@@ -408,18 +409,14 @@ public class PropertyController : AbstractController
         {
             return StatusCode(403);
         }
-
-        List<string> flashTypes = new(),
-            flashMessages = new();
+        
         foreach (var image in images)
         {
             var isImageResult = _azureStorage.IsImage(image.FileName);
             if (!isImageResult.isImage)
             {
                 _logger.LogInformation($"Failed to upload {image.FileName}: not in a recognised image format");
-                flashTypes.Add("danger");
-                flashMessages.Add(
-                    $"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: {isImageResult.imageExtString}");
+                AddFlashMessage("danger", $"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: {isImageResult.imageExtString}");               
             }
             else
             {
@@ -427,19 +424,16 @@ public class PropertyController : AbstractController
                 {
                     var message = await _azureStorage.UploadFile(image, "property", propertyId);
                     _logger.LogInformation($"Successfully uploaded {image.FileName}");
-                    flashTypes.Add("success");
-                    flashMessages.Add(message);
+                    AddFlashMessage("success", message);
                 }
                 else
                 {
                     _logger.LogInformation($"Failed to upload {image.FileName}: has length zero.");
-                    flashTypes.Add("danger");
-                    flashMessages.Add($"{image.FileName} contains no data, and so has not been uploaded");
+                    AddFlashMessage("danger", $"{image.FileName} contains no data, and so has not been uploaded");
                 }
             }
         }
-
-        FlashMultipleMessages(flashTypes, flashMessages);
+        
         return RedirectToAction("ListPropertyImages", "Property", new { propertyId });
     }
 
@@ -487,7 +481,8 @@ public class PropertyController : AbstractController
 
         if (properties == null)
         {
-            FlashMessage(_logger,($"Failed to find postcode {postcode}","warning",$"Failed to sort property using postcode {postcode}: invalid postcode"));
+            _logger.LogWarning($"Failed to find postcode {postcode}");
+            AddFlashMessage("warning",$"Failed to sort property using postcode {postcode}: invalid postcode");
             return RedirectToAction("SortProperties", "Property", new { sortBy = "Availability" });
         }
 

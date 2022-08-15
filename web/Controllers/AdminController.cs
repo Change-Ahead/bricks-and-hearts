@@ -55,7 +55,8 @@ public class AdminController : AbstractController
         }
 
         _adminService.RequestAdminAccess(user);
-        FlashRequestSuccess(_logger, user, "requested admin access");
+        _logger.LogInformation($"Successfully requested admin access for user {user.Id}");
+        AddFlashMessage("success", "Successfully requested admin access.");
         return RedirectToAction(nameof(AdminDashboard));
     }
 
@@ -69,16 +70,15 @@ public class AdminController : AbstractController
         }
 
         _adminService.CancelAdminAccessRequest(user);
-        FlashRequestSuccess(_logger, user, "cancelled admin access request");
+        _logger.LogInformation($"Successfully cancelled admin access request for user {user.Id}");
+        AddFlashMessage("success", "Successfully cancelled admin access request.");
         return RedirectToAction(nameof(AdminDashboard));
     }
     
     private void LoggerAlreadyAdminWarning(ILogger logger, BricksAndHeartsUser user)
     {
-        FlashMessage(logger,
-            ($"User {user.Id} already an admin",
-                "danger",
-                "Already an admin"));
+        logger.LogInformation($"User {user.Id} already an admin");
+        AddFlashMessage("danger", "Already an admin");
     }
     
     [Authorize(Roles = "Admin")]
@@ -110,7 +110,8 @@ public class AdminController : AbstractController
         }
         else
         {
-            FlashMessage(_logger, ($"User {userToRemoveId} may not remove their own admin status", "warning", "You may not remove your own admin status"));
+            _logger.LogWarning($"User {userToRemoveId} may not remove their own admin status");
+            AddFlashMessage("warning", "You may not remove your own admin status");
         }
         return RedirectToAction("GetAdminList");
     }
@@ -148,25 +149,26 @@ public class AdminController : AbstractController
         if (user != null)
         {
             var flashMessageBody = $"Landlord already linked to user {user.GoogleUserName}";
-            FlashMessage(_logger, (flashMessageBody, "warning", flashMessageBody));
+            _logger.LogInformation(flashMessageBody);
+            AddFlashMessage("warning", flashMessageBody);
         }
         else
         {
             var inviteLink = _adminService.FindExistingInviteLink(landlordId);
-            string flashMessageBody;
+            string logMessage;
             if (string.IsNullOrEmpty(inviteLink))
             {
-                flashMessageBody = "Successfully created a new invite link";
+                logMessage = "Successfully created a new invite link";
                 inviteLink = _adminService.CreateNewInviteLink(landlordId);
             }
             else
             {
-                flashMessageBody = "Landlord already has an invite link";
+                logMessage = "Landlord already has an invite link";
             }
 
-            FlashMessage(_logger, (flashMessageBody, "success", flashMessageBody + $": {(HttpContext.Request.IsHttps ? "https" : "http")}" +
-                                                                                    $"://{HttpContext.Request.Host}" +
-                                                                                    $"/invite/{inviteLink}"));
+            _logger.LogInformation(logMessage);
+            var flashMessage = logMessage + $": {(HttpContext.Request.IsHttps ? "https" : "http")}://{HttpContext.Request.Host}/invite/{inviteLink}";
+            AddFlashMessage("success", flashMessage);
         }
 
         return RedirectToAction("Profile", "Landlord", new { id = landlordId });
@@ -179,21 +181,24 @@ public class AdminController : AbstractController
         var user = _adminService.FindUserByLandlordId(landlordId);
         if (user != null)
         {
-            TempData["InviteLinkMessage"] = $"Landlord already linked to user {user.GoogleUserName}";
+            _logger.LogInformation($"Landlord {landlordId} already linked to user {user.GoogleUserName}");
+            AddFlashMessage("warning", $"Landlord already linked to user {user.GoogleUserName}");
         }
         else
         {
             var inviteLink = _adminService.FindExistingInviteLink(landlordId);
             if (string.IsNullOrEmpty(inviteLink))
             {
-                TempData["InviteLinkMessage"] = "No existing invite link. Successfully created a new invite link :)";
+                _logger.LogInformation($"Successfully created an invite link for landlord {landlordId}");
+                AddFlashMessage("success", "No existing invite link. Successfully created a new invite link");
                 inviteLink = _adminService.CreateNewInviteLink(landlordId);
             }
             else
             {
                 _adminService.DeleteExistingInviteLink(landlordId);
                 inviteLink = _adminService.CreateNewInviteLink(landlordId);
-                TempData["InviteLinkMessage"] = "Successfully created a new invite link :)";
+                _logger.LogInformation($"Successfully created a new invite link for landlord {landlordId}");
+                AddFlashMessage("success", "Successfully created a new invite link");
             }
 
             TempData["InviteLink"] = $"{inviteLink}";
@@ -220,32 +225,39 @@ public class AdminController : AbstractController
         var fileName = csvFile.FileName;
         if (csvFile.Length == 0)
         {
-            FlashMessage(_logger,
-                ($"{fileName} has length zero.", "danger", $"{fileName} contains no data. Please upload a file containing the tenant data you would like to import."));
+            _logger.LogWarning($"{fileName} has length zero.");
+            AddFlashMessage("danger", $"{fileName} contains no data. Please upload a file containing the tenant data you would like to import.");
             return RedirectToAction(nameof(TenantList));
         }
         if (fileName.Substring(fileName.Length - 3) != "csv")
         {
-            FlashMessage(_logger,
-                ($"{fileName} not a CSV file.", "danger",
-                    $"{fileName} is not a CSV file. Please upload your data as a CSV file."));
+            _logger.LogWarning($"{fileName} not a CSV file.");
+            AddFlashMessage("danger", $"{fileName} is not a CSV file. Please upload your data as a CSV file.");
             return RedirectToAction(nameof(TenantList));
         }
         
         var flashResponse = _csvImportService.CheckIfImportWorks(csvFile);
+        for (int i = 0; i < flashResponse.FlashMessages.Count(); i++)
+        {
+            AddFlashMessage(flashResponse.FlashTypes[i], flashResponse.FlashMessages[i]);
+        }
+        
         if (flashResponse.FlashTypes.Contains("danger"))
         {
-            FlashMultipleMessages(flashResponse.FlashTypes, flashResponse.FlashMessages);
             return RedirectToAction(nameof(TenantList));
         }
-        var furtherFlashResponse = await _csvImportService.ImportTenants(csvFile, flashResponse);
+        
+        var furtherFlashResponse = await _csvImportService.ImportTenants(csvFile);
+        for (int i = 0; i < furtherFlashResponse.FlashMessages.Count(); i++)
+        {
+            AddFlashMessage(furtherFlashResponse.FlashTypes[i],  furtherFlashResponse.FlashMessages[i]);
+        }
         
         if (furtherFlashResponse.FlashMessages.Count() == 0)
         {
-            FlashMessage(_logger,
-                ("Successfuly imported all tenant data.", "success", "Successfully imported all tenant data."));
+            _logger.LogInformation("Successfuly imported all tenant data.");
+            AddFlashMessage("success", "Successfully imported all tenant data.");
         }
-        FlashMultipleMessages(furtherFlashResponse.FlashTypes, furtherFlashResponse.FlashMessages);
         return RedirectToAction(nameof(TenantList));
     }
 }

@@ -19,6 +19,7 @@ public class LandlordControllerTestsBase : ControllerTestsBase
     protected readonly ILogger<LandlordController> Logger;
     protected readonly IMailService MailService;
     protected readonly IPropertyService PropertyService;
+    protected IEnumerable<string>? FlashMessages => UnderTest.TempData["FlashMessages"] as List<string>;
     protected readonly LandlordController UnderTest;
 
     protected LandlordControllerTestsBase()
@@ -35,7 +36,7 @@ public class LandlordControllerTestsBase : ControllerTestsBase
         // Fixes NullReferenceException when calling TryValidateModel()
         UnderTest.ObjectValidator = new CustomObjectValidator();
     }
-
+    
     protected PropertyViewModel CreateExamplePropertyViewModel()
     {
         return new PropertyViewModel
