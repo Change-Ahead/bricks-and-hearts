@@ -1,6 +1,7 @@
 using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
+using Microsoft.EntityFrameworkCore;
 
 namespace BricksAndHearts.Services;
 
@@ -15,15 +16,19 @@ public interface IPropertyService
     public List<PropertyDbModel> SortProperties(string by);
     public PropertyCountModel CountProperties();
     string? CreateNewPublicViewLink(int propertyId);
+    public Task<List<PropertyDbModel>?> SortPropertiesByLocation(string postalCode, int page, int perPage);
+
 }
 
 public class PropertyService : IPropertyService
 {
     private readonly BricksAndHeartsDbContext _dbContext;
+    private readonly IPostcodeApiService _postcodeApiService;
 
-    public PropertyService(BricksAndHeartsDbContext dbContext)
+    public PropertyService(BricksAndHeartsDbContext dbContext, IPostcodeApiService postcodeApiService)
     {
         _dbContext = dbContext;
+        _postcodeApiService = postcodeApiService;
     }
 
     public List<PropertyDbModel> GetPropertiesByLandlord(int landlordId)
@@ -56,13 +61,15 @@ public class PropertyService : IPropertyService
 
             Description = createModel.Description,
 
-            AcceptsSingleTenant = createModel.AcceptsSingleTenant,
-            AcceptsCouple = createModel.AcceptsCouple,
-            AcceptsFamily = createModel.AcceptsFamily,
-            AcceptsPets = createModel.AcceptsPets,
-            AcceptsBenefits = createModel.AcceptsBenefits,
-            AcceptsNotEET = createModel.AcceptsNotEET,
-            AcceptsWithoutGuarantor = createModel.AcceptsWithoutGuarantor,
+            AcceptsSingleTenant = createModel.LandlordRequirements.AcceptsSingleTenant,
+            AcceptsCouple = createModel.LandlordRequirements.AcceptsCouple,
+            AcceptsFamily = createModel.LandlordRequirements.AcceptsFamily,
+            AcceptsPets = createModel.LandlordRequirements.AcceptsPets,
+            AcceptsCredit = createModel.LandlordRequirements.AcceptsCredit,
+            AcceptsBenefits = createModel.LandlordRequirements.AcceptsBenefits,
+            AcceptsNotEET = createModel.LandlordRequirements.AcceptsNotEET,
+            AcceptsOver35 = createModel.LandlordRequirements.AcceptsOver35,
+            AcceptsWithoutGuarantor = createModel.LandlordRequirements.AcceptsWithoutGuarantor,
 
             Rent = createModel.Rent,
 
@@ -96,20 +103,22 @@ public class PropertyService : IPropertyService
         dbModel.County = updateModel.Address.County ?? dbModel.County;
         dbModel.Postcode = updateModel.Address.Postcode ?? dbModel.Postcode;
         dbModel.Lat = updateModel.Lat ?? dbModel.Lat;
-        dbModel.Lon = updateModel.Lat ?? dbModel.Lon;
+        dbModel.Lon = updateModel.Lon ?? dbModel.Lon;
 
         dbModel.PropertyType = updateModel.PropertyType ?? dbModel.PropertyType;
         dbModel.NumOfBedrooms = updateModel.NumOfBedrooms ?? dbModel.NumOfBedrooms;
 
         dbModel.Description = updateModel.Description ?? dbModel.Description;
 
-        dbModel.AcceptsSingleTenant = updateModel.AcceptsSingleTenant ?? dbModel.AcceptsSingleTenant;
-        dbModel.AcceptsCouple = updateModel.AcceptsCouple ?? dbModel.AcceptsCouple;
-        dbModel.AcceptsFamily = updateModel.AcceptsFamily ?? dbModel.AcceptsFamily;
-        dbModel.AcceptsPets = updateModel.AcceptsPets ?? dbModel.AcceptsPets;
-        dbModel.AcceptsBenefits = updateModel.AcceptsBenefits ?? dbModel.AcceptsBenefits;
-        dbModel.AcceptsNotEET = updateModel.AcceptsNotEET ?? dbModel.AcceptsNotEET;
-        dbModel.AcceptsWithoutGuarantor = updateModel.AcceptsWithoutGuarantor ?? dbModel.AcceptsWithoutGuarantor;
+        dbModel.AcceptsSingleTenant = updateModel.LandlordRequirements.AcceptsSingleTenant ?? dbModel.AcceptsSingleTenant;
+        dbModel.AcceptsCouple = updateModel.LandlordRequirements.AcceptsCouple ?? dbModel.AcceptsCouple;
+        dbModel.AcceptsFamily = updateModel.LandlordRequirements.AcceptsFamily ?? dbModel.AcceptsFamily;
+        dbModel.AcceptsPets = updateModel.LandlordRequirements.AcceptsPets ?? dbModel.AcceptsPets;
+        dbModel.AcceptsCredit = updateModel.LandlordRequirements.AcceptsCredit ?? dbModel.AcceptsCredit;
+        dbModel.AcceptsBenefits = updateModel.LandlordRequirements.AcceptsBenefits ?? dbModel.AcceptsBenefits;
+        dbModel.AcceptsNotEET = updateModel.LandlordRequirements.AcceptsNotEET ?? dbModel.AcceptsNotEET;
+        dbModel.AcceptsOver35 = updateModel.LandlordRequirements.AcceptsOver35 ?? dbModel.AcceptsOver35;
+        dbModel.AcceptsWithoutGuarantor = updateModel.LandlordRequirements.AcceptsWithoutGuarantor ?? dbModel.AcceptsWithoutGuarantor;
 
         dbModel.Rent = updateModel.Rent ?? dbModel.Rent;
 
@@ -206,5 +215,44 @@ public class PropertyService : IPropertyService
         propertyDbModel.PublicViewLink = publicViewLink;
         _dbContext.SaveChanges();
         return publicViewLink;
+    }
+    
+    public async Task<List<PropertyDbModel>?> SortPropertiesByLocation(string postalCode, int page, int perPage)
+    {
+        var responseBody = await _postcodeApiService.MakeApiRequestToPostcodeApi(postalCode);
+        var model = _postcodeApiService.TurnResponseBodyToModel(responseBody);
+        if (model.Result == null || model.Result.Lat == null || model.Result.Lon == null)
+        {
+            return null;
+        }
+
+        var properties = _dbContext.Properties
+            // This is a simpler method using pythagoras, not too accurate
+            /*.FromSqlInterpolated(
+                @$"
+                SELECT *
+                FROM dbo.Property
+                WHERE Lon is not NULL and Lat is not NULL
+                ORDER BY ((Lat-{model.Result.Lat})*(Lat-{model.Result.Lat})) + ((Lon - {model.Result.Lon})*(Lon - {model.Result.Lon})) ASC");
+            */
+            // This is a more complicated method, if things break, use method 1 and try again
+            .FromSqlInterpolated(
+                @$"SELECT *, (
+                  6371 * acos (
+                  cos ( radians({model.Result.Lat}) )
+                  * cos( radians( Lat ) )
+                  * cos( radians( Lon ) - radians({model.Result.Lon}) )
+                  + sin ( radians({model.Result.Lat}) )
+                  * sin( radians( Lat ) )
+                    )
+                ) AS distance 
+                FROM dbo.Property
+                WHERE Lon is not NULL and Lat is not NULL
+                ORDER BY distance
+                OFFSET {perPage * (page - 1)} ROWS
+                FETCH NEXT {perPage} ROWS ONLY
+                "
+            );
+        return await properties.ToListAsync();
     }
 }

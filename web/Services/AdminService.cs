@@ -1,5 +1,6 @@
 using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
+using BricksAndHearts.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace BricksAndHearts.Services;
@@ -7,34 +8,36 @@ namespace BricksAndHearts.Services;
 public interface IAdminService
 {
     public UserDbModel? GetUserFromId(int userId);
-    
+
     //Admin Access
     public void RequestAdminAccess(BricksAndHeartsUser user);
     public void CancelAdminAccessRequest(BricksAndHeartsUser user);
     public void ApproveAdminAccessRequest(int userId);
     public void RejectAdminAccessRequest(int userId);
-    
+    public void RemoveAdmin(int userId);
+
     //Information Lists
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
-    public Task<List<LandlordDbModel>> GetLandlordDisplayList(string approvalStatus);
-    public Task<List<TenantDbModel>> GetTenantList();
-    public Task<List<TenantDbModel>> GetTenantDbModelsFromFilter(string[] filterArray);
-    
+    public Task<List<LandlordDbModel>> GetLandlordList(LandlordListModel landlordListModel);
+
+    public Task<List<TenantDbModel>> GetTenantList(HousingRequirementModel filter);
+
     //Invite Links
     public UserDbModel? FindUserByLandlordId(int landlordId);
     public string? FindExistingInviteLink(int landlordId);
     public string CreateNewInviteLink(int landlordId);
     public void DeleteExistingInviteLink(int landlordId);
-    
 }
 
 public class AdminService : IAdminService
 {
     private readonly BricksAndHeartsDbContext _dbContext;
+    private readonly ILogger<AdminService> _logger;
 
-    public AdminService(BricksAndHeartsDbContext dbContext)
+    public AdminService(BricksAndHeartsDbContext dbContext, ILogger<AdminService> logger)
     {
         _dbContext = dbContext;
+        _logger = logger;
     }
 
     public UserDbModel? GetUserFromId(int userId)
@@ -42,12 +45,18 @@ public class AdminService : IAdminService
         UserDbModel userFromId = _dbContext.Users.SingleOrDefault(u => u.Id == userId)!;
         return userFromId;
     }
-    
+
     public void RequestAdminAccess(BricksAndHeartsUser user)
     {
         var userRecord = _dbContext.Users.Single(u => u.Id == user.Id);
         userRecord.HasRequestedAdmin = true;
         _dbContext.SaveChanges();
+
+        if (!_dbContext.Users.Any(u => u.IsAdmin))
+        {
+            _logger.LogInformation("Automatically approved admin request for user {userName} ({userId})", user.Name, user.Id);
+            ApproveAdminAccessRequest(user.Id);
+        }
     }
 
     public void CancelAdminAccessRequest(BricksAndHeartsUser user)
@@ -56,7 +65,7 @@ public class AdminService : IAdminService
         userRecord.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
     }
-    
+
     public void ApproveAdminAccessRequest(int userId)
     {
         var userToAdmin = _dbContext.Users.SingleOrDefault(u => u.Id == userId);
@@ -64,6 +73,7 @@ public class AdminService : IAdminService
         {
             throw new Exception($"No user found with id {userId}");
         }
+
         userToAdmin.IsAdmin = true;
         userToAdmin.HasRequestedAdmin = false;
         _dbContext.SaveChanges();
@@ -76,8 +86,20 @@ public class AdminService : IAdminService
         {
             throw new Exception($"No user found with id {userId}");
         }
-        
+
         userToAdmin.HasRequestedAdmin = false;
+        _dbContext.SaveChanges();
+    }
+    
+    public void RemoveAdmin(int userId)
+    {
+        var userToUnAdmin = _dbContext.Users.SingleOrDefault(u => u.Id == userId);
+        if (userToUnAdmin == null)
+        {
+            throw new Exception($"No user found with id {userId}");
+        }
+
+        userToUnAdmin.IsAdmin = false;
         _dbContext.SaveChanges();
     }
 
@@ -85,7 +107,7 @@ public class AdminService : IAdminService
     {
         return (await GetCurrentAdmins(), await GetPendingAdmins());
     }
-    
+
     private async Task<List<UserDbModel>> GetCurrentAdmins()
     {
         return await _dbContext.Users.Where(u => u.IsAdmin == true).ToListAsync();
@@ -98,47 +120,58 @@ public class AdminService : IAdminService
         return pendingAdmins;
     }
 
-    public async Task<List<LandlordDbModel>> GetLandlordDisplayList(string approvalStatus)
+    public async Task<List<LandlordDbModel>> GetLandlordList(LandlordListModel landlordListModel)
     {
-        return approvalStatus switch
+        var landlordQuery = _dbContext.Landlords.AsQueryable();
+        if (landlordListModel.IsApproved != null)
         {
-            "Unapproved" => await _dbContext.Landlords.Where(u => u.CharterApproved == false).ToListAsync(),
-            "Approved" => await _dbContext.Landlords.Where(u => u.CharterApproved == true).ToListAsync(),
-            _ => await _dbContext.Landlords.ToListAsync(),
-        };
+            landlordQuery = landlordQuery.Where(l => l.CharterApproved == landlordListModel.IsApproved);
+        }
+
+        if (landlordListModel.IsAssigned != null)
+        {
+            landlordQuery = landlordQuery.Where(l => _dbContext.Users.Any(u => u.LandlordId == l.Id) == landlordListModel.IsAssigned);
+        }
+
+        return await landlordQuery.ToListAsync();
     }
-    
-    public async Task<List<TenantDbModel>> GetTenantList()
-    {
-        return await _dbContext.Tenants.ToListAsync();
-    }
-    
-    public async Task<List<TenantDbModel>> GetTenantDbModelsFromFilter(string[] filterArray)
+
+    public async Task<List<TenantDbModel>> GetTenantList(HousingRequirementModel filters)
     {
         var tenantQuery = from tenants in _dbContext.Tenants select tenants;
-        for (var currentFilterNo = 0; currentFilterNo < filterArray.Length; currentFilterNo++)
+        var currentFilterNo = -1;
+        foreach (var filter in filters)
         {
-            var filterToCheck = filterArray[currentFilterNo];
-            if (filterToCheck != "all")
+            currentFilterNo++;
+            if (filter != null)
             {
                 tenantQuery = currentFilterNo switch
                 {
-                    0 => filterToCheck switch
+                    0 => filter switch
                     {
-                        "Single" => tenantQuery.Where(t => t.Type == "Single"),
-                        "Couple" => tenantQuery.Where(t => t.Type == "Couple"),
-                        "Family" => tenantQuery.Where(t => t.Type == "Family"),
-                        _ => tenantQuery
+                        true => tenantQuery.Where(t => t.Type == "Single"),
+                        false => tenantQuery.Where(t => t.Type != "Single")
                     },
-                    1 => tenantQuery.Where(t => t.HasPet == Convert.ToBoolean(filterToCheck)),
-                    2 => tenantQuery.Where(t => t.ETT == Convert.ToBoolean(filterToCheck)),
-                    3 => tenantQuery.Where(t => t.UniversalCredit == Convert.ToBoolean(filterToCheck)),
-                    4 => tenantQuery.Where(t => t.HousingBenefits == Convert.ToBoolean(filterToCheck)),
-                    5 => tenantQuery.Where(t => t.Over35 == Convert.ToBoolean(filterToCheck)),
+                    1 => filter switch
+                    {
+                        true => tenantQuery.Where(t => t.Type == "Couple"),
+                        false => tenantQuery.Where(t => t.Type != "Couple")
+                    },
+                    2 => filter switch
+                    {
+                        true => tenantQuery.Where(t => t.Type == "Family"),
+                        false => tenantQuery.Where(t => t.Type != "Family")
+                    },
+                    3 => tenantQuery.Where(t => t.HasPet == filter),
+                    4 => tenantQuery.Where(t => t.ETT == filter),
+                    5 => tenantQuery.Where(t => t.UniversalCredit == filter),
+                    6 => tenantQuery.Where(t => t.HousingBenefits == filter),
+                    7 => tenantQuery.Where(t => t.Over35 == filter),
                     _ => tenantQuery
                 };
             }
         }
+
         return await tenantQuery.ToListAsync();
     }
 

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
@@ -127,7 +126,7 @@ public class AdminControllerTests : AdminControllerTestsBase
     }
 
     [Fact]
-    public void AcceptAdminRequest_CallsGetUserFromThenCallsApproveAdminAccessRequestAndRedirectsToGetAdminList()
+    public void AcceptAdminRequest_CallsApproveAdminAccessRequestAndRedirectsToGetAdminList()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -144,7 +143,7 @@ public class AdminControllerTests : AdminControllerTestsBase
     }
 
     [Fact]
-    public void RejectAdminRequest_OnValidUserId_CallsGetUserFromThenCallsRejectAdminAccessRequestAndRedirectsToGetAdminList()
+    public void RejectAdminRequest_CallsRejectAdminAccessRequestAndRedirectsToGetAdminList()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -159,15 +158,50 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("GetAdminList");
     }
+    
+    [Fact]
+    public void RemoveAdmin_OnOwnUserId_RedirectsToGetAdminListWithFlash()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+
+        // Act
+        var result = UnderTest.RemoveAdmin(1) as RedirectToActionResult;
+
+        // Assert
+        A.CallTo(() => AdminService.RemoveAdmin(1)).MustNotHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("GetAdminList");
+        FlashMessages.Should().Contain("You may not remove your own admin status");
+    }
+    
+    [Fact]
+    public void RemoveAdmin_OnNonSelfUserId_CallsRemoveAdminAndRedirectsToGetAdminList()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+
+        // Act
+        var result = UnderTest.RemoveAdmin(2) as RedirectToActionResult;
+
+        // Assert
+        A.CallTo(() => AdminService.RemoveAdmin(2)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("GetAdminList");
+    }
 
     [Fact]
-    public void GetAdminList_CallsGetAdminListsAndReturnsViewWithAdminListModel()
+    public async void GetAdminList_CallsGetAdminListsAndReturnsViewWithAdminListModel()
     {
         // Arrange
         MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
 
         // Act
-        var result = UnderTest.GetAdminList().Result as ViewResult;
+        var result = await UnderTest.GetAdminList() as ViewResult;
 
         // Assert
         A.CallTo(() => AdminService.GetAdminLists()).MustHaveHappened();
@@ -180,12 +214,13 @@ public class AdminControllerTests : AdminControllerTestsBase
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
-
+        var landlordListModel = new LandlordListModel();
+        
         // Act
-        var result = await UnderTest.LandlordList() as ViewResult;
+        var result = await UnderTest.LandlordList(landlordListModel) as ViewResult;
 
         // Assert
-        A.CallTo(() => AdminService.GetLandlordDisplayList("")).MustHaveHappened();
+        A.CallTo(() => AdminService.GetLandlordList(landlordListModel)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<LandlordListModel?>();
     }
     
@@ -195,12 +230,13 @@ public class AdminControllerTests : AdminControllerTestsBase
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
+        var tenantListModel = new TenantListModel();
 
         // Act
-        var result = await UnderTest.TenantList() as ViewResult;
+        var result = await UnderTest.TenantList(tenantListModel) as ViewResult;
 
         // Assert
-        A.CallTo(() => AdminService.GetTenantList()).MustHaveHappened();
+        A.CallTo(() => AdminService.GetTenantList(tenantListModel.Filter)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<TenantListModel?>();
     }
     
@@ -222,7 +258,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Profile");
-        UnderTest.TempData["FlashMessage"].Should().Be($"Landlord already linked to user {landlordUser.GoogleUserName}");
+        FlashMessages.Should().Contain($"Landlord already linked to user {landlordUser.GoogleUserName}");
     }
     
     [Fact]
@@ -245,7 +281,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Profile");
-        UnderTest.TempData["FlashMessage"].Should().Be("Successfully created a new invite link: http:///invite/new link");
+        FlashMessages.Should().Contain("Successfully created a new invite link: http:///invite/new link");
     }
     
     [Fact]
@@ -267,10 +303,10 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Profile");
-        UnderTest.TempData["FlashMessage"].Should().Be("Landlord already has an invite link: http:///invite/existing link");
+        FlashMessages.Should().Contain("Landlord already has an invite link: http:///invite/existing link");
     }
     
-        [Fact]
+    [Fact]
     public void RenewInviteLink_CalledOnLinkedLandlord_CallsFindUserByLandlordIdAndRedirectsToLandlordProfileWithFLash()
     {
         // Arrange
@@ -288,7 +324,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Profile");
-        UnderTest.TempData["InviteLinkMessage"].Should().Be($"Landlord already linked to user {landlordUser.GoogleUserName}");
+        FlashMessages.Should().Contain($"Landlord already linked to user {landlordUser.GoogleUserName}");
     }
     
     [Fact]
@@ -312,7 +348,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Profile");
-        UnderTest.TempData["InviteLinkMessage"].Should().Be("No existing invite link. Successfully created a new invite link :)");
+        FlashMessages.Should().Contain("No existing invite link. Successfully created a new invite link");
     }
     
     [Fact]
@@ -335,25 +371,9 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Profile");
-        UnderTest.TempData["InviteLinkMessage"].Should().Be("Successfully created a new invite link :)");
+        FlashMessages.Should().Contain("Successfully created a new invite link");
     }
 
-    [Fact]
-    public void GetFilteredTenants_WithCorrectInput_CallsGetTenantDbModelsFromFilter()
-    {
-        // Arrange
-        MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
-        var fakeTenantListModel = A.Fake<TenantListModel>();
-
-        // Act
-        A.CallTo(() => AdminService.GetTenantDbModelsFromFilter(fakeTenantListModel.Filters)).Returns(A.Fake<List<TenantDbModel>>());
-        var result = UnderTest.GetFilteredTenants(fakeTenantListModel).Result;
-        
-        // Assert
-        A.CallTo(() => AdminService.GetTenantDbModelsFromFilter(fakeTenantListModel.Filters)).MustHaveHappened();
-        result.Should().BeOfType<ViewResult>().Which.Model.Should().Be(fakeTenantListModel);
-    }
-    
     [Fact]
     public async void ImportTenants_WhenCalledWithEmptyFile_RedirectsToTenantListWithErrorFlashMessage()
     {
@@ -369,7 +389,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("TenantList");
-        UnderTest.TempData["FlashMessage"].Should().Be(
+        FlashMessages.Should().Contain(
             $"{csvFile.FileName} contains no data. Please upload a file containing the tenant data you would like to import.");
        
     }
@@ -389,7 +409,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("TenantList");
-        UnderTest.TempData["FlashMessage"].Should().Be(
+        FlashMessages.Should().Contain(
             $"{csvFile.FileName} is not a CSV file. Please upload your data as a CSV file.");
     }
     
@@ -412,7 +432,7 @@ public class AdminControllerTests : AdminControllerTestsBase
 
         // Assert
         A.CallTo(() => CsvImportService.CheckIfImportWorks(csvFile)).MustHaveHappened();
-        A.CallTo(() => CsvImportService.ImportTenants(csvFile, flashResponse)).MustNotHaveHappened();
+        A.CallTo(() => CsvImportService.ImportTenants(csvFile)).MustNotHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("TenantList");
@@ -437,7 +457,7 @@ public class AdminControllerTests : AdminControllerTestsBase
 
         // Assert
         A.CallTo(() => CsvImportService.CheckIfImportWorks(csvFile)).MustHaveHappened();
-        A.CallTo(() => CsvImportService.ImportTenants(csvFile, flashResponse)).MustHaveHappened();
+        A.CallTo(() => CsvImportService.ImportTenants(csvFile)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("TenantList");

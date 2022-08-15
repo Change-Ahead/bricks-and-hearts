@@ -1,81 +1,120 @@
-﻿@model TenantListModel
+@model TenantListModel
 
 @{
     ViewData["Title"] = "Tenant List";
 }
 
-@{
-    if (TempData["MultipleFlashMessages"] != null)
-    {
-        var flashMessages = TempData["MultipleFlashMessages"] as string[];
-        var flashTypes = TempData["MultipleFlashTypes"] as string[];
-        for (int i = 0; i < flashMessages!.Length; i++)
-        {
-            <div class="alert alert-@flashTypes![i]" role="alert">
-            @flashMessages[i]
-            </div>
-        }
-    }
-}
-
 <h2>Tenant List</h2>
 
-<form method="get" asp-controller="Admin" asp-action="GetFilteredTenants">
+<div class="dropdown-button">
+    <a class="btn btn-primary mb-3" data-bs-toggle="collapse" href="#dropdown-contents" role="button" aria-expanded="false" aria-controls="dropdown-contents">
+        <i class="bi bi-arrow-90deg-down"></i> Filter
+    </a>
+</div>
+<div class="collapse @(Model.Filter.GetList().SequenceEqual(new HousingRequirementModel().GetList()) ? "":"show")" id="dropdown-contents">
+    <form method="get" asp-controller="Admin" asp-action="TenantList">
 
-    <div class="row g-3">
-        <div class="col-auto d-grid">
-            <label asp-for="Filters[0]" class="form-label">Tenant type</label>
-            <select asp-for="Filters[0]" class="form-select">
-                <option value="all">All</option>
-                <option value="Single">Single tenant</option>
-                <option value="Couple">Couple</option>
-                <option value="Family">Family</option>
-            </select>
+        <div class="row g-3">
+            <div class="col-auto d-grid">
+                @Html.DropDownListFor(
+                    model => model.Filter.AcceptsSingleTenant,
+                    new List<SelectListItem>
+                    {
+                        new("Only single tenants", "true"),
+                        new("No single tenants", "false")
+                    }, 
+                    "Filter by single tenant",
+                    new { @class="form-select" }
+                    )
+            </div>
+            <div class="col-auto d-grid">
+                @Html.DropDownListFor(
+                    model => model.Filter.AcceptsCouple,
+                    new List<SelectListItem>
+                    {
+                        new("Only couples", "true"),
+                        new("No couples", "false")
+                    }, 
+                    "Filter by couple",
+                    new { @class="form-select" }
+                    )
+            </div>
+            <div class="col-auto d-grid">
+                @Html.DropDownListFor(
+                    model => model.Filter.AcceptsFamily,
+                    new List<SelectListItem>
+                    {
+                        new("Only families", "true"),
+                        new("No families", "false")
+                    }, 
+                    "Filter by family",
+                    new { @class="form-select" }
+                    )
+            </div>
+            <div class="col-auto d-grid">
+                @Html.DropDownListFor(
+                    model => model.Filter.AcceptsPets,
+                    new List<SelectListItem>
+                    {
+                        new("Has pet", "true"),
+                        new("Does not have pet", "false")
+                    }, 
+                    "Filter by Pets",
+                    new { @class="form-select" }
+                    )
+            </div>
+            <div class="col-auto d-grid">
+                @Html.DropDownListFor(
+                    model => model.Filter.AcceptsNotEET,
+                    new List<SelectListItem>
+                    {
+                        new("In ETT", "true"),
+                        new("Not in ETT", "false")
+                    }, 
+                    "Filter by ETT",
+                    new { @class="form-select" }
+                    )
+            </div>
+            <div class="col-auto d-grid">
+                @Html.DropDownListFor(
+                    model => model.Filter.AcceptsCredit,
+                    new List<SelectListItem>
+                    {
+                        new("On Universal Credit", "true"),
+                        new("Not on Universal Credit", "false")
+                    }, 
+                    "Filter by Universal Credit",
+                    new { @class="form-select" }
+                    )
+            </div>
+            <div class="col-auto d-grid">
+                @Html.DropDownListFor(
+                    model => model.Filter.AcceptsBenefits,
+                    new List<SelectListItem>
+                    {
+                        new("On Housing Benefits", "true"),
+                        new("Not on Housing Benefits", "false")
+                    }, 
+                    "Filter by Housing Benefits",
+                    new { @class="form-select" }
+                    )
+            </div>
+            <div class="col-auto d-grid">
+                @Html.DropDownListFor(
+                    model => model.Filter.AcceptsOver35,
+                    new List<SelectListItem>
+                    {
+                        new("Over 35", "true"),
+                        new("35 or under", "false")
+                    }, 
+                    "Filter by Over 35",
+                    new { @class="form-select" }
+                    )
+            </div>
         </div>
-        <div class="col-auto d-grid">
-            <label asp-for="Filters[1]" class="form-label">Has pet</label>
-            <select asp-for="Filters[1]" class="form-select">
-                <option value="all">All</option>
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-            </select>
-        </div>
-        <div class="col-auto d-grid">
-            <label asp-for="Filters[2]" class="form-label">In ETT</label>
-            <select asp-for="Filters[2]" class="form-select">
-                <option value="all">All</option>
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-            </select>
-        </div>
-        <div class="col-auto d-grid">
-            <label asp-for="Filters[3]" class="form-label">On universal credit</label>
-            <select asp-for="Filters[3]" class="form-select">
-                <option value="all">All</option>
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-            </select>
-        </div>
-        <div class="col-auto d-grid">
-            <label asp-for="Filters[4]" class="form-label">On benefits</label>
-            <select asp-for="Filters[4]" class="form-select">
-                <option value="all">All</option>
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-            </select>
-        </div>
-        <div class="col-auto d-grid">
-            <label asp-for="Filters[5]" class="form-label">Over 35</label>
-            <select asp-for="Filters[5]" class="form-select">
-                <option value="all">All</option>
-                <option value="true">Yes</option>
-                <option value="false">No</option>
-            </select>
-        </div>
-    </div>
-    
-    <input type="submit" value="Filter" class="btn btn-large btn-primary mb-3"/>
-</form>
+        <input type="submit" value="Apply" class="btn btn-large btn-primary my-3"/>
+    </form>
+</div>
 
 <table class="table">
     <thead>

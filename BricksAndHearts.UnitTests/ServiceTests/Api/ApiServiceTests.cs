@@ -17,22 +17,19 @@ namespace BricksAndHearts.UnitTests.ServiceTests.Api;
 
 public class ApiServiceTests
 {
-    // A fake options
     private IOptions<AzureMapsOptions> _options; 
-    private ILogger<AzureMapsAzureMapsApiService> _logger; 
+    private ILogger<AzureMapsApiService> _logger; 
     private HttpMessageHandler _messageHandler;
     private HttpClient _httpClient;
-    
-    // A real API service
-    private AzureMapsAzureMapsApiService _underTest;
+    private AzureMapsApiService _underTest;
 
     public ApiServiceTests()
     {
         _options = A.Fake<IOptions<AzureMapsOptions>>();
-        _logger= A.Fake<ILogger<AzureMapsAzureMapsApiService>>();
+        _logger= A.Fake<ILogger<AzureMapsApiService>>();
         _messageHandler = A.Fake<HttpMessageHandler>();
         _httpClient = new HttpClient(_messageHandler);
-        _underTest= new AzureMapsAzureMapsApiService(_logger, _options,_httpClient);
+        _underTest= new AzureMapsApiService(_logger, _options,_httpClient);
     }
     
     [Fact]

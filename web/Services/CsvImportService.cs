@@ -9,7 +9,7 @@ namespace BricksAndHearts.Services;
 public interface ICsvImportService
 {
     public (List<string> FlashTypes, List<string> FlashMessages) CheckIfImportWorks(IFormFile csvFile);
-    public Task<(List<string> FlashTypes, List<string> FlashMessages)> ImportTenants(IFormFile csvFile, (List<string> flashTypes, List<string> flashMessages) flashResponse);
+    public Task<(List<string> FlashTypes, List<string> FlashMessages)> ImportTenants(IFormFile csvFile);
 }
 
 public class CsvImportService : ICsvImportService
@@ -63,19 +63,20 @@ public class CsvImportService : ICsvImportService
         return (flashTypes, flashMessages);
     }
 
-    public async Task<(List<string> FlashTypes, List<string> FlashMessages)> ImportTenants(IFormFile csvFile, (List<string> flashTypes, List<string> flashMessages) flashResponse)
+    public async Task<(List<string> FlashTypes, List<string> FlashMessages)> ImportTenants(IFormFile csvFile)
     {
-        CsvFileDescription csvFileDescription = new CsvFileDescription
+        var csvFileDescription = new CsvFileDescription
         {
             SeparatorChar = ',',
             FirstLineHasColumnNames = true,
             IgnoreUnknownColumns = true
         };
-        CsvContext csvContext = new CsvContext();
-        StreamReader streamReader = new StreamReader(csvFile.OpenReadStream());
-        IEnumerable<TenantUploadModel> list = csvContext.Read<TenantUploadModel>(streamReader, csvFileDescription);
+        var csvContext = new CsvContext();
+        var streamReader = new StreamReader(csvFile.OpenReadStream());
+        IEnumerable<TenantUploadModel> tenantUploadList = csvContext.Read<TenantUploadModel>(streamReader, csvFileDescription);
         
-        List<string> flashTypes = flashResponse.flashTypes, flashMessages = flashResponse.flashMessages;
+        List<string> flashTypes = new(),
+            flashMessages = new();
         await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
         {
             foreach (var tenant in _dbContext.Tenants)
@@ -84,7 +85,7 @@ public class CsvImportService : ICsvImportService
             }
 
             int lineNo = 0;
-            foreach (TenantUploadModel tenant in list)
+            foreach (TenantUploadModel tenant in tenantUploadList)
             {
                 lineNo += 1;
                 if (tenant.Name == null)

@@ -16,24 +16,12 @@ public abstract class AbstractController : Controller
         return (BricksAndHeartsUser)User.Identity;
     }
 
-    protected void FlashRequestSuccess(ILogger logger, BricksAndHeartsUser user, string requestAction)
+    protected void AddFlashMessage(string flashType, string flashMessage)
     {
-        FlashMessage(logger,
-            ($"Successfully {requestAction} for user {user.Id}",
-                "success",
-                $"Successfully {requestAction}"));
-    }
-
-    protected void FlashMessage(ILogger logger, (string logInfo, string flashtype, string flashmessage) flash)
-    {
-        logger.LogInformation(flash.logInfo);
-        TempData["FlashType"] = flash.flashtype;
-        TempData["FlashMessage"] = flash.flashmessage;
-    }
-    
-    protected void FlashMultipleMessages(List<string> flashTypes, List<string> flashMessages)
-    {
-        TempData["MultipleFlashTypes"] = flashTypes;
-        TempData["MultipleFlashMessages"] = flashMessages;
+        TempData["FlashTypes"] ??= new List<string>();
+        TempData["FlashMessages"] ??= new List<string>();
+        
+        (TempData["FlashTypes"] as List<string>)!.Add(flashType);
+        (TempData["FlashMessages"] as List<string>)!.Add(flashMessage);
     }
 }

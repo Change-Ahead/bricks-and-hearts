@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Diagnostics.CodeAnalysis;
 using BricksAndHearts.Database;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace BricksAndHearts.ViewModels;
 
@@ -34,16 +36,10 @@ public class PropertyViewModel : IValidatableObject
 
 
     // Tenant profile
-    public bool? AcceptsSingleTenant { get; set; }
-    public bool? AcceptsCouple { get; set; }
-    public bool? AcceptsFamily { get; set; }
-    public bool? AcceptsPets { get; set; }
-    public bool? AcceptsBenefits { get; set; }
-    public bool? AcceptsNotEET { get; set; }
-
-    public bool? AcceptsWithoutGuarantor { get; set; }
-
-
+    // checks for this are done manually in the override
+    [ValidateNever]
+    public HousingRequirementModel LandlordRequirements { get; set; } = new();
+    
     // Rent, deposits, and duration
     [Range(0, 100000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
     public int? Rent { get; set; }
@@ -67,7 +63,7 @@ public class PropertyViewModel : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (AcceptsSingleTenant == false && AcceptsCouple == false && AcceptsFamily == false)
+        if (LandlordRequirements.AcceptsSingleTenant == false && LandlordRequirements.AcceptsCouple == false && LandlordRequirements.AcceptsFamily == false)
         {
             yield return new ValidationResult("At least one type of tenant must be selected");
         }
@@ -109,13 +105,18 @@ public class PropertyViewModel : IValidatableObject
                 County = property.County,
                 Postcode = property.Postcode
             },
-            AcceptsSingleTenant = property.AcceptsSingleTenant,
-            AcceptsCouple = property.AcceptsCouple,
-            AcceptsFamily = property.AcceptsFamily,
-            AcceptsPets = property.AcceptsPets,
-            AcceptsBenefits = property.AcceptsBenefits,
-            AcceptsNotEET = property.AcceptsNotEET,
-            AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor,
+            LandlordRequirements = new HousingRequirementModel
+            {
+                AcceptsSingleTenant = property.AcceptsSingleTenant,
+                AcceptsCouple = property.AcceptsCouple,
+                AcceptsFamily = property.AcceptsFamily,
+                AcceptsPets = property.AcceptsPets,
+                AcceptsCredit = property.AcceptsCredit,
+                AcceptsBenefits = property.AcceptsBenefits,
+                AcceptsNotEET = property.AcceptsNotEET,
+                AcceptsOver35 = property.AcceptsOver35,
+                AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor  
+            },
             Availability = property.Availability,
             AvailableFrom = property.AvailableFrom,
             TotalUnits = property.TotalUnits,

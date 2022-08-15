@@ -28,7 +28,7 @@
                     }
                 </td>
                 <td>
-                    @using (Html.BeginForm("RejectAdminRequest", "Admin", new { userToAcceptId = pendingAdmin.Id }, FormMethod.Post))
+                    @using (Html.BeginForm("RejectAdminRequest", "Admin", new { userToRejectId = pendingAdmin.Id }, FormMethod.Post))
                     {
                         <button type="submit" class="btn btn-outline-danger">Reject</button>
                     }
@@ -44,6 +44,7 @@
         <tr>
             <th scope="col">Google Email</th>
             <th scope="col">Google Name</th>
+            <th></th>
         </tr>
         </thead>
         <tbody>
@@ -52,6 +53,12 @@
             <tr>
                 <td>@currentAdmin.GoogleEmail</td>
                 <td>@currentAdmin.GoogleUserName</td>
+                <td>
+                    @using (Html.BeginForm("RemoveAdmin", "Admin", new { userToRemoveId = currentAdmin.Id }, FormMethod.Post))
+                    {
+                        <button type="submit" class="btn btn-outline-danger">Revoke admin rights</button>
+                    }
+                </td>
             </tr>
         }
         </tbody>
