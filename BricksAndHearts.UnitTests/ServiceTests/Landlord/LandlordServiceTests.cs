@@ -232,7 +232,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
             // Arrange
             using var context = Fixture.CreateReadContext();
             var service = new LandlordService(context);
-            var landlordToEdit = Fixture.CreateLandlordProfileWithEditedMemberId(421);
+            var landlordToEdit = Fixture.CreateLandlordProfileWithEditedMemberId(6);
 
             // Act
             var result = service.CheckForDuplicateMembershipId(landlordToEdit);

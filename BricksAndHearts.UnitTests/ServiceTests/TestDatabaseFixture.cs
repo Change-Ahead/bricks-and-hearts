@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
 using Microsoft.Extensions.Configuration;
@@ -29,8 +29,8 @@ public class TestDatabaseFixture
                     CreateUnapprovedLandlord(), // landlordId = 2
                     CreateLandlordWithLink(), // landlordId = 3
                     CreateUnlinkedLandlordWithLink(), // landlordId = 4
-                    CreateLandlordWithMembershipId(420), // landlordId = 5
-                    CreateLandlordWithMembershipId(421) // landlordId = 6
+                    CreateLandlordWithMembershipId(5), // landlordId = 5
+                    CreateLandlordWithMembershipId(6) // landlordId = 6
                 );
 
                 context.Users.AddRange(
@@ -111,7 +111,7 @@ public class TestDatabaseFixture
         };
     }
 
-    public UserDbModel CreateNonAdminUser()
+    private static UserDbModel CreateNonAdminUser()
     {
         return new UserDbModel
         {
@@ -124,7 +124,7 @@ public class TestDatabaseFixture
         };
     }
 
-    public UserDbModel CreateRequestedAdminUser()
+    private static UserDbModel CreateRequestedAdminUser()
     {
         return new UserDbModel
         {
@@ -149,7 +149,7 @@ public class TestDatabaseFixture
         };
     }
 
-    public UserDbModel CreateUnapprovedLandlordUser()
+    private static UserDbModel CreateUnapprovedLandlordUser()
     {
         return new UserDbModel
         {
@@ -161,7 +161,7 @@ public class TestDatabaseFixture
         };
     }
 
-    public UserDbModel CreateLandlordUserWithLink()
+    private static UserDbModel CreateLandlordUserWithLink()
     {
         return new UserDbModel
         {
@@ -173,7 +173,7 @@ public class TestDatabaseFixture
         };
     }
 
-    public UserDbModel CreateUnlinkedLandlordUser()
+    private static UserDbModel CreateUnlinkedLandlordUser()
     {
         return new UserDbModel
         {
@@ -191,7 +191,7 @@ public class TestDatabaseFixture
     // PLEASE!
 
     // Begin Landlord models
-    public LandlordDbModel CreateApprovedLandlord()
+    private static LandlordDbModel CreateApprovedLandlord()
     {
         return new LandlordDbModel
         {
@@ -212,7 +212,7 @@ public class TestDatabaseFixture
         };
     }
 
-    public LandlordDbModel CreateUnapprovedLandlord()
+    private static LandlordDbModel CreateUnapprovedLandlord()
     {
         return new LandlordDbModel
         {
@@ -232,7 +232,7 @@ public class TestDatabaseFixture
         };
     }
 
-    public LandlordDbModel CreateLandlordWithLink()
+    private static LandlordDbModel CreateLandlordWithLink()
     {
         return new LandlordDbModel
         {
@@ -253,7 +253,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private LandlordDbModel CreateUnlinkedLandlordWithLink()
+    private static LandlordDbModel CreateUnlinkedLandlordWithLink()
     {
         return new LandlordDbModel
         {
@@ -274,7 +274,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private LandlordDbModel CreateLandlordWithMembershipId(int memberId)
+    private static LandlordDbModel CreateLandlordWithMembershipId(int memberId)
     {
         return new LandlordDbModel
         {
@@ -347,7 +347,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private PropertyDbModel CreateCompleteProperty()
+    private static PropertyDbModel CreateCompleteProperty()
     {
         return new PropertyDbModel
         {
@@ -364,7 +364,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private PropertyDbModel CreateIncompleteProperty()
+    private static PropertyDbModel CreateIncompleteProperty()
     {
         return new PropertyDbModel
         {
@@ -379,7 +379,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private PropertyDbModel CreateAvailableProperty()
+    private static PropertyDbModel CreateAvailableProperty()
     {
         return new PropertyDbModel
         {
@@ -394,7 +394,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private PropertyDbModel CreateAvailableSoonProperty()
+    private static PropertyDbModel CreateAvailableSoonProperty()
     {
         return new PropertyDbModel
         {
@@ -410,7 +410,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private PropertyDbModel CreateMultiUnitProperty()
+    private static PropertyDbModel CreateMultiUnitProperty()
     {
         return new PropertyDbModel
         {
@@ -427,7 +427,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private PropertyDbModel CreateDraftProperty()
+    private static PropertyDbModel CreateDraftProperty()
     {
         return new PropertyDbModel
         {
@@ -442,7 +442,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private PropertyDbModel CreateIncompleteProperty(int landlordId)
+    private static PropertyDbModel CreateIncompleteProperty(int landlordId)
     {
         return new PropertyDbModel
         {
@@ -455,7 +455,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private PropertyDbModel CreateBrightonProperty(int landlordId)
+    private static PropertyDbModel CreateBrightonProperty(int landlordId)
     {
         return new PropertyDbModel
         {
@@ -470,7 +470,7 @@ public class TestDatabaseFixture
         }; 
     }
     
-    private PropertyDbModel CreateLondonProperty(int landlordId)
+    private static PropertyDbModel CreateLondonProperty(int landlordId)
     {
         return new PropertyDbModel
         {
@@ -485,7 +485,7 @@ public class TestDatabaseFixture
         }; 
     }
     
-    private PropertyDbModel CreatePeterboroughProperty(int landlordId)
+    private static PropertyDbModel CreatePeterboroughProperty(int landlordId)
     {
         return new PropertyDbModel
         {
@@ -500,7 +500,7 @@ public class TestDatabaseFixture
         }; 
     }
     
-    private PropertyDbModel CreateLeedsProperty(int landlordId)
+    private static PropertyDbModel CreateLeedsProperty(int landlordId)
     {
         return new PropertyDbModel
         {
@@ -515,7 +515,7 @@ public class TestDatabaseFixture
         }; 
     }
 
-    private TenantDbModel CreateTenant()
+    private static TenantDbModel CreateTenant()
     {
         return new TenantDbModel
         {
@@ -528,7 +528,7 @@ public class TestDatabaseFixture
         };
     }
     
-    private TenantDbModel CreateFalseTenant()
+    private static TenantDbModel CreateFalseTenant()
     {
         return new TenantDbModel
         {
@@ -539,7 +539,7 @@ public class TestDatabaseFixture
     }
 
 
-    private PropertyDbModel CreateCompleteProperty(int landlordId)
+    private static PropertyDbModel CreateCompleteProperty(int landlordId)
     {
         return new PropertyDbModel
         {
