@@ -14,43 +14,22 @@
 <div class="collapse @(Model.Filter.GetList().SequenceEqual(new HousingRequirementModel().GetList()) ? "":"show")" id="dropdown-contents">
     <form method="get" asp-controller="Admin" asp-action="TenantList">
 
+        <div class="row mb-3">
+            <div class="col-auto d-grid">
+                @Html.CheckBox("Filter.AcceptsSingleTenant", Model.Filter.AcceptsSingleTenant ?? false, new { @class = "btn-check" })
+                <label asp-for="Filter.AcceptsSingleTenant" class="btn btn-outline-blue shadow-none pill-check">Single tenant</label>
+            </div>
+            <div class="col-auto d-grid">
+                @Html.CheckBox("Filter.AcceptsCouple", Model.Filter.AcceptsCouple ?? false, new { @class = "btn-check" })
+                <label asp-for="Filter.AcceptsCouple" class="btn btn-outline-blue shadow-none pill-check">Couple</label>
+            </div>
+            <div class="col-auto d-grid">
+                @Html.CheckBox("Filter.AcceptsFamily", Model.Filter.AcceptsFamily ?? false, new { @class = "btn-check" })
+                <label asp-for="Filter.AcceptsFamily" class="btn btn-outline-blue shadow-none pill-check">Family (3+)</label>
+            </div>
+        </div>
+
         <div class="row g-3">
-            <div class="col-auto d-grid">
-                @Html.DropDownListFor(
-                    model => model.Filter.AcceptsSingleTenant,
-                    new List<SelectListItem>
-                    {
-                        new("Only single tenants", "true"),
-                        new("No single tenants", "false")
-                    }, 
-                    "Filter by single tenant",
-                    new { @class="form-select" }
-                    )
-            </div>
-            <div class="col-auto d-grid">
-                @Html.DropDownListFor(
-                    model => model.Filter.AcceptsCouple,
-                    new List<SelectListItem>
-                    {
-                        new("Only couples", "true"),
-                        new("No couples", "false")
-                    }, 
-                    "Filter by couple",
-                    new { @class="form-select" }
-                    )
-            </div>
-            <div class="col-auto d-grid">
-                @Html.DropDownListFor(
-                    model => model.Filter.AcceptsFamily,
-                    new List<SelectListItem>
-                    {
-                        new("Only families", "true"),
-                        new("No families", "false")
-                    }, 
-                    "Filter by family",
-                    new { @class="form-select" }
-                    )
-            </div>
             <div class="col-auto d-grid">
                 @Html.DropDownListFor(
                     model => model.Filter.AcceptsPets,
