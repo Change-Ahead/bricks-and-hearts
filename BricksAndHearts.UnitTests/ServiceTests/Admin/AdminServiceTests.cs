@@ -210,7 +210,6 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         result.Count.Should().Be(context.Landlords.Where(l => l.CharterApproved == true)
             .Count(l => context.Users.SingleOrDefault(u => u.LandlordId == l.Id) == null));
     }
-    
     [Fact]
     public async void TenantList_CalledWithNoFilter_ReturnsAllTenants()
     {
