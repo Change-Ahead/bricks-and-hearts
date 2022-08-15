@@ -195,13 +195,13 @@ public class AdminControllerTests : AdminControllerTestsBase
     }
 
     [Fact]
-    public void GetAdminList_CallsGetAdminListsAndReturnsViewWithAdminListModel()
+    public async void GetAdminList_CallsGetAdminListsAndReturnsViewWithAdminListModel()
     {
         // Arrange
         MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
 
         // Act
-        var result = UnderTest.GetAdminList().Result as ViewResult;
+        var result = await UnderTest.GetAdminList() as ViewResult;
 
         // Assert
         A.CallTo(() => AdminService.GetAdminLists()).MustHaveHappened();
@@ -374,6 +374,22 @@ public class AdminControllerTests : AdminControllerTestsBase
         FlashMessages.Should().Contain("Successfully created a new invite link");
     }
 
+    [Fact]
+    public async void GetFilteredTenants_WithCorrectInput_CallsGetTenantDbModelsFromFilter()
+    {
+        // Arrange
+        MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
+        var fakeTenantListModel = A.Fake<TenantListModel>();
+
+        // Act
+        A.CallTo(() => AdminService.GetTenantDbModelsFromFilter(fakeTenantListModel.Filters)).Returns(A.Fake<List<TenantDbModel>>());
+        var result = await UnderTest.GetFilteredTenants(fakeTenantListModel);
+        
+        // Assert
+        A.CallTo(() => AdminService.GetTenantDbModelsFromFilter(fakeTenantListModel.Filters)).MustHaveHappened();
+        result.Should().BeOfType<ViewResult>().Which.Model.Should().Be(fakeTenantListModel);
+    }
+    
     [Fact]
     public async void ImportTenants_WhenCalledWithEmptyFile_RedirectsToTenantListWithErrorFlashMessage()
     {

@@ -143,14 +143,15 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     }
 
     [Fact]
-    public void GetAdminLists_GetsListOfCurrentAndPendingAdmins_ForAdminUser()
+    public async void GetAdminLists_GetsListOfCurrentAndPendingAdmins_ForAdminUser()
     {
         // Arrange
+        await using var context = Fixture.CreateReadContext();
         using var context = Fixture.CreateReadContext();
         var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
 
         // Act
-        var result = service.GetAdminLists().Result;
+        var result = await service.GetAdminLists();
 
         // Assert
 
@@ -210,7 +211,6 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         result.Count.Should().Be(context.Landlords.Where(l => l.CharterApproved == true)
             .Count(l => context.Users.SingleOrDefault(u => u.LandlordId == l.Id) == null));
     }
-
     [Fact]
     public async void TenantList_CalledWithNoFilter_ReturnsAllTenants()
     {
