@@ -28,7 +28,9 @@ public class TestDatabaseFixture
                     CreateApprovedLandlord(), // landlordId = 1
                     CreateUnapprovedLandlord(), // landlordId = 2
                     CreateLandlordWithLink(), // landlordId = 3
-                    CreateUnlinkedLandlordWithLink() // landlordId = 4
+                    CreateUnlinkedLandlordWithLink(), // landlordId = 4
+                    CreateLandlordWithMembershipId(5), // landlordId = 5
+                    CreateLandlordWithMembershipId(6) // landlordId = 6
                 );
 
                 context.Users.AddRange(
@@ -109,7 +111,7 @@ public class TestDatabaseFixture
         };
     }
 
-    public UserDbModel CreateNonAdminUser()
+    private static UserDbModel CreateNonAdminUser()
     {
         return new UserDbModel
         {
@@ -122,7 +124,7 @@ public class TestDatabaseFixture
         };
     }
 
-    public UserDbModel CreateRequestedAdminUser()
+    private static UserDbModel CreateRequestedAdminUser()
     {
         return new UserDbModel
         {
@@ -147,7 +149,7 @@ public class TestDatabaseFixture
         };
     }
 
-    public UserDbModel CreateUnapprovedLandlordUser()
+    private static UserDbModel CreateUnapprovedLandlordUser()
     {
         return new UserDbModel
         {
@@ -159,7 +161,7 @@ public class TestDatabaseFixture
         };
     }
 
-    public UserDbModel CreateLandlordUserWithLink()
+    private static UserDbModel CreateLandlordUserWithLink()
     {
         return new UserDbModel
         {
@@ -171,7 +173,7 @@ public class TestDatabaseFixture
         };
     }
 
-    public UserDbModel CreateUnlinkedLandlordUser()
+    private static UserDbModel CreateUnlinkedLandlordUser()
     {
         return new UserDbModel
         {
@@ -189,14 +191,14 @@ public class TestDatabaseFixture
     // PLEASE!
 
     // Begin Landlord models
-    public LandlordDbModel CreateApprovedLandlord()
+    private static LandlordDbModel CreateApprovedLandlord()
     {
         return new LandlordDbModel
         {
             Email = "test.landlord1@gmail.com",
-            FirstName = "Ronnie",
-            LastName = "McFace",
-            Title = "Dr",
+            FirstName = "Landlord1Approved",
+            LastName = "Landlord1Sur",
+            Title = "Mr",
             Phone = "01189998819991197253",
             LandlordType = "Non profit",
             CharterApproved = true,
@@ -210,13 +212,13 @@ public class TestDatabaseFixture
         };
     }
 
-    public LandlordDbModel CreateUnapprovedLandlord()
+    private static LandlordDbModel CreateUnapprovedLandlord()
     {
         return new LandlordDbModel
         {
             Email = "test.landlord2@gmail.com",
-            FirstName = "Donnie",
-            LastName = "McCheeks",
+            FirstName = "Landlord2Unapproved",
+            LastName = "Landlord2Sur",
             Title = "Mr",
             Phone = "01189998819991197253",
             LandlordType = "Non profit",
@@ -230,14 +232,14 @@ public class TestDatabaseFixture
         };
     }
 
-    public LandlordDbModel CreateLandlordWithLink()
+    private static LandlordDbModel CreateLandlordWithLink()
     {
         return new LandlordDbModel
         {
             Email = "test.landlord3@gmail.com",
-            FirstName = "Lonnie",
-            LastName = "McMc",
-            Title = "Sister",
+            FirstName = "Landlord3Link",
+            LastName = "Landlord3Sur",
+            Title = "Mr",
             Phone = "01189998819991197253",
             LandlordType = "Non profit",
             CharterApproved = true,
@@ -251,13 +253,13 @@ public class TestDatabaseFixture
         };
     }
 
-    private LandlordDbModel CreateUnlinkedLandlordWithLink()
+    private static LandlordDbModel CreateUnlinkedLandlordWithLink()
     {
         return new LandlordDbModel
         {
             Email = "test.landlord4@gmail.com",
-            FirstName = "Unlinked",
-            LastName = "Landlord",
+            FirstName = "Landlord4Unlinked",
+            LastName = "Landlord4Sur",
             Title = "Mr",
             Phone = "004",
             LandlordType = "Non profit",
@@ -272,7 +274,80 @@ public class TestDatabaseFixture
         };
     }
 
-    private PropertyDbModel CreateCompleteProperty()
+    private static LandlordDbModel CreateLandlordWithMembershipId(int memberId)
+    {
+        return new LandlordDbModel
+        {
+            Email = "test.landlord5&6@gmail.com",
+            FirstName = "Landlord5&6MembershipId",
+            LastName = "Landlord5&6Sur",
+            Title = "Mr",
+            Phone = "005&6",
+            LandlordType = "Non profit",
+            CharterApproved = true,
+            MembershipId = $"Member-{memberId}",
+            AddressLine1 = "adr1",
+            AddressLine2 = "adr2",
+            AddressLine3 = "adr3",
+            TownOrCity = "city",
+            County = "county",
+            Postcode = "cb2 1la"
+        };
+    }
+    
+        
+    public LandlordProfileModel CreateLandlordProfileWithEditedEmail(string email)
+    {
+        return new LandlordProfileModel
+        {
+            LandlordId = 3,
+            Email = email,
+            FirstName = "Landlord3Link",
+            LastName = "Landlord3Sur",
+            Title = "Mr",
+            Phone = "01189998819991197253",
+            LandlordType = "Non profit",
+            CharterApproved = true,
+            InviteLink = "InvitimusLinkimus",
+            Address = new AddressModel
+            {
+                AddressLine1 = "adr1",
+                AddressLine2 = "adr2",
+                AddressLine3 = "adr3",
+                TownOrCity = "city",
+                County = "county",
+                Postcode = "cb2 1la"
+            }
+        };
+    }
+    
+    public LandlordProfileModel CreateLandlordProfileWithEditedMemberId(int memberId)
+    {
+        return new LandlordProfileModel
+        {
+            LandlordId = 5,
+            Email = "test.landlord5&6@gmail.com",
+            FirstName = "Landlord3Link",
+            LastName = "Landlord3Sur",
+            Title = "Mr",
+            Phone = "01189998819991197253",
+            LandlordType = "Non profit",
+            CharterApproved = true,
+            MembershipId = $"Member-{memberId}",
+            InviteLink = "InvitimusLinkimus",
+            Address = new AddressModel
+            {
+                AddressLine1 = "adr1",
+                AddressLine2 = "adr2",
+                AddressLine3 = "adr3",
+                TownOrCity = "city",
+                County = "county",
+                Postcode = "cb2 1la"
+            }
+        };
+    }
+
+    private static PropertyDbModel CreateCompleteProperty()
     {
         return new PropertyDbModel
         {
@@ -289,7 +364,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private PropertyDbModel CreateIncompleteProperty()
+    private static PropertyDbModel CreateIncompleteProperty()
     {
         return new PropertyDbModel
         {
@@ -304,7 +379,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private PropertyDbModel CreateAvailableProperty()
+    private static PropertyDbModel CreateAvailableProperty()
     {
         return new PropertyDbModel
         {
@@ -319,7 +394,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private PropertyDbModel CreateAvailableSoonProperty()
+    private static PropertyDbModel CreateAvailableSoonProperty()
     {
         return new PropertyDbModel
         {
@@ -335,7 +410,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private PropertyDbModel CreateMultiUnitProperty()
+    private static PropertyDbModel CreateMultiUnitProperty()
     {
         return new PropertyDbModel
         {
@@ -352,7 +427,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private PropertyDbModel CreateDraftProperty()
+    private static PropertyDbModel CreateDraftProperty()
     {
         return new PropertyDbModel
         {
@@ -367,7 +442,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private PropertyDbModel CreateIncompleteProperty(int landlordId)
+    private static PropertyDbModel CreateIncompleteProperty(int landlordId)
     {
         return new PropertyDbModel
         {
@@ -380,7 +455,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private PropertyDbModel CreateBrightonProperty(int landlordId)
+    private static PropertyDbModel CreateBrightonProperty(int landlordId)
     {
         return new PropertyDbModel
         {
@@ -395,7 +470,7 @@ public class TestDatabaseFixture
         }; 
     }
     
-    private PropertyDbModel CreateLondonProperty(int landlordId)
+    private static PropertyDbModel CreateLondonProperty(int landlordId)
     {
         return new PropertyDbModel
         {
@@ -410,7 +485,7 @@ public class TestDatabaseFixture
         }; 
     }
     
-    private PropertyDbModel CreatePeterboroughProperty(int landlordId)
+    private static PropertyDbModel CreatePeterboroughProperty(int landlordId)
     {
         return new PropertyDbModel
         {
@@ -425,7 +500,7 @@ public class TestDatabaseFixture
         }; 
     }
     
-    private PropertyDbModel CreateLeedsProperty(int landlordId)
+    private static PropertyDbModel CreateLeedsProperty(int landlordId)
     {
         return new PropertyDbModel
         {
@@ -440,7 +515,7 @@ public class TestDatabaseFixture
         }; 
     }
 
-    private TenantDbModel CreateTenant()
+    private static TenantDbModel CreateTenant()
     {
         return new TenantDbModel
         {
@@ -453,7 +528,7 @@ public class TestDatabaseFixture
         };
     }
     
-    private TenantDbModel CreateFalseTenant()
+    private static TenantDbModel CreateFalseTenant()
     {
         return new TenantDbModel
         {
@@ -464,7 +539,7 @@ public class TestDatabaseFixture
     }
 
 
-    private PropertyDbModel CreateCompleteProperty(int landlordId)
+    private static PropertyDbModel CreateCompleteProperty(int landlordId)
     {
         return new PropertyDbModel
         {

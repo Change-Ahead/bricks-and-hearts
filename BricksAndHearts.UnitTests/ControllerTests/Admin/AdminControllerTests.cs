@@ -195,13 +195,13 @@ public class AdminControllerTests : AdminControllerTestsBase
     }
 
     [Fact]
-    public void GetAdminList_CallsGetAdminListsAndReturnsViewWithAdminListModel()
+    public async void GetAdminList_CallsGetAdminListsAndReturnsViewWithAdminListModel()
     {
         // Arrange
         MakeUserPrincipalInController(CreateAdminUser(), UnderTest);
 
         // Act
-        var result = UnderTest.GetAdminList().Result as ViewResult;
+        var result = await UnderTest.GetAdminList() as ViewResult;
 
         // Assert
         A.CallTo(() => AdminService.GetAdminLists()).MustHaveHappened();
