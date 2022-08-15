@@ -28,9 +28,9 @@ public class TestDatabaseFixture
                     CreateApprovedLandlord(), // landlordId = 1
                     CreateUnapprovedLandlord(), // landlordId = 2
                     CreateLandlordWithLink(), // landlordId = 3
-                    CreateUnlinkedLandlordWithLink()//, // landlordId = 4
-                    // CreateLandlordWithMembershipId(420), // landlordId = 5
-                    // CreateLandlordWithMembershipId(421) // landlordId = 6
+                    CreateUnlinkedLandlordWithLink(), // landlordId = 4
+                    CreateLandlordWithMembershipId(420), // landlordId = 5
+                    CreateLandlordWithMembershipId(421) // landlordId = 6
                 );
 
                 context.Users.AddRange(
@@ -274,78 +274,78 @@ public class TestDatabaseFixture
         };
     }
 
-    // private LandlordDbModel CreateLandlordWithMembershipId(int memberId)
-    // {
-    //     return new LandlordDbModel
-    //     {
-    //         Email = "test.landlord5&6@gmail.com",
-    //         FirstName = "Landlord5&6MembershipId",
-    //         LastName = "Landlord5&6Sur",
-    //         Title = "Mr",
-    //         Phone = "005&6",
-    //         LandlordType = "Non profit",
-    //         CharterApproved = true,
-    //         MembershipId = $"Member-{memberId}",
-    //         AddressLine1 = "adr1",
-    //         AddressLine2 = "adr2",
-    //         AddressLine3 = "adr3",
-    //         TownOrCity = "city",
-    //         County = "county",
-    //         Postcode = "cb2 1la"
-    //     };
-    // }
-    //
-    //     
-    // public LandlordProfileModel CreateLandlordProfileWithEditedEmail(string email)
-    // {
-    //     return new LandlordProfileModel
-    //     {
-    //         LandlordId = 3,
-    //         Email = email,
-    //         FirstName = "Landlord3Link",
-    //         LastName = "Landlord3Sur",
-    //         Title = "Mr",
-    //         Phone = "01189998819991197253",
-    //         LandlordType = "Non profit",
-    //         CharterApproved = true,
-    //         InviteLink = "InvitimusLinkimus",
-    //         Address = new AddressModel
-    //         {
-    //             AddressLine1 = "adr1",
-    //             AddressLine2 = "adr2",
-    //             AddressLine3 = "adr3",
-    //             TownOrCity = "city",
-    //             County = "county",
-    //             Postcode = "cb2 1la"
-    //         }
-    //     };
-    // }
-    //
-    // public LandlordProfileModel CreateLandlordProfileWithEditedMemberId(int memberId)
-    // {
-    //     return new LandlordProfileModel
-    //     {
-    //         LandlordId = 5,
-    //         Email = "test.landlord5&6@gmail.com",
-    //         FirstName = "Landlord3Link",
-    //         LastName = "Landlord3Sur",
-    //         Title = "Mr",
-    //         Phone = "01189998819991197253",
-    //         LandlordType = "Non profit",
-    //         CharterApproved = true,
-    //         MembershipId = $"Member-{memberId}",
-    //         InviteLink = "InvitimusLinkimus",
-    //         Address = new AddressModel
-    //         {
-    //             AddressLine1 = "adr1",
-    //             AddressLine2 = "adr2",
-    //             AddressLine3 = "adr3",
-    //             TownOrCity = "city",
-    //             County = "county",
-    //             Postcode = "cb2 1la"
-    //         }
-    //     };
-    // }
+    private LandlordDbModel CreateLandlordWithMembershipId(int memberId)
+    {
+        return new LandlordDbModel
+        {
+            Email = "test.landlord5&6@gmail.com",
+            FirstName = "Landlord5&6MembershipId",
+            LastName = "Landlord5&6Sur",
+            Title = "Mr",
+            Phone = "005&6",
+            LandlordType = "Non profit",
+            CharterApproved = true,
+            MembershipId = $"Member-{memberId}",
+            AddressLine1 = "adr1",
+            AddressLine2 = "adr2",
+            AddressLine3 = "adr3",
+            TownOrCity = "city",
+            County = "county",
+            Postcode = "cb2 1la"
+        };
+    }
+    
+        
+    public LandlordProfileModel CreateLandlordProfileWithEditedEmail(string email)
+    {
+        return new LandlordProfileModel
+        {
+            LandlordId = 3,
+            Email = email,
+            FirstName = "Landlord3Link",
+            LastName = "Landlord3Sur",
+            Title = "Mr",
+            Phone = "01189998819991197253",
+            LandlordType = "Non profit",
+            CharterApproved = true,
+            InviteLink = "InvitimusLinkimus",
+            Address = new AddressModel
+            {
+                AddressLine1 = "adr1",
+                AddressLine2 = "adr2",
+                AddressLine3 = "adr3",
+                TownOrCity = "city",
+                County = "county",
+                Postcode = "cb2 1la"
+            }
+        };
+    }
+    
+    public LandlordProfileModel CreateLandlordProfileWithEditedMemberId(int memberId)
+    {
+        return new LandlordProfileModel
+        {
+            LandlordId = 5,
+            Email = "test.landlord5&6@gmail.com",
+            FirstName = "Landlord3Link",
+            LastName = "Landlord3Sur",
+            Title = "Mr",
+            Phone = "01189998819991197253",
+            LandlordType = "Non profit",
+            CharterApproved = true,
+            MembershipId = $"Member-{memberId}",
+            InviteLink = "InvitimusLinkimus",
+            Address = new AddressModel
+            {
+                AddressLine1 = "adr1",
+                AddressLine2 = "adr2",
+                AddressLine3 = "adr3",
+                TownOrCity = "city",
+                County = "county",
+                Postcode = "cb2 1la"
+            }
+        };
+    }
 
     private PropertyDbModel CreateCompleteProperty()
     {

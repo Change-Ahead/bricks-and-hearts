@@ -176,8 +176,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         // Arrange
         await using var context = Fixture.CreateWriteContext();
         var service = new LandlordService(context);
-        var landlordToEdit = new LandlordProfileModel();
-        // var landlordToEdit = Fixture.CreateLandlordProfileWithEditedEmail("NewEmail@Boring.com");
+        var landlordToEdit = Fixture.CreateLandlordProfileWithEditedEmail("NewEmail@Boring.com");
 
         // Act
         var result = await service.EditLandlordDetails(landlordToEdit);
@@ -199,8 +198,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
             // Arrange
             using var context = Fixture.CreateReadContext();
             var service = new LandlordService(context);
-            var landlordToEdit = new LandlordProfileModel();
-            // var landlordToEdit = Fixture.CreateLandlordProfileWithEditedEmail("test.landlord1@gmail.com");
+            var landlordToEdit = Fixture.CreateLandlordProfileWithEditedEmail("test.landlord1@gmail.com");
 
             // Act
             var result = service.CheckForDuplicateEmail(landlordToEdit);
@@ -215,8 +213,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
             // Arrange
             using var context = Fixture.CreateReadContext();
             var service = new LandlordService(context);
-            var landlordToEdit = new LandlordProfileModel();
-            // var landlordToEdit = Fixture.CreateLandlordProfileWithEditedEmail("NewEmail@Boring.com");
+            var landlordToEdit = Fixture.CreateLandlordProfileWithEditedEmail("NewEmail@Boring.com");
 
             // Act
             var result = service.CheckForDuplicateEmail(landlordToEdit);
@@ -235,8 +232,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
             // Arrange
             using var context = Fixture.CreateReadContext();
             var service = new LandlordService(context);
-            var landlordToEdit = new LandlordProfileModel();
-            // var landlordToEdit = Fixture.CreateLandlordProfileWithEditedMemberId(421);
+            var landlordToEdit = Fixture.CreateLandlordProfileWithEditedMemberId(421);
 
             // Act
             var result = service.CheckForDuplicateMembershipId(landlordToEdit);
@@ -251,8 +247,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
             // Arrange
             using var context = Fixture.CreateReadContext();
             var service = new LandlordService(context);
-            var landlordToEdit = new LandlordProfileModel();
-            // var landlordToEdit = Fixture.CreateLandlordProfileWithEditedMemberId(1);
+            var landlordToEdit = Fixture.CreateLandlordProfileWithEditedMemberId(1);
 
             // Act
             var result = service.CheckForDuplicateMembershipId(landlordToEdit);
