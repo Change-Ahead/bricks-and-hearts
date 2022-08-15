@@ -182,7 +182,7 @@ public class LandlordController : AbstractController
                 flashMessageType = "warning";
                 break;
         }
-        
+
         _logger.LogInformation(flashMessageBody);
         AddFlashMessage(flashMessageType, flashMessageBody);
         return RedirectToAction("Profile", "Landlord", new { Id = landlord.LandlordId.Value });
@@ -286,6 +286,7 @@ public class LandlordController : AbstractController
         }
 
         model.InviteLinkToAccept = inviteLink;
+        model.Landlord = LandlordProfileModel.FromDbModel(landlord);
         return View(model);
     }
 
@@ -295,27 +296,23 @@ public class LandlordController : AbstractController
     {
         var user = GetCurrentUser();
         var result = await _landlordService.LinkExistingLandlordWithUser(inviteLink, user);
-        if (result == ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist)
+        switch (result)
         {
-            _logger.LogWarning("Invite Link {Link} does not work", inviteLink);
-            return RedirectToAction(nameof(Invite), new { inviteLink });
+            case ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist:
+                _logger.LogWarning("Invite Link {Link} does not work", inviteLink);
+                return RedirectToAction(nameof(Invite), new { inviteLink });
+            case ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord:
+                _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
+                AddFlashMessage("warning", $"User already registered with landlord (landlordId = {user.LandlordId})");
+                return RedirectToAction(nameof(MyProfile));
+            case ILandlordService.LinkUserWithLandlordResult.Success:
+                _logger.LogInformation("Successfully registered landlord with user {UserId}", user.Id);
+                AddFlashMessage("success",
+                    $"User {user.Id} successfully linked with landlord (landlordId = {user.LandlordId})");
+                return RedirectToAction(nameof(MyProfile));
+            default:
+                throw new Exception($"Unknown landlord registration error ${result}");
         }
-
-        if (result == ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord)
-        {
-            _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
-            AddFlashMessage("warning", $"User already registered with landlord (landlordId = {user.LandlordId})");
-            return RedirectToAction(nameof(MyProfile));
-        }
-
-        if (result == ILandlordService.LinkUserWithLandlordResult.Success)
-        {
-            _logger.LogInformation("Successfully registered landlord with user {UserId}", user.Id);
-            AddFlashMessage("success", $"User {user.Id} successfully linked with landlord (landlordId = {user.LandlordId})");
-            return RedirectToAction(nameof(MyProfile));
-        }
-
-        throw new Exception($"Unknown landlord registration error ${result}");
     }
 
     [HttpGet]
