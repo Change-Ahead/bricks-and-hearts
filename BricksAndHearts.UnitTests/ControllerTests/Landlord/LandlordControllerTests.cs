@@ -65,11 +65,10 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
         // Act
         await UnderTest.ApproveCharter(landlordProfile);
-        var flashMessages = UnderTest.TempData["FlashMessages"] as List<string>;
 
         // Assert
         A.CallTo(() => LandlordService.ApproveLandlord(landlordUser.Id, adminUser, "abc")).MustHaveHappened();
-        flashMessages.Should().Contain("Successfully approved landlord charter.");
+        FlashMessages.Should().Contain("Successfully approved landlord charter.");
     }
 
     [Fact]
@@ -83,11 +82,10 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
         // Act
         await UnderTest.ApproveCharter(landlordProfile);
-        var flashMessages = UnderTest.TempData["FlashMessages"] as List<string>;
 
         // Assert
         A.CallTo(() => LandlordService.ApproveLandlord(landlordUser.Id, adminUser, null!)).MustNotHaveHappened();
-        flashMessages.Should().Contain("Membership ID is required.");
+        FlashMessages.Should().Contain("Membership ID is required.");
     }
 
     [Fact]
@@ -284,7 +282,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("Invite");
         result.Should().BeOfType<RedirectToActionResult>().Which.RouteValues.Should()
             .Contain("inviteLink", inviteLink);
-        UnderTest.TempData["FlashMessage"].Should().BeNull();
+        UnderTest.TempData["FlashMessages"].Should().BeNull();
     }
 
     [Fact]
@@ -300,11 +298,10 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
         // Act
         var result = await UnderTest.TieUserWithLandlord(inviteLink);
-        var flashMessages = UnderTest.TempData["FlashMessages"] as List<string>;
 
         // Assert   
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("MyProfile");
-        flashMessages.Should()
+        FlashMessages.Should()
             .Contain($"User already registered with landlord (landlordId = {landlordUser.LandlordId})");
     }
 
@@ -321,11 +318,10 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
         // Act
         var result = await UnderTest.TieUserWithLandlord(inviteLink);
-        var flashMessages = UnderTest.TempData["FlashMessages"] as List<string>;
 
         // Assert
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("MyProfile");
-        flashMessages.Should()
+        FlashMessages.Should()
             .Contain($"User {nonLandlordUser.Id} successfully linked with landlord (landlordId = {nonLandlordUser.LandlordId})");
     }
 }

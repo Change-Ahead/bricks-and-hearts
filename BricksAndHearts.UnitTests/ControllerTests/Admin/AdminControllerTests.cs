@@ -168,14 +168,13 @@ public class AdminControllerTests : AdminControllerTestsBase
 
         // Act
         var result = UnderTest.RemoveAdmin(1) as RedirectToActionResult;
-        var flashMessages = UnderTest.TempData["FlashMessages"] as List<string>;
 
         // Assert
         A.CallTo(() => AdminService.RemoveAdmin(1)).MustNotHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("GetAdminList");
-        flashMessages.Should().Contain("You may not remove your own admin status");
+        FlashMessages.Should().Contain("You may not remove your own admin status");
     }
     
     [Fact]
@@ -252,7 +251,6 @@ public class AdminControllerTests : AdminControllerTestsBase
 
         // Act
         var result = UnderTest.GetInviteLink(1) as RedirectToActionResult;
-        var flashMessages = UnderTest.TempData["FlashMessages"] as List<string>;
 
         // Assert
         A.CallTo(() => AdminService.FindUserByLandlordId(1)).MustHaveHappened();
@@ -260,7 +258,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Profile");
-        flashMessages.Should().Contain($"Landlord already linked to user {landlordUser.GoogleUserName}");
+        FlashMessages.Should().Contain($"Landlord already linked to user {landlordUser.GoogleUserName}");
     }
     
     [Fact]
@@ -275,7 +273,6 @@ public class AdminControllerTests : AdminControllerTestsBase
 
         // Act
         var result = UnderTest.GetInviteLink(1) as RedirectToActionResult;
-        var flashMessages = UnderTest.TempData["FlashMessages"] as List<string>;
 
         // Assert
         A.CallTo(() => AdminService.FindUserByLandlordId(1)).MustHaveHappened();
@@ -284,7 +281,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Profile");
-        flashMessages.Should().Contain("Successfully created a new invite link: http:///invite/new link");
+        FlashMessages.Should().Contain("Successfully created a new invite link: http:///invite/new link");
     }
     
     [Fact]
@@ -298,7 +295,6 @@ public class AdminControllerTests : AdminControllerTestsBase
 
         // Act
         var result = UnderTest.GetInviteLink(1) as RedirectToActionResult;
-        var flashMessages = UnderTest.TempData["FlashMessages"] as List<string>;
 
         // Assert
         A.CallTo(() => AdminService.FindUserByLandlordId(1)).MustHaveHappened();
@@ -307,7 +303,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Profile");
-        flashMessages.Should().Contain("Landlord already has an invite link: http:///invite/existing link");
+        FlashMessages.Should().Contain("Landlord already has an invite link: http:///invite/existing link");
     }
     
     [Fact]
@@ -321,7 +317,6 @@ public class AdminControllerTests : AdminControllerTestsBase
 
         // Act
         var result = UnderTest.RenewInviteLink(1) as RedirectToActionResult;
-        var flashMessages = UnderTest.TempData["FlashMessages"] as List<string>;
 
         // Assert
         A.CallTo(() => AdminService.FindUserByLandlordId(1)).MustHaveHappened();
@@ -329,7 +324,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Profile");
-        flashMessages.Should().Contain($"Landlord already linked to user {landlordUser.GoogleUserName}");
+        FlashMessages.Should().Contain($"Landlord already linked to user {landlordUser.GoogleUserName}");
     }
     
     [Fact]
@@ -344,7 +339,6 @@ public class AdminControllerTests : AdminControllerTestsBase
 
         // Act
         var result = UnderTest.RenewInviteLink(1) as RedirectToActionResult;
-        var flashMessages = UnderTest.TempData["FlashMessages"] as List<string>;
 
         // Assert
         A.CallTo(() => AdminService.FindUserByLandlordId(1)).MustHaveHappened();
@@ -354,7 +348,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Profile");
-       flashMessages.Should().Contain("No existing invite link. Successfully created a new invite link");
+        FlashMessages.Should().Contain("No existing invite link. Successfully created a new invite link");
     }
     
     [Fact]
@@ -368,7 +362,6 @@ public class AdminControllerTests : AdminControllerTestsBase
 
         // Act
         var result = UnderTest.RenewInviteLink(1) as RedirectToActionResult;
-        var flashMessages = UnderTest.TempData["FlashMessages"] as List<string>;
 
         // Assert
         A.CallTo(() => AdminService.FindUserByLandlordId(1)).MustHaveHappened();
@@ -378,7 +371,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Profile");
-        flashMessages.Should().Contain("Successfully created a new invite link");
+        FlashMessages.Should().Contain("Successfully created a new invite link");
     }
 
     [Fact]
@@ -391,13 +384,12 @@ public class AdminControllerTests : AdminControllerTestsBase
 
         // Act
         var result = await UnderTest.ImportTenants(csvFile) as RedirectToActionResult;
-        var flashMessages = UnderTest.TempData["FlashMessages"] as List<string>;
 
         // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("TenantList");
-        flashMessages.Should().Contain(
+        FlashMessages.Should().Contain(
             $"{csvFile.FileName} contains no data. Please upload a file containing the tenant data you would like to import.");
        
     }
@@ -412,13 +404,12 @@ public class AdminControllerTests : AdminControllerTestsBase
 
         // Act
         var result = await UnderTest.ImportTenants(csvFile) as RedirectToActionResult;
-        var flashMessages = UnderTest.TempData["FlashMessages"] as List<string>;
 
         // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("TenantList");
-        flashMessages.Should().Contain(
+        FlashMessages.Should().Contain(
             $"{csvFile.FileName} is not a CSV file. Please upload your data as a CSV file.");
     }
     

@@ -155,21 +155,20 @@ public class AdminController : AbstractController
         else
         {
             var inviteLink = _adminService.FindExistingInviteLink(landlordId);
-            string flashMessageBody;
+            string logMessage;
             if (string.IsNullOrEmpty(inviteLink))
             {
-                flashMessageBody = "Successfully created a new invite link";
+                logMessage = "Successfully created a new invite link";
                 inviteLink = _adminService.CreateNewInviteLink(landlordId);
             }
             else
             {
-                flashMessageBody = "Landlord already has an invite link";
+                logMessage = "Landlord already has an invite link";
             }
 
-            _logger.LogInformation(flashMessageBody);
-            AddFlashMessage("success", flashMessageBody + $": {(HttpContext.Request.IsHttps ? "https" : "http")}" +
-                                                                                    $"://{HttpContext.Request.Host}" +
-                                                                                    $"/invite/{inviteLink}");
+            _logger.LogInformation(logMessage);
+            var flashMessage = logMessage + $": {(HttpContext.Request.IsHttps ? "https" : "http")}://{HttpContext.Request.Host}/invite/{inviteLink}";
+            AddFlashMessage("success", flashMessage);
         }
 
         return RedirectToAction("Profile", "Landlord", new { id = landlordId });

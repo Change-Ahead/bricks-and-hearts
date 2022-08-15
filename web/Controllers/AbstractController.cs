@@ -2,7 +2,6 @@
 
 using BricksAndHearts.Auth;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Azure;
 
 #endregion
 
@@ -19,15 +18,10 @@ public abstract class AbstractController : Controller
 
     protected void AddFlashMessage(string flashType, string flashMessage)
     {
-        if (TempData["FlashMessages"] == null||TempData["FlashTypes"] == null)
-        {
-            TempData["FlashTypes"] = new List<string>{flashType};
-            TempData["FlashMessages"] = new List<string> {flashMessage};
-        }
-        else
-        {
-            (TempData["FlashTypes"] as List<string>)!.Add(flashType);
-            (TempData["FlashMessages"] as List<string>)!.Add(flashMessage);
-        }
+        TempData["FlashTypes"] ??= new List<string>();
+        TempData["FlashMessages"] ??= new List<string>();
+        
+        (TempData["FlashTypes"] as List<string>)!.Add(flashType);
+        (TempData["FlashMessages"] as List<string>)!.Add(flashMessage);
     }
 }

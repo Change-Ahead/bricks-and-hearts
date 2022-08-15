@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using BricksAndHearts.Controllers;
 using BricksAndHearts.Services;
@@ -15,6 +16,7 @@ public class AdminControllerTestsBase : ControllerTestsBase
     protected readonly ILandlordService LandlordService;
     protected readonly IPropertyService PropertyService;
     protected readonly ICsvImportService CsvImportService;
+    protected IEnumerable<string>? FlashMessages => UnderTest.TempData["FlashMessages"] as List<string>;
     protected readonly AdminController UnderTest;
 
     protected AdminControllerTestsBase()
@@ -28,7 +30,7 @@ public class AdminControllerTestsBase : ControllerTestsBase
         var tempData = new TempDataDictionary(httpContext, A.Fake<ITempDataProvider>());
         UnderTest = new AdminController(Logger, AdminService, LandlordService, PropertyService, CsvImportService){TempData = tempData};
     }
-    
+
     protected IFormFile CreateExampleFile(string fileName, int length)
     {
         var stream = new MemoryStream();
