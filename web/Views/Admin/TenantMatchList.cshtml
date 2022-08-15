@@ -1,22 +1,7 @@
-﻿@using BricksAndHearts.Services
-@model TenantMatchListModel
+﻿@model TenantMatchListModel
 
 @{
     ViewData["Title"] = "Tenant List";
-}
-
-@{
-    if (TempData["MultipleFlashMessages"] != null)
-    {
-        var flashMessages = TempData["MultipleFlashMessages"] as string[];
-        var flashTypes = TempData["MultipleFlashTypes"] as string[];
-        for (int i = 0; i < flashMessages!.Length; i++)
-        {
-            <div class="alert alert-@flashTypes![i]" role="alert">
-            @flashMessages[i]
-            </div>
-        }
-    }
 }
 
 <h2>Tenant Matches for @Model.CurrentProperty.Address.AddressLine1 @Model.CurrentProperty.Address.AddressLine2 @Model.CurrentProperty.Address.AddressLine3</h2>

@@ -160,6 +160,18 @@ public class AdminController : AbstractController
 
     [Authorize(Roles = "Admin")]
     [HttpPost]
+    [Route("{currentPropertyId:int}/Matches")]
+    public ActionResult SendMatchLinkEmail(string propertyLink, string tenantEmail, int currentPropertyId)
+    {
+        var addressToSendTo = new List<string> { tenantEmail };
+        _mailService.TrySendMsgInBackground(propertyLink, tenantEmail, addressToSendTo);
+        _logger.LogInformation($"Successfully emailed tenant {tenantEmail}");
+        AddFlashMessage("success", $"successfully emailed {tenantEmail}");
+        return RedirectToAction("TenantMatchList", new {currentPropertyId});
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
     public ActionResult GetInviteLink(int landlordId)
     {
         var user = _adminService.FindUserByLandlordId(landlordId);
@@ -276,16 +288,5 @@ public class AdminController : AbstractController
             AddFlashMessage("success", "Successfully imported all tenant data.");
         }
         return RedirectToAction(nameof(TenantList));
-    }
-
-    [Authorize(Roles = "Admin")]
-    [HttpPost]
-    [Route("{currentPropertyId:int}/Matches")]
-    public ActionResult SendMatchLinkEmail(string propertyLink, string tenantEmail, int currentPropertyId)
-    {
-        var addressToSendTo = new List<string> { tenantEmail };
-        _mailService.TrySendMsgInBackground(propertyLink, tenantEmail, addressToSendTo);
-        FlashMessage(_logger, ("Successfully emailed tenant", "success", $"successfully emailed {tenantEmail}"));
-        return RedirectToAction(nameof(TenantMatchList), new {currentPropertyId});
     }
 }

@@ -1,9 +1,13 @@
+using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
+using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Admin;
@@ -461,5 +465,42 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("TenantList");
+    }
+
+    [Fact]
+    public async void TenantMatchList_CalledWithAnyInput_ReturnsTenantMatchListAndGetsNearestTenants()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        
+        
+        // Act
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(A.Fake<PropertyDbModel>());
+        A.CallTo(() => AdminService.GetNearestTenantsToProperty(A.Fake<PropertyViewModel>())).Returns(A.Fake<List<TenantDbModel>>());
+        var result = await UnderTest.TenantMatchList(1);
+
+        // Assert
+        A.CallTo(() => AdminService.GetNearestTenantsToProperty(A<PropertyViewModel>.Ignored)).MustHaveHappened();
+        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
+        result.Should().BeOfType<ViewResult>().Which.ViewName.Should().Be("TenantMatchList");
+    }
+
+    [Fact]
+    public void SendMatchLinkEmail_CalledWithAnyInput_ReturnsTenantMatchListAndSendsEmail()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        
+        // Act
+        A.CallTo(() => MailService.TrySendMsgInBackground(A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored)).DoesNothing();
+        var result = UnderTest.SendMatchLinkEmail("test", "a@b.com", 1);
+
+        // Assert
+        A.CallTo(() => MailService.TrySendMsgInBackground(A<string>.Ignored,
+                                                                        A<string>.Ignored,
+                                                                            A<List<string>>.Ignored)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("TenantMatchList");
     }
 }
