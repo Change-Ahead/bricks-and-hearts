@@ -27,22 +27,11 @@ public class AddressModel
 
     public string ToShortAddressString()
     {
-        var address = new StringBuilder(AddressLine1);
-        if (AddressLine2 != null)
-        {
-            address.Append($", {AddressLine2}");
-        }
+        var address = AddressLine1;
+        address += AddressLine2 != null ? $", {AddressLine2}" : "";
+        address += AddressLine3 != null ? $", {AddressLine3}" : "";
+        address += TownOrCity != null ? $", {TownOrCity}" : "";
 
-        if (AddressLine3 != null)
-        {
-            address.Append($", {AddressLine3}");
-        }
-
-        if (TownOrCity != null)
-        {
-            address.Append($", {TownOrCity}");
-        }
-
-        return address.ToString();
+        return address;
     }
 }
