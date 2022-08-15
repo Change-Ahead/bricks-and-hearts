@@ -106,7 +106,7 @@ public class PostcodeService : IPostcodeService
         var postcodesToLookup = new List<string>();
         foreach (string postcode in postcodes)
         {
-            if (!_dbContext.Postcodes.Any(p => p.Postcode == postcode))
+            if (!_dbContext.Postcodes.Any(p => p.Postcode == postcode) && !postcodesToLookup.Any(p => p == postcode))
             {
                 postcodesToLookup.Add(postcode);
             }

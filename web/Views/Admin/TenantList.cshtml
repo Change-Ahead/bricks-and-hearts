@@ -11,6 +11,13 @@
         <i class="bi bi-arrow-90deg-down"></i> Filter
     </a>
 </div>
+<div class="col-8">
+    @using (Html.BeginForm("SortTenantsByLocation", "Tenant", FormMethod.Get))
+    {
+        <input class="form-control" id="postcode" name="postcode" required placeholder="Enter postcode to sort by location" pattern="([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"/>
+        <button type="submit" class="btn custom-btn-primary"> Sort </button>
+    }
+</div>
 <div class="collapse @(Model.Filter.GetList().SequenceEqual(new HousingRequirementModel().GetList()) ? "":"show")" id="dropdown-contents">
     <form method="get" asp-controller="Admin" asp-action="TenantList">
 

@@ -37,6 +37,7 @@ builder.Services.AddHttpClient();
 builder.Services.AddScoped<ILandlordService, LandlordService>();
 builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddScoped<IPropertyService, PropertyService>();
+builder.Services.AddScoped<ITenantService, TenantService>();
 builder.Services.AddScoped<ICsvImportService, CsvImportService>();
 builder.Services.AddScoped<IMailService, MailService>();
 builder.Services.AddScoped<IAzureMapsApiService, AzureMapsApiService>();
