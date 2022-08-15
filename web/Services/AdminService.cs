@@ -139,52 +139,61 @@ public class AdminService : IAdminService
         return await landlordQuery.ToListAsync();
     }
 
-    private IQueryable<TenantDbModel> GetFilteredTenantQuery(HousingRequirementModel filters)
+    private IQueryable<TenantDbModel> GetFilteredTenantQuery(HousingRequirementModel filters, bool filterOrMatching)
     {
         var tenantQuery = from tenants in _dbContext.Tenants select tenants;
-        var currentFilterNo = -1;
-        foreach (var filter in filters)
+        var filterList = filters.GetList();
+        if (filterList.SequenceEqual(new HousingRequirementModel().GetList())) return tenantQuery;
+        tenantQuery = tenantQuery.Where(t => (t.Type == "Single" && filterList[0] == true) ||
+                                             (t.Type == "Couple" && filterList[1] == true) ||
+                                             (t.Type == "Family" && filterList[2] == true) ||
+                                             (filterList[0] != true && filterList[1] != true && filterList[2] != true));
+        /*the above are INCLUSIVE filters*/
+        if (filterOrMatching)
         {
-            currentFilterNo++;
-            if (filter != null)
+            if (filterList[3]==false)
             {
-                tenantQuery = currentFilterNo switch
-                {
-                    0 => filter switch
-                    {
-                        true => tenantQuery.Where(t => t.Type == "Single"),
-                        false => tenantQuery.Where(t => t.Type != "Single")
-                    },
-                    1 => filter switch
-                    {
-                        true => tenantQuery.Where(t => t.Type == "Couple"),
-                        false => tenantQuery.Where(t => t.Type != "Couple")
-                    },
-                    2 => filter switch
-                    {
-                        true => tenantQuery.Where(t => t.Type == "Family"),
-                        false => tenantQuery.Where(t => t.Type != "Family")
-                    },
-                    3 => tenantQuery.Where(t => t.HasPet == filter),
-                    4 => tenantQuery.Where(t => t.ETT == filter),
-                    5 => tenantQuery.Where(t => t.UniversalCredit == filter),
-                    6 => tenantQuery.Where(t => t.HousingBenefits == filter),
-                    7 => tenantQuery.Where(t => t.Over35 == filter),
-                    _ => tenantQuery
-                };
+                tenantQuery = tenantQuery.Where(t => t.HasPet == false);
             }
+
+            if (filterList[4]==false)
+            {
+                tenantQuery = tenantQuery.Where(t => t.ETT == false);
+            }
+
+            if (filterList[5]==false)
+            {
+                tenantQuery = tenantQuery.Where(t => t.UniversalCredit == false);
+            }
+
+            if (filterList[6]==false)
+            {
+                tenantQuery = tenantQuery.Where(t => t.HousingBenefits == false);
+            }
+
+            if (filterList[7]==false)
+            {
+                tenantQuery = tenantQuery.Where(t => t.Over35 == false);
+            }
+            return tenantQuery;
         }
-        return tenantQuery;
+        /*Above are INCLUSIVE filters for the matching page*/
+        return tenantQuery.Where(t => (filterList[3] == null || t.HasPet == filterList[3]) &&
+                                      (filterList[4] == null || t.ETT == filterList[4]) &&
+                                      (filterList[5] == null || t.UniversalCredit == filterList[5]) &&
+                                      (filterList[6] == null || t.HousingBenefits == filterList[6]) &&
+                                      (filterList[7] == null || t.Over35 == filterList[7]));
+        /*Above are EXCLUSIVE filters for the filters page*/
     }
-    
+
     public async Task<List<TenantDbModel>> GetTenantList(HousingRequirementModel filters)
     {
-        return await GetFilteredTenantQuery(filters).ToListAsync();
+        return await GetFilteredTenantQuery(filters, false).ToListAsync();
     }
 
     public async Task<List<TenantDbModel>> GetNearestTenantsToProperty(PropertyViewModel currentProperty)
     {
-        var tenantQuery = GetFilteredTenantQuery(currentProperty.LandlordRequirements);
+        var tenantQuery = GetFilteredTenantQuery(currentProperty.LandlordRequirements, true);
         //TODO: Currently orders by name, needs to order by distance from property. This depends on BNH-142 and others!
         tenantQuery = tenantQuery.OrderBy(t => t.Name).Take(5);
         return await tenantQuery.ToListAsync();
