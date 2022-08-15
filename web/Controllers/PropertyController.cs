@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
@@ -231,8 +232,10 @@ public class PropertyController : AbstractController
     public async Task<ActionResult> PropertyInputStepOne([FromForm] PropertyInputFormViewModel model,
         [FromRoute] int landlordId, [FromRoute] int propertyId, [FromRoute] string operationType)
     {
+        var isValid =
+            Validator.TryValidateObject(model.Step1.Address, new ValidationContext(model.Step1?.Address), null);
         // Check model validity
-        if (!ModelState.IsValid)
+        if (!ModelState.IsValid && isValid)
         {
             return RedirectToAction("PropertyInputStepOne", "Property",
                 new

@@ -35,6 +35,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         MakeUserPrincipalInController(unregisteredUser, UnderTest);
         var formResultModel = new LandlordProfileModel();
         var returnedLandlord = new LandlordDbModel();
+        formResultModel.Address.Postcode = "N3 2FT";
 
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel, unregisteredUser))
             .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));

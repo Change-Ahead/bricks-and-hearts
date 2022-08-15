@@ -26,6 +26,7 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
         {
             Unassigned = true
         };
+        formResultModel.Address.Postcode = "N3 2FT";
         var msgBody = $"A Landlord has just registered\n"
                       + "\n"
                       + $"Title: {formResultModel.Title}\n"
@@ -41,6 +42,7 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
             A<string>.That.Matches(s => s == msgBody), A<string>.That.Matches(s => s == subject), A<List<string>>.Ignored, A<string>.Ignored,
             A<string>.Ignored
         )).WithAnyArguments().DoesNothing();
+
 
         // Act
         var result = await UnderTest.RegisterPost(formResultModel) as RedirectToActionResult;
@@ -66,7 +68,7 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
         var returnedLandlord = A.Fake<LandlordDbModel>();
         var formResultModel = A.Fake<LandlordProfileModel>();
         formResultModel.Unassigned = true;
-
+        formResultModel.Address.Postcode = "N3 2FT";
         // Act
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel))
             .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));

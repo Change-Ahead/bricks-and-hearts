@@ -4,6 +4,7 @@ using BricksAndHearts.Controllers;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
+using BricksAndHearts.ViewModels.PropertyInput;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -15,6 +16,7 @@ public class PropertyControllerTestsBase : ControllerTestsBase
 {
     protected readonly IAzureMapsApiService AzureMapsApiService;
     protected readonly IAzureStorage AzureStorage;
+    protected readonly ILogger<PropertyController> Logger;
     protected readonly IPropertyService PropertyService;
     protected readonly ILandlordService LandlordService;
     protected readonly PropertyController UnderTest;
@@ -54,6 +56,70 @@ public class PropertyControllerTestsBase : ControllerTestsBase
             OccupiedUnits = 2
         };
     }
+
+    protected PropertyInputFormViewModel CreateExamplePropertyInputFormViewModel()
+    {
+        return new PropertyInputFormViewModel
+        {
+            Step1 = new PropertyInputModelStep1
+            {
+                Address = new AddressModel
+                {
+                    AddressLine1 = "Adr1",
+                    AddressLine2 = "Adr2",
+                    AddressLine3 = "Adr3",
+                    TownOrCity = "City",
+                    County = "County",
+                    Postcode = "Postcode"
+                }
+            },
+            Step2 = new PropertyInputModelStep2
+            {
+                Address = new AddressModel
+                {
+                    AddressLine1 = "Adr1",
+                    AddressLine2 = "Adr2",
+                    AddressLine3 = "Adr3",
+                    TownOrCity = "City",
+                    County = "County",
+                    Postcode = "Postcode"
+                }
+            },
+            Step3 = new PropertyInputModelStep3
+            {
+                NumOfBedrooms = 12,
+                PropertyType = "Detached"
+            },
+            Step4 = new PropertyInputModelStep4
+            {
+                Description = "Sample Description"
+            },
+            Step5 = new PropertyInputModelStep5
+            {
+                HousingRequirementModel = new HousingRequirementModel
+                {
+                    AcceptsSingleTenant = false,
+                    AcceptsCouple = false,
+                    AcceptsFamily = true,
+                    AcceptsPets = true,
+                    AcceptsNotEET = false,
+                    AcceptsCredit = true,
+                    AcceptsBenefits = false,
+                    AcceptsOver35 = true,
+                    AcceptsWithoutGuarantor = true
+                }
+            },
+            Step6 = new PropertyInputModelStep6
+            {
+                OccupiedUnits = 2,
+                TotalUnits = 5,
+                AvailableFrom = null,
+                Availability = "draft",
+                Rent = 1000
+            }
+        };
+    }
+
 
     protected static PropertyDbModel CreateExamplePropertyDbModel()
     {
