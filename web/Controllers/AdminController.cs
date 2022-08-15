@@ -5,6 +5,7 @@ using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 #endregion
 
@@ -17,15 +18,17 @@ public class AdminController : AbstractController
     private readonly IPropertyService _propertyService;
     private readonly ICsvImportService _csvImportService;
     private readonly ILogger<AdminController> _logger;
+    private readonly IMailService _mailService;
 
     public AdminController(ILogger<AdminController> logger, IAdminService adminService,
-        ILandlordService landlordService, IPropertyService propertyService, ICsvImportService csvImportService)
+        ILandlordService landlordService, IPropertyService propertyService, ICsvImportService csvImportService, IMailService mailService)
     {
         _logger = logger;
         _adminService = adminService;
         _landlordService = landlordService;
         _propertyService = propertyService;
         _csvImportService = csvImportService;
+        _mailService = mailService;
     }
 
     [HttpGet]
@@ -273,5 +276,16 @@ public class AdminController : AbstractController
             AddFlashMessage("success", "Successfully imported all tenant data.");
         }
         return RedirectToAction(nameof(TenantList));
+    }
+
+    [Authorize(Roles = "Admin")]
+    [HttpPost]
+    [Route("{currentPropertyId:int}/Matches")]
+    public ActionResult SendMatchLinkEmail(string propertyLink, string tenantEmail, int currentPropertyId)
+    {
+        var addressToSendTo = new List<string> { tenantEmail };
+        _mailService.TrySendMsgInBackground(propertyLink, tenantEmail, addressToSendTo);
+        FlashMessage(_logger, ("Successfully emailed tenant", "success", $"successfully emailed {tenantEmail}"));
+        return RedirectToAction(nameof(TenantMatchList), new {currentPropertyId});
     }
 }

@@ -10,13 +10,15 @@ public interface IMailService
     public Task SendMsg(
         string msgBody,
         string subject,
+        List<string>? msgToAddress,
         string msgFromName = "",
         string msgToName = ""
     );
 
     public void TrySendMsgInBackground(
         string msgBody,
-        string subject
+        string subject,
+        List<string>? msgToAddress
     );
 }
 
@@ -34,11 +36,13 @@ public class MailService : IMailService
     public async Task SendMsg(
         string msgBody,
         string subject,
+        List<string>? msgToAddress,
         string msgFromName = "",
         string msgToName = ""
     )
     {
-        var msgFromAddress = _config.Value.FromAddress; 
+        var msgFromAddress = _config.Value.FromAddress;
+        msgToAddress ??= _config.Value.ToAddress;
         
         var message = new MimeMessage();
         message.From.Add(new MailboxAddress(msgFromName, msgFromAddress));
@@ -47,9 +51,9 @@ public class MailService : IMailService
         {
             Text = msgBody
         };
-        foreach (var msgToAddress in _config.Value.ToAddress)
+        foreach (var address in msgToAddress)
         {
-            message.To.Add(new MailboxAddress(msgToName, msgToAddress));
+            message.To.Add(new MailboxAddress(msgToName, address));
         }
 
         using var client = new SmtpClient();
@@ -65,13 +69,14 @@ public class MailService : IMailService
     private async Task TrySendMsg(
         string msgBody,
         string subject,
+        List<string>? msgToAddress,
         string msgFromName = "",
         string msgToName = ""
     )
     {
         try
         {
-            await SendMsg(msgBody, subject, msgFromName, msgToName);
+            await SendMsg(msgBody, subject, msgToAddress, msgFromName, msgToName);
             _logger.LogInformation("Successfully sent emails");
         }
         catch (Exception e)
@@ -84,9 +89,10 @@ public class MailService : IMailService
 
     public void TrySendMsgInBackground(
         string msgBody,
-        string subject
+        string subject,
+        List<string>? msgToAddress
     )
     {
-        Task.Run(() => TrySendMsg(msgBody, subject));
+        Task.Run(() => TrySendMsg(msgBody, subject, msgToAddress));
     }
 }
