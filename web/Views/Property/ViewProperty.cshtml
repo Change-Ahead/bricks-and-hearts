@@ -44,7 +44,7 @@
 
 <div class="row mt-4">
     <div class="col-auto mb-2">
-        <a asp-action="EditProperty" asp-controller="Property" class="btn btn-large btn-outline-primary d-table-cell">Edit property</a>
+        <a asp-action="EditProperty" asp-controller="Property" asp-route-propertyId="@Model.Property.PropertyId" class="btn btn-large btn-outline-primary d-table-cell">Edit property</a>
     </div>
     <div class="col-auto">
         <button type="button" class="btn btn-large btn-danger" data-bs-toggle="modal" data-bs-target="#deletePropertyModal">
