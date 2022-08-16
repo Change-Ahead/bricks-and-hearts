@@ -32,9 +32,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <form method="post" asp-controller="Property" asp-action="PropertyInputCancel" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId" asp-route-operationType="@(Model.IsEdit ? "edit" : "add")">
-                        <input type="submit" value="Cancel" class="btn btn-danger"/>
-                    </form>
+                    <a class="btn btn-danger" asp-controller="Property" asp-action="PropertyInputCancel" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId" asp-route-operationType="@(Model.IsEdit ? "edit" : "add")">Delete Property</a>
                 </div>
             </div>
         </div>
@@ -52,9 +50,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <form method="post" asp-controller="Property" asp-action="PropertyInputCancel" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId" asp-route-operationType="@(Model.IsEdit ? "edit" : "add")">
-                        <input type="submit" value="Stop Editing" class="btn btn-danger"/>
-                    </form>
+                    <a class="btn btn-danger" asp-controller="Property" asp-action="PropertyInputCancel" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId" asp-route-operationType="@(Model.IsEdit ? "edit" : "add")">Stop Editing</a>
                 </div>
             </div>
         </div>

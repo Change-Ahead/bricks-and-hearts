@@ -301,7 +301,7 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpGet("{operationType:regex(^(add|edit)$)}/{propertyId:int}/step/2")]
-    public ActionResult PropertyInputStepTwo(int propertyId, [FromRoute] string operationType)
+    public ActionResult PropertyInputStepTwo([FromRoute] int propertyId, [FromRoute] string operationType)
     {
         //Get Database record (if there is one)
         var property = _propertyService.GetPropertyByPropertyId(propertyId);
@@ -604,14 +604,14 @@ public class PropertyController : AbstractController
     }
 
     [Authorize(Roles = "Landlord, Admin")]
-    [HttpPost(
-        @"/landlord/{landlordId:int}/property/{operationType:regex(^(add|edit)$)})/{propertyId:int}/step/{step:int}/cancel")]
+    [HttpGet(
+        @"/landlord/{landlordId:int}/property/{operationType:regex(^(add|edit)$)})/{propertyId:int}/cancel")]
     public async Task<ActionResult> PropertyInputCancel([FromRoute] int propertyId, [FromRoute] int landlordId,
         [FromRoute] string operationType)
     {
         if (operationType == "edit")
         {
-            return RedirectToAction("ViewProperty", "Property", new { id = propertyId });
+            return RedirectToAction("ViewProperty", "Property", new { propertyId });
         }
 
         // Get the property we're currently adding

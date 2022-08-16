@@ -39,7 +39,12 @@
 
     <div class="my-4 py-3">
         <label class="form-label">Will you accept tenants:</label>
-
+        <div class="form-check">
+            @Html.CheckBox("Step5.HousingRequirementModel.AcceptsCredit", Model.Step5!.HousingRequirementModel.AcceptsCredit ?? false, new { @class = "form-check-input" })
+            <label asp-for="Step5!.HousingRequirementModel.AcceptsCredit" class="form-check-label">
+                on Universal Credit or housing benefits?
+            </label>
+        </div>
         <div class="form-check">
             @Html.CheckBox("Step5.HousingRequirementModel.AcceptsBenefits", Model.Step5!.HousingRequirementModel.AcceptsBenefits ?? false, new { @class = "form-check-input" })
             <label asp-for="Step5!.HousingRequirementModel.AcceptsBenefits" class="form-check-label">
@@ -55,6 +60,12 @@
         <div class="form-check">
             @Html.CheckBox("Step5.HousingRequirementModel.AcceptsWithoutGuarantor", Model.Step5!.HousingRequirementModel.AcceptsWithoutGuarantor ?? false, new { @class = "form-check-input" })
             <label asp-for="Step5!.HousingRequirementModel.AcceptsWithoutGuarantor" class="form-check-label">
+                without a rent guarantor?
+            </label>
+        </div>
+        <div class="form-check">
+            @Html.CheckBox("Step5.HousingRequirementModel.AcceptsOver35", Model.Step5!.HousingRequirementModel.AcceptsOver35 ?? false, new { @class = "form-check-input" })
+            <label asp-for="Step5!.HousingRequirementModel.AcceptsOver35" class="form-check-label">
                 without a rent guarantor?
             </label>
         </div>

@@ -18,6 +18,8 @@ public class PropertyInputModelStep5 : PropertyInputModelBase
         HousingRequirementModel.AcceptsBenefits = property.AcceptsBenefits;
         HousingRequirementModel.AcceptsNotEET = property.AcceptsNotEET;
         HousingRequirementModel.AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor;
+        HousingRequirementModel.AcceptsCredit = property.AcceptsCredit;
+        HousingRequirementModel.AcceptsOver35 = property.AcceptsOver35;
     }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

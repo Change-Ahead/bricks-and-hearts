@@ -247,7 +247,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Assert
         result!.ViewName.Should().Be("PropertyInput");
         result.Model.Should().BeOfType<PropertyInputFormViewModel>().Which.Step.Should().Be(1);
-        result.Model.Should().BeOfType<PropertyInputFormViewModel>().Which.Step1?.Address.AddressLine1.Should()
+        result.Model.Should().BeOfType<PropertyInputFormViewModel>().Which.Step1?.Address!.AddressLine1.Should()
             .NotBeNull();
     }
 
@@ -271,7 +271,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Assert
         result!.ViewName.Should().Be("PropertyInput");
         result.Model.Should().BeOfType<PropertyInputFormViewModel>().Which.Step.Should().Be(2);
-        result.Model.Should().BeOfType<PropertyInputFormViewModel>().Which.Step1?.Address.AddressLine2.Should()
+        result.Model.Should().BeOfType<PropertyInputFormViewModel>().Which.Step1?.Address!.AddressLine2.Should()
             .NotBeNull();
     }
 
@@ -410,10 +410,9 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Theory]
-    [InlineData("add", false)]
-    [InlineData("edit", true)]
-    public void PropertyInputPost_AtMiddleSteps_UpdatesRecord_AndRedirectsToNextStep(string operationType,
-        bool isEdit)
+    [InlineData("add")]
+    [InlineData("edit")]
+    public void PropertyInputPost_AtMiddleSteps_UpdatesRecord_AndRedirectsToNextStep(string operationType)
     {
         // Arrange
         var fakePropertyDbModel = CreateExamplePropertyDbModel();
