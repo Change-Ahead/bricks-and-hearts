@@ -13,5 +13,6 @@
     <input type="hidden" asp-for="LandlordId" value="@Model.LandlordId"/>
     <input type="hidden" asp-for="PropertyId" value="@Model.PropertyId"/>
     <input type="hidden" asp-for="Step" value="@Model.Step"/>
+    <input type="hidden" asp-for="IsEdit" value="@Model.IsEdit"/>
     <partial name=@("_PropertyFormButtons") model="Model"/>
 </form>

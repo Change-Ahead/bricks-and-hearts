@@ -7,41 +7,42 @@
     <div class="row">
         <div class="col-auto">
             <div class="my-3">
-                <label asp-for="Step2!.Address.AddressLine1" class="form-label">Address Line 1</label>
-                <input asp-for="Step2!.Address.AddressLine1" class="form-control" required/>
-                <span asp-validation-for="Step2!.Address.AddressLine1" class="text-danger"></span>
+                <label asp-for="Step2!.Address!.AddressLine1" class="form-label">Address Line 1</label>
+                <input asp-for="Step1!.Address!.AddressLine1" class="form-control" required/>
+                <span asp-validation-for="Step1!.Address!.AddressLine1" class="text-danger"></span>
             </div>
             <div class="my-3">
-                <label asp-for="Step2!.Address.AddressLine2" class="form-label">Address Line 2</label>
-                <input asp-for="Step2!.Address.AddressLine2" class="form-control"/>
-                <span asp-validation-for="Step2!.Address.AddressLine2" class="text-danger"></span>
+                <label asp-for="Step1!.Address!.AddressLine2" class="form-label">Address Line 2</label>
+                <input asp-for="Step1!.Address!.AddressLine2" class="form-control"/>
+                <span asp-validation-for="Step1!.Address!.AddressLine2" class="text-danger"></span>
             </div>
             <div class="my-3">
-                <label asp-for="Step2!.Address.AddressLine3" class="form-label">Address Line 3</label>
-                <input asp-for="Step2!.Address.AddressLine3" class="form-control"/>
-                <span asp-validation-for="Step2!.Address.AddressLine3" class="text-danger"></span>
+                <label asp-for="Step1!.Address!.AddressLine3" class="form-label">Address Line 3</label>
+                <input asp-for="Step1!.Address!.AddressLine3" class="form-control"/>
+                <span asp-validation-for="Step1!.Address!.AddressLine3" class="text-danger"></span>
             </div>
         </div>
         <div class="col-auto">
             <div class="my-3">
-                <label asp-for="Step2!.Address.TownOrCity" class="form-label">Town or City</label>
-                <input asp-for="Step2!.Address.TownOrCity" class="form-control" required/>
-                <span asp-validation-for="Step2!.Address.TownOrCity" class="text-danger"></span>
+                <label asp-for="Step1!.Address!.TownOrCity" class="form-label">Town or City</label>
+                <input asp-for="Step1!.Address!.TownOrCity" class="form-control" required/>
+                <span asp-validation-for="Step1!.Address!.TownOrCity" class="text-danger"></span>
             </div>
             <div class="my-3">
-                <label asp-for="Step2!.Address.County" class="form-label">County</label>
-                <input asp-for="Step2!.Address.County" class="form-control" required/>
-                <span asp-validation-for="Step2!.Address.County" class="text-danger"></span>
+                <label asp-for="Step1!.Address!.County" class="form-label">County</label>
+                <input asp-for="Step1!.Address!.County" class="form-control" required/>
+                <span asp-validation-for="Step1!.Address!.County" class="text-danger"></span>
             </div>
             <div class="my-3">
-                <label asp-for="Step2!.Address.Postcode" class="form-label">Postcode</label>
-                <input asp-for="Step2!.Address.Postcode" class="form-control" required disabled="disabled"/>
-                <span asp-validation-for="Step2!.Address.Postcode" class="text-danger"></span>
+                <label asp-for="Step1!.Address!.Postcode" class="form-label">Postcode</label>
+                <input asp-for="Step1!.Address!.Postcode" class="form-control" required disabled="disabled"/>
+                <span asp-validation-for="Step1!.Address!.Postcode" class="text-danger"></span>
             </div>
         </div>
     </div>
     <input type="hidden" asp-for="LandlordId" value="@Model.LandlordId"/>
     <input type="hidden" asp-for="PropertyId" value="@Model.PropertyId"/>
     <input type="hidden" asp-for="Step" value="@Model.Step"/>
+    <input type="hidden" asp-for="IsEdit" value="@Model.IsEdit"/>
     <partial name=@("_PropertyFormButtons") model="Model"/>
 </form>
