@@ -9,7 +9,7 @@
 
     string GetPreferenceIcon(bool? preference)
     {
-        return preference ?? false ? "bi-check-lg" : "bi-x-lg";
+        return preference == true ? "bi-check-lg" : "bi-x-lg";
     }
 }
 
