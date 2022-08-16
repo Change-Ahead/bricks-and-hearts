@@ -8,7 +8,6 @@ namespace BricksAndHearts.UnitTests.ControllerTests.HomeControllerTests;
 
 public class HomeControllerTests : HomeControllerTestsBase
 {
-    
     [Fact]
     public void Index_WhenCalledByAnonymousUser_ReturnsIndexViewWithLoginLink()
     {
