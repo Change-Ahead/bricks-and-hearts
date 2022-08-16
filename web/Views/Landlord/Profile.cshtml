@@ -1,12 +1,13 @@
-﻿@model LandlordProfileModel
+﻿@using BricksAndHearts.Auth
+@model LandlordProfileModel
 
 @{
     ViewData["Title"] = "Details";
 }
 
 <div class="row py-3">
-    <div class="col-sm-1 profile-photo">
-        <img src="https://www.pngarts.com/files/10/Default-Profile-Picture-Transparent-Image.png" class="img-fluid" alt="profile picture">
+    <div class="col-sm-1 profile-photo-lg">
+        <img src="@(((BricksAndHeartsUser)User.Identity!).GoogleProfileImageUrl ?? Url.Content("~/images/profileDefault.png"))" alt="profile picture">
     </div>
     <div class="col-sm my-auto">
         <h1 class="font-h1 font-blue">@Html.DisplayFor(model => model.FirstName) @Html.DisplayFor(model => model.LastName)</h1>

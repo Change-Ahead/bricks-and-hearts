@@ -1,4 +1,6 @@
-﻿@model AdminDashboardViewModel
+﻿@using BricksAndHearts.Auth
+@using Microsoft.AspNetCore.Mvc.TagHelpers
+@model AdminDashboardViewModel
 @{
     ViewData["Title"] = "Admin Page";
 }
@@ -10,10 +12,8 @@
     {
         <div>
             <div class="row">
-                <div class="col-1 mt-4">
-                    <h1>
-                        <i class="bi bi-person-square"></i>
-                    </h1>
+                <div class="col-1 mt-4 profile-photo-lg">
+                    <img src="@(((BricksAndHeartsUser)User.Identity!).GoogleProfileImageUrl ?? Url.Content("~/images/profileDefault.png"))" alt="profile picture">
                 </div>
                 <div class="col-7">
                     <div class="row">
@@ -36,7 +36,7 @@
                                     <p></p>
                                     <p>@Model.LandlordCounts.RegisteredLandlords Registered Landlord</p>
                                     <p>@Model.LandlordCounts.ApprovedLandlords Approved Landlords</p>
-                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div class="col-5">
@@ -64,8 +64,8 @@
                     <a class="btn btn-primary" asp-controller="Landlord" asp-action="RegisterGet" asp-route-createUnassigned="true">Create Unassigned Landlord</a> <br/>
                 </div>
             </div>
-        </div> 
-        }
+        </div>
+    }
     else
     {
         <div>

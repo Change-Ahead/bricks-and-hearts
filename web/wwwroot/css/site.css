@@ -364,11 +364,15 @@ th {
     max-height: 200px;
 }
 
-.profile-photo {
-    height: 100px;
+.profile-photo-lg {
+    height: 80px;
 }
 
-.profile-photo img {
+.profile-photo-sm {
+    height: 43px;
+}
+
+.profile-photo-lg img, .profile-photo-sm img {
     height: 100%;
     width: auto;
     clip-path: circle();
