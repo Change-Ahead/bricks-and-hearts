@@ -38,7 +38,7 @@
             </div>
         </div>
         <div class="col 3">
-            <div class="row">
+            <div class="row border rounded mb-1">
                 <div class="col-3">
                     @if (Model.CurrentLandlord.CharterApproved)
                     {
@@ -53,34 +53,34 @@
                         </h1>
                     }
                 </div>
-                <div class="col-6">
-                    Charter Approval State
+                <div class="col text-end">
+                    <p class = "font-smallBody">Charter Approval State</p>
                 </div>
             </div>
-            <div class="row">
+            <div class="row border rounded mb-1">
                 <div class="col-3">
                     <h1>
                         <i class="bi bi-house-door font-blue icon-lg"></i>
                     </h1>
                 </div>
-                <div class="col-6">
-                    <h1>
+                <div class="col text-end">
+                    <h1 class="font-statistics">
                         @Model.CurrentLandlord.NumOfProperties
                     </h1>
-                    <h6>Total Properties</h6>
+                    <p class="font-smallBody">Total Properties</p>
                 </div>
             </div>
-            <div class="row">
+            <div class="row border rounded mb-1">
                 <div class="col-3">
                     <h1>
                         <i class="bi bi-house-heart font-blue icon-lg"></i>
                     </h1>
                 </div>
-                <div class="col-6">
-                    <h1>
+                <div class="col text-end">
+                    <h1 class="font-statistics">
                         @Model.CurrentLandlord.NumOfProperties
                     </h1>
-                    <h6>Live Properties</h6>
+                    <p class="font-smallBody">Live Properties</p>
                 </div>
             </div>
         </div>
