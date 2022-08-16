@@ -1,4 +1,3 @@
-using System.Text.RegularExpressions;
 using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
@@ -222,6 +221,10 @@ public class PropertyService : IPropertyService
     {
         var postcode = _postcodeService.FormatPostcode(postalCode);
         await _postcodeService.AddSinglePostcodeToDatabaseIfAbsent(postcode);
+        if (postcode == "")
+        {
+            return null;
+        }
         var model = _dbContext.Postcodes.SingleOrDefault(p => p.Postcode == postcode);
         if (model == null || model.Lat == null || model.Lon == null)
         {

@@ -1,0 +1,89 @@
+﻿{
+    "status": 200,
+    "result": [
+        {
+            "query": "EH1 1AD",
+            "result": {
+                "postcode": "EH1 1AD",
+                "quality": 1,
+                "eastings": 325621,
+                "northings": 673516,
+                "country": "Scotland",
+                "nhs_ha": "Lothian",
+                "longitude": -3.19259,
+                "latitude": 55.948894,
+                "european_electoral_region": "Scotland",
+                "primary_care_trust": "Edinburgh Community Health Partnership",
+                "region": null,
+                "lsoa": "Old Town, Princes Street and Leith Street - 01",
+                "msoa": "Old Town, Princes Street and Leith Street",
+                "incode": "1AD",
+                "outcode": "EH1",
+                "parliamentary_constituency": "Edinburgh East",
+                "admin_district": "City of Edinburgh",
+                "parish": null,
+                "admin_county": null,
+                "admin_ward": "City Centre",
+                "ced": null,
+                "ccg": "Edinburgh Community Health Partnership",
+                "nuts": "City of Edinburgh",
+                "codes": {
+                    "admin_district": "S12000036",
+                    "admin_county": "S99999999",
+                    "admin_ward": "S13002929",
+                    "parish": "S99999999",
+                    "parliamentary_constituency": "S14000022",
+                    "ccg": "S03000042",
+                    "ccg_id": "042",
+                    "ced": "S99999999",
+                    "nuts": "TLM75",
+                    "lsoa": "S01008674",
+                    "msoa": "S02001622",
+                    "lau2": "S30000008"
+                }
+            }
+        },
+        {
+            "query": "CB3 9AJ",
+            "result": {
+                "postcode": "CB3 9AJ",
+                "quality": 1,
+                "eastings": 544301,
+                "northings": 258407,
+                "country": "England",
+                "nhs_ha": "East of England",
+                "longitude": 0.110262,
+                "latitude": 52.205004,
+                "european_electoral_region": "Eastern",
+                "primary_care_trust": "Cambridgeshire",
+                "region": "East of England",
+                "lsoa": "Cambridge 007F",
+                "msoa": "Cambridge 007",
+                "incode": "9AJ",
+                "outcode": "CB3",
+                "parliamentary_constituency": "Cambridge",
+                "admin_district": "Cambridge",
+                "parish": "Cambridge, unparished area",
+                "admin_county": "Cambridgeshire",
+                "admin_ward": "Newnham",
+                "ced": "Newnham",
+                "ccg": "NHS Cambridgeshire and Peterborough",
+                "nuts": "Cambridgeshire CC",
+                "codes": {
+                    "admin_district": "E07000008",
+                    "admin_county": "E10000003",
+                    "admin_ward": "E05013058",
+                    "parish": "E43000042",
+                    "parliamentary_constituency": "E14000617",
+                    "ccg": "E38000026",
+                    "ccg_id": "06H",
+                    "ced": "E58000080",
+                    "nuts": "TLH12",
+                    "lsoa": "E01017986",
+                    "msoa": "E02003725",
+                    "lau2": "E07000008"
+                }
+            }
+        }
+    ]
+}

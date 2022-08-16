@@ -20,8 +20,7 @@ public class PropertyController : AbstractController
         IPropertyService propertyService,
         IAzureMapsApiService azureMapsApiService,
         ILogger<PropertyController> logger,
-        IAzureStorage azureStorage,
-        IPostcodeService postcodeService)
+        IAzureStorage azureStorage)
     {
         _propertyService = propertyService;
         _azureMapsApiService = azureMapsApiService;

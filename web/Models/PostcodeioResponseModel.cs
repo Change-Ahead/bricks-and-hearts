@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace BricksAndHearts.Services;
+namespace BricksAndHearts.Models;
 
 public class PostcodeioResponseModel
 {

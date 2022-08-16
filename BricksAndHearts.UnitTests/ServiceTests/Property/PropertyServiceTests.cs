@@ -444,17 +444,16 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     public async void SortPropertiesByLocation_WhenCalledWithValidPostcode_ReturnPropertiesSorted()
     {
         // Arrange
-        await using var context = Fixture.CreateReadContext();
+        await using var context = Fixture.CreateWriteContext();
         var logger = A.Fake<ILogger<PostcodeService>>();
         var messageHandler = A.Fake<HttpMessageHandler>();
         const string postcode = "eh11ad";
-        var responseBody = await File.ReadAllTextAsync($"{AppDomain.CurrentDomain.BaseDirectory}/../../../ServiceTests/Api/PostcodeioApiResponse.json");
+        var responseBody = await File.ReadAllTextAsync($"{AppDomain.CurrentDomain.BaseDirectory}/../../../ServiceTests/Api/PostcodeioApiSingleResponse.json");
         var response = new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(responseBody)
         };
-        // Slightly icky because "SendAsync" is protected
         A.CallTo(messageHandler).Where(c => c.Method.Name == "SendAsync").WithReturnType<Task<HttpResponseMessage>>().Returns(response);
         var httpClient = new HttpClient(messageHandler);
         var postcodeApiService = new PostcodeService(logger, context, httpClient);

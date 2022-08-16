@@ -77,7 +77,7 @@ public class CsvImportService : ICsvImportService
         };
         var csvContext = new CsvContext();
         var streamReader = new StreamReader(csvFile.OpenReadStream());
-        IEnumerable<TenantUploadModel> tenantUploadList =
+        var tenantUploadList =
             csvContext.Read<TenantUploadModel>(streamReader, csvFileDescription);
 
         List<string> flashTypes = new(),
@@ -113,7 +113,7 @@ public class CsvImportService : ICsvImportService
     private (List<string> flashTypes, List<string> flashMessages, string postcode) AddTenantToDb(TenantUploadModel tenant, int lineNo)
     {
         List<string> flashTypes = new(), flashMessages = new();
-        string postcode = "";
+        var postcode = "";
         if (tenant.Name == null)
         {
             _logger.LogWarning($"Name is missing from record {tenant.Email}.");
@@ -122,10 +122,12 @@ public class CsvImportService : ICsvImportService
         }
         else
         {
-            TenantDbModel dbTenant = new TenantDbModel();
-            dbTenant.Name = tenant.Name;
-            dbTenant.Email = tenant.Email;
-            dbTenant.Phone = tenant.Phone;
+            var dbTenant = new TenantDbModel()
+            {
+                Name = tenant.Name,
+                Email = tenant.Email,
+                Phone = tenant.Phone
+            };
 
             if (tenant.Postcode is not null)
             {
@@ -143,7 +145,7 @@ public class CsvImportService : ICsvImportService
 
             dbTenant.Type = tenant.Type;
 
-            if (Boolean.TryParse(tenant.HasPet, out bool boolHasPet) || tenant.HasPet is null)
+            if (bool.TryParse(tenant.HasPet, out var boolHasPet) || tenant.HasPet is null)
             {
                 dbTenant.HasPet = boolHasPet;
             }
@@ -153,7 +155,7 @@ public class CsvImportService : ICsvImportService
                 flashMessages.Add(InvalidInputMessage(tenant.Name, "HasPet", tenant.HasPet));
             }
 
-            if (Boolean.TryParse(tenant.ETT, out bool boolETT) || tenant.ETT is null)
+            if (bool.TryParse(tenant.ETT, out var boolETT) || tenant.ETT is null)
             {
                 dbTenant.ETT = boolETT;
             }
@@ -163,7 +165,7 @@ public class CsvImportService : ICsvImportService
                 flashMessages.Add(InvalidInputMessage(tenant.Name, "ETT", tenant.ETT));
             }
 
-            if (Boolean.TryParse(tenant.UniversalCredit, out bool boolUniversalCredit) ||
+            if (bool.TryParse(tenant.UniversalCredit, out var boolUniversalCredit) ||
                 tenant.UniversalCredit is null)
             {
                 dbTenant.UniversalCredit = boolUniversalCredit;
@@ -174,7 +176,7 @@ public class CsvImportService : ICsvImportService
                 flashMessages.Add(InvalidInputMessage(tenant.Name, "UniversalCredit", tenant.UniversalCredit));
             }
 
-            if (Boolean.TryParse(tenant.HousingBenefits, out bool boolHousingBenefits) ||
+            if (bool.TryParse(tenant.HousingBenefits, out var boolHousingBenefits) ||
                 tenant.HousingBenefits is null)
             {
                 dbTenant.HousingBenefits = boolHousingBenefits;
@@ -185,7 +187,7 @@ public class CsvImportService : ICsvImportService
                 flashMessages.Add(InvalidInputMessage(tenant.Name, "HousingBenefits", tenant.HousingBenefits));
             }
 
-            if (Boolean.TryParse(tenant.Over35, out bool boolOver35) || tenant.Over35 is null)
+            if (bool.TryParse(tenant.Over35, out var boolOver35) || tenant.Over35 is null)
             {
                 dbTenant.Over35 = boolOver35;
             }
@@ -218,7 +220,7 @@ public class CsvImportService : ICsvImportService
         foreach (var tenant in tenantsWithPostcodesToConvert)
         {
             var postcodeDbModel = _dbContext.Postcodes.FirstOrDefault(p => p.Postcode == tenant.Postcode);
-            if (postcodeDbModel == null || postcodeDbModel.Lat == null || postcodeDbModel.Lon == null)
+            if (postcodeDbModel?.Lat == null || postcodeDbModel.Lon == null)
             {
                 _logger.LogWarning($"Postcode {tenant.Postcode} is absent from Postcode table");
                 flashTypes.Add("danger");

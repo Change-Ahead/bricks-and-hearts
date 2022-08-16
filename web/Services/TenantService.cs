@@ -19,13 +19,12 @@ public class TenantService : ITenantService
         _postcodeService = postcodeService;
     }
 
-    
     public async Task<List<TenantDbModel>?> SortTenantsByLocation(string postalCode, int page, int perPage)
     {
         var postcode = _postcodeService.FormatPostcode(postalCode);
         await _postcodeService.AddSinglePostcodeToDatabaseIfAbsent(postcode);
-        var model = _dbContext.Postcodes.SingleOrDefault(p => p.Postcode == postcode);
-        if (model == null || model.Lat == null || model.Lon == null)
+        var targetLocation = _dbContext.Postcodes.SingleOrDefault(p => p.Postcode == postcode);
+        if (targetLocation == null || targetLocation.Lat == null || targetLocation.Lon == null)
         {
             return null;
         }
@@ -34,10 +33,10 @@ public class TenantService : ITenantService
             .FromSqlInterpolated(
                 @$"SELECT *, (
                   6371 * acos (
-                  cos ( radians({model.Lat}) )
+                  cos ( radians({targetLocation.Lat}) )
                   * cos( radians( Lat ) )
-                  * cos( radians( Lon ) - radians({model.Lon}) )
-                  + sin ( radians({model.Lat}) )
+                  * cos( radians( Lon ) - radians({targetLocation.Lon}) )
+                  + sin ( radians({targetLocation.Lat}) )
                   * sin( radians( Lat ) )
                     )
                 ) AS distance 

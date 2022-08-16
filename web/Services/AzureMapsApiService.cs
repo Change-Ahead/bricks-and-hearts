@@ -1,4 +1,5 @@
 ﻿using BricksAndHearts.Auth;
+using BricksAndHearts.Models;
 using BricksAndHearts.ViewModels;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
