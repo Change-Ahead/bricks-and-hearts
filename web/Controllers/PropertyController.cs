@@ -46,12 +46,10 @@ public class PropertyController : AbstractController
             return StatusCode(404);
         }
 
-        var landlordId = propDB.Landlord.Id;
-
-        // Delete property
+        var landlordId = propDB.LandlordId;
         _propertyService.DeleteProperty(propDB);
-
-        // Go to View Properties page
+        _azureStorage.DeleteContainer("property", propertyId);
+        
         return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
     }
 
