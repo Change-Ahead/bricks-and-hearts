@@ -1,0 +1,13 @@
+﻿@model PropertyDetailsViewModel
+
+<div class="d-flex">
+    <h3 class="font-h3 d-inline-block">Description</h3>
+    <a class="bi bi-pencil ms-auto" asp-action="EditProperty" asp-controller="Property" asp-route-propertyId="@Model.Property!.PropertyId"></a>
+</div>
+
+<div class="card custom-card mt-2">
+    <div class="card-body">
+        <p class="collapse property-description font-smallBody" id="descriptionCollapse">@(Model.Property!.Description ?? "Missing description")</p>
+        <a class="collapsed font-smallBody" role="button" data-bs-toggle="collapse" href="#descriptionCollapse"></a>
+    </div>
+</div>

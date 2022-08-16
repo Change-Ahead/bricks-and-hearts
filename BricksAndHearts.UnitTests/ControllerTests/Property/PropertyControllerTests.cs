@@ -90,7 +90,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     #region ViewProperties
 
     [Fact]
-    public void ViewProperty_WithNonExistingProperty_Returns404ErrorPage()
+    public async Task ViewProperty_WithNonExistingProperty_Returns404ErrorPage()
     {
         // Arrange
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(null);
@@ -99,7 +99,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         // Act
-        var result = UnderTest.ViewProperty(1);
+        var result = await UnderTest.ViewProperty(1);
 
         // Assert
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
@@ -108,7 +108,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public void ViewProperty_WithExistingProperty_ReturnViewPropertyView()
+    public async Task ViewProperty_WithExistingProperty_ReturnViewPropertyView()
     {
         // Arrange
         var model = CreateExamplePropertyDbModel();
@@ -118,11 +118,11 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         // Act
-        var result = UnderTest.ViewProperty(1) as ViewResult;
+        var result = await UnderTest.ViewProperty(1) as ViewResult;
 
         // Assert
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
-        result!.ViewData.Model.Should().BeOfType<PropertyViewModel>();
+        result!.ViewData.Model.Should().BeOfType<PropertyDetailsViewModel>();
     }
 
     #endregion
@@ -159,7 +159,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }*/
 
     [Fact]
-    public async void AddPropertyImages_CallsUploadImageForEachImage_AndRedirectsToListImagesWithFlashMultipleMessages()
+    public async void
+        AddPropertyImages_CallsUploadImageForEachImage_AndRedirectsToViewProperty_WithFlashMultipleMessages()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -178,7 +179,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Assert
         A.CallTo(() => AzureStorage.UploadFile(fakeImage, "property", 1)).MustHaveHappened();
         A.CallTo(() => AzureStorage.UploadFile(fakeImage2, "property", 1)).MustHaveHappened();
-        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ListPropertyImages");
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperty");
     }
 
     [Fact]
@@ -202,7 +203,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     [Fact]
-    public async void DeleteImage_CallsDeleteFileAsync_AndRedirectsToListImages()
+    public async void DeleteImage_CallsDeleteFileAsync_AndRedirectsToViewProperty()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -216,7 +217,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         // Assert
         A.CallTo(() => AzureStorage.DeleteFile("property", 1, fakeImage.FileName)).MustHaveHappened();
-        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ListPropertyImages");
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperty");
     }
 
     #endregion

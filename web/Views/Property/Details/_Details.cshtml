@@ -1,0 +1,23 @@
+﻿@model PropertyDetailsViewModel
+
+<div class="d-flex">
+    <h3 class="font-h3 d-inline-block">Details</h3>
+    <a class="bi bi-pencil ms-auto" asp-action="EditProperty" asp-controller="Property" asp-route-propertyId="@Model.Property!.PropertyId"></a>
+</div>
+
+<div class="card custom-card mt-2">
+    <div class="card-body row text-center">
+        <div class="col border-end">
+            <h4 class="font-smallBody">Type</h4>
+            <p class="font-h2 mb-0">@(Model.Property!.PropertyType ?? "N/A")</p>
+        </div>
+        <div class="col border-end">
+            <h4 class="font-smallBody">Bedrooms</h4>
+            <p class="font-h2 mb-0">@(Model.Property.NumOfBedrooms != null ? Model.Property.NumOfBedrooms : "N/A")</p>
+        </div>
+        <div class="col">
+            <h4 class="font-smallBody">Rent</h4>
+            <p class="font-h2 mb-0">@(Model.Property.Rent != null ? "£" + Model.Property.Rent + " pcm" : "N/A")</p>
+        </div>
+    </div>
+</div>

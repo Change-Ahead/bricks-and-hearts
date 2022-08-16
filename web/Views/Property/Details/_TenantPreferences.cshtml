@@ -1,0 +1,52 @@
+﻿@model PropertyDetailsViewModel
+
+@functions
+{
+    string GetPreferenceFont(bool? preference)
+    {
+        return preference == true ? "" : "font-orange";
+    }
+
+    string GetPreferenceIcon(bool? preference)
+    {
+        return preference == true ? "bi-check-lg" : "bi-x-lg";
+    }
+}
+
+<div class="d-flex">
+    <h3 class="font-h3 d-inline-block">Tenant preferences</h3>
+    <a class="bi bi-pencil ms-auto" asp-action="EditProperty" asp-controller="Property" asp-route-propertyId="@Model.Property!.PropertyId"></a>
+</div>
+
+<div class="card custom-card flex-grow-1 mt-2">
+    <div class="card-body">
+        <div class="@GetPreferenceFont(Model.Property!.LandlordRequirements.AcceptsSingleTenant)">
+            <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsSingleTenant)"></i>
+            Single tenants
+        </div>
+        <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsCouple)">
+            <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsCouple)"></i>
+            Couples
+        </div>
+        <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsFamily)">
+            <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsFamily)"></i>
+            Families
+        </div>
+        <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsPets)">
+            <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsPets)"></i>
+            With pets
+        </div>
+        <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsBenefits)">
+            <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsBenefits)"></i>
+            On Universal Credit or housing benefits
+        </div>
+        <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsNotEET)">
+            <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsNotEET)"></i>
+            Not in EET (Employment, Education, or Training)
+        </div>
+        <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsWithoutGuarantor)">
+            <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsWithoutGuarantor)"></i>
+            Without rent guarantor
+        </div>
+    </div>
+</div>

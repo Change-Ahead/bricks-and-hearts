@@ -16,7 +16,12 @@ public class PropertyController : AbstractController
     private readonly ILogger<PropertyController> _logger;
     private readonly IAzureStorage _azureStorage;
 
-    public PropertyController(IPropertyService propertyService, IAzureMapsApiService azureMapsApiService, ILogger<PropertyController> logger, IAzureStorage azureStorage, IPostcodeApiService postcodeApiService)
+    public PropertyController(
+        IPropertyService propertyService,
+        IAzureMapsApiService azureMapsApiService,
+        ILogger<PropertyController> logger,
+        IAzureStorage azureStorage,
+        IPostcodeApiService postcodeApiService)
     {
         _propertyService = propertyService;
         _azureMapsApiService = azureMapsApiService;
@@ -52,7 +57,7 @@ public class PropertyController : AbstractController
 
     [HttpGet]
     [Route("/property/{propertyId:int}/view")]
-    public ActionResult ViewProperty(int propertyId)
+    public async Task<ActionResult> ViewProperty(int propertyId)
     {
         var model = _propertyService.GetPropertyByPropertyId(propertyId);
         if (model == null)
@@ -67,7 +72,12 @@ public class PropertyController : AbstractController
         }
 
         var propertyViewModel = PropertyViewModel.FromDbModel(model);
-        return View(propertyViewModel);
+
+        var fileNames = await _azureStorage.ListFileNames("property", propertyId);
+        var imageFiles = GetFilesFromFileNames(fileNames, propertyId);
+        var propertyDetailsModel = new PropertyDetailsViewModel { Property = propertyViewModel, Images = imageFiles };
+
+        return View(propertyDetailsModel);
     }
 
     [Authorize(Roles = "Admin")]
@@ -114,7 +124,7 @@ public class PropertyController : AbstractController
             var baseUrl = HttpContext.Request.GetUri().Authority;
             _logger.LogInformation(flashMessageBody);
             AddFlashMessage("success",
-                    flashMessageBody + ": " + baseUrl + $"/public/propertyid/{propertyId}/{publicViewLink}");
+                flashMessageBody + ": " + baseUrl + $"/public/propertyid/{propertyId}/{publicViewLink}");
         }
 
         return RedirectToAction("ViewProperty", "Property", new { propertyId });
@@ -370,27 +380,6 @@ public class PropertyController : AbstractController
 
     #region Images
 
-    [Authorize(Roles = "Landlord, Admin")]
-    [HttpGet]
-    public async Task<IActionResult> ListPropertyImages(int propertyId)
-    {
-        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
-        {
-            return StatusCode(403);
-        }
-
-        var fileNames = await _azureStorage.ListFileNames("property", propertyId);
-        var imageFiles = GetFilesFromFileNames(fileNames, propertyId);
-
-        var imageList = new ImageListViewModel
-        {
-            PropertyId = propertyId,
-            FileList = imageFiles
-        };
-
-        return View(imageList);
-    }
-
     public List<ImageFileUrlModel> GetFilesFromFileNames(List<string> fileNames, int propertyId)
     {
         return fileNames.Select(fileName =>
@@ -409,14 +398,15 @@ public class PropertyController : AbstractController
         {
             return StatusCode(403);
         }
-        
+
         foreach (var image in images)
         {
             var isImageResult = _azureStorage.IsImage(image.FileName);
             if (!isImageResult.isImage)
             {
                 _logger.LogInformation($"Failed to upload {image.FileName}: not in a recognised image format");
-                AddFlashMessage("danger", $"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: {isImageResult.imageExtString}");               
+                AddFlashMessage("danger",
+                    $"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: {isImageResult.imageExtString}");
             }
             else
             {
@@ -433,8 +423,8 @@ public class PropertyController : AbstractController
                 }
             }
         }
-        
-        return RedirectToAction("ListPropertyImages", "Property", new { propertyId });
+
+        return RedirectToAction("ViewProperty", "Property", new { propertyId });
     }
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -468,7 +458,7 @@ public class PropertyController : AbstractController
         }
 
         await _azureStorage.DeleteFile("property", propertyId, fileName);
-        return RedirectToAction("ListPropertyImages", "Property", new { propertyId });
+        return RedirectToAction("ViewProperty", "Property", new { propertyId });
     }
 
     #endregion
@@ -482,13 +472,15 @@ public class PropertyController : AbstractController
         if (properties == null)
         {
             _logger.LogWarning($"Failed to find postcode {postcode}");
-            AddFlashMessage("warning",$"Failed to sort property using postcode {postcode}: invalid postcode");
+            AddFlashMessage("warning", $"Failed to sort property using postcode {postcode}: invalid postcode");
             return RedirectToAction("SortProperties", "Property", new { sortBy = "Availability" });
         }
 
         _logger.LogInformation("Successfully sorted by location");
-        var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).ToList();
-        
-        return View("~/Views/Admin/PropertyList.cshtml", new PropertiesDashboardViewModel(listOfProperties.Skip((page-1)*propPerPage).Take(propPerPage).ToList(),  listOfProperties.Count, null! , page, "Location"));
+        var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).Skip((page - 1) * propPerPage)
+            .Take(propPerPage).ToList();
+
+        return View("~/Views/Admin/PropertyList.cshtml",
+            new PropertiesDashboardViewModel(listOfProperties, listOfProperties.Count, null!, page, "Location"));
     }
 }
