@@ -330,8 +330,12 @@ public class LandlordController : AbstractController
         {
             return StatusCode(404);
         }
-
-        var viewModel = LandlordProfileModel.FromDbModel(landlord);
+        var landlordViewProperties = landlord.Properties.Select(PropertyViewModel.FromDbModel).ToList();
+        var viewModel = new LandlordDashboardViewModel
+        {
+            CurrentLandlord = LandlordProfileModel.FromDbModel(landlord),
+            Properties = landlordViewProperties
+        };
         return View("Dashboard", viewModel);
     }
 
