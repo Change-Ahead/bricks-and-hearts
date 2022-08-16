@@ -32,14 +32,20 @@ public class ClaimsTransformer : IClaimsTransformation
             throw new Exception("Authentication failed, non-Google identity type");
 
         var googleAccountId = existingClaimsIdentity.Claims.First(c => c.Type == ClaimTypes.NameIdentifier).Value;
+        var googlePhotoUrl = existingClaimsIdentity.Claims.First(c => c.Type == "urn:google:picture").Value;
 
         // Find the user in the DB
         var databaseUser = await _context.Users.FirstOrDefaultAsync(u => u.GoogleAccountId == googleAccountId);
         if (databaseUser == null)
         {
             // If they don't exist yet, create them
-            databaseUser = await CreateUserInDatabase(googleAccountId, existingClaimsIdentity);
-            _logger.LogInformation("Created new user '{UserEmail}' in database with id {UserId}", databaseUser.GoogleEmail, databaseUser.Id);
+            databaseUser = await CreateUserInDatabase(googleAccountId, googlePhotoUrl, existingClaimsIdentity);
+            _logger.LogInformation("Created new user '{UserEmail}' in database with id {UserId}",
+                databaseUser.GoogleEmail, databaseUser.Id);
+        }
+        else
+        {
+            await UpdateUserProfilePhoto(databaseUser, googlePhotoUrl);
         }
 
         var claims = new List<Claim>(existingClaimsIdentity.Claims);
@@ -48,11 +54,13 @@ public class ClaimsTransformer : IClaimsTransformation
         if (databaseUser.LandlordId != null) claims.Add(new Claim(ClaimTypes.Role, "Landlord"));
 
         // Build and return our new user principal
-        var newClaimsIdentity = new BricksAndHeartsUser(databaseUser, claims, existingClaimsIdentity.AuthenticationType);
+        var newClaimsIdentity =
+            new BricksAndHeartsUser(databaseUser, claims, existingClaimsIdentity.AuthenticationType);
         return new ClaimsPrincipal(newClaimsIdentity);
     }
 
-    private async Task<UserDbModel> CreateUserInDatabase(string googleAccountId, ClaimsIdentity identity)
+    private async Task<UserDbModel> CreateUserInDatabase(string googleAccountId, string googlePhotoUrl,
+        ClaimsIdentity identity)
     {
         var name = identity.Name!;
         var email = identity.Claims.First(c => c.Type == ClaimTypes.Email).Value;
@@ -61,11 +69,18 @@ public class ClaimsTransformer : IClaimsTransformation
             GoogleUserName = name,
             GoogleEmail = email,
             GoogleAccountId = googleAccountId,
+            GoogleProfileImageUrl = googlePhotoUrl,
             IsAdmin = false
         };
         _context.Users.Add(databaseUser);
         // Google Account Id has a unique index, so if this races with another request one should fail without having duplicate users
         await _context.SaveChangesAsync();
         return databaseUser;
+    }
+
+    private async Task UpdateUserProfilePhoto(UserDbModel userDbModel, string photoUrl)
+    {
+        userDbModel.GoogleProfileImageUrl = photoUrl;
+        await _context.SaveChangesAsync();
     }
 }
