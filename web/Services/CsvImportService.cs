@@ -106,7 +106,7 @@ public class CsvImportService : ICsvImportService
             await transaction.CommitAsync();
         }
 
-        await _postcodeService.BulkAddPostcodesToDatabaseIfAbsent(postcodes);
+        await _postcodeService.AddPostcodesToDatabaseIfAbsent(postcodes);
         return (flashTypes, flashMessages);
     }
     

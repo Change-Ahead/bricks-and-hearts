@@ -9,8 +9,7 @@ namespace BricksAndHearts.Services;
 public interface IPostcodeService
 {
     public string FormatPostcode(string postcode);
-    public Task AddSinglePostcodeToDatabaseIfAbsent(string postcode);
-    public Task BulkAddPostcodesToDatabaseIfAbsent(List<string> postcodes);
+    public Task AddPostcodesToDatabaseIfAbsent(List<string> postcodes);
 }
 
 public class PostcodeService : IPostcodeService
@@ -34,72 +33,28 @@ public class PostcodeService : IPostcodeService
             : "";
     }
 
-    public async Task AddSinglePostcodeToDatabaseIfAbsent(string postcode)
-    {
-        if (postcode != "" && !_dbContext.Postcodes.Any(p => p.Postcode == postcode))
-        {
-            var responseBody = await MakeSingleApiRequestToPostcodeApi(postcode);
-            var postcodeResponse = TurnResponseBodyToModel(responseBody);
-            AddPostcodeToPostcodeDb(postcodeResponse);
-        }
-    }
-    
-    public async Task BulkAddPostcodesToDatabaseIfAbsent(List<string> postcodes)
+    public async Task AddPostcodesToDatabaseIfAbsent(List<string> postcodes)
     {
         var postcodesToLookup = new List<string>();
         var lookupTasks = new List<Task>();
         foreach (var postcode in postcodes)
         {
-            if (_dbContext.Postcodes.All(p => p.Postcode != postcode) && postcodesToLookup.All(p => p != postcode))
+            if (postcode != "" && _dbContext.Postcodes.All(p => p.Postcode != postcode) && postcodesToLookup.All(p => p != postcode))
             {
                 postcodesToLookup.Add(postcode);
             }
 
             if (postcodesToLookup.Count == 100)
             {
-                lookupTasks.Add(Task.Run(() => BulkGetLatLonForPostcodes(postcodesToLookup)));
+                await BulkGetLatLonForPostcodes(postcodesToLookup);
                 postcodesToLookup = new List<string>();
             }
         }
 
         if (postcodesToLookup.Count != 0)
         {
-            lookupTasks.Add(Task.Run(() => BulkGetLatLonForPostcodes(postcodesToLookup)));
             await BulkGetLatLonForPostcodes(postcodesToLookup);
         }
-        await Task.Run(() => lookupTasks);
-        
-    }
-
-    private async Task<string> MakeSingleApiRequestToPostcodeApi(string postcode)
-    {
-        var escapedPostalCode = Uri.EscapeDataString(postcode);
-        var uri = $"https://api.postcodes.io/postcodes/{escapedPostalCode}";
-        var responseBody = string.Empty;
-        _logger.LogInformation("Making API Request to {Uri}", uri);
-        try
-        {
-            var response = await _client.GetAsync(uri);
-            response.EnsureSuccessStatusCode();
-            responseBody = await response.Content.ReadAsStringAsync();
-            _logger.LogInformation("Successful API request to {Uri}", uri);
-        }
-        catch (Exception e)
-        {
-            _logger.LogWarning("Message :{Message} ", e.Message);
-        }
-
-        return responseBody;
-    }
-    
-    private PostcodeioResponseModel TurnResponseBodyToModel(string responseBody)
-    {
-        if (string.IsNullOrEmpty(responseBody))
-        {
-            return new PostcodeioResponseModel();
-        }
-        var postcodeResponse = JsonConvert.DeserializeObject<PostcodeioResponseModel>(responseBody);
-        return postcodeResponse!;
     }
 
     private async Task BulkGetLatLonForPostcodes(List<string> postcodesToLookup)

@@ -448,7 +448,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         var logger = A.Fake<ILogger<PostcodeService>>();
         var messageHandler = A.Fake<HttpMessageHandler>();
         const string postcode = "eh11ad";
-        var responseBody = await File.ReadAllTextAsync($"{AppDomain.CurrentDomain.BaseDirectory}/../../../ServiceTests/Api/PostcodeioApiSingleResponse.json");
+        var responseBody = await File.ReadAllTextAsync($"{AppDomain.CurrentDomain.BaseDirectory}/../../../ServiceTests/Api/PostcodeioApiBulkResponse.json");
         var response = new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,

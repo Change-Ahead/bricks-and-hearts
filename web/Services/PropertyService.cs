@@ -220,7 +220,8 @@ public class PropertyService : IPropertyService
     public async Task<List<PropertyDbModel>?> SortPropertiesByLocation(string postalCode, int page, int perPage)
     {
         var postcode = _postcodeService.FormatPostcode(postalCode);
-        await _postcodeService.AddSinglePostcodeToDatabaseIfAbsent(postcode);
+        var postcodeList = new List<string> { postcode };
+        await _postcodeService.AddPostcodesToDatabaseIfAbsent(postcodeList);
         if (postcode == "")
         {
             return null;

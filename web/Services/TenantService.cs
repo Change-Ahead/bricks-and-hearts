@@ -22,7 +22,8 @@ public class TenantService : ITenantService
     public async Task<List<TenantDbModel>?> SortTenantsByLocation(string postalCode, int page, int perPage)
     {
         var postcode = _postcodeService.FormatPostcode(postalCode);
-        await _postcodeService.AddSinglePostcodeToDatabaseIfAbsent(postcode);
+        var postcodeList = new List<string> { postcode };
+        await _postcodeService.AddPostcodesToDatabaseIfAbsent(postcodeList);
         var targetLocation = _dbContext.Postcodes.SingleOrDefault(p => p.Postcode == postcode);
         if (targetLocation == null || targetLocation.Lat == null || targetLocation.Lon == null)
         {

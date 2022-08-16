@@ -44,78 +44,7 @@ public class PostcodeServiceTests : PostcodeServiceTestsBase
         // Assert
         result.Should().Be("");
     }
-    
-    [Fact]
-    public async void AddSinglePostcodeToDatabaseIfAbsent_WithAbsentPostcode_CallsHttpClientAndAddsCorrectPostcodeToDatabase()
-    {
-        // Arrange
-        await using var context = Fixture.CreateWriteContext();
-        var service = new PostcodeService(Logger, context, HttpClient);
-        var postcodesBeforeCount = context.Postcodes.Count();
 
-        const string postcode = "EH1 1AD";//_httpClient hard-coded to return API response for this postcode
-        context.Postcodes.Should().NotContain(p => p.Postcode == postcode);
-        var response = CreateHttpResponseMessageForSingleApiRequest();
-        A.CallTo(MessageHandler).Where(c => c.Method.Name == "SendAsync").WithReturnType<Task<HttpResponseMessage>>()
-            .Returns(response);
-
-        // Act
-        await service.AddSinglePostcodeToDatabaseIfAbsent(postcode);
-        
-        context.ChangeTracker.Clear();
-        
-        // Assert
-        A.CallTo(MessageHandler).Where(c => c.Method.Name == "SendAsync").WithReturnType<Task<HttpResponseMessage>>()
-            .MustHaveHappened();
-        context.Postcodes.Count().Should().Be(postcodesBeforeCount + 1);
-        context.Postcodes.Should().Contain(p => p.Postcode == postcode);
-    }
-    
-    [Fact]
-    public async void AddSinglePostcodeToDatabaseIfAbsent_WithPresentPostcode_DoesNotCallHttpClientAndDoesNotChangeDatabase()
-    {
-        // Arrange
-        await using var context = Fixture.CreateWriteContext();
-        var service = new PostcodeService(Logger, context, HttpClient);
-        var postcodesBeforeCount = context.Postcodes.Count();
-
-        const string postcode = "CB2 1LA";
-        context.Postcodes.Should().Contain(p => p.Postcode == postcode);
-
-        // Act
-        await service.AddSinglePostcodeToDatabaseIfAbsent(postcode);
-        
-        context.ChangeTracker.Clear();
-        
-        // Assert
-        A.CallTo(MessageHandler).Where(c => c.Method.Name == "SendAsync").WithReturnType<Task<HttpResponseMessage>>()
-            .MustNotHaveHappened();
-        context.Postcodes.Count().Should().Be(postcodesBeforeCount);
-        context.Postcodes.Should().Contain(p => p.Postcode == postcode);
-    }
-    
-    [Fact]
-    public async void AddSinglePostcodeToDatabaseIfAbsent_WithEmptyString_DoesNotCallHttpClientAndDoesNotChangeDatabase()
-    {
-        // Arrange
-        await using var context = Fixture.CreateWriteContext();
-        var service = new PostcodeService(Logger, context, HttpClient);
-        var postcodesBeforeCount = context.Postcodes.Count();
-
-        const string postcode = "";
-
-        // Act
-        await service.AddSinglePostcodeToDatabaseIfAbsent(postcode);
-        
-        context.ChangeTracker.Clear();
-        
-        // Assert
-        A.CallTo(MessageHandler).Where(c => c.Method.Name == "SendAsync").WithReturnType<Task<HttpResponseMessage>>()
-            .MustNotHaveHappened();
-        context.Postcodes.Count().Should().Be(postcodesBeforeCount);
-        context.Postcodes.Should().NotContain(p => p.Postcode == postcode);
-    }
-    
     [Fact]
     public async void BulkAddPostcodeToDatabaseIfAbsent_WithAbsentPostcodes_CallsHttpClientAndAddsCorrectPostcodeToDatabase()
     {
@@ -135,7 +64,7 @@ public class PostcodeServiceTests : PostcodeServiceTestsBase
            .Returns(response);
 
        // Act
-       await service.BulkAddPostcodesToDatabaseIfAbsent(postcodes);
+       await service.AddPostcodesToDatabaseIfAbsent(postcodes);
        
        context.ChangeTracker.Clear();
        
@@ -164,7 +93,7 @@ public class PostcodeServiceTests : PostcodeServiceTestsBase
         }
 
         // Act
-        await service.BulkAddPostcodesToDatabaseIfAbsent(postcodes);
+        await service.AddPostcodesToDatabaseIfAbsent(postcodes);
        
         context.ChangeTracker.Clear();
        
