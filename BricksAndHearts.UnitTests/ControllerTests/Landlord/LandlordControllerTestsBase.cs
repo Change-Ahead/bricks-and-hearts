@@ -19,6 +19,7 @@ public class LandlordControllerTestsBase : ControllerTestsBase
     protected readonly ILogger<LandlordController> Logger;
     protected readonly IMailService MailService;
     protected readonly IPropertyService PropertyService;
+    protected readonly IAzureStorage AzureStorage;
     protected IEnumerable<string>? FlashMessages => UnderTest.TempData["FlashMessages"] as List<string>;
     protected readonly LandlordController UnderTest;
 
@@ -29,9 +30,10 @@ public class LandlordControllerTestsBase : ControllerTestsBase
         MailService = A.Fake<IMailService>();
         PropertyService = A.Fake<IPropertyService>();
         MailService = A.Fake<IMailService>();
+        AzureStorage = A.Fake<IAzureStorage>();
         var httpContext = new DefaultHttpContext();
         var tempData = new TempDataDictionary(httpContext, A.Fake<ITempDataProvider>());
-        UnderTest = new LandlordController(Logger, LandlordService, PropertyService, MailService)
+        UnderTest = new LandlordController(Logger, LandlordService, PropertyService, MailService, AzureStorage)
             { TempData = tempData };
         // Fixes NullReferenceException when calling TryValidateModel()
         UnderTest.ObjectValidator = new CustomObjectValidator();

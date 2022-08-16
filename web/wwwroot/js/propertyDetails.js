@@ -14,8 +14,3 @@ deleteImageModal.addEventListener('hide.bs.modal', function () {
     const imageModal = document.getElementById('imageModal');
     imageModal.classList.toggle("modal-overlay");
 });
-
-function hidePlaceholder(imageId) {
-    $(imageId + "Placeholder").hide();
-    $(imageId).show();
-}

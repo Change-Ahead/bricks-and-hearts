@@ -15,10 +15,20 @@
             <div class="row">
                 <h6 class = "font-body">Hello</h6>
                 <h2 class = "font-blue font-h1">@Model.CurrentLandlord.FirstName</h2>
-                <h6 class = "font-body">Start adding your properties to the portal, to get matches</h6>
-                <div>
-                    <a class="btn btn-primary btn-lg mt-3 align-middle" href='@Url.Action("AddNewProperty_Begin", "Property", null)'>Add Properties</a>
-                </div>
+                @if (Model.CurrentLandlord.NumOfProperties > 0)
+                {
+                    <h6 class = "font-body">View your properties</h6>
+                    <div>
+                        <a class="btn btn-primary btn-lg mt-3 align-middle" href='@Url.Action("ViewProperties", "Landlord", new{id = Model.CurrentLandlord.LandlordId})'>View Properties</a>
+                    </div>
+                }
+                else
+                {
+                    <h6 class = "font-body">Start adding your properties to the portal, to get matches</h6>
+                    <div>
+                        <a class="btn btn-primary btn-lg mt-3 align-middle" href='@Url.Action("AddNewProperty_Begin", "Property", null)'>Add Properties</a>
+                    </div>
+                }
                 @if (!Model.CurrentLandlord.CharterApproved)
                 {
                     <p class="font-subtitle font-orange mt-1">
@@ -29,7 +39,7 @@
         </div>
         <div class="col 3">
             <div class="row">
-                <div class="col-1">
+                <div class="col-3">
                     @if (Model.CurrentLandlord.CharterApproved)
                     {
                         <h1>
@@ -43,17 +53,17 @@
                         </h1>
                     }
                 </div>
-                <div class="col-3">
+                <div class="col-6">
                     Charter Approval State
                 </div>
             </div>
             <div class="row">
-                <div class="col-1">
+                <div class="col-3">
                     <h1>
                         <i class="bi bi-house-door font-blue icon-lg"></i>
                     </h1>
                 </div>
-                <div class="col-3">
+                <div class="col-6">
                     <h1>
                         @Model.CurrentLandlord.NumOfProperties
                     </h1>
@@ -66,7 +76,7 @@
                         <i class="bi bi-house-heart font-blue icon-lg"></i>
                     </h1>
                 </div>
-                <div class="col-5">
+                <div class="col-6">
                     <h1>
                         @Model.CurrentLandlord.NumOfProperties
                     </h1>
@@ -84,6 +94,9 @@
                         @{ await Html.RenderPartialAsync("_DashboardPropertyDisplayPartial", property); }
                     </row>
                 }
+            <div>
+                <a class="btn btn-outline-primary mt-3 align-middle" href='@Url.Action("ViewProperties", "Landlord", new{id = Model.CurrentLandlord.LandlordId})'>View All</a>
+            </div>
         </div>
     </div>
 </div>

@@ -34,3 +34,8 @@ function copyLinkToClipboard(linkToCopy) {
             copyBtn.className = "btn btn-success my-3"
         });
 }
+
+function hidePlaceholder(imageId) {
+    $(imageId + "Placeholder").hide();
+    $(imageId).show();
+}
