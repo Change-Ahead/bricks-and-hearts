@@ -290,7 +290,6 @@ input:checked + .pill-check i {
     text-decoration: none;
 }
 
-
 /* Navbar */
 .navbar-primary a {
     text-transform: uppercase;
@@ -337,7 +336,6 @@ th {
     overflow-x: auto;
     max-height: 200px;
 }
-
 
 .profile-photo {
     height: 100px;
