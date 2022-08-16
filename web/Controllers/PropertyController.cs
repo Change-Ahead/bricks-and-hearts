@@ -36,20 +36,26 @@ public class PropertyController : AbstractController
         var propDB = _propertyService.GetPropertyByPropertyId(propertyId);
         if (propDB == null)
         {
-            _logger.LogWarning("Property with ID {PropertyId} does not exist", propertyId);
-            return StatusCode(404);
+            _logger.LogWarning($"Property with Id {propertyId} does not exist");
+            AddFlashMessage("danger", $"Property with Id {propertyId} does not exist");
+            if (GetCurrentUser().LandlordId != null)
+            {
+                return RedirectToAction("ViewProperties", "Landlord", new { id = GetCurrentUser().LandlordId });
+            }
+            return RedirectToAction("Index", "Home");
         }
 
         if (GetCurrentUser().IsAdmin == false && GetCurrentUser().LandlordId != propDB.LandlordId)
         {
-            _logger.LogWarning("You do not have access to any property with ID {PropertyId}.", propertyId);
-            return StatusCode(404);
+            _logger.LogWarning($"User {GetCurrentUser().Id} does not have access to any property with ID {propertyId}.");
+            return StatusCode(403);
         }
 
         var landlordId = propDB.LandlordId;
         _propertyService.DeleteProperty(propDB);
         _azureStorage.DeleteContainer("property", propertyId);
         
+        AddFlashMessage("danger", $"Successfully deleted property with Id {propertyId}");
         return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
     }
 

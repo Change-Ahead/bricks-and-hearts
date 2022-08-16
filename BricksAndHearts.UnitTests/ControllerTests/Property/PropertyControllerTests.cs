@@ -225,7 +225,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     #region DeleteProperty
 
     [Fact]
-    public void DeleteProperty_WithExistingProperty_DeletesAndRedirectsToViewProperties()
+    public void DeleteProperty_WithExistingProperty_DeletesPropertyAndImagesAndRedirectsToViewProperties()
     {
         // Arrange
         var fakePropertyDbModel = CreateExamplePropertyDbModel();
@@ -241,11 +241,12 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         // Assert
         A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustHaveHappened();
+        A.CallTo(() => AzureStorage.DeleteContainer("property", fakePropertyDbModel.Id)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
     }
 
     [Fact]
-    public void DeleteProperty_WithNonExistingProperty_Returns404ErrorPage()
+    public void DeleteProperty_WithNonExistingProperty_RedirectsToViewProperties()
     {
         // Arrange
         var fakePropertyDbModel = CreateExamplePropertyDbModel();
@@ -260,7 +261,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Assert
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
         A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustNotHaveHappened();
-        result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(404);
+        A.CallTo(() => AzureStorage.DeleteContainer("property", fakePropertyDbModel.Id)).MustNotHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
     }
 
     #endregion
