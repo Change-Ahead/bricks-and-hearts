@@ -17,5 +17,5 @@ public class PropertyInputModelStep2 : PropertyInputModelBase
         };
     }
 
-    public AddressModel Address { get; set; }
+    public AddressModel? Address { get; set; }
 }

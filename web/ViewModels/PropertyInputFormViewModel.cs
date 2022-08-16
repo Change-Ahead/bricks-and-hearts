@@ -92,10 +92,10 @@ public class PropertyInputFormViewModel
                 property.NumOfBedrooms = Step3.NumOfBedrooms;
                 break;
             case 2:
-                property.Address = Step2!.Address;
+                property.Address = Step2!.Address!;
                 break;
             case 1:
-                property.Address = Step1!.Address;
+                property.Address = Step1!.Address!;
                 break;
         }
 

@@ -44,7 +44,7 @@
 
 <div class="row mt-4">
     <div class="col-auto mb-2">
-<a class="btn btn-primary" asp-controller="Property" asp-action="PropertyInputStepOne" asp-route-operationType="edit" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId">Edit Property</a>
+        <a class="btn btn-primary" asp-controller="Property" asp-action="PropertyInputStepOne" asp-route-operationType="edit" asp-route-propertyId="@Model.Property.PropertyId" asp-route-landlordId="@Model.Property.LandlordId">Edit Property</a>
     </div>
     <div class="col-auto">
         <button type="button" class="btn btn-large btn-outline-primary" data-bs-toggle="modal" data-bs-target="#deletePropertyModal">

@@ -29,6 +29,7 @@ public class PropertyController : AbstractController
         _azureStorage = azureStorage;
     }
 
+
     [Authorize(Roles = "Admin")]
     [HttpGet("SortPropertiesByLocation")]
     public async Task<IActionResult> SortPropertiesByLocation(string postcode, int page = 1, int propPerPage = 10)
@@ -37,18 +38,17 @@ public class PropertyController : AbstractController
 
         if (properties == null)
         {
-            FlashMessage(_logger,
-                ($"Failed to find postcode {postcode}", "warning",
-                    $"Failed to sort property using postcode {postcode}: invalid postcode"));
+            _logger.LogWarning($"Failed to find postcode {postcode}");
+            AddFlashMessage("warning", $"Failed to sort property using postcode {postcode}: invalid postcode");
             return RedirectToAction("SortProperties", "Property", new { sortBy = "Availability" });
         }
 
         _logger.LogInformation("Successfully sorted by location");
-        var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).ToList();
+        var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).Skip((page - 1) * propPerPage)
+            .Take(propPerPage).ToList();
 
         return View("~/Views/Admin/PropertyList.cshtml",
-            new PropertiesDashboardViewModel(listOfProperties.Skip((page - 1) * propPerPage).Take(propPerPage).ToList(),
-                listOfProperties.Count, null!, page, "Location"));
+            new PropertiesDashboardViewModel(listOfProperties, listOfProperties.Count, null!, page, "Location"));
     }
 
     #region Misc
@@ -233,7 +233,7 @@ public class PropertyController : AbstractController
         [FromRoute] int landlordId, [FromRoute] int propertyId, [FromRoute] string operationType)
     {
         var isValid =
-            Validator.TryValidateObject(model.Step1.Address, new ValidationContext(model.Step1?.Address), null);
+            Validator.TryValidateObject(model.Step1?.Address!, new ValidationContext(model.Step1?.Address!), null);
         // Check model validity
         if (!ModelState.IsValid && isValid)
         {
@@ -583,16 +583,17 @@ public class PropertyController : AbstractController
     [Authorize(Roles = "Landlord, Admin")]
     [HttpGet(
         "/landlord/{landlordId:int}/property/{operationType:regex(^(add|edit)$)})/{propertyId:int}/step/{step:int}/back")]
-    public ActionResult PropertyInputBack([FromRoute] int step, [FromRoute] int propertyId, [FromRoute] int landlordId)
+    public ActionResult PropertyInputBack([FromRoute] int step, [FromRoute] int propertyId, [FromRoute] int landlordId,
+        [FromRoute] string operationType)
     {
         return step switch
         {
-            1 => RedirectToAction("PropertyInputStepOne", new { propertyId, landlordId }),
-            2 => RedirectToAction("PropertyInputStepTwo", new { propertyId }),
-            3 => RedirectToAction("PropertyInputStepThree", new { propertyId }),
-            4 => RedirectToAction("PropertyInputStepFour", new { propertyId }),
-            5 => RedirectToAction("PropertyInputStepFive", new { propertyId }),
-            6 => RedirectToAction("PropertyInputStepSix", new { propertyId }),
+            1 => RedirectToAction("PropertyInputStepOne", new { propertyId, landlordId, operationType }),
+            2 => RedirectToAction("PropertyInputStepTwo", new { propertyId, operationType }),
+            3 => RedirectToAction("PropertyInputStepThree", new { propertyId, operationType }),
+            4 => RedirectToAction("PropertyInputStepFour", new { propertyId, operationType }),
+            5 => RedirectToAction("PropertyInputStepFive", new { propertyId, operationType }),
+            6 => RedirectToAction("PropertyInputStepSix", new { propertyId, operationType }),
             _ => StatusCode(404)
         };
     }
@@ -610,7 +611,7 @@ public class PropertyController : AbstractController
     {
         if (operationType == "edit")
         {
-            return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
+            return RedirectToAction("ViewProperty", "Property", new { id = propertyId });
         }
 
         // Get the property we're currently adding

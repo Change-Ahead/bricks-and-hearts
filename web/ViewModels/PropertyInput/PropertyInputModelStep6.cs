@@ -11,7 +11,7 @@ public class PropertyInputModelStep6 : PropertyInputModelBase
 
     public DateTime? AvailableFrom { get; set; }
 
-    public string Availability { get; set; }
+    public string? Availability { get; set; }
 
     public int? Rent { get; set; }
 

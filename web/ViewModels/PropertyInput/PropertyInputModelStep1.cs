@@ -5,6 +5,9 @@ namespace BricksAndHearts.ViewModels.PropertyInput;
 
 public class PropertyInputModelStep1 : PropertyInputModelBase
 {
+    [Required]
+    public AddressModel? Address { get; set; }
+
     public override void PropertyInputModelStepInitialiser(PropertyDbModel property)
     {
         Address = new AddressModel
@@ -17,8 +20,4 @@ public class PropertyInputModelStep1 : PropertyInputModelBase
             Postcode = property.Postcode
         };
     }
-
-
-    [Required]
-    public AddressModel Address { get; set; }
 }

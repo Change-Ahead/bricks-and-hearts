@@ -1,6 +1,4 @@
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
@@ -45,63 +43,6 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         // Assert
         availableUnits.Should().Be(3);
-    }
-
-    #endregion
-
-    #region TestDataClasses
-
-    //Classes to allow ranges for tests
-
-    /// <summary>
-    ///     Counts from 1, to 1 below final step
-    /// </summary>
-    private class NoLastStepTestData : IEnumerable<object[]>
-    {
-        public IEnumerator<object[]> GetEnumerator()
-        {
-            foreach (var i in Enumerable.Range(1, PropertyInputFormViewModel.MaximumStep - 1))
-                yield return new object[] { i };
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-    }
-
-    /// <summary>
-    ///     Counts from 2, to 1 below final step
-    /// </summary>
-    private class NoFirstNoLastStepTestData : IEnumerable<object[]>
-    {
-        public IEnumerator<object[]> GetEnumerator()
-        {
-            foreach (var i in Enumerable.Range(2, PropertyInputFormViewModel.MaximumStep - 2))
-                yield return new object[] { i };
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
-    }
-
-    /// <summary>
-    ///     Counts from 1, to final step inclusively
-    /// </summary>
-    private class StepTestData : IEnumerable<object[]>
-    {
-        public IEnumerator<object[]> GetEnumerator()
-        {
-            foreach (var i in Enumerable.Range(1, PropertyInputFormViewModel.MaximumStep))
-                yield return new object[] { i };
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
     }
 
     #endregion
@@ -496,11 +437,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("PropertyInputStepSix");
     }
 
-    [Theory]
-    [InlineData("add", false)]
-    [InlineData("edit", true)]
-    public void PropertyInputStepSixPost_UpdatesRecord_AndRedirectsToViewProperties(string operationType,
-        bool isEdit)
+    [Fact]
+    public void PropertyInputStepSixPost_UpdatesRecord_AndRedirectsToViewProperties()
     {
         // Arrange
         var landlordUser = CreateLandlordUser();
