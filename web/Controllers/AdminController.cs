@@ -17,19 +17,25 @@ public class AdminController : AbstractController
     private readonly IPropertyService _propertyService;
     private readonly ICsvImportService _csvImportService;
     private readonly ILogger<AdminController> _logger;
+    private readonly IMailService _mailService;
 
-    public AdminController(ILogger<AdminController> logger, IAdminService adminService,
-        ILandlordService landlordService, IPropertyService propertyService, ICsvImportService csvImportService)
+    public AdminController(
+        ILogger<AdminController> logger,
+        IAdminService adminService,
+        ILandlordService landlordService,
+        IPropertyService propertyService, 
+        ICsvImportService csvImportService, 
+        IMailService mailService)
     {
         _logger = logger;
         _adminService = adminService;
         _landlordService = landlordService;
         _propertyService = propertyService;
         _csvImportService = csvImportService;
+        _mailService = mailService;
     }
 
-    [HttpGet]
-    [Route("/admin")]
+    [HttpGet("/admin")]
     public IActionResult AdminDashboard()
     {
         var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
@@ -140,7 +146,31 @@ public class AdminController : AbstractController
         tenantListModel.TenantList = await _adminService.GetTenantList(tenantListModel.Filter);
         return View("TenantList", tenantListModel);
     }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpGet("{currentPropertyId:int}/Matches")]
+    public async Task<IActionResult> TenantMatchList(int currentPropertyId)
+    {
+        var currentProperty = PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(currentPropertyId)!);
+        
+        var tenantMatchListModel = new TenantMatchListModel{
+            TenantList = await _adminService.GetNearestTenantsToProperty(currentProperty),
+            CurrentProperty = currentProperty
+        };
+        return View("TenantMatchList", tenantMatchListModel);
+    }
 
+    [Authorize(Roles = "Admin")]
+    [HttpPost("{currentPropertyId:int}/Matches")]
+    public ActionResult SendMatchLinkEmail(string propertyLink, string tenantEmail, int currentPropertyId)
+    {
+        var addressToSendTo = new List<string> { tenantEmail };
+        _mailService.TrySendMsgInBackground(propertyLink, tenantEmail, addressToSendTo);
+        _logger.LogInformation($"Successfully emailed tenant {tenantEmail}");
+        AddFlashMessage("success", $"successfully emailed {tenantEmail}");
+        return RedirectToAction("TenantMatchList", new {currentPropertyId});
+    }
+    
     [Authorize(Roles = "Admin")]
     [HttpPost]
     public ActionResult GetInviteLink(int landlordId)

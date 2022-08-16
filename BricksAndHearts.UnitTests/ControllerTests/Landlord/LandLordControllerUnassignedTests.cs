@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
@@ -37,7 +38,7 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel))
             .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));
         A.CallTo(() => MailService.SendMsg(
-            A<string>.That.Matches(s => s == msgBody), A<string>.That.Matches(s => s == subject), A<string>.Ignored,
+            A<string>.That.Matches(s => s == msgBody), A<string>.That.Matches(s => s == subject), A<List<string>>.Ignored, A<string>.Ignored,
             A<string>.Ignored
         )).WithAnyArguments().DoesNothing();
 
@@ -46,7 +47,7 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
 
         // Assert
         A.CallTo(() => MailService.TrySendMsgInBackground(
-            A<string>.That.Matches(s => s == msgBody), A<string>.That.Matches(s => s == subject)
+            A<string>.That.Matches(s => s == msgBody), A<string>.That.Matches(s => s == subject), null
         )).WithAnyArguments().MustHaveHappened();
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel)).MustHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>();
@@ -70,19 +71,16 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel))
             .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));
         A.CallTo(() => MailService.SendMsg(
-            A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored
+            A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored,A<string>.Ignored, A<string>.Ignored
         )).WithAnyArguments().DoesNothing();
         var result = await UnderTest.RegisterPost(formResultModel) as StatusCodeResult;
 
         // Assert
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel)).WithAnyArguments().MustNotHaveHappened();
         A.CallTo(() => MailService.SendMsg(
-            A<string>.Ignored, A<string>.Ignored, A<string>.Ignored, A<string>.Ignored
+            A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored,A<string>.Ignored, A<string>.Ignored
         )).WithAnyArguments().MustNotHaveHappened();
         result.Should().NotBeNull();
-        if (result != null)
-        {
-            result.StatusCode.Should().Be(403);
-        }
+        result?.StatusCode.Should().Be(403);
     }
 }
