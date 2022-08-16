@@ -29,7 +29,6 @@ public interface IAdminService
     public string? FindExistingInviteLink(int landlordId);
     public string CreateNewInviteLink(int landlordId);
     public void DeleteExistingInviteLink(int landlordId);
-
 }
 
 public class AdminService : IAdminService
@@ -139,53 +138,6 @@ public class AdminService : IAdminService
         return await landlordQuery.ToListAsync();
     }
 
-    private IQueryable<TenantDbModel> GetFilteredTenantQuery(HousingRequirementModel filters, bool filterOrMatching)
-    {
-        var tenantQuery = from tenants in _dbContext.Tenants select tenants;
-        var filterList = filters.GetList();
-        if (filterList.SequenceEqual(new HousingRequirementModel().GetList())) return tenantQuery;
-        tenantQuery = tenantQuery.Where(t => (t.Type == "Single" && filterList[0] == true) ||
-                                             (t.Type == "Couple" && filterList[1] == true) ||
-                                             (t.Type == "Family" && filterList[2] == true) ||
-                                             (filterList[0] != true && filterList[1] != true && filterList[2] != true));
-        /*the above are INCLUSIVE filters*/
-        if (filterOrMatching)
-        {
-            if (filterList[3]==false)
-            {
-                tenantQuery = tenantQuery.Where(t => t.HasPet == false);
-            }
-
-            if (filterList[4]==false)
-            {
-                tenantQuery = tenantQuery.Where(t => t.ETT == false);
-            }
-
-            if (filterList[5]==false)
-            {
-                tenantQuery = tenantQuery.Where(t => t.UniversalCredit == false);
-            }
-
-            if (filterList[6]==false)
-            {
-                tenantQuery = tenantQuery.Where(t => t.HousingBenefits == false);
-            }
-
-            if (filterList[7]==false)
-            {
-                tenantQuery = tenantQuery.Where(t => t.Over35 == false);
-            }
-            return tenantQuery;
-        }
-        /*Above are INCLUSIVE filters for the matching page*/
-        return tenantQuery.Where(t => (filterList[3] == null || t.HasPet == filterList[3]) &&
-                                      (filterList[4] == null || t.ETT == filterList[4]) &&
-                                      (filterList[5] == null || t.UniversalCredit == filterList[5]) &&
-                                      (filterList[6] == null || t.HousingBenefits == filterList[6]) &&
-                                      (filterList[7] == null || t.Over35 == filterList[7]));
-        /*Above are EXCLUSIVE filters for the filters page*/
-    }
-
     public async Task<List<TenantDbModel>> GetTenantList(HousingRequirementModel filters)
     {
         return await GetFilteredTenantQuery(filters, false).ToListAsync();
@@ -235,5 +187,51 @@ public class AdminService : IAdminService
 
         landlord.InviteLink = null;
         _dbContext.SaveChanges();
+    }
+    
+    private IQueryable<TenantDbModel> GetFilteredTenantQuery(HousingRequirementModel filters, bool isMatching)
+    {
+        var tenantQuery = from tenants in _dbContext.Tenants select tenants;
+        tenantQuery = tenantQuery.Where(t => (t.Type == "Single" && filters.AcceptsSingleTenant == true) 
+                                             || (t.Type == "Couple" && filters.AcceptsCouple == true) 
+                                             || (t.Type == "Family" && filters.AcceptsFamily == true) 
+                                             || (filters.AcceptsSingleTenant != true && filters.AcceptsCouple != true && filters.AcceptsFamily != true));
+        /*the above are INCLUSIVE filters*/
+        if (!isMatching)
+        {
+            return tenantQuery.Where(t => (filters.AcceptsPets == null || t.HasPet == filters.AcceptsPets) 
+                                          && (filters.AcceptsNotEET == null || t.ETT == filters.AcceptsNotEET) 
+                                          && (filters.AcceptsCredit == null || t.UniversalCredit == filters.AcceptsCredit) 
+                                          && (filters.AcceptsBenefits == null || t.HousingBenefits == filters.AcceptsBenefits) 
+                                          && (filters.AcceptsOver35 == null || t.Over35 == filters.AcceptsOver35));
+            /*Above are EXCLUSIVE filters for the filters page*/
+            
+        }
+        if (filters.AcceptsPets == false)
+        {
+            tenantQuery = tenantQuery.Where(t => t.HasPet == false);
+        }
+
+        if (filters.AcceptsNotEET == false)
+        {
+            tenantQuery = tenantQuery.Where(t => t.ETT == false);
+        }
+
+        if (filters.AcceptsCredit == false)
+        {
+            tenantQuery = tenantQuery.Where(t => t.UniversalCredit == false);
+        }
+
+        if (filters.AcceptsBenefits == false)
+        {
+            tenantQuery = tenantQuery.Where(t => t.HousingBenefits == false);
+        }
+
+        if (filters.AcceptsOver35 == false)
+        {
+            tenantQuery = tenantQuery.Where(t => t.Over35 == false);
+        }
+        return tenantQuery;
+        /*Above are INCLUSIVE filters for the matching page*/
     }
 }

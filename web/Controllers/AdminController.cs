@@ -5,7 +5,6 @@ using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 #endregion
 
@@ -20,8 +19,13 @@ public class AdminController : AbstractController
     private readonly ILogger<AdminController> _logger;
     private readonly IMailService _mailService;
 
-    public AdminController(ILogger<AdminController> logger, IAdminService adminService,
-        ILandlordService landlordService, IPropertyService propertyService, ICsvImportService csvImportService, IMailService mailService)
+    public AdminController(
+        ILogger<AdminController> logger,
+        IAdminService adminService,
+        ILandlordService landlordService,
+        IPropertyService propertyService, 
+        ICsvImportService csvImportService, 
+        IMailService mailService)
     {
         _logger = logger;
         _adminService = adminService;
@@ -31,8 +35,7 @@ public class AdminController : AbstractController
         _mailService = mailService;
     }
 
-    [HttpGet]
-    [Route("/admin")]
+    [HttpGet("/admin")]
     public IActionResult AdminDashboard()
     {
         var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
@@ -145,8 +148,7 @@ public class AdminController : AbstractController
     }
     
     [Authorize(Roles = "Admin")]
-    [HttpGet]
-    [Route("{currentPropertyId:int}/Matches")]
+    [HttpGet("{currentPropertyId:int}/Matches")]
     public async Task<IActionResult> TenantMatchList(int currentPropertyId)
     {
         var currentProperty = PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(currentPropertyId)!);
@@ -159,8 +161,7 @@ public class AdminController : AbstractController
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpPost]
-    [Route("{currentPropertyId:int}/Matches")]
+    [HttpPost("{currentPropertyId:int}/Matches")]
     public ActionResult SendMatchLinkEmail(string propertyLink, string tenantEmail, int currentPropertyId)
     {
         var addressToSendTo = new List<string> { tenantEmail };

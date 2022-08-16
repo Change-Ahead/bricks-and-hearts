@@ -8,17 +8,17 @@ namespace BricksAndHearts.Services;
 public interface IMailService
 {
     public Task SendMsg(
-        string msgBody,
+        string body,
         string subject,
-        List<string>? msgToAddress,
-        string msgFromName = "",
-        string msgToName = ""
+        List<string>? toAddresses,
+        string fromName = "",
+        string toName = ""
     );
 
     public void TrySendMsgInBackground(
-        string msgBody,
+        string body,
         string subject,
-        List<string>? msgToAddress
+        List<string>? toAddresses = null
     );
 }
 
@@ -34,26 +34,26 @@ public class MailService : IMailService
     }
     
     public async Task SendMsg(
-        string msgBody,
+        string body,
         string subject,
-        List<string>? msgToAddress,
-        string msgFromName = "",
-        string msgToName = ""
+        List<string>? toAddresses,
+        string fromName = "",
+        string toName = ""
     )
     {
-        var msgFromAddress = _config.Value.FromAddress;
-        msgToAddress ??= _config.Value.ToAddress;
+        var fromAddress = _config.Value.FromAddress;
+        toAddresses ??= _config.Value.ToAddress;
         
         var message = new MimeMessage();
-        message.From.Add(new MailboxAddress(msgFromName, msgFromAddress));
+        message.From.Add(new MailboxAddress(fromName, fromAddress));
         message.Subject = subject;
         message.Body = new TextPart("plain")
         {
-            Text = msgBody
+            Text = body
         };
-        foreach (var address in msgToAddress)
+        foreach (var address in toAddresses)
         {
-            message.To.Add(new MailboxAddress(msgToName, address));
+            message.To.Add(new MailboxAddress(toName, address));
         }
 
         using var client = new SmtpClient();
@@ -67,32 +67,32 @@ public class MailService : IMailService
     }
     
     private async Task TrySendMsg(
-        string msgBody,
+        string body,
         string subject,
-        List<string>? msgToAddress,
-        string msgFromName = "",
-        string msgToName = ""
+        List<string>? toAddresses,
+        string fromName = "",
+        string toName = ""
     )
     {
         try
         {
-            await SendMsg(msgBody, subject, msgToAddress, msgFromName, msgToName);
+            await SendMsg(body, subject, toAddresses, fromName, toName);
             _logger.LogInformation("Successfully sent emails");
         }
         catch (Exception e)
         {
             // ignored
-            _logger.LogWarning("Failed to send email with message:\n{Msg}\n \nSubject:\n{Subject}", msgBody, subject);
+            _logger.LogWarning("Failed to send email with message:\n{Msg}\n \nSubject:\n{Subject}", body, subject);
             _logger.LogWarning("Email sending exception message: {E}", e);
         }
     }
 
     public void TrySendMsgInBackground(
-        string msgBody,
+        string body,
         string subject,
-        List<string>? msgToAddress
+        List<string>? toAddresses = null
     )
     {
-        Task.Run(() => TrySendMsg(msgBody, subject, msgToAddress));
+        Task.Run(() => TrySendMsg(body, subject, toAddresses));
     }
 }

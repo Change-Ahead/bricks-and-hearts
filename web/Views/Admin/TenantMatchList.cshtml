@@ -37,9 +37,11 @@
             <td>@tenant.HousingBenefits</td>
             <td>@tenant.Over35</td>
             <td>
-                @using (Html.BeginForm("SendMatchLinkEmail", "Admin", new { propertyLink = Model.CurrentProperty.Description, /*TODO: change this from description to link*/ 
-                                                                                                        tenantEmail = tenant.Email, 
-                                                                                                        currentPropertyId = Model.CurrentProperty.PropertyId }, FormMethod.Post))
+                @using (Html.BeginForm("SendMatchLinkEmail", "Admin", new {
+                    propertyLink = Model.CurrentProperty.Description, /*TODO: change this from description to link*/ 
+                    tenantEmail = tenant.Email, 
+                    currentPropertyId = Model.CurrentProperty.PropertyId }, 
+                    FormMethod.Post))
                 {
                     <button type="submit" class="btn btn-thin btn-outline-primary mx-3">Match</button>
                 }

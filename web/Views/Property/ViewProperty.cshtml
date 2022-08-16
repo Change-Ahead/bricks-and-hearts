@@ -34,8 +34,7 @@
 {
     <div class="row mt-4">
         <div class="col-auto mb-2">
-            @* TODO: Link this to tenant matching page *@
-            <a asp-action="" asp-controller="" class="btn btn-large btn-outline-primary d-table-cell">View matches</a>
+            <a asp-action="TenantMatchList" asp-controller="Admin" asp-route-currentPropertyId="@Model.Property.PropertyId" class="btn btn-large btn-outline-primary d-table-cell">View matches</a>
         </div>
         <div class="col-auto mb-2">
             <a asp-action="GetPublicViewLink" asp-controller="Property" asp-route-propertyId="@Model.Property.PropertyId" class="btn btn-large btn-outline-primary d-table-cell">Get shareable link</a>
