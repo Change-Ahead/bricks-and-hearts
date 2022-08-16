@@ -3,18 +3,37 @@
     ViewData["Title"] = "Accept Invite";
 }
 
-@if (@Model.InviteLinkToAccept != null)
+@functions
 {
-    @using (Html.BeginForm("TieUserWithLandlord", "Landlord", new { inviteLink = @Model.InviteLinkToAccept }))
+    bool InvalidLink() => Model.InviteLinkToAccept == null || Model.Landlord == null;
+}
+
+<div class="row mt-5">
+    @if (InvalidLink())
     {
-        <h3>Welcome! You've been invited...</h3>
-        <br/>
-        <input type="submit" class="btn-primary btn-lg" value="Accept Invite"/>
+        <h1 class="font-h1">Invalid invite link</h1>
+        <p class="font-body">We couldn't find a profile associated with your invite link.</p>
     }
-}
-else
-{
-    <h3>Ooops your invite link does not seem to work!</h3>
-}
+    else
+    {
+        <h1 class="font-h1">Welcome onboard, @Model.Landlord!.FirstName!</h1>
+        <p class="font-body">You have been invited to Bricks & Hearts. Accept the invite below to start adding more details to your profile.</p>
+    }
+</div>
 
+<div class="col-sm-5">
+    <img src="@Url.Content("~/images/BNH_Landlordinvite_illustration.png")" alt="Landlord accepting invite" class="h-100 w-100"/>
+</div>
 
+<div class="mt-4">
+    @if (InvalidLink())
+    {
+        <a asp-action="RegisterGet" asp-controller="Landlord" class="btn btn-large btn-primary d-table-cell" role="button">Register</a>
+    }
+    else
+    {
+        <form asp-action="TieUserWithLandlord" asp-controller="Landlord" asp-route-inviteLink="@Model.InviteLinkToAccept" method="post">
+            <button type="submit" class="btn btn-large btn-primary">Accept invite</button>
+        </form>
+    }
+</div>

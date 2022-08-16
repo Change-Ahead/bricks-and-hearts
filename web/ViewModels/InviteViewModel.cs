@@ -2,10 +2,6 @@
 
 public class InviteViewModel
 {
-    public string? InviteLinkToAccept { get; set; } = null;
-
-    public InviteViewModel(string? inviteLinkToAccept = null)
-    {
-        InviteLinkToAccept = inviteLinkToAccept;
-    }
+    public string? InviteLinkToAccept { get; set; }
+    public LandlordProfileModel? Landlord { get; set; }
 }

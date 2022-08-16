@@ -31,7 +31,7 @@ a, .nav-link {
 }
 
 body {
-    background-image: url("images/backgroundHouses.jpg");
+    background-image: url("../images/backgroundHouses.jpg");
     background-color: rgba(255, 255, 255, 0.97);
     background-blend-mode: lighten;
 }
