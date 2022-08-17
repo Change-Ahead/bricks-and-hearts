@@ -1,51 +1,46 @@
-﻿@model PropertyInputFormViewModel
+﻿@model BricksAndHearts.ViewModels.PropertyInput.PropertyInputModelStep3
 
 <h1 class="font-h1">Property details</h1>
 
 <div asp-validation-summary="All" class="text-danger"></div>
-<form method="post" asp-controller="Property" asp-action="PropertyInputStepThree" asp-route-propertyId="@Model.PropertyId" asp-route-operationType="@(Model.IsEdit ? "edit" : "add")">
-
+<form method="post">
     <div class="my-4 py-3">
         <label class="form-label mb-3">What is your property type?</label>
 
         <div class="form-check">
-            <input type="radio" asp-for="Step3!.PropertyType" value="Detached" id="TypeDetached" class="form-check-input" required>
+            <input type="radio" asp-for="PropertyType" value="Detached" id="TypeDetached" class="form-check-input" required>
             <label for="TypeDetached" class="form-check-label">Detached</label>
         </div>
         <div class="form-check">
-            <input type="radio" asp-for="Step3!.PropertyType" value="Semi-detached" id="TypeSemiDetached" class="form-check-input" required>
+            <input type="radio" asp-for="PropertyType" value="Semi-detached" id="TypeSemiDetached" class="form-check-input" required>
             <label for="TypeSemiDetached" class="form-check-label">Semi-detached</label>
         </div>
         <div class="form-check">
-            <input type="radio" asp-for="Step3!.PropertyType" value="Top floor flat" id="TypeTopFlat" class="form-check-input" required>
+            <input type="radio" asp-for="PropertyType" value="Top floor flat" id="TypeTopFlat" class="form-check-input" required>
             <label for="TypeTopFlat" class="form-check-label">Top floor flat</label>
         </div>
         <div class="form-check">
-            <input type="radio" asp-for="Step3!.PropertyType" value="Mid floor flat" id="TypeMidFlat" class="form-check-input" required>
+            <input type="radio" asp-for="PropertyType" value="Mid floor flat" id="TypeMidFlat" class="form-check-input" required>
             <label for="TypeMidFlat" class="form-check-label">Mid floor flat</label>
         </div>
         <div class="form-check">
-            <input type="radio" asp-for="Step3!.PropertyType" value="Ground floor flat" id="TypeGroundFlat" class="form-check-input" required>
+            <input type="radio" asp-for="PropertyType" value="Ground floor flat" id="TypeGroundFlat" class="form-check-input" required>
             <label for="TypeGroundFlat" class="form-check-label">Ground floor flat</label>
         </div>
         <div class="form-check">
-            <input type="radio" asp-for="Step3!.PropertyType" value="Mid terrace" id="TypeMidTerrace" class="form-check-input" required>
+            <input type="radio" asp-for="PropertyType" value="Mid terrace" id="TypeMidTerrace" class="form-check-input" required>
             <label for="TypeMidTerrace" class="form-check-label">Mid terrace</label>
         </div>
         <div class="form-check">
-            <input type="radio" asp-for="Step3!.PropertyType" value="End terrace" id="TypeEndTerrace" class="form-check-input" required>
+            <input type="radio" asp-for="PropertyType" value="End terrace" id="TypeEndTerrace" class="form-check-input" required>
             <label for="TypeEndTerrace" class="form-check-label">End terrace</label>
         </div>
     </div>
 
     <div class="my-4 py-3">
-        <label asp-for="Step3!.NumOfBedrooms" class="form-label">Number of bedrooms</label>
-        <input asp-for="Step3!.NumOfBedrooms" class="form-control" required/>
-        <span asp-validation-for="Step3!.NumOfBedrooms" class="text-danger"></span>
+        <label asp-for="NumOfBedrooms" class="form-label">Number of bedrooms</label>
+        <input asp-for="NumOfBedrooms" class="form-control" required/>
+        <span asp-validation-for="NumOfBedrooms" class="text-danger"></span>
     </div>
-    <input type="hidden" asp-for="LandlordId" value="@Model.LandlordId"/>
-    <input type="hidden" asp-for="PropertyId" value="@Model.PropertyId"/>
-    <input type="hidden" asp-for="Step" value="@Model.Step"/>
-    <input type="hidden" asp-for="IsEdit" value="@Model.IsEdit"/>
-    <partial name=@("_PropertyFormButtons") model="Model"/>
+    @{ await Html.RenderPartialAsync("_PropertyFormButtons", Model); }
 </form>

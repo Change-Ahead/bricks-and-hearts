@@ -1,10 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
-using System.Text;
 
 namespace BricksAndHearts.ViewModels;
 
 public class AddressModel
 {
+    [Required]
     [StringLength(10000)]
     public string? AddressLine1 { get; set; }
 

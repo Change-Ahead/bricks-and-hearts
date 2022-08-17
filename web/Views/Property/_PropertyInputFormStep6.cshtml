@@ -1,48 +1,43 @@
 @using Microsoft.AspNetCore.Mvc.TagHelpers
-@model PropertyInputFormViewModel
+@model BricksAndHearts.ViewModels.PropertyInput.PropertyInputModelStep6
 
 <h1 class="font-h1">Rent, deposits, availability, and duration</h1>
-<form method="post" asp-controller="Property" asp-action="PropertyInputStepSix" asp-route-propertyId="@Model.PropertyId" asp-route-operationType="@(Model.IsEdit ? "edit" : "add")">
-
+<form method="post">
     <div asp-validation-summary="All" class="text-danger"></div>
     <div class="my-4 py-3">
-        <label asp-for="Step6!.Rent" class="form-label">Rent amount</label>
+        <label asp-for="Rent" class="form-label">Rent amount</label>
         <div class="input-group">
             <span class="input-group-text">£</span>
-            <input asp-for="Step6!.Rent" class="form-control" required/>
+            <input asp-for="Rent" class="form-control" required/>
             <span class="input-group-text">per month</span>
         </div>
-        <span asp-validation-for="Step6!.Rent" class="text-danger"></span>
+        <span asp-validation-for="Rent" class="text-danger"></span>
     </div>
 
     <div class="my-4 py-3 row">
         <div class="col-auto">
-            <label asp-for="Step6!.Availability" class="form-label">Availability</label>
-            <select asp-for="Step6!.Availability" class="form-select" required
+            <label asp-for="Availability" class="form-label">Availability</label>
+            <select asp-for="Availability" class="form-select" required
                     id="Select" onclick="checkIfSelectedValueIsTarget('@AvailabilityState.AvailableSoon')">
                 <option selected>@AvailabilityState.Draft</option>
                 <option>@AvailabilityState.Available</option>
                 <option>@AvailabilityState.AvailableSoon</option>
                 <option>@AvailabilityState.Unavailable</option>
             </select>
-            <span asp-validation-for="Step6!.Availability" class="text-danger"></span>
+            <span asp-validation-for="Availability" class="text-danger"></span>
         </div>
-        <div class="col-auto" id="ifTrue" style="@(Model.Step6!.Availability == AvailabilityState.AvailableSoon ? "" : "display: none;")">
-            <label asp-for="Step6!.AvailableFrom" class="form-label">Available from</label>
-            <input asp-for="Step6!.AvailableFrom" class="form-control empty"/>
-            <span asp-validation-for="Step6!.AvailableFrom" class="text-danger"></span>
+        <div class="col-auto" id="ifTrue" style="@(Model.Availability == AvailabilityState.AvailableSoon ? "" : "display: none;")">
+            <label asp-for="AvailableFrom" class="form-label">Available from</label>
+            <input asp-for="AvailableFrom" class="form-control empty"/>
+            <span asp-validation-for="AvailableFrom" class="text-danger"></span>
             @*TODO require AvailableFrom date to be in future*@
         </div>
         <div class="d-none" id="ifFalse"></div>
     </div>
 
     <div class="my-4 py-3">
-        <label asp-for="Step6!.TotalUnits" class="form-label">Number of units available in this property</label>
-        <input asp-for="Step6!.TotalUnits" class="form-control" required>
+        <label asp-for="TotalUnits" class="form-label">Number of units available in this property</label>
+        <input asp-for="TotalUnits" class="form-control" required>
     </div>
-    <input type="hidden" asp-for="LandlordId" value="@Model.LandlordId"/>
-    <input type="hidden" asp-for="PropertyId" value="@Model.PropertyId"/>
-    <input type="hidden" asp-for="Step" value="@Model.Step"/>
-    <input type="hidden" asp-for="IsEdit" value="@Model.IsEdit"/>
-    <partial name=@("_PropertyFormButtons") model="Model"/>
+    @{ await Html.RenderPartialAsync("_PropertyFormButtons", Model); }
 </form>

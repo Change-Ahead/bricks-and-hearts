@@ -1,8 +1,9 @@
-﻿@model PropertyInputFormViewModel
+﻿@using BricksAndHearts.ViewModels.PropertyInput
+@model BricksAndHearts.ViewModels.PropertyInput.PropertyInputModelBase
 
 <div class="row my-4">
     <div class="col-auto">
-        @if (Model.Step < PropertyInputFormViewModel.MaximumStep)
+        @if (Model.Step < PropertyInputModelBase.MaximumStep)
         {
             <input type="submit" value="Next" class="btn btn-large btn-primary mb-3"/>
         }
@@ -19,10 +20,10 @@
 </div>
 <!-- Modal -->
 <div class="modal fade" id="cancelModal" tabindex="-1" aria-labelledby="cancelModalLabel" aria-hidden="true">
-    @if (Model.IsEdit == false)
-    {
-        <div class="modal-dialog">
-            <div class="modal-content">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            @if (Model.IsEdit == false)
+            {
                 <div class="modal-header">
                     <h5 class="modal-title" id="cancelModalLabel">Cancel adding new property</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -34,13 +35,9 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <a class="btn btn-danger" asp-controller="Property" asp-action="PropertyInputCancel" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId" asp-route-operationType="@(Model.IsEdit ? "edit" : "add")">Delete Property</a>
                 </div>
-            </div>
-        </div>
-    }
-    else
-    {
-        <div class="modal-dialog">
-            <div class="modal-content">
+            }
+            else
+            {
                 <div class="modal-header">
                     <h5 class="modal-title" id="cancelModalLabel">Stop editing property</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -52,7 +49,7 @@
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                     <a class="btn btn-danger" asp-controller="Property" asp-action="PropertyInputCancel" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId" asp-route-operationType="@(Model.IsEdit ? "edit" : "add")">Stop Editing</a>
                 </div>
-            </div>
+            }
         </div>
-    }
+    </div>
 </div>

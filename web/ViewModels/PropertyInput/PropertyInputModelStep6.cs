@@ -15,13 +15,25 @@ public class PropertyInputModelStep6 : PropertyInputModelBase
 
     public int? Rent { get; set; }
 
-    public override void PropertyInputModelStepInitialiser(PropertyDbModel property)
+    public override void InitialiseViewModel(PropertyDbModel property)
     {
+        base.InitialiseViewModel(property);
         Rent = property.Rent;
         Availability = property.Availability;
         AvailableFrom = property.AvailableFrom;
         TotalUnits = property.TotalUnits;
         OccupiedUnits = property.OccupiedUnits;
+    }
+
+    public override PropertyViewModel FormToViewModel(int propertyId, int landlordId)
+    {
+        var property = base.FormToViewModel(propertyId, landlordId);
+        property.Availability = Availability;
+        property.Rent = Rent;
+        property.AvailableFrom = AvailableFrom;
+        property.TotalUnits = TotalUnits;
+        property.OccupiedUnits = OccupiedUnits;
+        return property;
     }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
