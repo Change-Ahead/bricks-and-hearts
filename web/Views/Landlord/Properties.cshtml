@@ -61,7 +61,7 @@ else
             <td>@prop.AvailableUnits</td>
             <td>
                 <a class="btn btn-outline-primary position-relative" href="@Url.Action("ViewProperty", "Property", new { propertyId = prop.PropertyId })">
-                    <i class="bi bi-house"></i>
+                    <p>view</p>
                     @if (prop.IsIncomplete)
                     {
                         <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
