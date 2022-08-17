@@ -4,6 +4,7 @@ using BricksAndHearts.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BricksAndHearts.Migrations
 {
     [DbContext(typeof(BricksAndHeartsDbContext))]
-    partial class BricksAndHeartsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220812134249_AddLatLongToTenant")]
+    partial class AddLatLongToTenant
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -102,22 +104,6 @@ namespace BricksAndHearts.Migrations
                     b.ToTable("Landlord");
                 });
 
-            modelBuilder.Entity("BricksAndHearts.Database.PostcodeDbModel", b =>
-                {
-                    b.Property<string>("Postcode")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<decimal?>("Lat")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("Lon")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Postcode");
-
-                    b.ToTable("Postcodes");
-                });
-
             modelBuilder.Entity("BricksAndHearts.Database.PropertyDbModel", b =>
                 {
                     b.Property<int>("Id")
@@ -132,16 +118,10 @@ namespace BricksAndHearts.Migrations
                     b.Property<bool?>("AcceptsCouple")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("AcceptsCredit")
-                        .HasColumnType("bit");
-
                     b.Property<bool?>("AcceptsFamily")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("AcceptsNotEET")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("AcceptsOver35")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("AcceptsPets")

@@ -116,4 +116,13 @@ public class ControllerTestsBase
         var landlordUser = new BricksAndHeartsUser(userDbModel, new List<Claim>(), "google");
         return landlordUser;
     }
+
+    protected TenantDbModel CreateTenant()
+    {
+        return new TenantDbModel
+        {
+            Name = "Test Tenant",
+            Postcode = "CB2 1LA"
+        };
+    }
 }

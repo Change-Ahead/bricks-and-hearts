@@ -23,12 +23,12 @@ public interface IPropertyService
 public class PropertyService : IPropertyService
 {
     private readonly BricksAndHeartsDbContext _dbContext;
-    private readonly IPostcodeApiService _postcodeApiService;
+    private readonly IPostcodeService _postcodeService;
 
-    public PropertyService(BricksAndHeartsDbContext dbContext, IPostcodeApiService postcodeApiService)
+    public PropertyService(BricksAndHeartsDbContext dbContext, IPostcodeService postcodeService)
     {
         _dbContext = dbContext;
-        _postcodeApiService = postcodeApiService;
+        _postcodeService = postcodeService;
     }
 
     public List<PropertyDbModel> GetPropertiesByLandlord(int landlordId)
@@ -219,9 +219,15 @@ public class PropertyService : IPropertyService
     
     public async Task<List<PropertyDbModel>?> SortPropertiesByLocation(string postalCode, int page, int perPage)
     {
-        var responseBody = await _postcodeApiService.MakeApiRequestToPostcodeApi(postalCode);
-        var model = _postcodeApiService.TurnResponseBodyToModel(responseBody);
-        if (model.Result == null || model.Result.Lat == null || model.Result.Lon == null)
+        var postcode = _postcodeService.FormatPostcode(postalCode);
+        var postcodeList = new List<string> { postcode };
+        await _postcodeService.AddPostcodesToDatabaseIfAbsent(postcodeList);
+        if (postcode == "")
+        {
+            return null;
+        }
+        var model = _dbContext.Postcodes.SingleOrDefault(p => p.Postcode == postcode);
+        if (model?.Lat == null || model.Lon == null)
         {
             return null;
         }
@@ -239,10 +245,10 @@ public class PropertyService : IPropertyService
             .FromSqlInterpolated(
                 @$"SELECT *, (
                   6371 * acos (
-                  cos ( radians({model.Result.Lat}) )
+                  cos ( radians({model.Lat}) )
                   * cos( radians( Lat ) )
-                  * cos( radians( Lon ) - radians({model.Result.Lon}) )
-                  + sin ( radians({model.Result.Lat}) )
+                  * cos( radians( Lon ) - radians({model.Lon}) )
+                  + sin ( radians({model.Lat}) )
                   * sin( radians( Lat ) )
                     )
                 ) AS distance 

@@ -13,6 +13,7 @@ namespace BricksAndHearts.UnitTests.ServiceTests.CsvImport;
 public class CsvImportServiceTests : IClassFixture<TestDatabaseFixture>
 {
     private TestDatabaseFixture Fixture { get; }
+    private IPostcodeService PostcodeService;
     private ILogger<CsvImportService> Logger { get; } 
     private HttpMessageHandler MessageHandler;
     private HttpClient HttpClient;
@@ -20,6 +21,7 @@ public class CsvImportServiceTests : IClassFixture<TestDatabaseFixture>
     public CsvImportServiceTests(TestDatabaseFixture fixture)
     {
         Fixture = fixture;
+        PostcodeService = A.Fake<PostcodeService>();
         Logger = A.Fake<ILogger<CsvImportService>>();
         MessageHandler = A.Fake<HttpMessageHandler>();
         HttpClient = new HttpClient(MessageHandler);
@@ -30,7 +32,7 @@ public class CsvImportServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
-        var service = new CsvImportService(context, Logger);
+        var service = new CsvImportService(context, PostcodeService, Logger);
 
         var data = Encoding.UTF8.GetBytes("Name,Phone,Postcode,Type,HasPet,ETT,UniversalCredit,HousingBenefits,Over35");
         var csvFile = new FormFile(new MemoryStream(data), 0, data.Length, null!, "fakeFile.csv");
@@ -48,7 +50,7 @@ public class CsvImportServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
-        var service = new CsvImportService(context, Logger);
+        var service = new CsvImportService(context, PostcodeService, Logger);
 
         var data = Encoding.UTF8.GetBytes("Extra,Name,Email,Phone,Postcode,Type,HasPet,ETT,UniversalCredit,HousingBenefits,Over35");
         var csvFile = new FormFile(new MemoryStream(data), 0, data.Length, null!, "fakeFile.csv");
@@ -66,7 +68,7 @@ public class CsvImportServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
-        var service = new CsvImportService(context, Logger);
+        var service = new CsvImportService(context, PostcodeService, Logger);
 
         var data = Encoding.UTF8.GetBytes("Name,Email,Phone,Postcode,Type,HasPet,ETT,UniversalCredit,HousingBenefits,Over35");
         var csvFile = new FormFile(new MemoryStream(data), 0, data.Length, null!, "fakeFile.csv");

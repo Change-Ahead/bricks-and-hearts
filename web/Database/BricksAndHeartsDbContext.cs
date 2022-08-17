@@ -15,6 +15,7 @@ public class BricksAndHeartsDbContext : DbContext
     public DbSet<UserDbModel> Users { get; set; } = null!;
     public DbSet<PropertyDbModel> Properties { get; set; } = null!;
     public DbSet<TenantDbModel> Tenants { get; set; } = null!;
+    public DbSet<PostcodeDbModel> Postcodes { get; set; } = null!;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {

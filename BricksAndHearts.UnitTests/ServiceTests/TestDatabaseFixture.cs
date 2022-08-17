@@ -67,6 +67,11 @@ public class TestDatabaseFixture
                     CreateTenant(),
                     CreateFalseTenant()
                 );
+                
+                context.Postcodes.AddRange(
+                    AddPostcode1(),
+                    AddPostcode2()
+                );
 
                 context.SaveChanges();
             }
@@ -556,6 +561,26 @@ public class TestDatabaseFixture
             AcceptsWithoutGuarantor = true,
             Postcode = "CB1 1DX",
             IsIncomplete = false
+        };
+    }
+    
+    private static PostcodeDbModel AddPostcode1()
+    {
+        return new PostcodeDbModel
+        {
+            Postcode = "CB2 1LA",
+            Lat = (decimal?)52.196849,
+            Lon = (decimal?)0.129235
+        };
+    }
+    
+    private static PostcodeDbModel AddPostcode2()
+    {
+        return new PostcodeDbModel
+        {
+            Postcode = "NW5 1TL",
+            Lat = (decimal?)51.553935,
+            Lon = (decimal?)-0.144754
         };
     }
 }

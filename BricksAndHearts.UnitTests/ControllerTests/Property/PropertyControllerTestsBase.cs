@@ -14,7 +14,6 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Property;
 public class PropertyControllerTestsBase : ControllerTestsBase
 {
     protected readonly IAzureMapsApiService AzureMapsApiService;
-    protected readonly IPostcodeApiService PostcodeApiService;
     protected readonly IAzureStorage AzureStorage;
     protected readonly ILogger<PropertyController> Logger;
     protected readonly IPropertyService PropertyService;
@@ -24,12 +23,11 @@ public class PropertyControllerTestsBase : ControllerTestsBase
     {
         PropertyService = A.Fake<IPropertyService>();
         AzureMapsApiService = A.Fake<IAzureMapsApiService>();
-        PostcodeApiService = A.Fake<IPostcodeApiService>();
         AzureStorage = A.Fake<IAzureStorage>();
         Logger = A.Fake<ILogger<PropertyController>>();
         var httpContext = new DefaultHttpContext();
         var tempData = new TempDataDictionary(httpContext, A.Fake<ITempDataProvider>());
-        UnderTest = new PropertyController(PropertyService, AzureMapsApiService, Logger, AzureStorage, PostcodeApiService){TempData = tempData};
+        UnderTest = new PropertyController(PropertyService, AzureMapsApiService, Logger, AzureStorage){TempData = tempData};
     }
 
     protected PropertyViewModel CreateExamplePropertyViewModel()

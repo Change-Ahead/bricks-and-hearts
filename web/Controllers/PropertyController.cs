@@ -20,8 +20,7 @@ public class PropertyController : AbstractController
         IPropertyService propertyService,
         IAzureMapsApiService azureMapsApiService,
         ILogger<PropertyController> logger,
-        IAzureStorage azureStorage,
-        IPostcodeApiService postcodeApiService)
+        IAzureStorage azureStorage)
     {
         _propertyService = propertyService;
         _azureMapsApiService = azureMapsApiService;
@@ -409,8 +408,7 @@ public class PropertyController : AbstractController
             if (!isImageResult.isImage)
             {
                 _logger.LogInformation($"Failed to upload {image.FileName}: not in a recognised image format");
-                AddFlashMessage("danger",
-                    $"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: {isImageResult.imageExtString}");
+                AddFlashMessage("danger", $"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: {isImageResult.imageExtString}");               
             }
             else
             {

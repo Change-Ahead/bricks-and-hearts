@@ -418,7 +418,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     public async void SortPropertiesByLocation_WhenCalledWithInvalidPostcode_ReturnsNull()
     {
         // Arrange
-        var logger = A.Fake<ILogger<PostcodeApiService>>();
+        var logger = A.Fake<ILogger<PostcodeService>>();
         var messageHandler = A.Fake<HttpMessageHandler>();
         const string postcode = "eeeeee";
         var responseBody = string.Empty;
@@ -430,7 +430,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         // Slightly icky because "SendAsync" is protected
         A.CallTo(messageHandler).Where(c => c.Method.Name == "SendAsync").WithReturnType<Task<HttpResponseMessage>>().Returns(response);
         var httpClient = new HttpClient(messageHandler);
-        var postcodeApiService = new PostcodeApiService(logger, null!, httpClient);
+        var postcodeApiService = new PostcodeService(logger, null!, httpClient);
         var service = new PropertyService(null!, postcodeApiService);
 
         // Act
@@ -444,20 +444,19 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     public async void SortPropertiesByLocation_WhenCalledWithValidPostcode_ReturnPropertiesSorted()
     {
         // Arrange
-        await using var context = Fixture.CreateReadContext();
-        var logger = A.Fake<ILogger<PostcodeApiService>>();
+        await using var context = Fixture.CreateWriteContext();
+        var logger = A.Fake<ILogger<PostcodeService>>();
         var messageHandler = A.Fake<HttpMessageHandler>();
         const string postcode = "eh11ad";
-        var responseBody = await File.ReadAllTextAsync($"{AppDomain.CurrentDomain.BaseDirectory}/../../../ServiceTests/Api/PostcodeioApiResponse.json");
+        var responseBody = await File.ReadAllTextAsync($"{AppDomain.CurrentDomain.BaseDirectory}/../../../ServiceTests/Api/PostcodeioApiBulkResponse.json");
         var response = new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(responseBody)
         };
-        // Slightly icky because "SendAsync" is protected
         A.CallTo(messageHandler).Where(c => c.Method.Name == "SendAsync").WithReturnType<Task<HttpResponseMessage>>().Returns(response);
         var httpClient = new HttpClient(messageHandler);
-        var postcodeApiService = new PostcodeApiService(logger, context, httpClient);
+        var postcodeApiService = new PostcodeService(logger, context, httpClient);
         var service = new PropertyService(context, postcodeApiService);
         
         
