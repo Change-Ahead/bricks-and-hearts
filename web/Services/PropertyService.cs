@@ -204,17 +204,15 @@ public class PropertyService : IPropertyService
                 AvailableProperties = _dbContext.Properties.Count(p => p.Availability == AvailabilityState.Available)
             };   
         }
-
+        var landlord = _dbContext.Landlords.Include(l => l.Properties).SingleOrDefault(l => l.Id == landlordId);
+        var properties = landlord?.Properties ?? new List<PropertyDbModel>();
         return new PropertyCountModel
         {
-            RegisteredProperties = _dbContext.Properties.Count(p => p.LandlordId == landlordId),
-            LiveProperties = _dbContext.Properties.Count(p =>
-                p.Availability != AvailabilityState.Draft 
-                && p.Landlord.CharterApproved 
-                && p.LandlordId == landlordId),
-            AvailableProperties = _dbContext.Properties.Count(p =>
-                p.Availability == AvailabilityState.Available 
-                && p.LandlordId == landlordId)
+            RegisteredProperties = properties.Count,
+            LiveProperties = properties.Count(p =>
+                landlord?.CharterApproved == true && p.Availability != AvailabilityState.Draft),
+            AvailableProperties = properties.Count(p =>
+                p.Availability == AvailabilityState.Available)
         };
     }
 

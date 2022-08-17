@@ -118,7 +118,7 @@ public class LandlordController : AbstractController
             return StatusCode(403);
         }
 
-        var landlord = await _landlordService.GetLandlordIfExistsFromId(id);
+        var landlord = await _landlordService.GetLandlordIfExistsWithProperties(id);
         if (landlord == null)
         {
             return StatusCode(404);
@@ -323,7 +323,7 @@ public class LandlordController : AbstractController
         {
             return StatusCode(404);
         }
-        var landlordViewProperties = landlord.Properties.Select(PropertyViewModel.FromDbModel).OrderByDescending(p => p.PropertyId).Take(2).ToList();
+        var landlordViewProperties = landlord.Properties.Select(PropertyViewModel.FromDbModel).OrderByDescending(p => p.PropertyId).Take(2);
         var allPropertyDetails = new List<PropertyDetailsViewModel>();
         foreach (var property in landlordViewProperties)
         {
@@ -343,7 +343,7 @@ public class LandlordController : AbstractController
         return View("Dashboard", viewModel);
     }
 
-    private List<ImageFileUrlModel> GetFilesFromFileNames(List<string> fileNames, int propertyId)
+    private List<ImageFileUrlModel> GetFilesFromFileNames(IEnumerable<string> fileNames, int propertyId)
     {
         return fileNames.Select(fileName =>
             {

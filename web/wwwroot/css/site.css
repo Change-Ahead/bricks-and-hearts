@@ -443,7 +443,7 @@ th {
 
 .statBox {
     background-color: var(--white);
-    box-shadow: 0 0 2px var(--black);
+    box-shadow: rgba(149, 157, 165, 0.2) 0px 8px 24px;
 }
 
 .modal-overlay {
