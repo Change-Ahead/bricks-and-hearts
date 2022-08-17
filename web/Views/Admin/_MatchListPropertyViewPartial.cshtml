@@ -1,2 +1,90 @@
-﻿@model PropertyDetailsViewModel
+﻿@model LandlordAndPropertyViewModel
 
+@functions
+{
+    void GetImageElement(int propertyId, int id, string size)
+    {
+        <div href="#" class="property-img-@(size) placeholder-glow">
+            <div class="placeholder w-100 h-100" id="image@(propertyId)@(id)Placeholder"></div>
+            <img src="@Model.Images[id].FileUrl" alt="@Model.Images[id].FileName" id="image@(propertyId)@(id)" style="display: none" onload="hidePlaceholder('#image@(propertyId)@(id)')">
+        </div>
+    }
+}
+
+<div class="border border-primary rounded mb-3 p-2 statBox">
+    <div class="row">
+        <div class="col">
+            <div class="row property-img-row w-100">
+                @if (Model.Images.Count > 0)
+                {
+                    <div class="col-sm my-3">
+                        @{ GetImageElement(Model.Property!.PropertyId, 0, "lg"); }
+                    </div>
+                }
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="row">
+                        <div class="col-sm-auto">
+                            @* TODO BNH-99: Replace icon with profile picture *@
+                            <img alt="profile picture" src="https://www.softwire.com/wp-content/uploads/2019/07/Gareth-J-Final-Head-Shot.jpg" width="100" height="100" class="rounded-circle img-thumbnail img-fluid"/>
+                        </div>
+                        <div class="col">
+                            <h1 class="font-blue font-h1">@Model.CurrentLandlord.FirstName</h1>
+                            <p class="font-subtitle font-blue">@Model.CurrentLandlord.LandlordType</p>
+                            <p class="font-subtitle">@Model.CurrentLandlord.NumOfProperties current properties</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="row">
+                <h2 class="font-h2">@Model.Property!.Address.ToShortAddressString()</h2>
+                <div class="d-flex">
+                    @if (Model.Property.Availability == "Available")
+                    {
+                        <p class="flex-row flex-grow-1"><i class="bi bi-check2-all"></i>Available</p>
+                    }
+                    else
+                    {
+                        <p class="flex-row"><i class="bi bi-x"></i>Not yet available</p>
+                    }
+                    <div class="flex-row-reverse">
+                        <p><i class="bi bi-geo-alt"></i>@Model.Property.Address.County, @Model.Property.Address.Postcode</p>
+                    </div>
+                </div>
+            </div>
+            <div class="row m-0">
+                <div class="card custom-card flex-grow-1 mt-2">
+                    <div class="card-body">
+                        <div class="col">
+                            <p class="font-smallBody">Type</p>
+                            <h2 class="font-h2">@Model.Property.PropertyType</h2>
+                        </div>
+                        <div class="col">
+                            <p class="font-smallBody">Bedrooms</p>
+                            <h2 class="font-h2">@Model.Property.NumOfBedrooms</h2>
+                        </div>
+                        <div class="col">
+                            <p class="font-smallBody">Rent</p>
+                            <h2 class="font-h2">@Model.Property.Rent</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="card custom-card flex-grow-1 mt-2">
+                        <div class="card-body">
+                            @Model.Property.Description
+                        </div>
+                    </div>
+                </div>
+                <div class="col">
+                    <partial name="Details/_TenantPreferences" model="@(new PropertyDetailsViewModel { Property = Model.Property, Images = Model.Images })"/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

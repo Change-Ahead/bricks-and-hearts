@@ -4,7 +4,7 @@
     ViewData["Title"] = "Tenant List";
 }
 
-<h2>Tenant Matches for @Model.CurrentProperty.Address.AddressLine1 @Model.CurrentProperty.Address.AddressLine2 @Model.CurrentProperty.Address.AddressLine3</h2>
+<partial name="_MatchListPropertyViewPartial" model="@Model.LandlordAndProperty"/>
 
 <table class="table">
     <thead>
@@ -46,9 +46,9 @@
             <td>
                 @using (Html.BeginForm("SendMatchLinkEmail", "Tenant", new
                 {
-                    propertyLink = Model.CurrentProperty.PublicViewLink,
+                    propertyLink = Model.LandlordAndProperty.Property!.PublicViewLink,
                     tenantEmail = tenant.Email,
-                    currentPropertyId = Model.CurrentProperty.PropertyId
+                    currentPropertyId = Model.LandlordAndProperty.Property.PropertyId
                 },
                     FormMethod.Post))
                 {

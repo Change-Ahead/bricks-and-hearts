@@ -26,6 +26,10 @@
     </div>
 
     <div class="col-md d-flex flex-column pb-2">
+        <div class="d-flex">
+            <h3 class="font-h3 d-inline-block">Tenant preferences</h3>
+            <a class="bi bi-pencil ms-auto" asp-action="EditProperty" asp-controller="Property" asp-route-propertyId="@Model.Property!.PropertyId"></a>
+        </div>
         <partial name="Details/_TenantPreferences"/>
     </div>
 </div>
