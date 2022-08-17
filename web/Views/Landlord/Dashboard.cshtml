@@ -11,7 +11,7 @@
             @* TODO BNH-99: Replace icon with profile picture *@
             <img alt="profile picture" src="https://www.pngarts.com/files/10/Default-Profile-Picture-Transparent-Image.png" width="100" height="100" class="rounded-circle img-thumbnail img-fluid"/>
         </div>
-        <div class="col-5">
+        <div class="col-3">
             <div class="row">
                 <h6 class = "font-body">Hello</h6>
                 <h2 class = "font-blue font-h1">@Model.CurrentLandlord.FirstName</h2>
@@ -38,51 +38,36 @@
             </div>
         </div>
         <div class="col 3">
-            <div class="row border rounded mb-1">
-                <div class="col-3">
-                    @if (Model.CurrentLandlord.CharterApproved)
-                    {
-                        <h1>
-                            <i class="bi bi-check font-blue icon-lg"></i>
-                        </h1>
-                    }
-                    else
-                    {
-                        <h1>
-                            <i class="bi bi-x font-blue icon-lg"></i>
-                        </h1>
-                    }
-                </div>
-                <div class="col text-end">
-                    <p class = "font-smallBody">Charter Approval State</p>
-                </div>
-            </div>
-            <div class="row border rounded mb-1">
-                <div class="col-3">
-                    <h1>
-                        <i class="bi bi-house-door font-blue icon-lg"></i>
-                    </h1>
-                </div>
-                <div class="col text-end">
-                    <h1 class="font-statistics">
-                        @Model.CurrentLandlord.NumOfProperties
-                    </h1>
-                    <p class="font-smallBody">Total Properties</p>
-                </div>
-            </div>
-            <div class="row border rounded mb-1">
-                <div class="col-3">
-                    <h1>
-                        <i class="bi bi-house-heart font-blue icon-lg"></i>
-                    </h1>
-                </div>
-                <div class="col text-end">
-                    <h1 class="font-statistics">
-                        @Model.CurrentLandlord.NumOfProperties
-                    </h1>
-                    <p class="font-smallBody">Live Properties</p>
-                </div>
-            </div>
+            <row>
+                <h6 class="font-h3">My Stats</h6>
+            </row>
+            @if (Model.CurrentLandlord.CharterApproved)
+            {
+                await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
+                {
+                    IconName = "bi-check",
+                    Stat = "Approved",
+                    StatDescription = "Charter Approval State"
+                });
+            }
+            else
+            {
+                await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
+                {
+                    IconName = "bi-x",
+                    Stat = "Not Approved",
+                    StatDescription = "Charter Approval State"
+                });
+            }
+            @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel{IconName = "bi-house",
+                Stat = Model.PropertyTypeCount!.RegisteredProperties.ToString(),
+                StatDescription = "Total Properties"}); }
+            @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel{IconName = "bi-house-door",
+                Stat = Model.PropertyTypeCount.AvailableProperties.ToString(),
+                StatDescription = "Available Properties"}); }
+            @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel{IconName = "bi-house-heart",
+                Stat = Model.PropertyTypeCount.LiveProperties.ToString(),
+                StatDescription = "Live Properties"}); }
         </div>
         <div class="col-4">
             <row>

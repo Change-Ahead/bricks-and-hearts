@@ -337,7 +337,8 @@ public class LandlordController : AbstractController
         var viewModel = new LandlordDashboardViewModel
         {
             CurrentLandlord = LandlordProfileModel.FromDbModel(landlord),
-            Properties = allPropertyDetails
+            Properties = allPropertyDetails,
+            PropertyTypeCount = _propertyService.CountProperties(id)
         };
         return View("Dashboard", viewModel);
     }
