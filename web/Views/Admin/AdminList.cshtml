@@ -7,14 +7,21 @@
 <div class="tables">
     <h2>Pending Admins</h2>
     <table class="display table" id="pendingAdminTable">
-        <thead>
-        <tr>
-            <th scope="col">Google Email</th>
-            <th scope="col">Google Name</th>
-            <th></th>
-            <th></th>
-        </tr>
-        </thead>
+        @if (Model.PendingAdmins.Count > 0)
+        {
+            <thead>
+            <tr>
+                <th scope="col">Google Email</th>
+                <th scope="col">Google Name</th>
+                <th></th>
+                <th></th>
+            </tr>
+            </thead> 
+        }
+        else
+        {
+            <div>There are no pending admin access requests.</div>
+        }
         <tbody>
         @foreach (var pendingAdmin in Model.PendingAdmins)
         {
@@ -40,13 +47,20 @@
     <br/>
     <h2>Current Admins</h2>
     <table class="display table" id="adminTable">
-        <thead>
-        <tr>
-            <th scope="col">Google Email</th>
-            <th scope="col">Google Name</th>
-            <th></th>
-        </tr>
-        </thead>
+        @if (Model.CurrentAdmins.Count > 0)
+        {
+            <thead>
+            <tr>
+                <th scope="col">Google Email</th>
+                <th scope="col">Google Name</th>
+                <th></th>
+            </tr>
+            </thead>
+        }
+        else
+        {
+            <div>There are no current admins.</div> //this should never be the case (if so, who is seeing this message?)
+        }
         <tbody>
         @foreach (var currentAdmin in Model.CurrentAdmins)
         {
