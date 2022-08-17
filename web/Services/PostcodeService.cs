@@ -35,37 +35,25 @@ public class PostcodeService : IPostcodeService
 
     public async Task AddPostcodesToDatabaseIfAbsent(List<string> postcodes)
     {
-        var postcodesToLookup = new List<string>();
-        var lookupTasks = new List<Task>();
-        foreach (var postcode in postcodes)
-        {
-            if (postcode != "" && _dbContext.Postcodes.All(p => p.Postcode != postcode) && postcodesToLookup.All(p => p != postcode))
-            {
-                postcodesToLookup.Add(postcode);
-            }
+        var postcodeResponseList = new List<PostcodeioResponseModel>();
+        var postcodesToLookupChunks = postcodes.Distinct()
+            .Where(p => p != "" && _dbContext.Postcodes.All(dbRecord => dbRecord.Postcode != p))
+            .Chunk(100);
 
-            if (postcodesToLookup.Count == 100)
-            {
-                await BulkGetLatLonForPostcodes(postcodesToLookup);
-                postcodesToLookup = new List<string>();
-            }
-        }
+        var addPostcodeChunkToResponseList = postcodesToLookupChunks.Select(async p => postcodeResponseList.AddRange(await BulkGetLatLonForPostcodes(p.ToList())));
+        await Task.WhenAll(addPostcodeChunkToResponseList);
 
-        if (postcodesToLookup.Count != 0)
-        {
-            await BulkGetLatLonForPostcodes(postcodesToLookup);
-        }
-    }
-
-    private async Task BulkGetLatLonForPostcodes(List<string> postcodesToLookup)
-    {
-        var bulkResponseBody = await MakeBulkApiRequestToPostcodeApi(postcodesToLookup);
-        var postcodeResponse = TurnBulkResponseBodyToModel(bulkResponseBody);
-
-        foreach (var response in postcodeResponse)
+        foreach (var response in postcodeResponseList)
         {
             AddPostcodeToPostcodeDb(response);
         }
+    }
+
+    private async Task<List<PostcodeioResponseModel>> BulkGetLatLonForPostcodes(List<string> postcodesToLookup)
+    {
+        var bulkResponseBody = await MakeBulkApiRequestToPostcodeApi(postcodesToLookup);
+        var postcodeResponse = TurnBulkResponseBodyToModel(bulkResponseBody);
+        return postcodeResponse;
     }
 
     private async Task<string> MakeBulkApiRequestToPostcodeApi(List<string> postcodes)
