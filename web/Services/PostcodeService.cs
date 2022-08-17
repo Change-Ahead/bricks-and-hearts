@@ -42,10 +42,18 @@ public class PostcodeService : IPostcodeService
 
         var addPostcodeChunkToResponseList = postcodesToLookupChunks.Select(async p => postcodeResponseList.AddRange(await BulkGetLatLonForPostcodes(p.ToList())));
         await Task.WhenAll(addPostcodeChunkToResponseList);
-
-        foreach (var response in postcodeResponseList)
+        
+        var postcodeGroups = postcodeResponseList
+                .GroupBy(p => p.Result?.Lat == null || p.Result.Lon == null || p.Result.Postcode == null)
+                .ToDictionary(grouping => grouping.Key ? "invalid" : "valid", grouping => grouping.ToArray());
+    
+        if (postcodeGroups.ContainsKey("valid"))
         {
-            AddPostcodeToPostcodeDb(response);
+            AddPostcodesToPostcodeDb(postcodeGroups["valid"]);
+        }
+        if (postcodeGroups.ContainsKey("invalid") && postcodeGroups["invalid"].Length > 0)
+        {
+            _logger.LogWarning($"{postcodeGroups["invalid"].Length} postcodes cannot be converted to coordinates.");
         }
     }
 
@@ -94,22 +102,15 @@ public class PostcodeService : IPostcodeService
         return postcodeResponseList;
     }
     
-    private void AddPostcodeToPostcodeDb(PostcodeioResponseModel postcodeResponse)
+    private void AddPostcodesToPostcodeDb(IEnumerable<PostcodeioResponseModel> postcodeResponses)
     {
-        if (postcodeResponse.Result?.Lat == null || postcodeResponse.Result.Lon == null || postcodeResponse.Result.Postcode == null)
+        var postcodeDbModels = postcodeResponses.Select(p => new PostcodeDbModel
         {
-            _logger.LogWarning("Postcode cannot be converted to coordinates.");
-        }
-        else
-        {
-            var postcodeDbModel = new PostcodeDbModel
-            {
-                Postcode = postcodeResponse.Result.Postcode,
-                Lat = postcodeResponse.Result.Lat,
-                Lon = postcodeResponse.Result.Lon,
-            };
-            _dbContext.Postcodes.Add(postcodeDbModel);
-        }
+            Postcode = p.Result!.Postcode!,
+            Lat = p.Result.Lat,
+            Lon = p.Result.Lon,
+        });
+        _dbContext.Postcodes.AddRange(postcodeDbModels);
         _dbContext.SaveChanges();
     }
 }
