@@ -25,7 +25,7 @@ public class TenantService : ITenantService
         var postcodeList = new List<string> { postcode };
         await _postcodeService.AddPostcodesToDatabaseIfAbsent(postcodeList);
         var targetLocation = _dbContext.Postcodes.SingleOrDefault(p => p.Postcode == postcode);
-        if (targetLocation == null || targetLocation.Lat == null || targetLocation.Lon == null)
+        if (targetLocation?.Lat == null || targetLocation.Lon == null)
         {
             return null;
         }

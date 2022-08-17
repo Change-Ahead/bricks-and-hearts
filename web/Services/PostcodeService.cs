@@ -1,7 +1,6 @@
 ﻿using System.Text.RegularExpressions;
 using BricksAndHearts.Database;
 using BricksAndHearts.Models;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
 namespace BricksAndHearts.Services;
@@ -9,7 +8,7 @@ namespace BricksAndHearts.Services;
 public interface IPostcodeService
 {
     public string FormatPostcode(string postcode);
-    public Task AddPostcodesToDatabaseIfAbsent(List<string> postcodes);
+    public Task AddPostcodesToDatabaseIfAbsent(IEnumerable<string> postcodes);
 }
 
 public class PostcodeService : IPostcodeService
@@ -33,14 +32,14 @@ public class PostcodeService : IPostcodeService
             : "";
     }
 
-    public async Task AddPostcodesToDatabaseIfAbsent(List<string> postcodes)
+    public async Task AddPostcodesToDatabaseIfAbsent(IEnumerable<string> postcodes)
     {
         var postcodeResponseList = new List<PostcodeioResponseModel>();
         var postcodesToLookupChunks = postcodes.Distinct()
             .Where(p => p != "" && _dbContext.Postcodes.All(dbRecord => dbRecord.Postcode != p))
             .Chunk(100);
 
-        var addPostcodeChunkToResponseList = postcodesToLookupChunks.Select(async p => postcodeResponseList.AddRange(await BulkGetLatLonForPostcodes(p.ToList())));
+        var addPostcodeChunkToResponseList = postcodesToLookupChunks.Select(async p => postcodeResponseList.AddRange(await GetPostcodeDetails(p)));
         await Task.WhenAll(addPostcodeChunkToResponseList);
         
         var postcodeGroups = postcodeResponseList
@@ -57,14 +56,14 @@ public class PostcodeService : IPostcodeService
         }
     }
 
-    private async Task<List<PostcodeioResponseModel>> BulkGetLatLonForPostcodes(List<string> postcodesToLookup)
+    private async Task<IEnumerable<PostcodeioResponseModel>> GetPostcodeDetails(IEnumerable<string> postcodesToLookup)
     {
-        var bulkResponseBody = await MakeBulkApiRequestToPostcodeApi(postcodesToLookup);
+        var bulkResponseBody = await GetBulkPostcodeApiResponse(postcodesToLookup);
         var postcodeResponse = TurnBulkResponseBodyToModel(bulkResponseBody);
         return postcodeResponse;
     }
 
-    private async Task<string> MakeBulkApiRequestToPostcodeApi(List<string> postcodes)
+    private async Task<string> GetBulkPostcodeApiResponse(IEnumerable<string> postcodes)
     {
         var postcodesJson = new { postcodes = postcodes.ToArray() };
         var uri = "https://api.postcodes.io/postcodes/";
@@ -85,21 +84,15 @@ public class PostcodeService : IPostcodeService
         return bulkResponseBody;
     }
 
-    private List<PostcodeioResponseModel> TurnBulkResponseBodyToModel(string bulkResponseBody)
+    private IEnumerable<PostcodeioResponseModel> TurnBulkResponseBodyToModel(string bulkResponseBody)
     {
-        var postcodeResponseList = new List<PostcodeioResponseModel>();
         if (string.IsNullOrEmpty(bulkResponseBody))
         {
-            return postcodeResponseList;
+            return new List<PostcodeioResponseModel>();
         }
         var jObjectResponse = JObject.Parse(bulkResponseBody);
-        var postcodeList = jObjectResponse["result"]!.ToList();
-        foreach (var postcode in postcodeList)
-        {
-            var postcodeDbModel = postcode.ToObject<PostcodeioResponseModel>();
-            postcodeResponseList.Add(postcodeDbModel!);
-        }
-        return postcodeResponseList;
+        var postcodeList = jObjectResponse["result"]!;
+        return postcodeList.Select(postcode => postcode.ToObject<PostcodeioResponseModel>()!);
     }
     
     private void AddPostcodesToPostcodeDb(IEnumerable<PostcodeioResponseModel> postcodeResponses)
