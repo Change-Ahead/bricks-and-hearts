@@ -236,8 +236,8 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Assert
         result.Should().BeOfType<ViewResult>();
         result.Should().NotBeNull();
-        result!.Model.Should().BeOfType<PropertiesDashboardViewModel>();
-        result.Model.As<PropertiesDashboardViewModel>().Properties.Count.Should()
+        result!.Model.Should().BeOfType<PropertyListModel>();
+        result.Model.As<PropertyListModel>().Properties.Count.Should()
             .Be(10);
     }
 

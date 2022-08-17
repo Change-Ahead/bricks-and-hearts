@@ -26,7 +26,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var result = UnderTest.SortProperties(dummyString) as ViewResult;
 
         // Assert
-        result!.ViewData.Model.Should().BeOfType<PropertiesDashboardViewModel>();
+        result!.ViewData.Model.Should().BeOfType<PropertyListModel>();
     }
 
     #endregion

@@ -17,6 +17,14 @@ function checkIfSelectedValueIsTarget(target){
     }
 }
 
+function insertDefaultPostcodeIfNotSortByLocation() {
+    if ($("#Select :selected").val() == "Location") {
+        $("#target").val("");
+    } else {
+        $("#target").val("CB2 1LA");
+    }
+}
+
 function clearMembershipIdIfFalse() {
     if ($("#Select :selected").val() == "false") {
         $("#MembershipId").val(null);

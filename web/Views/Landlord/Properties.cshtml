@@ -1,5 +1,5 @@
 @using BricksAndHearts.Auth
-@model PropertiesDashboardViewModel
+@model PropertyListModel
 
 @{
     ViewData["Title"] = "Properties";
@@ -21,7 +21,7 @@
         }
     </h1>
 
-    <div class="row mt-4">
+   <div class="row mt-4">
         @* Sorting and filtering goes here *@
 
         <div class="col-auto ms-sm-auto">
@@ -29,5 +29,24 @@
         </div>
     </div>
 
-    <partial name="../Property/_PropertyTable"/>
+    @{ var from = (Model.Page - 1) * Model.PropPerPage + 1;
+        var to = Math.Min((Model.Page - 1) * Model.PropPerPage + Model.PropPerPage, Model.Total);}
+
+    @if (Model.Properties.Count > 0)
+    {<p>Displaying properties @from to @to of @Model.Total</p>}
+
+
+    @if (Model.Page > 1)
+    {
+        <a type="button" class="btn btn-outline-primary" href="@Url.Action("ViewProperties", "Landlord", new { sortBy = Model.SortBy, page = Model.Page - 1, propPerPage = Model.PropPerPage })">
+            <i class="previous"> Previous </i>
+        </a>
+    }
+
+    @if (Model.Page <= Model.Total/Model.PropPerPage)
+    {
+        <a type="button" class="btn btn-outline-primary" href="@Url.Action("ViewProperties", "Landlord", new { sortBy = Model.SortBy, page = Model.Page + 1, propPerPage = Model.PropPerPage })">
+            <i class="bi"> Next </i>
+        </a>
+    }
 </div>

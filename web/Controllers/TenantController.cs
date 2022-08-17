@@ -30,9 +30,10 @@ public class TenantController : AbstractController
         }
 
         _logger.LogInformation("Successfully sorted by location");
-        var tenantListModel = new TenantListModel();
-        tenantListModel.TenantList = tenants.ToList();
+        //var tenantListModel = new TenantListModel();
+        //tenantListModel.TenantList = tenants.ToList();
         
-        return View("~/Views/Admin/TenantList.cshtml", tenantListModel);
+        //return View("~/Views/Admin/TenantList.cshtml", tenantListModel);
+        return StatusCode(404); //TODO fix this
     }
 }

@@ -136,6 +136,25 @@
     </tbody>
 </table>
 
+@{ var from = (Model.Page - 1) * Model.TenantsPerPage + 1;
+    var to = Math.Min((Model.Page - 1) * Model.TenantsPerPage + Model.TenantsPerPage, Model.Total);}
+
+<p>Displaying properties @from to @to of @Model.Total</p>
+
+@if (Model.Page > 1)
+{
+    <a type="button" class="btn btn-outline-primary" href="@Url.Action("PropertyList", "Property", new { sortBy = Model.SortBy, page = Model.Page - 1, propPerPage = Model.TenantsPerPage })">
+        <i class="previous"> Previous </i>
+    </a>
+}
+
+@if (Model.Page <= Model.Total/Model.TenantsPerPage)
+{
+    <a type="button" class="btn btn-outline-primary" href="@Url.Action("PropertyList", "Property", new { sortBy = Model.SortBy, page = Model.Page + 1, propPerPage = Model.TenantsPerPage })">
+        <i class="bi"> Next </i>
+    </a>
+}
+
 <h2>Importing tenant information</h2>
 
 @using (Html.BeginForm("ImportTenants", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))

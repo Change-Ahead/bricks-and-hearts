@@ -1,4 +1,4 @@
-﻿@model PropertiesDashboardViewModel
+﻿@model PropertyListModel
 
 @{
     ViewData["Title"] = "Properties";
@@ -9,7 +9,7 @@
 
     <div class="row mt-4">
         <div class="col-auto me-auto mb-2">
-            <form asp-action="SortProperties" asp-controller="Property" method="get" class="row mx-0">
+            <form asp-action="PropertyList" asp-controller="Property" method="get" class="row mx-0">
                 @Html.DropDownListFor(
                     model => model.SortBy,
                     new List<SelectListItem>
@@ -22,7 +22,7 @@
             </form>
         </div>
         <div class="col-auto me-auto mb-2">
-            <form asp-action="SortPropertiesByLocation" asp-controller="Property" method="get" class="row mx-0">
+            <form asp-action="PropertyList" asp-controller="Property" method="get" class="row mx-0">
                 <input class="form-control col h-auto me-3" id="postcode" name="postcode" required placeholder="Enter postcode to sort by location" pattern="([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"/>
                 <button type="submit" class="btn btn-outline-primary col">Sort</button>
             </form>
@@ -32,6 +32,15 @@
             <a asp-controller="Property" asp-action="AddNewProperty_Begin" asp-route-landlordId="@Model.Owner?.LandlordId" class="btn btn-primary">Add new property</a>
         </div>
     </div>
+    
+    @if (Model.SortBy is not null)
+    {
+        <div>Currently sorted by @Model.SortBy</div>
+    }
+    @if (Model.SortBy == "Location")
+    {
+        <div>Showing properties in order of distance from @Model.Target</div>
+    }
 
     <partial name="../Property/_PropertyTable"/>
 
@@ -42,19 +51,19 @@
 
     <p>Displaying properties @from to @to of @Model.Total</p>
 
-    @if (Model.Page > 1)
-    {
-        <a type="button" class="btn btn-outline-primary" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page - 1, propPerPage = Model.PropPerPage })">
-            <i class="previous"> Previous </i>
-        </a>
-    }
+@if (Model.Page > 1)
+{
+    <a type="button" class="btn btn-outline-primary" href="@Url.Action("PropertyList", "Property", new { sortBy = Model.SortBy, target = Model.Target, page = Model.Page - 1, propPerPage = Model.PropPerPage })">
+        <i class="previous"> Previous </i>
+    </a>
+}
 
-    @if (Model.Page <= Model.Total / Model.PropPerPage)
-    {
-        <a type="button" class="btn btn-outline-primary" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page + 1, propPerPage = Model.PropPerPage })">
-            <i class="bi"> Next </i>
-        </a>
-    }
+@if (Model.Page <= Model.Total/Model.PropPerPage)
+{
+    <a type="button" class="btn btn-outline-primary" href="@Url.Action("PropertyList", "Property", new { sortBy = Model.SortBy, target = Model.Target, page = Model.Page + 1, propPerPage = Model.PropPerPage })">
+        <i class="bi"> Next </i>
+    </a>
+}
 
 </div>
 
