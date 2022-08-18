@@ -149,13 +149,13 @@ public class AdminController : AbstractController
     {
         if (targetPostcode != null)
         {
-            var tenantsByLocation = await _tenantService.SortTenantsByLocation(targetPostcode, page, tenantsPerPage);
+            var tenantsByLocation = await _tenantService.SortTenantsByLocation(targetPostcode);
 
             if (tenantsByLocation != null)
             {
                 _logger.LogInformation("Successfully sorted by location");
                 return View(new TenantListModel(tenantsByLocation.Skip((page - 1) * tenantsPerPage).Take(tenantsPerPage).ToList(),
-                    new HousingRequirementModel(), tenantsByLocation.Count, page, targetPostcode));
+                    new HousingRequirementModel(), tenantsByLocation.Count(), page, targetPostcode));
             }
 
             _logger.LogWarning($"Failed to find postcode {targetPostcode}");

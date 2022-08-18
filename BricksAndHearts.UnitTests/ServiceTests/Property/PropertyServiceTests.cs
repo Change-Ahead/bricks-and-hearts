@@ -434,7 +434,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         var service = new PropertyService(null!, postcodeApiService);
 
         // Act
-        var result = await service.SortPropertiesByLocation(postcode, 1, 10);
+        var result = await service.GetPropertyList("Location", postcode);
         
         // Assert
         result.Should().BeNull();
@@ -461,7 +461,8 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         
         
         // Act
-        var result = await service.SortPropertiesByLocation(postcode, 1, 10);
+        var result = await service.GetPropertyList("Location", postcode);
+        var listResult = result.ToList();
         
         // Assert
         var correctList = new List<PropertyDbModel>
@@ -471,7 +472,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
             context.Properties.Single(p => p.TownOrCity == "London"),
             context.Properties.Single(p => p.TownOrCity == "Brighton"),
         };
-        var propertyDbModelList = result!.FindAll(p => p.LandlordId == 3);
+        var propertyDbModelList = listResult!.FindAll(p => p.LandlordId == 3);
         propertyDbModelList.Should().BeEquivalentTo(correctList, options => options.WithStrictOrdering());
     }
 }

@@ -177,18 +177,17 @@ public class PropertyService : IPropertyService
         switch (sortBy)
         {
             case "Location":
-                var postcode = _postcodeService.FormatPostcode(target);
-                var postcodeList = new List<string> { postcode };
-                await _postcodeService.AddPostcodesToDatabaseIfAbsent(postcodeList);
+                var postcode = _postcodeService.FormatPostcode(target!);
                 if (postcode == "")
                 {
-                    return null;
+                    return null!;
                 }
-
+                var postcodeList = new List<string> { postcode };
+                await _postcodeService.AddPostcodesToDatabaseIfAbsent(postcodeList);
                 var model = _dbContext.Postcodes.SingleOrDefault(p => p.Postcode == postcode);
                 if (model?.Lat == null || model.Lon == null)
                 {
-                    return null;
+                    return null!;
                 }
 
                 properties = _dbContext.Properties
@@ -217,7 +216,6 @@ public class PropertyService : IPropertyService
                 properties = _dbContext.Properties.AsEnumerable();
                 break;
         }
-
         return properties;
     }
 

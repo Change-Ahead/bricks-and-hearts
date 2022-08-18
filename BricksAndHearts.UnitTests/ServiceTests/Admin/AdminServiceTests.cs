@@ -111,7 +111,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context,  A.Fake<ILogger<AdminService>>());
 
         var nonAdminUser = context.Users.Single(u => u.GoogleUserName == "NonAdminUser");
 
@@ -180,10 +180,10 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         // Arrange
         await using var context = Fixture.CreateReadContext();
         var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
-        var landlordListModel = new LandlordListModel();
 
         // Act
-        var result = await service.GetLandlordList(landlordListModel);
+        var response = service.GetLandlordList(null, null);
+        var result = response.ToList();
 
         // Assert
         result.Should().BeOfType<List<LandlordDbModel>>();
@@ -196,14 +196,10 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         // Arrange
         await using var context = Fixture.CreateReadContext();
         var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
-        var landlordListModel = new LandlordListModel
-        {
-            IsApproved = true,
-            IsAssigned = false
-        };
 
         // Act
-        var result = await service.GetLandlordList(landlordListModel);
+        var response = service.GetLandlordList(true, false);
+        var result = response.ToList();
 
         // Assert
         result.Should().BeOfType<List<LandlordDbModel>>();
@@ -219,10 +215,11 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         // Arrange
         await using var context = Fixture.CreateReadContext();
         var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
-        var tenantListModel = new TenantListModel();
+        var filter = new HousingRequirementModel();
 
         // Act
-        var result = await service.GetTenantList(tenantListModel.Filter);
+        var response = service.GetTenantList(filter);
+        var result = response.ToList();
 
         // Assert
         result.Should().BeOfType<List<TenantDbModel>>();
@@ -243,7 +240,8 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         };
 
         // Act
-        var result = await service.GetTenantList(filter);
+        var response = service.GetTenantList(filter);
+        var result = response.ToList();
 
         // Assert
         result.Should().BeOfType<List<TenantDbModel>>();
@@ -266,7 +264,8 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         };
 
         // Act
-        var result = await service.GetTenantList(filter);
+        var response = service.GetTenantList(filter);
+        var result = response.ToList();
 
         // Assert
         result.Should().BeOfType<List<TenantDbModel>>();
@@ -295,7 +294,8 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         };
 
         // Act
-        var result = await service.GetTenantList(filter);
+        var response = service.GetTenantList(filter);
+        var result = response.ToList();
 
         // Assert
         result.Should().BeOfType<List<TenantDbModel>>();

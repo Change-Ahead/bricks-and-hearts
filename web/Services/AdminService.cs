@@ -18,9 +18,9 @@ public interface IAdminService
 
     //Information Lists
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
-    public IQueryable<LandlordDbModel> GetLandlordList(bool? isApproved, bool? isAssigned);
+    public IEnumerable<LandlordDbModel> GetLandlordList(bool? isApproved, bool? isAssigned);
 
-    public IQueryable<TenantDbModel> GetTenantList(HousingRequirementModel filter);
+    public IEnumerable<TenantDbModel> GetTenantList(HousingRequirementModel filter);
 
     public Task<List<TenantDbModel>> GetNearestTenantsToProperty(PropertyViewModel currentProperty);
     
@@ -34,13 +34,11 @@ public interface IAdminService
 public class AdminService : IAdminService
 {
     private readonly BricksAndHeartsDbContext _dbContext;
-    private readonly IPostcodeService _postcodeService;
     private readonly ILogger<AdminService> _logger;
 
-    public AdminService(BricksAndHeartsDbContext dbContext, IPostcodeService postcodeService, ILogger<AdminService> logger)
+    public AdminService(BricksAndHeartsDbContext dbContext, ILogger<AdminService> logger)
     {
         _dbContext = dbContext;
-        _postcodeService = postcodeService;
         _logger = logger;
     }
 
@@ -124,7 +122,7 @@ public class AdminService : IAdminService
         return pendingAdmins;
     }
 
-    public IQueryable<LandlordDbModel> GetLandlordList(bool? isApproved, bool? isAssigned)
+    public IEnumerable<LandlordDbModel> GetLandlordList(bool? isApproved, bool? isAssigned)
     {
         var landlordQuery = _dbContext.Landlords.AsQueryable();
         if (isApproved != null)
@@ -137,12 +135,13 @@ public class AdminService : IAdminService
             landlordQuery = landlordQuery.Where(l => _dbContext.Users.Any(u => u.LandlordId == l.Id) == isAssigned);
         }
 
-        return landlordQuery;
+        return landlordQuery.AsEnumerable();
     }
 
-    public IQueryable<TenantDbModel> GetTenantList(HousingRequirementModel filters)
+    public IEnumerable<TenantDbModel> GetTenantList(HousingRequirementModel filters)
     {
-        return GetFilteredTenantQuery(filters, false);
+        var tenants =  GetFilteredTenantQuery(filters, false);
+        return tenants.AsEnumerable();
     }
 
     public async Task<List<TenantDbModel>> GetNearestTenantsToProperty(PropertyViewModel currentProperty)

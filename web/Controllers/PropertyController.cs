@@ -97,7 +97,7 @@ public class PropertyController : AbstractController
             TempData["FullWidthPage"] = true;
             return RedirectToAction("PropertyList", "Property", new { sortBy = "" });
         }
-        var listOfProperties = properties.Select(PropertyViewModel.FromDbModel);
+        var listOfProperties = properties!.Select(PropertyViewModel.FromDbModel);
         
         TempData["FullWidthPage"] = true;
         return View("~/Views/Admin/PropertyList.cshtml",

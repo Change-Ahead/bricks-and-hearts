@@ -5,7 +5,7 @@ namespace BricksAndHearts.Services;
 
 public interface ITenantService
 {
-    public Task<List<TenantDbModel>?> SortTenantsByLocation(string postalCode, int page, int perPage);
+    public Task<IEnumerable<TenantDbModel>> SortTenantsByLocation(string postalCode);
 }
 
 public class TenantService : ITenantService
@@ -19,7 +19,7 @@ public class TenantService : ITenantService
         _postcodeService = postcodeService;
     }
 
-    public async Task<List<TenantDbModel>?> SortTenantsByLocation(string postalCode, int page, int perPage)
+    public async Task<IEnumerable<TenantDbModel>> SortTenantsByLocation(string postalCode)
     {
         var postcode = _postcodeService.FormatPostcode(postalCode);
         var postcodeList = new List<string> { postcode };
@@ -27,7 +27,7 @@ public class TenantService : ITenantService
         var targetLocation = _dbContext.Postcodes.SingleOrDefault(p => p.Postcode == postcode);
         if (targetLocation?.Lat == null || targetLocation.Lon == null)
         {
-            return null;
+            return null!;
         }
 
         var tenants = _dbContext.Tenants
@@ -44,10 +44,8 @@ public class TenantService : ITenantService
                 FROM dbo.Tenant
                 WHERE Lon is not NULL and Lat is not NULL
                 ORDER BY distance
-                OFFSET {perPage * (page - 1)} ROWS
-                FETCH NEXT {perPage} ROWS ONLY
                 "
             );
-        return await tenants.ToListAsync();
+        return tenants.AsEnumerable();
     }
 }

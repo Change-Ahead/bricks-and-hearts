@@ -1,13 +1,11 @@
-using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using BricksAndHearts.Database;
+using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Admin;
@@ -213,35 +211,52 @@ public class AdminControllerTests : AdminControllerTestsBase
     }
     
     [Fact]
-    public async void LandlordList_CallsGetLandlordListAndReturnsLandlordListView()
+    public void LandlordList_CallsGetLandlordListAndReturnsLandlordListView()
     {
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
-        var landlordListModel = new LandlordListModel();
         
         // Act
-        var result = await UnderTest.LandlordList(landlordListModel) as ViewResult;
+        var result = UnderTest.LandlordList() as ViewResult;
 
         // Assert
-        A.CallTo(() => AdminService.GetLandlordList(landlordListModel)).MustHaveHappened();
+        A.CallTo(() => AdminService.GetLandlordList(null ,null)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<LandlordListModel?>();
     }
     
     [Fact]
-    public async void TenantList_CallsGetTenantListAndReturnsTenantListView()
+    public async void TenantList_NotSortedByLocation_CallsGetTenantListAndReturnsTenantListView()
     {
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
-        var tenantListModel = new TenantListModel();
+        var filter = new HousingRequirementModel();
 
         // Act
-        var result = await UnderTest.TenantList(tenantListModel) as ViewResult;
+        var result = await UnderTest.TenantList(filter, null) as ViewResult;
 
         // Assert
-        A.CallTo(() => AdminService.GetTenantList(tenantListModel.Filter)).MustHaveHappened();
+        A.CallTo(() => AdminService.GetTenantList(filter)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<TenantListModel?>();
+    }
+    
+    [Fact]
+    public async void TenantList_SortedByLocation_CallsSortTenantsByLocation_AndReturnsViewWithTenantList()
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        var filter = new HousingRequirementModel();
+        var targetPostcode = "CB3 9AJ";
+        
+        // Act
+        var result = await UnderTest.TenantList(filter, targetPostcode) as ViewResult;
+
+        // Assert
+        A.CallTo(() => TenantService.SortTenantsByLocation(targetPostcode)).MustHaveHappened();
+        A.CallTo(() => AdminService.GetTenantList(filter)).MustNotHaveHappened();
+        result!.ViewData.Model.Should().BeOfType<TenantListModel>();
     }
     
     [Fact]

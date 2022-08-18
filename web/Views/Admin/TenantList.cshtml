@@ -108,7 +108,7 @@
 
 <table class="table">
     <thead>
-        @if (Model.TenantList.Count > 0)
+        @if (Model.TenantList!.Count > 0)
         {
             <tr>
                 <th scope="col">Name</th>
@@ -132,7 +132,7 @@
     @foreach (var tenant in Model.TenantList!)
     {
         <tr>
-            <td>@tenant.Name</td>
+            <td>@tenant!.Name</td>
             <td>@tenant.Email</td>
             <td>@tenant.Phone</td>
             <td>@tenant.Postcode</td>

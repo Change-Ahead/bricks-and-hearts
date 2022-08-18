@@ -17,13 +17,13 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     #region SortProperties
 
     [Fact]
-    public void SortProperties_ReturnsViewWith_PropertiesDashboardViewModel()
+    public async void PropertyList_ReturnsViewWith_PropertiesListModel()
     {
         // Arrange
         var dummyString = "Rent";
 
         // Act
-        var result = UnderTest.SortProperties(dummyString) as ViewResult;
+        var result = await UnderTest.PropertyList(dummyString, "") as ViewResult;
 
         // Assert
         result!.ViewData.Model.Should().BeOfType<PropertyListModel>();
