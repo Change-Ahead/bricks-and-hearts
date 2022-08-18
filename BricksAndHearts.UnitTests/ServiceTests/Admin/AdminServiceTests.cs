@@ -26,7 +26,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
 
         var nonAdminUser = context.Users.Single(u => u.GoogleUserName == "NonAdminUser");
         var adminUser = context.Users.Single(u => u.GoogleUserName == "AdminUser");
@@ -49,7 +49,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
 
         var nonAdminUser = context.Users.Single(u => u.GoogleUserName == "NonAdminUser");
         context.Users.Where(u => u.IsAdmin).ToList().ForEach(u => u.IsAdmin = false);
@@ -74,7 +74,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
 
         var requestedAdminUser = context.Users.Single(u => u.GoogleUserName == "NonAdminUser");
 
@@ -92,7 +92,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
 
         var nonAdminUser = context.Users.Single(u => u.GoogleUserName == "NonAdminUser");
 
@@ -111,7 +111,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new AdminService(context,  A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
 
         var nonAdminUser = context.Users.Single(u => u.GoogleUserName == "NonAdminUser");
 
@@ -129,7 +129,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
 
         var adminUser = context.Users.Single(u => u.GoogleUserName == "AdminUser");
 
@@ -147,7 +147,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
 
         // Act
         var result = await service.GetAdminLists();
@@ -163,7 +163,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
 
         var adminUser = context.Users.Single(u => u.GoogleUserName == "AdminUser");
 
@@ -179,7 +179,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
 
         // Act
         var result = await service.GetLandlordList(null, null, 1, 10);
@@ -194,7 +194,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
 
         // Act
         var result = await service.GetLandlordList(true, false, 1, 10);
@@ -212,7 +212,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
         var filter = new HousingRequirementModel();
 
         // Act
@@ -228,7 +228,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
         var filter = new HousingRequirementModel
         {
             AcceptsSingleTenant = true,
@@ -251,7 +251,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
         var filter = new HousingRequirementModel
         {
             AcceptsSingleTenant = true,
@@ -275,7 +275,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
         var filter = new HousingRequirementModel
         {
             AcceptsSingleTenant = false,
@@ -303,7 +303,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
         var approvedLandlord = Fixture.CreateApprovedLandlordUser();
 
         // Act
@@ -320,7 +320,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
 
         // Act
         var result = service.FindUserByLandlordId(1000);
@@ -335,7 +335,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
 
         // Act
         var result = service.FindExistingInviteLink(3);
@@ -349,7 +349,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
 
         // Assert
         service.Invoking(y => y.CreateNewInviteLink(3)).Should().Throw<Exception>();
@@ -360,7 +360,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
 
         // Act
         var result = service.CreateNewInviteLink(1);
@@ -377,7 +377,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
 
         // Act
         service.DeleteExistingInviteLink(3);
@@ -393,7 +393,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>(), A.Fake<ITenantService>());
 
         // Assert
         service.Invoking(y => y.DeleteExistingInviteLink(1)).Should().Throw<Exception>();

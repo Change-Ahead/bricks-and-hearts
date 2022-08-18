@@ -36,11 +36,13 @@ public class AdminService : IAdminService
 {
     private readonly BricksAndHeartsDbContext _dbContext;
     private readonly ILogger<AdminService> _logger;
+    private readonly ITenantService _tenantService;
 
-    public AdminService(BricksAndHeartsDbContext dbContext, ILogger<AdminService> logger)
+    public AdminService(BricksAndHeartsDbContext dbContext, ILogger<AdminService> logger, ITenantService tenantService)
     {
         _dbContext = dbContext;
         _logger = logger;
+        _tenantService = tenantService;
     }
 
     public UserDbModel? GetUserFromId(int userId)
@@ -57,7 +59,7 @@ public class AdminService : IAdminService
             PendingAdmins = _dbContext.Users.Count(u => u.HasRequestedAdmin == true && u.IsAdmin == false)
         };
     }
-
+    
     public void RequestAdminAccess(BricksAndHeartsUser user)
     {
         var userRecord = _dbContext.Users.Single(u => u.Id == user.Id);
@@ -156,10 +158,14 @@ public class AdminService : IAdminService
 
     public async Task<List<TenantDbModel>> GetNearestTenantsToProperty(PropertyViewModel currentProperty)
     {
-        var tenantQuery = GetFilteredTenantQuery(currentProperty.LandlordRequirements, true);
-        //TODO: Currently orders by name, needs to order by distance from property. This depends on BNH-142 and others!
-        tenantQuery = tenantQuery.OrderBy(t => t.Name).Take(5);
-        return await tenantQuery.ToListAsync();
+        var filteredTenantQuery = GetFilteredTenantQuery(currentProperty.LandlordRequirements, true);
+        var distanceSortedTenantQuery = await _tenantService.SortTenantsByLocation(currentProperty.Address.Postcode!, 1, 5);
+        if (distanceSortedTenantQuery == null)
+        {
+            throw new Exception("Postcode not found");
+        }
+        filteredTenantQuery = distanceSortedTenantQuery.Intersect(filteredTenantQuery).Take(5);
+        return await filteredTenantQuery.ToListAsync();
     }
 
     public UserDbModel? FindUserByLandlordId(int landlordId)
