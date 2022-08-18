@@ -58,8 +58,7 @@ public class PropertyController : AbstractController
         return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
     }
 
-    [HttpGet]
-    [Route("/property/{propertyId:int}/view")]
+    [HttpGet("/property/{propertyId:int}/view")]
     public async Task<ActionResult> ViewProperty(int propertyId)
     {
         var model = _propertyService.GetPropertyByPropertyId(propertyId);
@@ -97,8 +96,7 @@ public class PropertyController : AbstractController
     }
 
     [Authorize(Roles = "Admin")]
-    [Route("/admin/get-public-view-link/{propertyId:int}")]
-    [HttpGet]
+    [HttpGet("/admin/get-public-view-link/{propertyId:int}")]
     public ActionResult GetPublicViewLink(int propertyId)
     {
         var property = _propertyService.GetPropertyByPropertyId(propertyId);
@@ -392,6 +390,26 @@ public class PropertyController : AbstractController
             })
             .ToList();
     }
+    
+    [Authorize(Roles = "Landlord, Admin")]
+    [HttpGet("{propertyId:int}/{fileName}")]
+    public async Task<IActionResult> GetImage(int propertyId, string fileName)
+    {
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
+        {
+            return StatusCode(403);
+        }
+
+        var image = await _azureStorage.DownloadFile("property", propertyId, fileName);
+        if (image == (null, null))
+        {
+            return StatusCode(404);
+        }
+
+        var data = image.data;
+        var fileType = image.fileType;
+        return File(data!, $"image/{fileType}");
+    }
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("addImage")]
@@ -427,27 +445,6 @@ public class PropertyController : AbstractController
         }
 
         return RedirectToAction("ViewProperty", "Property", new { propertyId });
-    }
-
-    [Authorize(Roles = "Landlord, Admin")]
-    [HttpGet]
-    [Route("{propertyId:int}/{fileName}")]
-    public async Task<IActionResult> GetImage(int propertyId, string fileName)
-    {
-        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
-        {
-            return StatusCode(403);
-        }
-
-        var image = await _azureStorage.DownloadFile("property", propertyId, fileName);
-        if (image == (null, null))
-        {
-            return StatusCode(404);
-        }
-
-        var data = image.data;
-        var fileType = image.fileType;
-        return File(data!, $"image/{fileType}");
     }
 
     [Authorize(Roles = "Landlord, Admin")]

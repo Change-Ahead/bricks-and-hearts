@@ -1,68 +1,83 @@
-﻿@model LandlordProfileModel
+﻿@model LandlordDashboardViewModel
 
 @{
     ViewData["Title"] = "Dashboard";
 }
 
-
 <div>
     <div class="row">
-        <div class="col-1">
-            @* TODO BNH-99: Replace icon with profile picture *@
-            <img alt="profile picture" src="https://www.pngarts.com/files/10/Default-Profile-Picture-Transparent-Image.png" width="100" height="100" class="rounded-circle img-thumbnail img-fluid"/>
-        </div>
-        <div class="col-7">
+        <div class="col">
             <div class="row">
-                <div class="col-7">
-                    <h6>Hello</h6>
-                    <h2 class="font-blue">@Model.FirstName</h2>
-                    <h6>Start adding your properties to the portal, to get matches</h6>
-                    <div>
-                        <a class="btn btn-primary mt-3" href='@Url.Action("AddNewProperty_Begin", "Property", null)'>Add Properties</a>
-                    </div>
+                <div class="col-sm-auto">
+                    @* TODO BNH-99: Replace icon with profile picture *@
+                    <img alt="profile picture" src="https://www.pngarts.com/files/10/Default-Profile-Picture-Transparent-Image.png" width="100" height="100" class="rounded-circle img-thumbnail img-fluid"/>
                 </div>
-            </div>
-            <div class="row mt-4">
-                <div class="col-5">
+                <div class="col">
                     <div class="row">
-                        <div class="col-3">
-                            @if (Model.CharterApproved)
-                            {
-                                <h1>
-                                    <i class="bi bi-check"></i>
-                                </h1>
-                            }
-                            else
-                            {
-                                <h1>
-                                    <i class="bi bi-x"></i>
-                                </h1>
-                            }
-                        </div>
-                        <div class="col-5">
-                            Charter Approval State
-                        </div>
-                    </div>
-                </div>
-                <div class="col-5">
-                    <div class="row">
-                        <div class="col-3">
-                            <h1>
-                                <i class="bi bi-house-door"></i>
-                            </h1>
-                        </div>
-                        <div class="col-5">
-                            <h1>
-                                @Model.NumOfProperties
-                            </h1>
-                            <h6>Total Properties</h6>
-                        </div>
+                        <h6 class="font-body">Hello</h6>
+                        <h2 class="font-blue font-h1">@Model.CurrentLandlord.FirstName</h2>
+                        @if (Model.CurrentLandlord.NumOfProperties > 0)
+                        {
+                            <h6 class="font-body">View your properties</h6>
+                            <div>
+                                <a class="btn btn-primary btn-lg mt-3 align-middle" href='@Url.Action("ViewProperties", "Landlord", new { id = Model.CurrentLandlord.LandlordId })'>View Properties</a>
+                            </div>
+                        }
+                        else
+                        {
+                            <h6 class="font-body">Start adding your properties to the portal, to get matches</h6>
+                            <div>
+                                <a class="btn btn-primary btn-lg mt-3 align-middle" href='@Url.Action("AddNewProperty_Begin", "Property", new { landlordId = Model.CurrentLandlord.LandlordId})'>Add Properties</a>
+                            </div>
+                        }
+                        @if (!Model.CurrentLandlord.CharterApproved)
+                        {
+                            <p class="font-subtitle font-orange mt-1">
+                                * Your properties won't go live until the ChangeAhead charter signup has been approved by the ChangeAhead admins. You can still add and update draft properties before then.
+                            </p>
+                        }
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-4">
-            <h6>My Matches</h6>
+        <div class="col">
+            <h6 class="font-h3">My Stats</h6>
+            @{await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
+                {
+                    IconName = Model.CurrentLandlord.CharterApproved ? "bi-check" : "bi-x",
+                    Stat = Model.CurrentLandlord.CharterApproved ? "Approved" : "Not Approved",
+                    StatDescription = "Charter Approval State"
+                }); }
+            @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
+                {
+                   IconName = "bi-house",
+                   Stat = Model.PropertyTypeCount!.RegisteredProperties.ToString(),
+                   StatDescription = "Total Properties"
+                }); }
+            @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
+               {
+                   IconName = "bi-house-door",
+                   Stat = Model.PropertyTypeCount.AvailableProperties.ToString(),
+                   StatDescription = "Available Properties"
+               }); }
+            @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
+               {
+                   IconName = "bi-house-heart",
+                   Stat = Model.PropertyTypeCount.LiveProperties.ToString(),
+                   StatDescription = "Live Properties"
+               }); }
+        </div>
+        <div class="col">
+            <div class="d-flex">
+                <h6 class="flex-row flex-grow-1 font-h3">My Properties</h6>
+                <a class="flex-row-reverse font-body font-blue" href='@Url.Action("ViewProperties", "Landlord", new { id = Model.CurrentLandlord.LandlordId })'>View All</a>
+            </div>
+            @foreach (var property in Model.Properties!)
+            {
+                <row>
+                    @{ await Html.RenderPartialAsync("_DashboardPropertyDisplayPartial", property); }
+                </row>
+            }
         </div>
     </div>
 </div>

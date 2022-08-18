@@ -1,0 +1,38 @@
+﻿@model PropertyDetailsViewModel
+
+@functions
+{
+    void GetImageElement(int propertyId, int id, string size)
+    {
+        <div href="#" class="property-img-@(size) placeholder-glow">
+            <div class="placeholder w-100 h-100" id="image@(propertyId)@(id)Placeholder"></div>
+            <img src="@Model.Images[id].FileUrl" alt="@Model.Images[id].FileName" id="image@(propertyId)@(id)" style="display: none" onload="hidePlaceholder('#image@(propertyId)@(id)')">
+        </div>
+    }
+}
+
+<div class="border border-primary rounded mb-3 p-2 statBox">
+    <div class="row property-img-row w-100">
+        @if (Model.Images.Count > 0)
+        {
+            <div class="col-sm my-3">
+                @{ GetImageElement(Model.Property!.PropertyId, 0, "lg"); }
+            </div>
+            @if (Model.Images.Count > 1)
+            {
+                <div class="col-sm-4 my-3 h-50 property-img-sm-col">
+                    @{ GetImageElement(Model.Property!.PropertyId, 1, "lg"); }
+                    @if (Model.Images.Count > 2)
+                    {
+                        <div class="my-3 property-img-sm-col">
+                                @{ GetImageElement(Model.Property!.PropertyId, 2, "lg"); }
+                        </div>
+                    }
+                </div>
+            }
+        }
+    </div>
+    <h2 class="font-h2">@Model.Property!.Address.ToShortAddressString()</h2>
+    <p class="font-smallBody">@Model.Property.Description</p>
+    <p class="font-subtitle">@Model.Property.Address.Postcode</p>
+</div>

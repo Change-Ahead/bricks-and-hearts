@@ -1,14 +1,11 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using BricksAndHearts.Controllers;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ControllerTests.Landlord;
@@ -250,16 +247,12 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Arrange
         var unregisteredUser = CreateUnregisteredUser();
         unregisteredUser.Id = 1;
-        var fakeLandlordService = A.Fake<ILandlordService>();
-        var fakePropertyService = A.Fake<IPropertyService>();
-        var underTest =
-            new LandlordController(A.Fake<ILogger<LandlordController>>(), fakeLandlordService, null!, null!);
-        MakeUserPrincipalInController(unregisteredUser, underTest);
-        A.CallTo(() => fakePropertyService.GetPropertiesByLandlord(2))
+        MakeUserPrincipalInController(unregisteredUser, UnderTest);
+        A.CallTo(() => PropertyService.GetPropertiesByLandlord(2))
             .Returns(A.CollectionOfFake<PropertyDbModel>(10).ToList());
 
         // Act
-        var result = await underTest.ViewProperties(2) as StatusCodeResult;
+        var result = await UnderTest.ViewProperties(2) as StatusCodeResult;
         result.Should().BeOfType<StatusCodeResult>();
         result.Should().NotBeNull();
         result!.StatusCode.Should().Be(403);

@@ -14,18 +14,19 @@ public class LandlordController : AbstractController
     private readonly ILogger<LandlordController> _logger;
     private readonly IMailService _mailService;
     private readonly IPropertyService _propertyService;
+    private readonly IAzureStorage _azureStorage;
 
     public LandlordController(ILogger<LandlordController> logger,
-        ILandlordService landlordService, IPropertyService propertyService, IMailService mailService)
+        ILandlordService landlordService, IPropertyService propertyService, IMailService mailService, IAzureStorage azureStorage)
     {
         _logger = logger;
         _landlordService = landlordService;
         _propertyService = propertyService;
         _mailService = mailService;
+        _azureStorage = azureStorage;
     }
 
-    [HttpGet]
-    [Route("register")]
+    [HttpGet("register")]
     public ActionResult RegisterGet(bool createUnassigned = false)
     {
         var currentUser = GetCurrentUser();
@@ -46,8 +47,7 @@ public class LandlordController : AbstractController
         });
     }
 
-    [HttpPost]
-    [Route("register")]
+    [HttpPost("register")]
     public async Task<ActionResult> RegisterPost([FromForm] LandlordProfileModel createModel)
     {
         // This does checks based on the annotations (e.g. [Required]) on LandlordProfileModel
@@ -109,8 +109,7 @@ public class LandlordController : AbstractController
         }
     }
 
-    [HttpGet]
-    [Route("{id:int}/profile")]
+    [HttpGet("{id:int}/profile")]
     public async Task<ActionResult> Profile([FromRoute] int id)
     {
         var user = GetCurrentUser();
@@ -119,7 +118,7 @@ public class LandlordController : AbstractController
             return StatusCode(403);
         }
 
-        var landlord = await _landlordService.GetLandlordIfExistsFromId(id);
+        var landlord = await _landlordService.GetLandlordIfExistsWithProperties(id);
         if (landlord == null)
         {
             return StatusCode(404);
@@ -129,8 +128,7 @@ public class LandlordController : AbstractController
         return View("Profile", viewModel);
     }
 
-    [HttpGet]
-    [Route("me/profile")]
+    [HttpGet("me/profile")]
     public async Task<ActionResult> MyProfile()
     {
         var landlordId = GetCurrentUser().LandlordId;
@@ -213,8 +211,7 @@ public class LandlordController : AbstractController
             new PropertiesDashboardViewModel(listOfProperties, listOfProperties.Count, landlordProfile));
     }
 
-    [HttpGet]
-    [Route("{landlordId:int}/edit")]
+    [HttpGet("{landlordId:int}/edit")]
     public async Task<ActionResult> EditProfilePage(int? landlordId)
     {
         var user = GetCurrentUser();
@@ -232,8 +229,7 @@ public class LandlordController : AbstractController
         return View("EditProfilePage", LandlordProfileModel.FromDbModel(landlordFromDb));
     }
 
-    [HttpPost]
-    [Route("edit")]
+    [HttpPost("edit")]
     public async Task<ActionResult> EditProfileUpdate([FromForm] LandlordProfileModel editModel)
     {
         var user = GetCurrentUser();
@@ -274,8 +270,7 @@ public class LandlordController : AbstractController
         return RedirectToAction("Profile", new { id = editModel.LandlordId });
     }
 
-    [HttpGet]
-    [Route("/invite/{inviteLink}")]
+    [HttpGet("/invite/{inviteLink}")]
     public ActionResult Invite(string inviteLink)
     {
         InviteViewModel model = new();
@@ -290,8 +285,7 @@ public class LandlordController : AbstractController
         return View(model);
     }
 
-    [HttpPost]
-    [Route("/invite/{inviteLink}/accepted")]
+    [HttpPost("/invite/{inviteLink}/accepted")]
     public async Task<IActionResult> TieUserWithLandlord(string inviteLink)
     {
         var user = GetCurrentUser();
@@ -315,8 +309,7 @@ public class LandlordController : AbstractController
         }
     }
 
-    [HttpGet]
-    [Route("{id:int}/dashboard")]
+    [HttpGet("{id:int}/dashboard")]
     public async Task<ActionResult> Dashboard([FromRoute] int id)
     {
         var user = GetCurrentUser();
@@ -330,13 +323,45 @@ public class LandlordController : AbstractController
         {
             return StatusCode(404);
         }
-
-        var viewModel = LandlordProfileModel.FromDbModel(landlord);
+        var landlordViewProperties = landlord.Properties.Select(PropertyViewModel.FromDbModel).OrderByDescending(p => p.PropertyId).Take(2);
+        var allPropertyDetails = new List<PropertyDetailsViewModel>();
+        foreach (var property in landlordViewProperties)
+        {
+            var fileNames = await _azureStorage.ListFileNames("property", property.PropertyId);
+            allPropertyDetails.Add(new PropertyDetailsViewModel
+            {
+                Images = GetFilesFromFileNames(fileNames, property.PropertyId),
+                Property = property
+            });
+        }
+        var viewModel = new LandlordDashboardViewModel
+        {
+            CurrentLandlord = LandlordProfileModel.FromDbModel(landlord),
+            Properties = allPropertyDetails,
+            PropertyTypeCount = _propertyService.CountProperties(id)
+        };
         return View("Dashboard", viewModel);
     }
 
-    [HttpGet]
-    [Route("me/dashboard")]
+    private List<ImageFileUrlModel> GetFilesFromFileNames(IEnumerable<string> fileNames, int propertyId)
+    {
+        return fileNames.Select(fileName =>
+            {
+                var url = Url.Action("GetImage", new { propertyId, fileName })!;
+                return new ImageFileUrlModel(fileName, url);
+            })
+            .ToList();
+    }
+    
+    [HttpGet("{propertyId:int}/{fileName}")]
+    public async Task<IActionResult> GetImage(int propertyId, string fileName)
+    {
+        var (data, fileType) = await _azureStorage.DownloadFile("property", propertyId, fileName);
+
+        return File(data!, $"image/{fileType}");
+    }
+
+    [HttpGet("me/dashboard")]
     public async Task<ActionResult> MyDashboard()
     {
         var landlordId = GetCurrentUser().LandlordId;

@@ -14,7 +14,7 @@ public interface IPropertyService
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId);
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId);
     public List<PropertyDbModel> SortProperties(string by);
-    public PropertyCountModel CountProperties();
+    public PropertyCountModel CountProperties(int? landlordId = null);
     string? CreateNewPublicViewLink(int propertyId);
     public Task<List<PropertyDbModel>?> SortPropertiesByLocation(string postalCode, int page, int perPage);
 
@@ -191,16 +191,29 @@ public class PropertyService : IPropertyService
         return properties;
     }
 
-    public PropertyCountModel CountProperties()
+    public PropertyCountModel CountProperties(int? landlordId = null)
     {
-        var propertyCounts = new PropertyCountModel
+        if(landlordId == null)
         {
-            RegisteredProperties = _dbContext.Properties.Count(),
-            LiveProperties = _dbContext.Properties.Count(p =>
-                p.Availability != AvailabilityState.Draft && p.Landlord.CharterApproved),
-            AvailableProperties = _dbContext.Properties.Count(p => p.Availability == AvailabilityState.Available)
+            return new PropertyCountModel
+            {
+                RegisteredProperties = _dbContext.Properties.Count(),
+                LiveProperties = _dbContext.Properties.Count(p =>
+                    p.Availability != AvailabilityState.Draft 
+                    && p.Landlord.CharterApproved),
+                AvailableProperties = _dbContext.Properties.Count(p => p.Availability == AvailabilityState.Available)
+            };   
+        }
+        var landlord = _dbContext.Landlords.Include(l => l.Properties).SingleOrDefault(l => l.Id == landlordId);
+        var properties = landlord?.Properties ?? new List<PropertyDbModel>();
+        return new PropertyCountModel
+        {
+            RegisteredProperties = properties.Count,
+            LiveProperties = properties.Count(p =>
+                landlord?.CharterApproved == true && p.Availability != AvailabilityState.Draft),
+            AvailableProperties = properties.Count(p =>
+                p.Availability == AvailabilityState.Available)
         };
-        return propertyCounts;
     }
 
     public string CreateNewPublicViewLink(int propertyId)

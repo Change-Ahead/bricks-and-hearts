@@ -1,0 +1,15 @@
+﻿@model StatBoxModel
+
+<div class="border border-primary row rounded mb-3 mx-0 p-2 statBox">
+    <div class="col-3">
+        <h1>
+            <i class="bi @Model.IconName font-blue icon-lg"></i>
+        </h1>
+    </div>
+    <div class="col text-end">
+        <h1 class="font-statistics">
+            @Model.Stat
+        </h1>
+        <p class="font-smallBody">@Model.StatDescription</p>
+    </div>
+</div>

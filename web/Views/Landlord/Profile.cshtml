@@ -131,7 +131,14 @@
     </div>
 </div>
 
-<a class="btn btn-primary my-3" href='@Url.Action("ViewProperties", "Landlord", new { id = Model.LandlordId })'><i class="bi bi-house"></i> View properties</a>
+@if (Model.NumOfProperties > 0)
+{
+    <a class="btn btn-primary my-3" href='@Url.Action("ViewProperties", "Landlord", new { id = Model.LandlordId })'>View Properties</a>
+}
+else
+{
+    <a class="btn btn-primary my-3" href='@Url.Action("AddNewProperty_Begin", "Property", new { landlordId = Model.LandlordId})'>Add Properties</a>
+}
 
 @if (User.IsInRole("Admin"))
 {
