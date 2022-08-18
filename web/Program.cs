@@ -30,6 +30,9 @@ builder.Services.AddAuthentication(options => options.DefaultScheme = CookieAuth
         googleOptions.ClientId = builder.Configuration["Authentication:Google:ClientId"];
         googleOptions.ClientSecret = builder.Configuration["Authentication:Google:ClientSecret"];
         googleOptions.CorrelationCookie.SecurePolicy = CookieSecurePolicy.Always;
+        googleOptions.Scope.Add("profile");
+        googleOptions.ClaimActions.MapJsonKey("urn:google:picture", "picture", "url");
+        googleOptions.SaveTokens = true;
     });
 
 builder.Services.AddTransient<IClaimsTransformation, ClaimsTransformer>();

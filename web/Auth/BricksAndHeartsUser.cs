@@ -11,6 +11,7 @@ public class BricksAndHeartsUser : ClaimsIdentity
         Id = dbUser.Id;
         GoogleName = dbUser.GoogleUserName;
         GoogleEmail = dbUser.GoogleEmail;
+        GoogleProfileImageUrl = dbUser.GoogleProfileImageUrl;
         IsAdmin = dbUser.IsAdmin;
         LandlordId = dbUser.LandlordId;
         HasRequestedAdmin = dbUser.HasRequestedAdmin;
@@ -21,6 +22,8 @@ public class BricksAndHeartsUser : ClaimsIdentity
     public string GoogleName { get; set; }
 
     public string GoogleEmail { get; set; }
+
+    public string? GoogleProfileImageUrl { get; set; }
 
     public bool IsAdmin { get; set; }
 

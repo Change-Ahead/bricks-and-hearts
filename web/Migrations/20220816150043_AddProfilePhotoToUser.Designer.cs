@@ -4,6 +4,7 @@ using BricksAndHearts.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BricksAndHearts.Migrations
 {
     [DbContext(typeof(BricksAndHeartsDbContext))]
-    partial class BricksAndHeartsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220816150043_AddProfilePhotoToUser")]
+    partial class AddProfilePhotoToUser
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -100,22 +102,6 @@ namespace BricksAndHearts.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Landlord");
-                });
-
-            modelBuilder.Entity("BricksAndHearts.Database.PostcodeDbModel", b =>
-                {
-                    b.Property<string>("Postcode")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<decimal?>("Lat")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("Lon")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.HasKey("Postcode");
-
-                    b.ToTable("Postcodes");
                 });
 
             modelBuilder.Entity("BricksAndHearts.Database.PropertyDbModel", b =>
@@ -249,12 +235,6 @@ namespace BricksAndHearts.Migrations
 
                     b.Property<bool?>("HousingBenefits")
                         .HasColumnType("bit");
-
-                    b.Property<decimal?>("Lat")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("Lon")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("Name")
                         .IsRequired()
