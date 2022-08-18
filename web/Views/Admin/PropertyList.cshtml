@@ -1,113 +1,56 @@
 ﻿@model PropertiesDashboardViewModel
 
 @{
-    ViewData["Title"] = "All Properties List";
+    ViewData["Title"] = "Properties";
 }
 
-<h2>All Properties List</h2>
+<div class="mx-md-5">
+    <h1 class="font-h1 mt-5">Properties</h1>
 
-<div class="mb-3">
-    <div class="row">
-        <div class="col-4">
-            @using (Html.BeginForm("SortProperties", "Property", FormMethod.Get))
-            {
-                <select class="form-select" id="sortBy" name="sortBy">
+    <div class="row mt-4">
+        <div class="col-auto me-auto mb-2">
+            <form asp-action="SortProperties" asp-controller="Property" method="get" class="row mx-0">
+                <select class="form-select col h-auto me-3" id="sortBy" name="sortBy">
                     <option value="Availability">Sort by availability</option>
                     <option value="Rent">Sort by rent</option>
                 </select>
-                <button type="submit" class="btn custom-btn-primary"> Display results </button>
-            }
+                <button type="submit" class="btn btn-outline-primary col">Sort</button>
+            </form>
         </div>
-        <div class="col-8">
-            @using (Html.BeginForm("SortPropertiesByLocation", "Property", FormMethod.Get))
-            {
-                <input class="form-control" id="postcode" name="postcode" required placeholder="Enter postcode to sort by location" pattern="([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"/>
-                <button type="submit" class="btn custom-btn-primary"> Sort </button>
-            }
+        <div class="col-auto me-auto mb-2">
+            <form asp-action="SortPropertiesByLocation" asp-controller="Property" method="get" class="row mx-0">
+                <input class="form-control col h-auto me-3" id="postcode" name="postcode" required placeholder="Enter postcode to sort by location" pattern="([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"/>
+                <button type="submit" class="btn btn-outline-primary col">Sort</button>
+            </form>
+        </div>
+
+        <div class="col-auto ms-sm-auto">
+            <a asp-controller="Property" asp-action="AddNewProperty_Begin" asp-route-landlordId="@Model.Owner?.LandlordId" class="btn btn-primary">Add new property</a>
         </div>
     </div>
-</div>
 
-<table class="table">
-    <thead>
-    <tr>
-        <th scope="col">Address</th>
-        <th scope="col">Type</th>
-        <th scope="col"># of Bedrooms</th>
-        <th scope="col">Created</th>
-        <th scope="col">Rent (pcm)</th>
-        <th scope="col">Description</th>
-        <th scope="col">Availability</th>
-        <th scope="col">Available From</th>
-        <th scope="col">Landlord's profile</th>
-        <th scope="col">Property information</th>
-        <th scope="col">Matches</th>
-    </tr>
-    </thead>
-    <tbody>
-    @foreach (var property in Model.Properties!)
-    {
-        <tr>
-            <td>@property.Address!.AddressLine1, @property.Address.AddressLine2, @property.Address.AddressLine3, @property.Address.TownOrCity</td>
-            <td>@property.PropertyType</td>
-            <td>@property.NumOfBedrooms</td>
-            <td>@property.CreationTime</td>
-            <td>@property.Rent</td>
-            <td>@property.Description</td>
-            <td>@property.Availability</td>
-            @if (property.AvailableFrom != null)
-            {
-                <td>@property.AvailableFrom.Value.ToString("dd/MM/yyyy")</td>
-            }
-            else
-            {
-                <td></td>
-            }
-            
-            <td>
-                <a type="button" class="btn btn-outline-primary" href="@Url.Action("Profile", "Landlord", new { id = property.LandlordId })">
-                    <i class="bi bi-person"></i>
-                </a>
-            </td>
-            <td>
-                <a class="btn btn-outline-primary position-relative" href="@Url.Action("ViewProperty", "Property", new { propertyId = property.PropertyId })">
-                    <i class="bi bi-house"></i>
-                    @if (property.IsIncomplete)
-                    {
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
-                            <i class="bi bi-circle-half"></i> Incomplete
-                            <span class="visually-hidden">Property is incomplete</span>
-                        </span>
-                    }
-                </a>
-            </td>
-            <td>
-                @Html.ActionLink("View matches", "TenantMatchList", "Admin", new { currentPropertyId = property.PropertyId}, 
-                            new { @class = "btn btn-primary" })
-            </td>
-        </tr>
+    <partial name="../Property/_PropertyTable"/>
+
+    @{
+        var from = (Model.Page - 1) * Model.PropPerPage + 1;
+        var to = Math.Min((Model.Page - 1) * Model.PropPerPage + Model.PropPerPage, Model.Total);
     }
-    </tbody>
-</table>
 
-@{ var from = (Model.Page - 1) * Model.PropPerPage + 1;
-    var to = Math.Min((Model.Page - 1) * Model.PropPerPage + Model.PropPerPage, Model.Total);}
+    <p>Displaying properties @from to @to of @Model.Total</p>
 
-<p>Displaying properties @from to @to of @Model.Total</p>
+    @if (Model.Page > 1)
+    {
+        <a type="button" class="btn btn-outline-primary" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page - 1, propPerPage = Model.PropPerPage })">
+            <i class="previous"> Previous </i>
+        </a>
+    }
 
-@if (Model.Page > 1)
-{
-    <a type="button" class="btn btn-outline-primary" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page - 1, propPerPage = Model.PropPerPage })">
-        <i class="previous"> Previous </i>
-    </a>
-}
+    @if (Model.Page <= Model.Total / Model.PropPerPage)
+    {
+        <a type="button" class="btn btn-outline-primary" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page + 1, propPerPage = Model.PropPerPage })">
+            <i class="bi"> Next </i>
+        </a>
+    }
 
-@if (Model.Page <= Model.Total/Model.PropPerPage)
-{
-    <a type="button" class="btn btn-outline-primary" href="@Url.Action("SortProperties", "Property", new { sortBy = Model.SortBy, page = Model.Page + 1, propPerPage = Model.PropPerPage })">
-        <i class="bi"> Next </i>
-    </a>
-}
-
-
+</div>
 

@@ -41,19 +41,21 @@ public class PropertyController : AbstractController
             {
                 return RedirectToAction("ViewProperties", "Landlord", new { id = GetCurrentUser().LandlordId });
             }
+
             return RedirectToAction("Index", "Home");
         }
 
         if (GetCurrentUser().IsAdmin == false && GetCurrentUser().LandlordId != propDB.LandlordId)
         {
-            _logger.LogWarning($"User {GetCurrentUser().Id} does not have access to any property with ID {propertyId}.");
+            _logger.LogWarning(
+                $"User {GetCurrentUser().Id} does not have access to any property with ID {propertyId}.");
             return StatusCode(403);
         }
 
         var landlordId = propDB.LandlordId;
         _propertyService.DeleteProperty(propDB);
         _azureStorage.DeleteContainer("property", propertyId);
-        
+
         AddFlashMessage("danger", $"Successfully deleted property with Id {propertyId}");
         return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
     }
@@ -89,6 +91,8 @@ public class PropertyController : AbstractController
         var properties = _propertyService.SortProperties(sortBy);
 
         var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).ToList();
+
+        TempData["Wide"] = true;
 
         return View("~/Views/Admin/PropertyList.cshtml",
             new PropertiesDashboardViewModel(listOfProperties.Skip((page - 1) * propPerPage).Take(propPerPage).ToList(),
@@ -426,7 +430,8 @@ public class PropertyController : AbstractController
             if (!isImageResult.isImage)
             {
                 _logger.LogInformation($"Failed to upload {image.FileName}: not in a recognised image format");
-                AddFlashMessage("danger", $"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: {isImageResult.imageExtString}");               
+                AddFlashMessage("danger",
+                    $"{image.FileName} is not in a recognised image format. Please submit your images in one of the following formats: {isImageResult.imageExtString}");
             }
             else
             {
@@ -478,6 +483,8 @@ public class PropertyController : AbstractController
         _logger.LogInformation("Successfully sorted by location");
         var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).Skip((page - 1) * propPerPage)
             .Take(propPerPage).ToList();
+
+        TempData["Wide"] = true;
 
         return View("~/Views/Admin/PropertyList.cshtml",
             new PropertiesDashboardViewModel(listOfProperties, listOfProperties.Count, null!, page, "Location"));

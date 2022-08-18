@@ -212,6 +212,8 @@ public class LandlordController : AbstractController
         var databaseResult = _propertyService.GetPropertiesByLandlord(id.Value);
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
         var landlordProfile = LandlordProfileModel.FromDbModel(await _landlordService.GetLandlordFromId((int)id));
+
+        TempData["Wide"] = true;
         return View("Properties",
             new PropertiesDashboardViewModel(listOfProperties, listOfProperties.Count, landlordProfile));
     }

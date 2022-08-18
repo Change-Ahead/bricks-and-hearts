@@ -85,7 +85,7 @@
 
 
 <main role="main">
-    <div class="container mt-3 pb-4">
+    <div class="container@(TempData["Wide"] is true ? "-fluid" : "") mt-3 pb-4">
         @if (TempData["FlashMessages"] != null && TempData["FlashTypes"] != null)
         {
             var flashMessages = TempData["FlashMessages"] as List<string>;

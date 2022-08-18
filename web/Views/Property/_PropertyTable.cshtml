@@ -1,0 +1,97 @@
+﻿@model PropertiesDashboardViewModel
+
+@if (Model.Properties.Count == 0)
+{
+    <h2 class="font-h2">No properties found</h2>
+    return;
+}
+<div class="table-responsive mt-4">
+    <table class="table">
+        <thead class="bg-pale-blue">
+        <tr>
+            <th scope="col">Status</th>
+            <th scope="col">Address</th>
+            <th scope="col" style="width: 150px">Type</th>
+            <th scope="col">Bedrooms</th>
+            <th scope="col">Description</th>
+            <th scope="col">Availability</th>
+            <th scope="col">Rent (pcm)</th>
+            <th scope="col">Total units</th>
+            <th scope="col">Available units</th>
+            <th scope="col">Created</th>
+            <th scope="col">Details</th>
+            @if (User.IsInRole("Admin"))
+            {
+                <th scope="col">Landlord</th>
+                <th scope="col">Match</th>
+            }
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var prop in Model.Properties)
+        {
+            <tr>
+                <td class="text-nowrap">
+                    <partial name="../Property/Details/_AvailabilityPill" model="prop"/>
+                </td>
+                <td>
+                    @prop.Address.AddressLine1,
+                    @prop.Address.AddressLine2@(prop.Address.AddressLine2 != null ? "," : "")
+                    @prop.Address.AddressLine3@(prop.Address.AddressLine3 != null ? "," : "")
+                    @prop.Address.TownOrCity,
+                    @prop.Address.County,
+                    @prop.Address.Postcode
+                </td>
+                <td>@prop.PropertyType</td>
+                <td>@prop.NumOfBedrooms</td>
+                <td>
+                    <div class="table-maxheight property-description">@prop.Description</div>
+                </td>
+                <td>
+                    @if (prop.Availability == AvailabilityState.AvailableSoon && prop.AvailableFrom.HasValue)
+                    {
+                        @("From " + prop.AvailableFrom.Value.ToShortDateString())
+                    }
+                    else
+                    {
+                        @("Now")
+                    }
+                </td>
+                <td>£@prop.Rent</td>
+                @if (prop.TotalUnits > 1)
+                {
+                    <td>@prop.TotalUnits</td>
+                    <td>@prop.AvailableUnits</td>
+                }
+                else
+                {
+                    <td class="bg-pale-blue">N/A</td>
+                    <td class="bg-pale-blue">N/A</td>
+                }
+                <td>@prop.CreationTime?.ToShortDateString()</td>
+                <td>
+                    <a asp-action="ViewProperty" asp-controller="Property" asp-route-propertyId="@prop.PropertyId" class="btn btn-@(User.IsInRole("Admin") ? "outline-" : "")primary">View</a>
+                </td>
+                @if (User.IsInRole("Admin"))
+                {
+                    <td>
+                        <a asp-action="Profile" asp-controller="Landlord" asp-route-id="@prop.LandlordId" class="btn btn-outline-primary">Landlord</a>
+                    </td>
+                    <td>
+                        @if (prop.Availability is AvailabilityState.Available or AvailabilityState.AvailableSoon)
+                        {
+                            // Allow matching
+                            <a asp-action="TenantMatchList" asp-controller="Admin" asp-route-currentPropertyId="@prop.PropertyId" class="btn btn-primary text-nowrap">Find potential tenants</a>
+                        }
+                        else
+                        {
+                            // Don't allow matching
+                            <a class="btn btn-primary text-nowrap disabled bg-grey">Find potential tenants</a>
+                        }
+                    </td>
+                }
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
