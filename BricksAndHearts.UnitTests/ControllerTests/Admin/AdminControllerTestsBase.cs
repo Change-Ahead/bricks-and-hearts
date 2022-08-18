@@ -15,10 +15,7 @@ public class AdminControllerTestsBase : ControllerTestsBase
     protected readonly IAdminService AdminService;
     protected readonly ILandlordService LandlordService;
     protected readonly IPropertyService PropertyService;
-    protected readonly ITenantService TenantService;
-    protected readonly ICsvImportService CsvImportService;
-    protected readonly IMailService MailService;
-    protected IEnumerable<string>? FlashMessages => UnderTest.TempData["FlashMessages"] as string[];
+    protected IEnumerable<string>? FlashMessages => UnderTest.TempData["FlashMessages"] as List<string>;
     protected readonly AdminController UnderTest;
 
     protected AdminControllerTestsBase()
@@ -27,18 +24,8 @@ public class AdminControllerTestsBase : ControllerTestsBase
         AdminService = A.Fake<IAdminService>();
         LandlordService = A.Fake<ILandlordService>();
         PropertyService = A.Fake<IPropertyService>();
-        TenantService = A.Fake<ITenantService>();
-        CsvImportService = A.Fake<ICsvImportService>();
-        MailService = A.Fake<IMailService>();
         var httpContext = new DefaultHttpContext();
         var tempData = new TempDataDictionary(httpContext, A.Fake<ITempDataProvider>());
-        UnderTest = new AdminController(Logger, AdminService, LandlordService, PropertyService, TenantService, CsvImportService, MailService){TempData = tempData};
-    }
-
-    protected IFormFile CreateExampleFile(string fileName, int length)
-    {
-        var stream = new MemoryStream();
-        IFormFile fakeFile = new FormFile(stream, 0, length, null!, fileName);
-        return fakeFile;
+        UnderTest = new AdminController(Logger, AdminService, LandlordService, PropertyService){TempData = tempData};
     }
 }

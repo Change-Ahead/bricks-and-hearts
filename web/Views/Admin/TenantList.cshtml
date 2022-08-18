@@ -6,7 +6,7 @@
 
 <h1 class="font-h1 mt-5">Tenants</h1>
 
-@using (Html.BeginForm("TenantList", "Admin", FormMethod.Get))
+@using (Html.BeginForm("TenantList", "Tenant", FormMethod.Get))
 {
     <div class="row mb-4">
         <input class="form-control" id="targetPostcode" name="targetPostcode" required placeholder="Enter postcode to sort by location" pattern="([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"/>
@@ -28,7 +28,7 @@
 </div>
 
 <div class="collapse @(Model.Filter.GetList().SequenceEqual(new HousingRequirementModel().GetList()) ? "" : "show")" id="dropdown-contents">
-    <form method="get" asp-controller="Admin" asp-action="TenantList">
+    <form method="get" asp-controller="Tenant" asp-action="TenantList">
 
         <div class="row mb-3">
             <div class="col-auto d-grid">
@@ -119,8 +119,8 @@
        Total = Model.Total,
        ItemsPerPage = Model.TenantsPerPage,
        ItemsOnPage = Model.TenantList.Count,
-       HrefPrevious = Url.Action("TenantList", "Admin", new { targetPostcode = Model.TargetPostcode, page = Model.Page - 1, propPerPage = Model.TenantsPerPage }),
-       HrefNext = Url.Action("TenantList", "Admin", new { targetPostcode = Model.TargetPostcode, page = Model.Page + 1, propPerPage = Model.TenantsPerPage }),
+       HrefPrevious = Url.Action("TenantList", "Tenant", new { targetPostcode = Model.TargetPostcode, page = Model.Page - 1, propPerPage = Model.TenantsPerPage }),
+       HrefNext = Url.Action("TenantList", "Tenant", new { targetPostcode = Model.TargetPostcode, page = Model.Page + 1, propPerPage = Model.TenantsPerPage }),
        TypeOfData = "tenants"
    }); }
 

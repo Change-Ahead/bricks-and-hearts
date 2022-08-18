@@ -21,10 +21,6 @@ public interface IAdminService
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
     public Task<(List<LandlordDbModel> LandlordList, int Count)> GetLandlordList(bool? isApproved, bool? isAssigned, int page, int landlordsPerPage);
 
-    public Task<(List<TenantDbModel> TenantList, int Count)> GetTenantList(HousingRequirementModel filter, int page, int tenantsPerPage);
-
-    public Task<List<TenantDbModel>> GetNearestTenantsToProperty(PropertyViewModel currentProperty);
-    
     //Invite Links
     public UserDbModel? FindUserByLandlordId(int landlordId);
     public string? FindExistingInviteLink(int landlordId);
@@ -36,13 +32,11 @@ public class AdminService : IAdminService
 {
     private readonly BricksAndHeartsDbContext _dbContext;
     private readonly ILogger<AdminService> _logger;
-    private readonly ITenantService _tenantService;
 
-    public AdminService(BricksAndHeartsDbContext dbContext, ILogger<AdminService> logger, ITenantService tenantService)
+    public AdminService(BricksAndHeartsDbContext dbContext, ILogger<AdminService> logger)
     {
         _dbContext = dbContext;
         _logger = logger;
-        _tenantService = tenantService;
     }
 
     public UserDbModel? GetUserFromId(int userId)
@@ -150,24 +144,6 @@ public class AdminService : IAdminService
         return (await landlordQuery.Skip((page - 1) * landlordsPerPage).Take(landlordsPerPage).ToListAsync(), landlordQuery.Count());
     }
 
-    public async Task<(List<TenantDbModel> TenantList, int Count)> GetTenantList(HousingRequirementModel filters, int page, int tenantsPerPage)
-    {
-        var tenants =  GetFilteredTenantQuery(filters, false);
-        return (await tenants.Skip((page - 1) * tenantsPerPage).Take(tenantsPerPage).ToListAsync(), tenants.Count());
-    }
-
-    public async Task<List<TenantDbModel>> GetNearestTenantsToProperty(PropertyViewModel currentProperty)
-    {
-        var filteredTenantQuery = GetFilteredTenantQuery(currentProperty.LandlordRequirements, true);
-        var distanceSortedTenantQuery = await _tenantService.SortTenantsByLocation(currentProperty.Address.Postcode!, 1, 5);
-        if (distanceSortedTenantQuery == null)
-        {
-            throw new Exception("Postcode not found");
-        }
-        filteredTenantQuery = distanceSortedTenantQuery.Intersect(filteredTenantQuery).Take(5);
-        return await filteredTenantQuery.ToListAsync();
-    }
-
     public UserDbModel? FindUserByLandlordId(int landlordId)
     {
         return _dbContext.Users.SingleOrDefault(u => u.LandlordId == landlordId);
@@ -204,53 +180,5 @@ public class AdminService : IAdminService
 
         landlord.InviteLink = null;
         _dbContext.SaveChanges();
-    }
-    
-    private IQueryable<TenantDbModel> GetFilteredTenantQuery(HousingRequirementModel filters, bool isMatching)
-    {
-        var tenantQuery = _dbContext.Tenants
-            .Include(p => p.Postcode)
-            .AsQueryable();
-        tenantQuery = tenantQuery.Where(t => (t.Type == "Single" && filters.AcceptsSingleTenant == true) 
-                                             || (t.Type == "Couple" && filters.AcceptsCouple == true) 
-                                             || (t.Type == "Family" && filters.AcceptsFamily == true) 
-                                             || (filters.AcceptsSingleTenant != true && filters.AcceptsCouple != true && filters.AcceptsFamily != true));
-        /*the above are INCLUSIVE filters*/
-        if (!isMatching)
-        {
-            return tenantQuery.Where(t => (filters.AcceptsPets == null || t.HasPet == filters.AcceptsPets) 
-                                          && (filters.AcceptsNotEET == null || t.ETT == filters.AcceptsNotEET) 
-                                          && (filters.AcceptsCredit == null || t.UniversalCredit == filters.AcceptsCredit) 
-                                          && (filters.AcceptsBenefits == null || t.HousingBenefits == filters.AcceptsBenefits) 
-                                          && (filters.AcceptsOver35 == null || t.Over35 == filters.AcceptsOver35));
-            /*Above are EXCLUSIVE filters for the filters page*/
-            
-        }
-        if (filters.AcceptsPets == false)
-        {
-            tenantQuery = tenantQuery.Where(t => t.HasPet == false);
-        }
-
-        if (filters.AcceptsNotEET == false)
-        {
-            tenantQuery = tenantQuery.Where(t => t.ETT == false);
-        }
-
-        if (filters.AcceptsCredit == false)
-        {
-            tenantQuery = tenantQuery.Where(t => t.UniversalCredit == false);
-        }
-
-        if (filters.AcceptsBenefits == false)
-        {
-            tenantQuery = tenantQuery.Where(t => t.HousingBenefits == false);
-        }
-
-        if (filters.AcceptsOver35 == false)
-        {
-            tenantQuery = tenantQuery.Where(t => t.Over35 == false);
-        }
-        return tenantQuery;
-        /*Above are INCLUSIVE filters for the matching page*/
     }
 }
