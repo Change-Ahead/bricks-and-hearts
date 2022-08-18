@@ -125,6 +125,7 @@ public class LandlordController : AbstractController
         }
 
         var viewModel = LandlordProfileModel.FromDbModel(landlord);
+        viewModel.GoogleProfileImageUrl = _landlordService.GetLandlordProfilePicture(id);
         return View("Profile", viewModel);
     }
 
@@ -340,6 +341,7 @@ public class LandlordController : AbstractController
             Properties = allPropertyDetails,
             PropertyTypeCount = _propertyService.CountProperties(id)
         };
+        viewModel.CurrentLandlord.GoogleProfileImageUrl = _landlordService.GetLandlordProfilePicture(id);
         return View("Dashboard", viewModel);
     }
 

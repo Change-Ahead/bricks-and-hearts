@@ -1,3 +1,4 @@
+@using BricksAndHearts.Auth
 @model LandlordDashboardViewModel
 
 @{
@@ -9,8 +10,7 @@
         <div class="col">
             <div class="row">
                 <div class="col-sm-auto profile-photo-lg">
-                    @* TODO BNH-99: Replace icon with profile picture *@
-                    <img alt="profile picture" src="https://www.pngarts.com/files/10/Default-Profile-Picture-Transparent-Image.png" width="100" height="100" class="rounded-circle img-thumbnail img-fluid"/>
+                    <img src="@(((BricksAndHeartsUser)User.Identity!).GoogleProfileImageUrl ?? Url.Content("~/images/profileDefault.png"))" alt="profile picture">
                 </div>
                 <div class="col">
                     <div class="row">

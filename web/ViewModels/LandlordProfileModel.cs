@@ -54,6 +54,8 @@ public class LandlordProfileModel
 
     public int NumOfProperties { get; set; }
 
+    public string? GoogleProfileImageUrl { get; set; }
+
     public static LandlordProfileModel FromDbModel(LandlordDbModel landlord)
     {
         return new LandlordProfileModel

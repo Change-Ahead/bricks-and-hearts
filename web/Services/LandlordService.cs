@@ -48,6 +48,7 @@ public interface ILandlordService
     public Task<ApproveLandlordResult> ApproveLandlord(int landlordId, BricksAndHeartsUser user, string membershipId);
     public Task UnapproveLandlord(int landlordId);
     public LandlordDbModel? FindLandlordWithInviteLink(string inviteLink);
+    public string? GetLandlordProfilePicture(int landlordId);
 
     public Task<LinkUserWithLandlordResult> LinkExistingLandlordWithUser(
         string inviteLink,
@@ -329,5 +330,10 @@ public class LandlordService : ILandlordService
         landlordCounts.RegisteredLandlords = _dbContext.Landlords.Count();
         landlordCounts.ApprovedLandlords = _dbContext.Landlords.Count(l => l.CharterApproved == true);
         return landlordCounts;
+    }
+
+    public string? GetLandlordProfilePicture(int landlordId)
+    {
+        return _dbContext.Users.FirstOrDefault(u => u.LandlordId == landlordId)?.GoogleProfileImageUrl;
     }
 }
