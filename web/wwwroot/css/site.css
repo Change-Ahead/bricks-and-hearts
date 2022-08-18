@@ -118,13 +118,26 @@ body {
     border-color: grey;
 }
 
-.card-home {
+.statbox-icon{
+    color: var(--blue);
+    background-color: var(--paleBlue);
+    font-size: 80px;
+    text-align: center;
+}
+
+.card-stat{
+    width: 90%;
+    height: 100%;
+    background-color: var(--white);
+}
+
+.card-home{
     width: 80%;
     height: 100%;
     background-color: var(--blue);
 }
 
-.bi-register {
+.bi-register{
     font-size: 85px;
     background-color: var(--blue);
     color: var(--white)

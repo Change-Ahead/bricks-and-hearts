@@ -13,7 +13,7 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Admin;
 public class AdminControllerTests : AdminControllerTestsBase
 {
     [Fact]
-    public void AdminDashboard_WhenCalledByAnonymousUser_ReturnsViewWithLoginLink()
+    public void AdminDashboard_WhenCalledByAnonymousUser_RedirectsToIndex()
     {
         // Arrange
         UnderTest.ControllerContext = new ControllerContext
@@ -22,11 +22,12 @@ public class AdminControllerTests : AdminControllerTestsBase
         };
 
         // Act
-        var result = UnderTest.AdminDashboard() as ViewResult;
+        var result = UnderTest.AdminDashboard() as RedirectToActionResult;
 
         // Assert
-        result!.ViewData.Model.Should().BeOfType<AdminDashboardViewModel>()
-            .Which.CurrentUser.Should().BeNull();
+        result.Should().BeOfType<RedirectToActionResult>();
+        result.Should().NotBeNull();
+        result!.ActionName.Should().BeEquivalentTo("Index");
     }
     
     [Fact]

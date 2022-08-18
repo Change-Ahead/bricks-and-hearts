@@ -8,6 +8,7 @@ namespace BricksAndHearts.Services;
 public interface IAdminService
 {
     public UserDbModel? GetUserFromId(int userId);
+    public AdminCountModel CountAdmins();
 
     //Admin Access
     public void RequestAdminAccess(BricksAndHeartsUser user);
@@ -46,6 +47,14 @@ public class AdminService : IAdminService
     {
         UserDbModel userFromId = _dbContext.Users.SingleOrDefault(u => u.Id == userId)!;
         return userFromId;
+    }
+    
+    public AdminCountModel CountAdmins()
+    {
+        AdminCountModel adminCounts = new AdminCountModel();
+        adminCounts.CurrentAdmins = _dbContext.Users.Count(u => u.IsAdmin == true);
+        adminCounts.PendingAdmins = _dbContext.Users.Count(u => u.HasRequestedAdmin == true && u.IsAdmin == false);
+        return adminCounts;
     }
 
     public void RequestAdminAccess(BricksAndHeartsUser user)
