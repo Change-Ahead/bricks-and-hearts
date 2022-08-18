@@ -136,10 +136,11 @@ public class AdminController : AbstractController
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
-    public async Task<IActionResult> LandlordList(LandlordListModel landlordListModel)
+    public IActionResult LandlordList(bool? isApproved = null, bool? isAssigned = null, int page = 1, int landlordsPerPage = 10)
     {
-        landlordListModel.LandlordList = await _adminService.GetLandlordList(landlordListModel);
-        return View(landlordListModel);
+        var landlords = _adminService.GetLandlordList(isApproved, isAssigned);
+        return View(new LandlordListModel(landlords.Skip((page - 1) * landlordsPerPage).Take(landlordsPerPage).ToList(), landlords.Count(),
+            isApproved, isAssigned, page));
     }
     
     [Authorize(Roles = "Admin")]
@@ -153,8 +154,8 @@ public class AdminController : AbstractController
             if (tenantsByLocation != null)
             {
                 _logger.LogInformation("Successfully sorted by location");
-                return View("TenantList", new TenantListModel(tenantsByLocation.Skip((page - 1) * tenantsPerPage).Take(tenantsPerPage).ToList(),
-                    new HousingRequirementModel(), tenantsByLocation.Count(), page, targetPostcode));
+                return View(new TenantListModel(tenantsByLocation.Skip((page - 1) * tenantsPerPage).Take(tenantsPerPage).ToList(),
+                    new HousingRequirementModel(), tenantsByLocation.Count, page, targetPostcode));
             }
 
             _logger.LogWarning($"Failed to find postcode {targetPostcode}");
@@ -162,7 +163,7 @@ public class AdminController : AbstractController
         }
         
         var tenantsByFilter = _adminService.GetTenantList(filter);
-        return View("TenantList", new TenantListModel(tenantsByFilter.Skip((page - 1) * tenantsPerPage).Take(tenantsPerPage).ToList(),
+        return View(new TenantListModel(tenantsByFilter.Skip((page - 1) * tenantsPerPage).Take(tenantsPerPage).ToList(),
             filter, tenantsByFilter.Count(), page, targetPostcode));
     }
 

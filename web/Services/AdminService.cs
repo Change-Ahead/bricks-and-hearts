@@ -18,7 +18,7 @@ public interface IAdminService
 
     //Information Lists
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
-    public Task<List<LandlordDbModel>> GetLandlordList(LandlordListModel landlordListModel);
+    public IQueryable<LandlordDbModel> GetLandlordList(bool? isApproved, bool? isAssigned);
 
     public IQueryable<TenantDbModel> GetTenantList(HousingRequirementModel filter);
 
@@ -124,20 +124,20 @@ public class AdminService : IAdminService
         return pendingAdmins;
     }
 
-    public async Task<List<LandlordDbModel>> GetLandlordList(LandlordListModel landlordListModel)
+    public IQueryable<LandlordDbModel> GetLandlordList(bool? isApproved, bool? isAssigned)
     {
         var landlordQuery = _dbContext.Landlords.AsQueryable();
-        if (landlordListModel.IsApproved != null)
+        if (isApproved != null)
         {
-            landlordQuery = landlordQuery.Where(l => l.CharterApproved == landlordListModel.IsApproved);
+            landlordQuery = landlordQuery.Where(l => l.CharterApproved == isApproved);
         }
 
-        if (landlordListModel.IsAssigned != null)
+        if (isAssigned != null)
         {
-            landlordQuery = landlordQuery.Where(l => _dbContext.Users.Any(u => u.LandlordId == l.Id) == landlordListModel.IsAssigned);
+            landlordQuery = landlordQuery.Where(l => _dbContext.Users.Any(u => u.LandlordId == l.Id) == isAssigned);
         }
 
-        return await landlordQuery.ToListAsync();
+        return landlordQuery;
     }
 
     public IQueryable<TenantDbModel> GetTenantList(HousingRequirementModel filters)
