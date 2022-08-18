@@ -2,7 +2,7 @@
 
 namespace BricksAndHearts.ViewModels.PropertyInput;
 
-public class PropertyInputModelStep1 : PropertyInputModelBase
+public class PropertyInputModelAddressStep : PropertyInputModelBase
 {
     public AddressModel? Address { get; set; }
 

@@ -185,11 +185,11 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpGet("/landlord/{landlordId:int}/property/{operationType:regex(^(add|edit)$)}/{propertyId:int}/step/1")]
-    public ActionResult PropertyInputStepOne([FromRoute] int landlordId, [FromRoute] string operationType,
+    public ActionResult PropertyInputStepOnePostcode([FromRoute] int landlordId, [FromRoute] string operationType,
         [FromRoute] int propertyId)
     {
         var property = _propertyService.GetPropertyByPropertyId(propertyId);
-        var model = new PropertyInputModelStep1();
+        var model = new PropertyInputModelAddressStep();
 
         if (property == null)
         {
@@ -213,7 +213,7 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("/landlord/{landlordId:int}/property/{operationType:regex(^(add|edit)$)}/{propertyId:int}/step/1")]
-    public async Task<ActionResult> PropertyInputStepOne([FromForm] PropertyInputModelStep1 model,
+    public async Task<ActionResult> PropertyInputStepOnePostcode([FromForm] PropertyInputModelAddressStep model,
         [FromRoute] int landlordId, [FromRoute] string operationType, [FromRoute] int propertyId)
     {
         var isValid =
@@ -221,7 +221,7 @@ public class PropertyController : AbstractController
         // Check model validity
         if (!ModelState.IsValid && isValid)
         {
-            return RedirectToAction("PropertyInputStepOne", "Property",
+            return RedirectToAction("PropertyInputStepOnePostcode", "Property",
                 new
                 {
                     propertyId, landlordId,
@@ -253,7 +253,7 @@ public class PropertyController : AbstractController
             }
 
             _propertyService.UpdateProperty(propertyId, propertyView);
-            return RedirectToAction("PropertyInputStepTwo", "Property",
+            return RedirectToAction("PropertyInputStepTwoAddress", "Property",
                 new { landlordId, operationType, propertyId });
         }
 
@@ -265,12 +265,13 @@ public class PropertyController : AbstractController
 
         // Create new record in the database for this property
         propertyId = await _propertyService.AddNewProperty(landlordId, propertyView);
-        return RedirectToAction("PropertyInputStepTwo", "Property", new { landlordId, operationType, propertyId });
+        return RedirectToAction("PropertyInputStepTwoAddress", "Property",
+            new { landlordId, operationType, propertyId });
     }
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpGet("/landlord/{landlordId:int}/property/{operationType:regex(^(add|edit)$)}/{propertyId:int}/step/2")]
-    public ActionResult PropertyInputStepTwo([FromRoute] int landlordId, [FromRoute] string operationType,
+    public ActionResult PropertyInputStepTwoAddress([FromRoute] int landlordId, [FromRoute] string operationType,
         [FromRoute] int propertyId)
     {
         //Get Database record (if there is one)
@@ -286,7 +287,7 @@ public class PropertyController : AbstractController
         }
 
         //Make new model for this step using database record
-        var model = new PropertyInputModelStep1();
+        var model = new PropertyInputModelAddressStep();
         model.InitialiseViewModel(property);
         model.IsEdit = OperationTypeToIsEdit(operationType);
         model.Step = 2;
@@ -296,13 +297,13 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("/landlord/{landlordId:int}/property/{operationType:regex(^(add|edit)$)}/{propertyId:int}/step/2")]
-    public ActionResult PropertyInputStepTwo([FromForm] PropertyInputModelStep1 model,
+    public ActionResult PropertyInputStepTwoAddress([FromForm] PropertyInputModelAddressStep model,
         [FromRoute] int landlordId, [FromRoute] string operationType, [FromRoute] int propertyId)
     {
         // Check model validity
         if (!ModelState.IsValid)
         {
-            return RedirectToAction("PropertyInputStepTwo", "Property",
+            return RedirectToAction("PropertyInputStepTwoAddress", "Property",
                 new
                 {
                     propertyId, landlordId,
@@ -322,12 +323,13 @@ public class PropertyController : AbstractController
         await _propertyService.UpdateProperty(propertyId, propertyView);
 
         //Redirect to next step (could be subverted with a bool for the edit function?)
-        return RedirectToAction("PropertyInputStepThree", "Property", new { landlordId, operationType, propertyId });
+        return RedirectToAction("PropertyInputStepThreeDetails", "Property",
+            new { landlordId, operationType, propertyId });
     }
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpGet("/landlord/{landlordId:int}/property/{operationType:regex(^(add|edit)$)}/{propertyId:int}/step/3")]
-    public ActionResult PropertyInputStepThree([FromRoute] int landlordId, [FromRoute] string operationType,
+    public ActionResult PropertyInputStepThreeDetails([FromRoute] int landlordId, [FromRoute] string operationType,
         [FromRoute] int propertyId)
     {
         //Get Database record (if there is one)
@@ -343,7 +345,7 @@ public class PropertyController : AbstractController
         }
 
         //Make new model for this step using database record
-        var model = new PropertyInputModelStep3();
+        var model = new PropertyInputModelDetails();
         model.InitialiseViewModel(property);
         model.IsEdit = OperationTypeToIsEdit(operationType);
         model.Step = 3;
@@ -352,13 +354,13 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("/landlord/{landlordId:int}/property/{operationType:regex(^(add|edit)$)}/{propertyId:int}/step/3")]
-    public ActionResult PropertyInputStepThree([FromForm] PropertyInputModelStep3 model,
+    public ActionResult PropertyInputStepThreeDetails([FromForm] PropertyInputModelDetails model,
         [FromRoute] int landlordId, [FromRoute] string operationType, [FromRoute] int propertyId)
     {
         // Check model validity
         if (!ModelState.IsValid)
         {
-            return RedirectToAction("PropertyInputStepThree", "Property",
+            return RedirectToAction("PropertyInputStepThreeDetails", "Property",
                 new
                 {
                     propertyId, landlordId,
@@ -378,12 +380,13 @@ public class PropertyController : AbstractController
         _propertyService.UpdateProperty(propertyId, propertyView);
 
         //Redirect to next step
-        return RedirectToAction("PropertyInputStepFour", "Property", new { landlordId, operationType, propertyId });
+        return RedirectToAction("PropertyInputStepFourDescription", "Property",
+            new { landlordId, operationType, propertyId });
     }
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpGet("/landlord/{landlordId:int}/property/{operationType:regex(^(add|edit)$)}/{propertyId:int}/step/4")]
-    public ActionResult PropertyInputStepFour([FromRoute] int landlordId, [FromRoute] string operationType,
+    public ActionResult PropertyInputStepFourDescription([FromRoute] int landlordId, [FromRoute] string operationType,
         [FromRoute] int propertyId)
     {
         //Get Database record (if there is one)
@@ -399,7 +402,7 @@ public class PropertyController : AbstractController
         }
 
         //Make new model for this step using database record
-        var model = new PropertyInputModelStep4();
+        var model = new PropertyInputModelDescriptionStep();
         model.Step = 4;
         model.InitialiseViewModel(property);
         model.IsEdit = OperationTypeToIsEdit(operationType);
@@ -408,13 +411,14 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("/landlord/{landlordId:int}/property/{operationType:regex(^(add|edit)$)}/{propertyId:int}/step/4")]
-    public ActionResult PropertyInputStepFour([FromForm] PropertyInputModelStep4 model, [FromRoute] int landlordId,
+    public ActionResult PropertyInputStepFourDescription([FromForm] PropertyInputModelDescriptionStep model,
+        [FromRoute] int landlordId,
         [FromRoute] string operationType, [FromRoute] int propertyId)
     {
         // Check model validity
         if (!ModelState.IsValid)
         {
-            return RedirectToAction("PropertyInputStepFour", "Property",
+            return RedirectToAction("PropertyInputStepFourDescription", "Property",
                 new
                 {
                     propertyId, landlordId,
@@ -434,12 +438,14 @@ public class PropertyController : AbstractController
         _propertyService.UpdateProperty(propertyId, propertyView);
 
         //Redirect to next step
-        return RedirectToAction("PropertyInputStepFive", "Property", new { landlordId, operationType, propertyId });
+        return RedirectToAction("PropertyInputStepFiveTenantPreferences", "Property",
+            new { landlordId, operationType, propertyId });
     }
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpGet("/landlord/{landlordId:int}/property/{operationType:regex(^(add|edit)$)}/{propertyId:int}/step/5")]
-    public ActionResult PropertyInputStepFive([FromRoute] int landlordId, [FromRoute] string operationType,
+    public ActionResult PropertyInputStepFiveTenantPreferences([FromRoute] int landlordId,
+        [FromRoute] string operationType,
         [FromRoute] int propertyId)
     {
         //Get Database record (if there is one)
@@ -455,7 +461,7 @@ public class PropertyController : AbstractController
         }
 
         //Make new model for this step using database record
-        var model = new PropertyInputModelStep5();
+        var model = new PropertyInputModelTenantPreferences();
         model.InitialiseViewModel(property);
         model.Step = 5;
         model.IsEdit = OperationTypeToIsEdit(operationType);
@@ -464,13 +470,13 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("/landlord/{landlordId:int}/property/{operationType:regex(^(add|edit)$)}/{propertyId:int}/step/5")]
-    public ActionResult PropertyInputStepFive([FromForm] PropertyInputModelStep5 model,
+    public ActionResult PropertyInputStepFiveTenantPreferences([FromForm] PropertyInputModelTenantPreferences model,
         [FromRoute] int landlordId, [FromRoute] string operationType, [FromRoute] int propertyId)
     {
         // Check model validity
         if (!ModelState.IsValid)
         {
-            return RedirectToAction("PropertyInputStepFive", "Property",
+            return RedirectToAction("PropertyInputStepFiveTenantPreferences", "Property",
                 new
                 {
                     propertyId, landlordId,
@@ -490,12 +496,13 @@ public class PropertyController : AbstractController
         _propertyService.UpdateProperty(propertyId, propertyView);
 
         //Redirect to next step (could be subverted with a bool for the edit function?)
-        return RedirectToAction("PropertyInputStepSix", "Property", new { landlordId, operationType, propertyId });
+        return RedirectToAction("PropertyInputStepSixAvailability", "Property",
+            new { landlordId, operationType, propertyId });
     }
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpGet("/landlord/{landlordId:int}/property/{operationType:regex(^(add|edit)$)}/{propertyId:int}/step/6")]
-    public ActionResult PropertyInputStepSix([FromRoute] int landlordId, [FromRoute] string operationType,
+    public ActionResult PropertyInputStepSixAvailability([FromRoute] int landlordId, [FromRoute] string operationType,
         [FromRoute] int propertyId)
     {
         //Get Database record (if there is one)
@@ -511,7 +518,7 @@ public class PropertyController : AbstractController
         }
 
         //Make new model for this step using database record
-        var model = new PropertyInputModelStep6();
+        var model = new PropertyInputModelAvailability();
         model.InitialiseViewModel(property);
         model.Step = 6;
         model.IsEdit = OperationTypeToIsEdit(operationType);
@@ -520,13 +527,14 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("/landlord/{landlordId:int}/property/{operationType:regex(^(add|edit)$)}/{propertyId:int}/step/6")]
-    public ActionResult PropertyInputStepSix([FromForm] PropertyInputModelStep6 model, [FromRoute] int landlordId,
+    public ActionResult PropertyInputStepSixAvailability([FromForm] PropertyInputModelAvailability model,
+        [FromRoute] int landlordId,
         [FromRoute] string operationType, [FromRoute] int propertyId)
     {
         // Check model validity
         if (!ModelState.IsValid)
         {
-            return RedirectToAction("PropertyInputStepSix", "Property",
+            return RedirectToAction("PropertyInputStepSixAvailability", "Property",
                 new
                 {
                     propertyId, landlordId,
@@ -568,12 +576,13 @@ public class PropertyController : AbstractController
     {
         return step switch
         {
-            1 => RedirectToAction("PropertyInputStepOne", new { propertyId, operationType, landlordId }),
-            2 => RedirectToAction("PropertyInputStepTwo", new { propertyId, operationType, landlordId }),
-            3 => RedirectToAction("PropertyInputStepThree", new { propertyId, operationType, landlordId }),
-            4 => RedirectToAction("PropertyInputStepFour", new { propertyId, operationType, landlordId }),
-            5 => RedirectToAction("PropertyInputStepFive", new { propertyId, operationType, landlordId }),
-            6 => RedirectToAction("PropertyInputStepSix", new { propertyId, operationType, landlordId }),
+            1 => RedirectToAction("PropertyInputStepOnePostcode", new { propertyId, operationType, landlordId }),
+            2 => RedirectToAction("PropertyInputStepTwoAddress", new { propertyId, operationType, landlordId }),
+            3 => RedirectToAction("PropertyInputStepThreeDetails", new { propertyId, operationType, landlordId }),
+            4 => RedirectToAction("PropertyInputStepFourDescription", new { propertyId, operationType, landlordId }),
+            5 => RedirectToAction("PropertyInputStepFiveTenantPreferences",
+                new { propertyId, operationType, landlordId }),
+            6 => RedirectToAction("PropertyInputStepSixAvailability", new { propertyId, operationType, landlordId }),
             _ => StatusCode(404)
         };
     }

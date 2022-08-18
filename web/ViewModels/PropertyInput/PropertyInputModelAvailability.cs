@@ -3,7 +3,7 @@ using BricksAndHearts.Database;
 
 namespace BricksAndHearts.ViewModels.PropertyInput;
 
-public class PropertyInputModelStep6 : PropertyInputModelBase
+public class PropertyInputModelAvailability : PropertyInputModelBase
 {
     public int OccupiedUnits { get; set; }
 

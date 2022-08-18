@@ -242,7 +242,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(prop);
 
         // Act
-        var result = UnderTest.PropertyInputStepOne(prop.LandlordId, prop.Id, "add") as ViewResult;
+        var result = UnderTest.PropertyInputStepOnePostcode(prop.LandlordId, prop.Id, "add") as ViewResult;
 
         // Assert
         result!.ViewName.Should().Be("PropertyInput");
@@ -292,7 +292,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         // Act
         var result =
-            await UnderTest.PropertyInputStepOne(formResultModel, formResultModel.LandlordId, 0, operationType) as
+            await UnderTest.PropertyInputStepOnePostcode(formResultModel, formResultModel.LandlordId, 0, operationType)
+                as
                 RedirectToActionResult;
 
         // Assert
@@ -300,7 +301,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
             .MustNotHaveHappened();
         A.CallTo(() => PropertyService.AddNewProperty(1, formResultModel.FormToViewModel(), true))
             .MustNotHaveHappened();
-        result!.ActionName.Should().Be("PropertyInputStepOne");
+        result!.ActionName.Should().Be("PropertyInputStepOnePostcode");
         result.RouteValues.Should().ContainKey("propertyId").WhoseValue.Should().Be(0);
         result.RouteValues.Should().ContainKey("operationType").WhoseValue.Should().Be(operationType);
     }
@@ -320,7 +321,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         var formResultModel = new PropertyInputFormViewModel
         {
-            Step1 = new PropertyInputModelStep1
+            Step1 = new PropertyInputModelAddressStep
             {
                 Address = new AddressModel()
             },
@@ -331,14 +332,15 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         // Act
         var result =
-            await UnderTest.PropertyInputStepOne(formResultModel, 1, 1, operationType) as RedirectToActionResult;
+            await UnderTest.PropertyInputStepOnePostcode(formResultModel, 1, 1,
+                operationType) as RedirectToActionResult;
 
         // Assert
         A.CallTo(() => PropertyService.AddNewProperty(1, formResultModel.FormToViewModel(), true))
             .MustNotHaveHappened();
         A.CallTo(() => PropertyService.UpdateProperty(1, formResultModel.FormToViewModel(), true))
             .MustNotHaveHappened();
-        result!.ActionName.Should().Be("PropertyInputStepOne");
+        result!.ActionName.Should().Be("PropertyInputStepOnePostcode");
         result.RouteValues.Should().ContainKey("propertyId").WhoseValue.Should().Be(1);
         result.RouteValues.Should().ContainKey("operationType").WhoseValue.Should().Be(operationType);
     }
@@ -369,7 +371,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         var formResultModel = new PropertyInputFormViewModel
         {
-            Step1 = new PropertyInputModelStep1
+            Step1 = new PropertyInputModelAddressStep
             {
                 Address = new AddressModel
                 {
@@ -388,7 +390,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         // Act
         var result =
-            await UnderTest.PropertyInputStepOne(formResultModel, 1, 1, operationType) as RedirectToActionResult;
+            await UnderTest.PropertyInputStepOnePostcode(formResultModel, 1, 1,
+                operationType) as RedirectToActionResult;
 
         // Assert
         if (!isEdit)
@@ -406,7 +409,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
                 .WithAnyArguments().MustHaveHappened();
         }
 
-        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("PropertyInputStepTwo");
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("PropertyInputStepTwoAddress");
     }
 
     [Theory]
@@ -433,7 +436,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         // Assert
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
         A.CallTo(() => PropertyService.UpdateProperty(1, A<PropertyViewModel>._, A<bool>._)).MustHaveHappened();
-        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("PropertyInputStepSix");
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should()
+            .Be("PropertyInputStepSixAvailability");
     }
 
     [Fact]
@@ -493,7 +497,9 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         switch (step)
         {
             case 1:
-                result = await UnderTest.PropertyInputStepOne(formResultModel, 1, 1, operationType) as StatusCodeResult;
+                result =
+                    await UnderTest.PropertyInputStepOnePostcode(formResultModel, 1, 1, operationType) as
+                        StatusCodeResult;
                 break;
             case 2:
                 result = UnderTest.PropertyInputStepTwo(formResultModel, operationType) as StatusCodeResult;

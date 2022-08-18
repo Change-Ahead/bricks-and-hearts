@@ -20,7 +20,7 @@
                         {
                             <h6 class="font-body">View your properties</h6>
                             <div>
-                                <a class="btn btn-primary mt-3" href='@Url.Action("PropertyInputStepOne", "Property", new { landlordId = Model.LandlordId, propertyId = 0, operationType = "add" })'>Add Properties</a>
+                                <a class="btn btn-primary mt-3" href='@Url.Action("PropertyInputStepOnePostcode", "Property", new { landlordId = Model.LandlordId, propertyId = 0, operationType = "add" })'>Add Properties</a>
                                 <a class="btn btn-primary btn-lg mt-3 align-middle" href='@Url.Action("ViewProperties", "Landlord", new { id = Model.CurrentLandlord.LandlordId })'>View Properties</a>
                             </div>
                         }

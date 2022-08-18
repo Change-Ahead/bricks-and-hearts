@@ -61,7 +61,7 @@ public class PropertyControllerTestsBase : ControllerTestsBase
     {
         return new PropertyInputFormViewModel
         {
-            Step1 = new PropertyInputModelStep1
+            Step1 = new PropertyInputModelAddressStep
             {
                 Address = new AddressModel
                 {
@@ -85,16 +85,16 @@ public class PropertyControllerTestsBase : ControllerTestsBase
                     Postcode = "Postcode"
                 }
             },
-            Step3 = new PropertyInputModelStep3
+            Step3 = new PropertyInputModelDetails
             {
                 NumOfBedrooms = 12,
                 PropertyType = "Detached"
             },
-            Step4 = new PropertyInputModelStep4
+            Step4 = new PropertyInputModelDescriptionStep
             {
                 Description = "Sample Description"
             },
-            Step5 = new PropertyInputModelStep5
+            Step5 = new PropertyInputModelTenantPreferences
             {
                 HousingRequirementModel = new HousingRequirementModel
                 {
@@ -109,7 +109,7 @@ public class PropertyControllerTestsBase : ControllerTestsBase
                     AcceptsWithoutGuarantor = true
                 }
             },
-            Step6 = new PropertyInputModelStep6
+            Step6 = new PropertyInputModelAvailability
             {
                 OccupiedUnits = 2,
                 TotalUnits = 5,

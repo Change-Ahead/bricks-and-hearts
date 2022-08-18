@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace BricksAndHearts.ViewModels.PropertyInput;
 
-public class PropertyInputModelStep5 : PropertyInputModelBase
+public class PropertyInputModelTenantPreferences : PropertyInputModelBase
 {
     [ValidateNever]
     public HousingRequirementModel HousingRequirementModel { get; set; } = new();
