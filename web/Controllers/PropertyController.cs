@@ -1,7 +1,6 @@
 using System.Text.RegularExpressions;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
-using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -75,6 +74,11 @@ public class PropertyController : AbstractController
             return StatusCode(403);
         }
 
+        if (model.PublicViewLink == null)
+        {
+            _propertyService.CreatePublicViewLink(model.Id);
+        }
+
         var propertyViewModel = PropertyViewModel.FromDbModel(model);
 
         var fileNames = await _azureStorage.ListFileNames("property", propertyId);
@@ -102,42 +106,6 @@ public class PropertyController : AbstractController
         TempData["FullWidthPage"] = true;
         return View("~/Views/Admin/PropertyList.cshtml",
             new PropertyListModel(listOfProperties, properties.Count, null!, page, sortBy, target));
-    }
-
-    [Authorize(Roles = "Admin")]
-    [HttpGet("/admin/get-public-view-link/{propertyId:int}")]
-    public ActionResult GetPublicViewLink(int propertyId)
-    {
-        var property = _propertyService.GetPropertyByPropertyId(propertyId);
-        if (property == null) // If property does not exist
-        {
-            var flashMessageBody = $"Property with ID: {propertyId} does not exist";
-            _logger.LogInformation(flashMessageBody);
-            AddFlashMessage("warning", flashMessageBody);
-        }
-        else
-        {
-            var publicViewLink = property.PublicViewLink;
-            string flashMessageBody;
-            if (string.IsNullOrEmpty(publicViewLink))
-            {
-                flashMessageBody = "Successfully created a new public view link";
-                publicViewLink = _propertyService.CreateNewPublicViewLink(propertyId);
-                _logger.LogInformation("Created public view link for property {PropertyId}: {PublicViewLink}",
-                    propertyId, publicViewLink);
-            }
-            else
-            {
-                flashMessageBody = "Property already has a public view link";
-            }
-
-            var baseUrl = HttpContext.Request.GetUri().Authority;
-            _logger.LogInformation(flashMessageBody);
-            AddFlashMessage("success",
-                flashMessageBody + ": " + baseUrl + $"/public/propertyid/{propertyId}/{publicViewLink}");
-        }
-
-        return RedirectToAction("ViewProperty", "Property", new { propertyId });
     }
 
     #region AddProperty
@@ -471,4 +439,21 @@ public class PropertyController : AbstractController
     }
 
     #endregion
+    
+    [HttpGet("public/{token}")]
+    [AllowAnonymous]
+    public async Task<ActionResult> PublicViewProperty(string token)
+    {
+        var dbModel = _propertyService.GetPropertyByPublicViewLink(token);
+        if (dbModel == null)
+        {
+            return View();
+        }
+
+        var propertyViewModel = PropertyViewModel.FromDbModel(dbModel);
+        var fileNames = await _azureStorage.ListFileNames("property", propertyViewModel.PropertyId);
+        var imageFiles = GetFilesFromFileNames(fileNames, propertyViewModel.PropertyId);
+        var propertyDetailsModel = new PropertyDetailsViewModel { Property = propertyViewModel, Images = imageFiles };
+        return View(propertyDetailsModel);
+    }
 }

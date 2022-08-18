@@ -12,6 +12,7 @@ public class PropertyViewModel : IValidatableObject
     public int PropertyId;
     public int LandlordId { get; set; }
     public DateTime? CreationTime { get; set; }
+    public string? PublicViewLink { get; set; }
 
 
     // Location
@@ -38,7 +39,7 @@ public class PropertyViewModel : IValidatableObject
     // checks for this are done manually in the override
     [ValidateNever]
     public HousingRequirementModel LandlordRequirements { get; set; } = new();
-    
+
     // Rent, deposits, and duration
     [Range(0, 100000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
     public int? Rent { get; set; }
@@ -62,7 +63,8 @@ public class PropertyViewModel : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (LandlordRequirements.AcceptsSingleTenant == false && LandlordRequirements.AcceptsCouple == false && LandlordRequirements.AcceptsFamily == false)
+        if (LandlordRequirements.AcceptsSingleTenant == false && LandlordRequirements.AcceptsCouple == false &&
+            LandlordRequirements.AcceptsFamily == false)
         {
             yield return new ValidationResult("At least one type of tenant must be selected");
         }
@@ -113,12 +115,13 @@ public class PropertyViewModel : IValidatableObject
                 AcceptsBenefits = property.AcceptsBenefits,
                 AcceptsNotEET = property.AcceptsNotEET,
                 AcceptsOver35 = property.AcceptsOver35,
-                AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor  
+                AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor
             },
             Availability = property.Availability,
             AvailableFrom = property.AvailableFrom,
             TotalUnits = property.TotalUnits,
-            OccupiedUnits = property.OccupiedUnits
+            OccupiedUnits = property.OccupiedUnits,
+            PublicViewLink = property.PublicViewLink
         };
     }
 }
