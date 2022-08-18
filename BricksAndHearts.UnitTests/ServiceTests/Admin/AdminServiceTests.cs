@@ -182,11 +182,10 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
 
         // Act
-        var response = service.GetLandlordList(null, null);
-        var result = response.ToList();
+        var result = await service.GetLandlordList(null, null, 1, 10);
 
         // Assert
-        result.Should().BeOfType<List<LandlordDbModel>>();
+        result.LandlordList.Should().BeOfType<List<LandlordDbModel>>();
         result.Count.Should().Be(context.Landlords.Count());
     }
 
@@ -198,11 +197,10 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
 
         // Act
-        var response = service.GetLandlordList(true, false);
-        var result = response.ToList();
+        var result = await service.GetLandlordList(true, false, 1, 10);
 
         // Assert
-        result.Should().BeOfType<List<LandlordDbModel>>();
+        result.LandlordList.Should().BeOfType<List<LandlordDbModel>>();
         result.Count.Should().Be(context.Landlords.Where(l => l.CharterApproved == true)
             .Count(l => context.Users.SingleOrDefault(u => u.LandlordId == l.Id) == null));
     }
@@ -218,11 +216,10 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         var filter = new HousingRequirementModel();
 
         // Act
-        var response = service.GetTenantList(filter);
-        var result = response.ToList();
+        var result = await service.GetTenantList(filter, 1, 10);
 
         // Assert
-        result.Should().BeOfType<List<TenantDbModel>>();
+        result.TenantList.Should().BeOfType<List<TenantDbModel>>();
         result.Count.Should().Be(context.Tenants.Count());
     }
 
@@ -240,11 +237,10 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         };
 
         // Act
-        var response = service.GetTenantList(filter);
-        var result = response.ToList();
+        var result = await service.GetTenantList(filter, 1, 10);
 
         // Assert
-        result.Should().BeOfType<List<TenantDbModel>>();
+        result.TenantList.Should().BeOfType<List<TenantDbModel>>();
         result.Count.Should().Be(context.Tenants.Where(t => t.ETT == true)
             .Where(t => t.UniversalCredit == true)
             .Count(t => t.Type == "Single"));
@@ -264,11 +260,10 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         };
 
         // Act
-        var response = service.GetTenantList(filter);
-        var result = response.ToList();
+        var result = await service.GetTenantList(filter, 1, 10);
 
         // Assert
-        result.Should().BeOfType<List<TenantDbModel>>();
+        result.TenantList.Should().BeOfType<List<TenantDbModel>>();
         result.Count.Should().Be(context.Tenants.Where(t => t.ETT == true)
             .Where(t => t.UniversalCredit != true)
             .Count(t => t.Type == "Single"));
@@ -294,11 +289,10 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
         };
 
         // Act
-        var response = service.GetTenantList(filter);
-        var result = response.ToList();
+        var result = await service.GetTenantList(filter, 1, 10);
 
         // Assert
-        result.Should().BeOfType<List<TenantDbModel>>();
+        result.TenantList.Should().BeOfType<List<TenantDbModel>>();
         result.Count.Should().Be(0);
     }
     

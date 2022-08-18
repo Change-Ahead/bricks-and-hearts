@@ -18,9 +18,9 @@ public interface IAdminService
 
     //Information Lists
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
-    public IEnumerable<LandlordDbModel> GetLandlordList(bool? isApproved, bool? isAssigned);
+    public Task<(List<LandlordDbModel> LandlordList, int Count)> GetLandlordList(bool? isApproved, bool? isAssigned, int page, int landlordsPerPage);
 
-    public IEnumerable<TenantDbModel> GetTenantList(HousingRequirementModel filter);
+    public Task<(List<TenantDbModel> TenantList, int Count)> GetTenantList(HousingRequirementModel filter, int page, int tenantsPerPage);
 
     public Task<List<TenantDbModel>> GetNearestTenantsToProperty(PropertyViewModel currentProperty);
     
@@ -122,7 +122,7 @@ public class AdminService : IAdminService
         return pendingAdmins;
     }
 
-    public IEnumerable<LandlordDbModel> GetLandlordList(bool? isApproved, bool? isAssigned)
+    public async Task<(List<LandlordDbModel> LandlordList, int Count)> GetLandlordList(bool? isApproved, bool? isAssigned, int page, int landlordsPerPage)
     {
         var landlordQuery = _dbContext.Landlords.AsQueryable();
         if (isApproved != null)
@@ -135,13 +135,13 @@ public class AdminService : IAdminService
             landlordQuery = landlordQuery.Where(l => _dbContext.Users.Any(u => u.LandlordId == l.Id) == isAssigned);
         }
 
-        return landlordQuery.AsEnumerable();
+        return (await landlordQuery.Skip((page - 1) * landlordsPerPage).Take(landlordsPerPage).ToListAsync(), landlordQuery.Count());
     }
 
-    public IEnumerable<TenantDbModel> GetTenantList(HousingRequirementModel filters)
+    public async Task<(List<TenantDbModel> TenantList, int Count)> GetTenantList(HousingRequirementModel filters, int page, int tenantsPerPage)
     {
         var tenants =  GetFilteredTenantQuery(filters, false);
-        return tenants.AsEnumerable();
+        return (await tenants.Skip((page - 1) * tenantsPerPage).Take(tenantsPerPage).ToListAsync(), tenants.Count());
     }
 
     public async Task<List<TenantDbModel>> GetNearestTenantsToProperty(PropertyViewModel currentProperty)

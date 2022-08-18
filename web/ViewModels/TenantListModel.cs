@@ -3,7 +3,7 @@ namespace BricksAndHearts.ViewModels;
 
 public class TenantListModel
 {
-    public List<TenantDbModel>? TenantList { get; set; }
+    public List<TenantDbModel> TenantList { get; set; }
 
     public HousingRequirementModel Filter { get; set; } = new ();
 
@@ -14,7 +14,7 @@ public class TenantListModel
 
     public int TenantsPerPage { get; set; } = 10;
 
-    public TenantListModel(List<TenantDbModel>? tenantList, HousingRequirementModel filter, int total, int page = 1, string? targetPostcode = null)
+    public TenantListModel(List<TenantDbModel> tenantList, HousingRequirementModel filter, int total, int page = 1, string? targetPostcode = null)
     {
         TenantList = tenantList;
         Filter = filter;

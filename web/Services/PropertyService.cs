@@ -13,7 +13,7 @@ public interface IPropertyService
     public void DeleteProperty(PropertyDbModel property);
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId);
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId);
-    public Task<IEnumerable<PropertyDbModel>> GetPropertyList(string sortBy, string? target);
+    public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string sortBy, string? target, int page, int propPerPage);
     public PropertyCountModel CountProperties(int? landlordId = null);
     string? CreateNewPublicViewLink(int propertyId);
 
@@ -171,26 +171,26 @@ public class PropertyService : IPropertyService
         return propertyLandlordId == userLandlordId;
     }
 
-    public async Task<IEnumerable<PropertyDbModel>> GetPropertyList(string? sortBy, string? target)
+    public async Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string? sortBy, string? target, int page, int propPerPage)
     {
-        IEnumerable<PropertyDbModel> properties;
+        List<PropertyDbModel> properties;
         switch (sortBy)
         {
             case "Location":
                 var postcode = _postcodeService.FormatPostcode(target!);
                 if (postcode == "")
                 {
-                    return null!;
+                    return (new List<PropertyDbModel>(), 0);
                 }
                 var postcodeList = new List<string> { postcode };
                 await _postcodeService.AddPostcodesToDatabaseIfAbsent(postcodeList);
                 var model = _dbContext.Postcodes.SingleOrDefault(p => p.Postcode == postcode);
                 if (model?.Lat == null || model.Lon == null)
                 {
-                    return null!;
+                    return (new List<PropertyDbModel>(), 0);
                 }
 
-                properties = _dbContext.Properties
+                properties = await _dbContext.Properties
                     .FromSqlInterpolated(
                         @$"SELECT *, (
                   6371 * acos (
@@ -204,19 +204,22 @@ public class PropertyService : IPropertyService
                 FROM dbo.Property
                 WHERE Lon is not NULL and Lat is not NULL
                 ORDER BY distance
-                ");
+                OFFSET {propPerPage * (page - 1)} ROWS
+                FETCH NEXT {propPerPage} ROWS ONLY
+                ").ToListAsync();
                 break;
             case "Rent":
-                properties = _dbContext.Properties.OrderBy(m => m.Rent).AsEnumerable();
+                properties = await _dbContext.Properties.OrderBy(m => m.Rent).Skip((page - 1) * propPerPage).Take(propPerPage).ToListAsync();
                 break;
             case "Availability": //TODO once availability state logic is improved (BNH-122), make this a useful sort
-                properties = _dbContext.Properties.OrderBy(m => m.AvailableFrom).AsEnumerable();
+                properties = await _dbContext.Properties.OrderBy(m => m.AvailableFrom).Skip((page - 1) * propPerPage).Take(propPerPage).ToListAsync();
                 break;
             default:
-                properties = _dbContext.Properties.AsEnumerable();
+                properties = await _dbContext.Properties.Skip((page - 1) * propPerPage).Take(propPerPage).ToListAsync();
                 break;
         }
-        return properties;
+        var propCount = await _dbContext.Properties.CountAsync();
+        return (properties, propCount);
     }
 
     public PropertyCountModel CountProperties(int? landlordId = null)

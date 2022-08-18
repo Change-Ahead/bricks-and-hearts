@@ -88,21 +88,20 @@ public class PropertyController : AbstractController
     [HttpGet("PropertyList")]
     public async Task<IActionResult> PropertyList(string sortBy, string? target, int page = 1, int propPerPage = 10)
     {
-        var properties = await _propertyService.GetPropertyList(sortBy, target);
+        var properties = await _propertyService.GetPropertyList(sortBy, target, page, propPerPage);
         
-        if (properties == null && sortBy == "Location")
+        if (properties.Count == 0 && sortBy == "Location")
         {
             _logger.LogWarning($"Failed to find postcode {target}");
             AddFlashMessage("warning", $"Failed to sort property using postcode {target}: invalid postcode");
-            TempData["FullWidthPage"] = true;
-            return RedirectToAction("PropertyList", "Property", new { sortBy = "" });
+            sortBy = "";
+            properties = await _propertyService.GetPropertyList(sortBy, target, page, propPerPage);
         }
-        var listOfProperties = properties!.Select(PropertyViewModel.FromDbModel);
         
+        var listOfProperties = properties.PropertyList.Select(PropertyViewModel.FromDbModel).ToList();
         TempData["FullWidthPage"] = true;
         return View("~/Views/Admin/PropertyList.cshtml",
-            new PropertyListModel(listOfProperties.Skip((page - 1) * propPerPage).Take(propPerPage).ToList(),
-                listOfProperties.Count(), null!, page, sortBy, target));
+            new PropertyListModel(listOfProperties, properties.Count, null!, page, sortBy, target));
     }
 
     [Authorize(Roles = "Admin")]

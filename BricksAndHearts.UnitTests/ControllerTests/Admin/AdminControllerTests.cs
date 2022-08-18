@@ -211,17 +211,17 @@ public class AdminControllerTests : AdminControllerTestsBase
     }
     
     [Fact]
-    public void LandlordList_CallsGetLandlordListAndReturnsLandlordListView()
+    public async void LandlordList_CallsGetLandlordListAndReturnsLandlordListView()
     {
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
         
         // Act
-        var result = UnderTest.LandlordList() as ViewResult;
+        var result = await UnderTest.LandlordList() as ViewResult;
 
         // Assert
-        A.CallTo(() => AdminService.GetLandlordList(null ,null)).MustHaveHappened();
+        A.CallTo(() => AdminService.GetLandlordList(null ,null, 1, 10)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<LandlordListModel?>();
     }
     
@@ -237,7 +237,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         var result = await UnderTest.TenantList(filter, null) as ViewResult;
 
         // Assert
-        A.CallTo(() => AdminService.GetTenantList(filter)).MustHaveHappened();
+        A.CallTo(() => AdminService.GetTenantList(filter, 1, 10)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<TenantListModel?>();
     }
     
@@ -249,13 +249,20 @@ public class AdminControllerTests : AdminControllerTestsBase
         MakeUserPrincipalInController(adminUser, UnderTest);
         var filter = new HousingRequirementModel();
         var targetPostcode = "CB3 9AJ";
+
+        var tenant = CreateTenant();
+        var sortedList = new List<TenantDbModel>
+        {
+            tenant
+        };
+        A.CallTo(() => TenantService.SortTenantsByLocation(targetPostcode, 1, 10)).Returns((sortedList, 1));
         
         // Act
         var result = await UnderTest.TenantList(filter, targetPostcode) as ViewResult;
 
         // Assert
-        A.CallTo(() => TenantService.SortTenantsByLocation(targetPostcode)).MustHaveHappened();
-        A.CallTo(() => AdminService.GetTenantList(filter)).MustNotHaveHappened();
+        A.CallTo(() => TenantService.SortTenantsByLocation(targetPostcode, 1, 10)).MustHaveHappened();
+        A.CallTo(() => AdminService.GetTenantList(filter, 1, 10)).MustNotHaveHappened();
         result!.ViewData.Model.Should().BeOfType<TenantListModel>();
     }
     
