@@ -532,7 +532,10 @@ public class TestDatabaseFixture
             Type = "Single",
             HasPet = false,
             ETT = true,
-            UniversalCredit = true
+            UniversalCredit = true,
+            Postcode = "LS1 1AZ",
+            Lat = (decimal?)53.796296,
+            Lon = (decimal?)-1.564095,
         };
     }
 
@@ -542,7 +545,16 @@ public class TestDatabaseFixture
         {
             Name = "Example Tenant",
             Email = "exampletenant@gmail.com",
-            Type = "Single"
+            Type = "Single",
+            HasPet = false,
+            ETT = false,
+            UniversalCredit = false,
+            HousingBenefits = false,
+            Over35 = false,
+            Postcode = "PE1 1BF",
+            Lat = (decimal?)52.571459,
+            Lon = (decimal?)-0.242008
+            
         };
     }
 

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
@@ -12,25 +12,6 @@ namespace BricksAndHearts.UnitTests.ControllerTests.Tenant;
 public class TenantControllerTests : TenantControllerTestsBase
 {
 
-    [Fact]
-    public async void TenantList_CallsGetTenantListAndReturnsTenantListView()
-    {
-        // Arrange
-        var adminUser = CreateAdminUser();
-        MakeUserPrincipalInController(adminUser, UnderTest);
-        var tenantListModel = new TenantListModel();
-        var nullTenantQuery = A.Fake<IQueryable<TenantDbModel>>();
-
-        // Act
-        A.CallTo(() => TenantService.SortTenantsByLocation("", 1, 10)).Returns(nullTenantQuery);
-        var result = await UnderTest.TenantList(tenantListModel, "") as ViewResult;
-
-        // Assert
-        A.CallTo(() => TenantService.SortTenantsByLocation("", 1, 10)).MustHaveHappened();
-        A.CallTo(() => TenantService.GetTenantList(tenantListModel.Filter, nullTenantQuery)).MustHaveHappened();
-        result!.ViewData.Model.Should().BeOfType<TenantListModel?>();
-    }
-    
     [Fact]
     public async void ImportTenants_WhenCalledWithEmptyFile_RedirectsToTenantListWithErrorFlashMessage()
     {
