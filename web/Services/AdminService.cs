@@ -20,7 +20,7 @@ public interface IAdminService
     public Task<(List<UserDbModel> CurrentAdmins, List<UserDbModel> PendingAdmins)> GetAdminLists();
     public Task<List<LandlordDbModel>> GetLandlordList(LandlordListModel landlordListModel);
 
-    public Task<List<TenantDbModel>> GetTenantList(HousingRequirementModel filter);
+    public IQueryable<TenantDbModel> GetTenantList(HousingRequirementModel filter);
 
     public Task<List<TenantDbModel>> GetNearestTenantsToProperty(PropertyViewModel currentProperty);
     
@@ -34,11 +34,13 @@ public interface IAdminService
 public class AdminService : IAdminService
 {
     private readonly BricksAndHeartsDbContext _dbContext;
+    private readonly IPostcodeService _postcodeService;
     private readonly ILogger<AdminService> _logger;
 
-    public AdminService(BricksAndHeartsDbContext dbContext, ILogger<AdminService> logger)
+    public AdminService(BricksAndHeartsDbContext dbContext, IPostcodeService postcodeService, ILogger<AdminService> logger)
     {
         _dbContext = dbContext;
+        _postcodeService = postcodeService;
         _logger = logger;
     }
 
@@ -138,9 +140,9 @@ public class AdminService : IAdminService
         return await landlordQuery.ToListAsync();
     }
 
-    public async Task<List<TenantDbModel>> GetTenantList(HousingRequirementModel filters)
+    public IQueryable<TenantDbModel> GetTenantList(HousingRequirementModel filters)
     {
-        return await GetFilteredTenantQuery(filters, false).ToListAsync();
+        return GetFilteredTenantQuery(filters, false);
     }
 
     public async Task<List<TenantDbModel>> GetNearestTenantsToProperty(PropertyViewModel currentProperty)

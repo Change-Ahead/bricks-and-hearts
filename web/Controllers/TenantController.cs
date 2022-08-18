@@ -8,32 +8,14 @@ namespace BricksAndHearts.Controllers;
 public class TenantController : AbstractController
 {
     private readonly ITenantService _tenantService;
+    private readonly IAdminService _adminService;
     private readonly ILogger<TenantController> _logger;
 
-    public TenantController(ILogger<TenantController> logger, ITenantService tenantService)
+    public TenantController(ILogger<TenantController> logger, ITenantService tenantService, IAdminService adminService)
     {
         _logger = logger;
         _tenantService = tenantService;
+        _adminService = adminService;
     }
     
-    [Authorize(Roles = "Admin")]
-    [HttpGet("SortTenantsByLocation")]
-    public async Task<IActionResult> SortTenantsByLocation(string postcode, int page = 1, int tenantsPerPage = 10)
-    {
-        var tenants = await _tenantService.SortTenantsByLocation(postcode, page, tenantsPerPage);
-
-        if (tenants == null)
-        {
-            _logger.LogWarning($"Failed to find postcode {postcode}");
-            AddFlashMessage("warning",$"Failed to sort tenants using postcode {postcode}: invalid postcode");
-            return RedirectToAction("TenantList", "Admin");
-        }
-
-        _logger.LogInformation("Successfully sorted by location");
-        //var tenantListModel = new TenantListModel();
-        //tenantListModel.TenantList = tenants.ToList();
-        
-        //return View("~/Views/Admin/TenantList.cshtml", tenantListModel);
-        return StatusCode(404); //TODO fix this
-    }
 }

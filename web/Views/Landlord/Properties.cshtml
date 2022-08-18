@@ -43,7 +43,7 @@
         </a>
     }
 
-    @if (Model.Page <= Model.Total/Model.PropPerPage)
+    @if (Model.Page <= (Model.Total-1)/Model.PropPerPage)
     {
         <a type="button" class="btn btn-outline-primary" href="@Url.Action("ViewProperties", "Landlord", new { sortBy = Model.SortBy, page = Model.Page + 1, propPerPage = Model.PropPerPage })">
             <i class="bi"> Next </i>
