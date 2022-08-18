@@ -10,17 +10,19 @@ public class PropertyInputModelDetails : PropertyInputModelBase
 
     public override void InitialiseViewModel(PropertyDbModel property)
     {
+        Title = "Property Details";
         base.InitialiseViewModel(property);
         PropertyType = property.PropertyType;
         NumOfBedrooms = property.NumOfBedrooms;
         LandlordId = property.LandlordId;
     }
 
-    public override PropertyViewModel FormToViewModel(int propertyId, int landlordId)
+    public override PropertyViewModel FormToViewModel()
     {
-        var property = base.FormToViewModel(propertyId, landlordId);
-        property.PropertyType = PropertyType;
-        property.NumOfBedrooms = NumOfBedrooms;
-        return property;
+        return new PropertyViewModel
+        {
+            PropertyType = PropertyType,
+            NumOfBedrooms = NumOfBedrooms
+        };
     }
 }

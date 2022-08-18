@@ -2,20 +2,22 @@
 
 namespace BricksAndHearts.ViewModels.PropertyInput;
 
-public class PropertyInputModelDescriptionStep : PropertyInputModelBase
+public class PropertyInputModelDescription : PropertyInputModelBase
 {
     public string? Description { get; set; }
 
     public override void InitialiseViewModel(PropertyDbModel property)
     {
+        Title = "Property Description";
         base.InitialiseViewModel(property);
         Description = property.Description;
     }
 
-    public override PropertyViewModel FormToViewModel(int propertyId, int landlordId)
+    public override PropertyViewModel FormToViewModel()
     {
-        var property = base.FormToViewModel(propertyId, landlordId);
-        property.Description = Description;
-        return property;
+        return new PropertyViewModel
+        {
+            Description = Description
+        };
     }
 }

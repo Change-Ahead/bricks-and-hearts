@@ -137,7 +137,7 @@
 }
 else
 {
-    <a class="btn btn-primary my-3" href='@Url.Action("AddNewProperty_Begin", "Property", new { landlordId = Model.LandlordId})'>Add Properties</a>
+    <a class="btn btn-primary my-3" href='@Url.Action("PropertyInputStepOnePostcode", "Property", new { landlordId = Model.LandlordId, propertyId = 0, operationType = "add" })'>Add Properties</a>
 }
 
 @if (User.IsInRole("Admin"))

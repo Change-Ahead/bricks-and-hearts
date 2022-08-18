@@ -1,7 +1,10 @@
 ﻿@model BricksAndHearts.ViewModels.PropertyInput.PropertyInputModelBase
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
 
 @{
-    ViewData["Title"] = "Add Property";
+    ViewData["Title"] = (Model.IsEdit ? "Edit" : "Add") + " Property";
 
     string GetStepClass(int step)
     {
@@ -36,4 +39,10 @@
     </div>
 }
 
-<partial name=@("_PropertyInputFormStep" + Model.Step) model="Model"/>
+<h1 class="font-h1">@Model.Title</h1>
+
+<div asp-validation-summary="All" class="text-danger"></div>
+<form method="post">
+    @RenderBody()
+    @{ await Html.RenderPartialAsync("PropertyInputForm/_PropertyFormButtons", Model); }
+</form>

@@ -17,6 +17,7 @@ public class PropertyInputModelAvailability : PropertyInputModelBase
 
     public override void InitialiseViewModel(PropertyDbModel property)
     {
+        var title = "Rent, Deposits, Availability, and Duration";
         base.InitialiseViewModel(property);
         Rent = property.Rent;
         Availability = property.Availability;
@@ -25,15 +26,16 @@ public class PropertyInputModelAvailability : PropertyInputModelBase
         OccupiedUnits = property.OccupiedUnits;
     }
 
-    public override PropertyViewModel FormToViewModel(int propertyId, int landlordId)
+    public override PropertyViewModel FormToViewModel()
     {
-        var property = base.FormToViewModel(propertyId, landlordId);
-        property.Availability = Availability;
-        property.Rent = Rent;
-        property.AvailableFrom = AvailableFrom;
-        property.TotalUnits = TotalUnits;
-        property.OccupiedUnits = OccupiedUnits;
-        return property;
+        return new PropertyViewModel
+        {
+            Availability = Availability,
+            Rent = Rent,
+            AvailableFrom = AvailableFrom,
+            TotalUnits = TotalUnits,
+            OccupiedUnits = OccupiedUnits
+        };
     }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)

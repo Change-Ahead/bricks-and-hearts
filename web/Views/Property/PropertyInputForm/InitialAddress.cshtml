@@ -1,0 +1,14 @@
+﻿@model BricksAndHearts.ViewModels.PropertyInput.PropertyInputModelAddress
+@{
+    Layout = "PropertyInputForm/_LayoutPropertyInputForm";
+}
+<div class="my-3">
+    <label asp-for="AddressLine1" class="form-label">Address Line 1</label>
+    <input asp-for="AddressLine1" class="form-control" required/>
+    <span asp-validation-for="AddressLine1" class="text-danger"></span>
+</div>
+<div class="my-3">
+    <label asp-for="Postcode" class="form-label">Postcode</label>
+    <input asp-for="Postcode" class="form-control" required/>
+    <span asp-validation-for="Postcode" class="text-danger"></span>
+</div>

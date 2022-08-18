@@ -1,9 +1,13 @@
 ﻿using BricksAndHearts.Database;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace BricksAndHearts.ViewModels.PropertyInput;
 
 public abstract class PropertyInputModelBase
 {
+    [ValidateNever]
+    public virtual string Title { get; set; }
+
     public static readonly int MaximumStep = 6;
     public int LandlordId { get; set; }
     public int PropertyId { get; set; }
@@ -16,11 +20,5 @@ public abstract class PropertyInputModelBase
         LandlordId = property.LandlordId;
     }
 
-    public virtual PropertyViewModel FormToViewModel(int propertyId, int landlordId)
-    {
-        var property = new PropertyViewModel();
-        property.PropertyId = propertyId;
-        property.LandlordId = landlordId;
-        return property;
-    }
+    public abstract PropertyViewModel FormToViewModel();
 }

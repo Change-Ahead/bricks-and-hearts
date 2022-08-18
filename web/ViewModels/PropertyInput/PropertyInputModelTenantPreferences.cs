@@ -12,6 +12,7 @@ public class PropertyInputModelTenantPreferences : PropertyInputModelBase
     public override void InitialiseViewModel(PropertyDbModel property)
     {
         base.InitialiseViewModel(property);
+        Title = "What kind of tenant would you prefer?";
         HousingRequirementModel.AcceptsSingleTenant = property.AcceptsSingleTenant;
         HousingRequirementModel.AcceptsCouple = property.AcceptsCouple;
         HousingRequirementModel.AcceptsFamily = property.AcceptsFamily;
@@ -23,11 +24,12 @@ public class PropertyInputModelTenantPreferences : PropertyInputModelBase
         HousingRequirementModel.AcceptsOver35 = property.AcceptsOver35;
     }
 
-    public override PropertyViewModel FormToViewModel(int propertyId, int landlordId)
+    public override PropertyViewModel FormToViewModel()
     {
-        var property = base.FormToViewModel(propertyId, landlordId);
-        property.LandlordRequirements = HousingRequirementModel;
-        return property;
+        return new PropertyViewModel
+        {
+            LandlordRequirements = HousingRequirementModel
+        };
     }
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
