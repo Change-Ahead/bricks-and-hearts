@@ -43,7 +43,7 @@ public class ClaimsTransformer : IClaimsTransformation
             _logger.LogInformation("Created new user '{UserEmail}' in database with id {UserId}",
                 databaseUser.GoogleEmail, databaseUser.Id);
         }
-        else
+        else if (databaseUser.GoogleProfileImageUrl != googlePhotoUrl)
         {
             await UpdateUserProfilePhoto(databaseUser, googlePhotoUrl);
         }
