@@ -36,8 +36,8 @@
                 </td>
                 <td>
                     @prop.Address.AddressLine1,
-                    @prop.Address.AddressLine2@(prop.Address.AddressLine2 != null ? "," : "")
-                    @prop.Address.AddressLine3@(prop.Address.AddressLine3 != null ? "," : "")
+                    @(prop.Address.AddressLine2 == null ? "" : prop.Address.AddressLine2 + ",")
+                    @(prop.Address.AddressLine3 == null ? "" : prop.Address.AddressLine3 + ",")
                     @prop.Address.TownOrCity,
                     @prop.Address.County,
                     @prop.Address.Postcode
