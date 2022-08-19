@@ -29,6 +29,29 @@ public class PropertyController : AbstractController
         _azureStorage = azureStorage;
     }
 
+    [Authorize(Roles = "Admin")]
+    [HttpGet("SortPropertiesByLocation")]
+    public async Task<IActionResult> SortPropertiesByLocation(string postcode, int page = 1, int propPerPage = 10)
+    {
+        var properties = await _propertyService.SortPropertiesByLocation(postcode, page, propPerPage);
+
+        if (properties == null)
+        {
+            _logger.LogWarning($"Failed to find postcode {postcode}");
+            AddFlashMessage("warning", $"Failed to sort property using postcode {postcode}: invalid postcode");
+            return RedirectToAction("SortProperties", "Property", new { sortBy = "Availability" });
+        }
+
+        _logger.LogInformation("Successfully sorted by location");
+        var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).Skip((page - 1) * propPerPage)
+            .Take(propPerPage).ToList();
+
+        TempData["FullWidthPage"] = true;
+
+        return View("~/Views/Admin/PropertyList.cshtml",
+            new PropertiesDashboardViewModel(listOfProperties, listOfProperties.Count, null!, page, "Location"));
+    }
+
 
     #region Misc
 
@@ -41,18 +64,18 @@ public class PropertyController : AbstractController
         {
             _logger.LogWarning($"Property with Id {propertyId} does not exist");
             AddFlashMessage("danger", $"Property with Id {propertyId} does not exist");
-            if (GetCurrentUser().LandlordId != null)
+            if (CurrentUser.LandlordId != null)
             {
-                return RedirectToAction("ViewProperties", "Landlord", new { id = GetCurrentUser().LandlordId });
+                return RedirectToAction("ViewProperties", "Landlord", new { id = CurrentUser.LandlordId });
             }
 
             return RedirectToAction("Index", "Home");
         }
 
-        if (GetCurrentUser().IsAdmin == false && GetCurrentUser().LandlordId != propDb.LandlordId)
+        if (CurrentUser.IsAdmin == false && CurrentUser.LandlordId != propDb.LandlordId)
         {
             _logger.LogWarning(
-                $"User {GetCurrentUser().Id} does not have access to any property with ID {propertyId}.");
+                $"User {CurrentUser.Id} does not have access to any property with ID {propertyId}.");
             return StatusCode(403);
         }
 
@@ -74,7 +97,7 @@ public class PropertyController : AbstractController
             return RedirectToAction("Error", "Home", new { status = 404 });
         }
 
-        if (!(GetCurrentUser().IsAdmin || GetCurrentUser().LandlordId == model.LandlordId))
+        if (!(CurrentUser.IsAdmin || CurrentUser.LandlordId == model.LandlordId))
         {
             return StatusCode(403);
         }
@@ -150,67 +173,20 @@ public class PropertyController : AbstractController
 
     #region Add/Edit Property
 
-    private bool OperationTypeToIsEdit(string input)
-    {
-        return input.ToUpper() != "ADD";
-    }
-
-    private ActionResult StandardPropertyInputPostMethod(PropertyInputModelBase model, int propertyId,
-        string operationType, string viewName)
-    {
-        if (!ModelState.IsValid)
-        {
-            return RedirectToAction("PropertyInputStepTwoAddress", "Property",
-                new
-                {
-                    propertyId,
-                    operationType
-                });
-        }
-
-        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
-        {
-            return StatusCode(403);
-        }
-
-        var propertyView = model.FormToViewModel();
-
-
-        _propertyService.UpdateProperty(propertyId, propertyView);
-
-        if (operationType == "add")
-        {
-            return RedirectToAction(viewName, "Property", new { propertyId, operationType });
-        }
-
-        return RedirectToAction("ViewProperty", "Property", new { propertyId });
-    }
-
-    private ActionResult StandardPropertyInputGetMethod(PropertyInputModelBase model, int propertyId, string viewName)
-    {
-        var property = _propertyService.GetPropertyByPropertyId(propertyId);
-
-        if (property == null)
-        {
-            return StatusCode(404);
-        }
-
-        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
-        {
-            return StatusCode(403);
-        }
-
-        model.InitialiseViewModel(property);
-        return View(viewName, model);
-    }
-
     [Authorize(Roles = "Landlord, Admin")]
     [HttpGet("{propertyId:int}/{operationType:regex(^(add|edit)$)}/step/1")]
     public ActionResult PropertyInputStepOnePostcode([FromRoute] string operationType,
         [FromRoute] int propertyId, [FromQuery] int landlordId)
     {
         var property = _propertyService.GetPropertyByPropertyId(propertyId);
-        var model = new PropertyInputModelAddress();
+
+        if (!(CurrentUser.IsAdmin
+              || (property != null && property.LandlordId == CurrentUser.LandlordId)
+              || (property == null && landlordId == CurrentUser.LandlordId)))
+        {
+            return StatusCode(403);
+        }
+
 
         property ??= new PropertyDbModel
         {
@@ -218,14 +194,12 @@ public class PropertyController : AbstractController
             LandlordId = landlordId
         };
 
-        if (!OwnerOrAdminCheck(PropertyViewModel.FromDbModel(property), false))
+        var model = new PropertyInputModelAddress
         {
-            return StatusCode(403);
-        }
-
-        model.IsEdit = OperationTypeToIsEdit(operationType);
+            IsEdit = OperationTypeToIsEdit(operationType),
+            Step = 1
+        };
         model.InitialiseViewModel(property);
-        model.Step = 1;
         return View("PropertyInputForm/InitialAddress", model);
     }
 
@@ -246,8 +220,8 @@ public class PropertyController : AbstractController
         var property = _propertyService.GetPropertyByPropertyId(propertyId);
 
         if (!(CurrentUser.IsAdmin
-              || (property != null && property.LandlordId == GetCurrentUser().LandlordId)
-              || (property == null && landlordId == GetCurrentUser().LandlordId)))
+              || (property != null && property.LandlordId == CurrentUser.LandlordId)
+              || (property == null && landlordId == CurrentUser.LandlordId)))
         {
             return StatusCode(403);
         }
@@ -288,9 +262,9 @@ public class PropertyController : AbstractController
     public ActionResult PropertyInputStepTwoAddress([FromForm] PropertyInputModelAddress model,
         [FromRoute] int propertyId, [FromRoute] string operationType)
     {
-        const string viewName = "PropertyInputStepThreeDetails";
+        const string nextActionName = "PropertyInputStepThreeDetails";
 
-        return StandardPropertyInputPostMethod(model, propertyId, operationType, viewName);
+        return StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName);
     }
 
         // Update the property's record with the values entered at this step
@@ -305,7 +279,7 @@ public class PropertyController : AbstractController
     [HttpGet("{propertyId:int}/{operationType:regex(^(add|edit)$)}/step/3")]
     public ActionResult PropertyInputStepThreeDetails([FromRoute] string operationType, [FromRoute] int propertyId)
     {
-        var viewName = "PropertyInputForm/Details";
+        const string viewName = "PropertyInputForm/Details";
         var model = new PropertyInputModelDetails
         {
             Step = 3,
@@ -318,18 +292,19 @@ public class PropertyController : AbstractController
     [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("{propertyId:int}/{operationType:regex(^(add|edit)$)}/step/3")]
     public ActionResult PropertyInputStepThreeDetails([FromForm] PropertyInputModelDetails model,
-        [FromRoute] int landlordId, [FromRoute] string operationType, [FromRoute] int propertyId)
+        [FromRoute] int propertyId,
+        [FromRoute] string operationType)
     {
-        var viewName = "PropertyInputStepFourDescription";
+        const string nextActionName = "PropertyInputStepFourDescription";
 
-        return StandardPropertyInputPostMethod(model, propertyId, operationType, viewName);
+        return StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName);
     }
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpGet("{propertyId:int}/{operationType:regex(^(add|edit)$)}/step/4")]
     public ActionResult PropertyInputStepFourDescription([FromRoute] int propertyId, [FromRoute] string operationType)
     {
-        var viewName = "PropertyInputForm/Description";
+        const string viewName = "PropertyInputForm/Description";
         var model = new PropertyInputModelDescription
         {
             Step = 4,
@@ -344,9 +319,9 @@ public class PropertyController : AbstractController
     public ActionResult PropertyInputStepFourDescription([FromForm] PropertyInputModelDescription model,
         [FromRoute] int propertyId, [FromRoute] string operationType)
     {
-        const string viewName = "PropertyInputStepFiveTenantPreferences";
+        const string nextActionName = "PropertyInputStepFiveTenantPreferences";
 
-        return StandardPropertyInputPostMethod(model, propertyId, operationType, viewName);
+        return StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName);
     }
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -369,9 +344,9 @@ public class PropertyController : AbstractController
     public ActionResult PropertyInputStepFiveTenantPreferences([FromForm] PropertyInputModelTenantPreferences model,
         [FromRoute] int propertyId, [FromRoute] string operationType)
     {
-        const string viewName = "PropertyInputStepSixAvailability";
+        const string nextActionName = "PropertyInputStepSixAvailability";
 
-        return StandardPropertyInputPostMethod(model, propertyId, operationType, viewName);
+        return StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName);
     }
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -405,7 +380,7 @@ public class PropertyController : AbstractController
 
         var propertyView = model.FormToViewModel();
 
-        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(CurrentUser, propertyId))
         {
             return StatusCode(403);
         }
@@ -413,18 +388,6 @@ public class PropertyController : AbstractController
         _propertyService.UpdateProperty(propertyId, propertyView);
 
         return RedirectToAction("ViewProperty", "Property", new { propertyId });
-    }
-
-    private bool OwnerOrAdminCheck(PropertyViewModel newPropertyModel, bool checkDB = true)
-    {
-        if (checkDB)
-        {
-            return GetCurrentUser().LandlordId == newPropertyModel.LandlordId &&
-                   newPropertyModel.LandlordId == _propertyService
-                       .GetPropertyByPropertyId(newPropertyModel.PropertyId)?.LandlordId;
-        }
-
-        return GetCurrentUser().IsAdmin || GetCurrentUser().LandlordId == newPropertyModel.LandlordId;
     }
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -463,7 +426,7 @@ public class PropertyController : AbstractController
             return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
         }
 
-        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(CurrentUser, propertyId))
         {
             return StatusCode(403);
         }
@@ -472,6 +435,60 @@ public class PropertyController : AbstractController
         await _azureStorage.DeleteContainer("property", property.Id);
 
         return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
+    }
+
+    private bool OperationTypeToIsEdit(string input)
+    {
+        return input.ToUpper() != "ADD";
+    }
+
+    private ActionResult StandardPropertyInputPostMethod(PropertyInputModelBase model, int propertyId,
+        string operationType, string nextActionName)
+    {
+        if (!ModelState.IsValid)
+        {
+            return RedirectToAction("PropertyInputStepTwoAddress", "Property",
+                new
+                {
+                    propertyId,
+                    operationType
+                });
+        }
+
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(CurrentUser, propertyId))
+        {
+            return StatusCode(403);
+        }
+
+        var propertyView = model.FormToViewModel();
+
+
+        _propertyService.UpdateProperty(propertyId, propertyView);
+
+        if (operationType == "add")
+        {
+            return RedirectToAction(nextActionName, "Property", new { propertyId, operationType });
+        }
+
+        return RedirectToAction("ViewProperty", "Property", new { propertyId });
+    }
+
+    private ActionResult StandardPropertyInputGetMethod(PropertyInputModelBase model, int propertyId, string viewName)
+    {
+        var property = _propertyService.GetPropertyByPropertyId(propertyId);
+
+        if (property == null)
+        {
+            return StatusCode(404);
+        }
+
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(CurrentUser, propertyId))
+        {
+            return StatusCode(403);
+        }
+
+        model.InitialiseViewModel(property);
+        return View(viewName, model);
     }
 
     #endregion
@@ -492,7 +509,7 @@ public class PropertyController : AbstractController
     [HttpGet("{propertyId:int}/{fileName}")]
     public async Task<IActionResult> GetImage(int propertyId, string fileName)
     {
-        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(CurrentUser, propertyId))
         {
             return StatusCode(403);
         }
@@ -512,7 +529,7 @@ public class PropertyController : AbstractController
     [HttpPost("addImage")]
     public async Task<IActionResult> AddPropertyImages(List<IFormFile> images, int propertyId)
     {
-        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(CurrentUser, propertyId))
         {
             return StatusCode(403);
         }
@@ -549,7 +566,7 @@ public class PropertyController : AbstractController
     [HttpPost("deleteImage")]
     public async Task<IActionResult> DeletePropertyImage(int propertyId, string fileName)
     {
-        if (!_propertyService.IsUserAdminOrCorrectLandlord(GetCurrentUser(), propertyId))
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(CurrentUser, propertyId))
         {
             return StatusCode(403);
         }

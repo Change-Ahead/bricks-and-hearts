@@ -7,12 +7,15 @@ public class PropertyInputModelAvailability : PropertyInputModelBase
 {
     public int OccupiedUnits { get; set; }
 
+    [Required]
     public int TotalUnits { get; set; }
 
     public DateTime? AvailableFrom { get; set; }
 
+    [Required]
     public string? Availability { get; set; }
 
+    [Required]
     public int? Rent { get; set; }
 
     public override void InitialiseViewModel(PropertyDbModel property)

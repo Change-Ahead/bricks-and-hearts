@@ -1,9 +1,11 @@
-﻿using BricksAndHearts.Database;
+﻿using System.ComponentModel.DataAnnotations;
+using BricksAndHearts.Database;
 
 namespace BricksAndHearts.ViewModels.PropertyInput;
 
 public class PropertyInputModelDescription : PropertyInputModelBase
 {
+    [Required]
     public string? Description { get; set; }
 
     public override void InitialiseViewModel(PropertyDbModel property)

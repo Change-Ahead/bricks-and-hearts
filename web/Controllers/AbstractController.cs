@@ -11,7 +11,7 @@ public abstract class AbstractController : Controller
 {
     protected BricksAndHeartsUser CurrentUser => GetCurrentUser();
 
-    protected BricksAndHeartsUser GetCurrentUser()
+    private BricksAndHeartsUser GetCurrentUser()
     {
         if (User.Identity?.IsAuthenticated != true)
         {

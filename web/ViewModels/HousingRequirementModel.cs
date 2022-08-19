@@ -14,6 +14,11 @@ public class HousingRequirementModel : IEnumerable
     public bool? AcceptsOver35 { get; set; }
     public bool? AcceptsWithoutGuarantor { get; set; }
 
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
     public IEnumerator<bool?> GetEnumerator()
     {
         yield return AcceptsSingleTenant;
@@ -27,18 +32,10 @@ public class HousingRequirementModel : IEnumerable
         yield return AcceptsWithoutGuarantor;
     }
 
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
-
     public List<bool?> GetList()
     {
         var listOfFilters = new List<bool?>();
-        foreach (var filter in this)
-        {
-            listOfFilters.Add(filter);
-        }
+        foreach (var filter in this) listOfFilters.Add(filter);
 
         return listOfFilters;
     }
