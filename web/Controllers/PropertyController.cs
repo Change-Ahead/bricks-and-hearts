@@ -29,30 +29,6 @@ public class PropertyController : AbstractController
         _azureStorage = azureStorage;
     }
 
-    [Authorize(Roles = "Admin")]
-    [HttpGet("SortPropertiesByLocation")]
-    public async Task<IActionResult> SortPropertiesByLocation(string postcode, int page = 1, int propPerPage = 10)
-    {
-        var properties = await _propertyService.SortPropertiesByLocation(postcode, page, propPerPage);
-
-        if (properties == null)
-        {
-            _logger.LogWarning($"Failed to find postcode {postcode}");
-            AddFlashMessage("warning", $"Failed to sort property using postcode {postcode}: invalid postcode");
-            return RedirectToAction("SortProperties", "Property", new { sortBy = "Availability" });
-        }
-
-        _logger.LogInformation("Successfully sorted by location");
-        var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).Skip((page - 1) * propPerPage)
-            .Take(propPerPage).ToList();
-
-        TempData["FullWidthPage"] = true;
-
-        return View("~/Views/Admin/PropertyList.cshtml",
-            new PropertiesDashboardViewModel(listOfProperties, listOfProperties.Count, null!, page, "Location"));
-    }
-
-
     #region Misc
 
     [HttpPost]

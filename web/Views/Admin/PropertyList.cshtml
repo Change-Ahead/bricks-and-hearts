@@ -18,7 +18,7 @@
                         new("Sort by rent", "Rent"),
                         new("Sort by location", "Location")
                     },
-                    new { @class = "form-select col h-auto me-3", @onchange = "checkIfSelectedValueIsTarget('Location', 'SortBy'); insertDefaultPostcodeIfNotSortByLocation(id)" })
+                    new { @class = "form-select col h-auto me-3", onchange = "checkIfSelectedValueIsTarget('Location', 'SortBy'); insertDefaultPostcodeIfNotSortByLocation(id)" })
                 <div id="ifTrue" class="col-auto" style="@(Model.SortBy != "Location" ? "display: none;" : "")">
                     <input class="form-control col h-auto me-3" id="target" name="target" required placeholder="Enter postcode to sort by location" pattern="([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"/>
                 </div>
@@ -31,24 +31,25 @@
         </div>
     </div>
 
-    @if (Model.SortBy is not null)
-    {
-        <div>Currently sorted by @Model.SortBy</div>
-    }
-    @if (Model.SortBy == "Location")
-    {
-        <div>Showing properties in order of distance from @Model.Target</div>
-    }
+        @if (Model.SortBy is not null)
+        {
+            <div>Currently sorted by @Model.SortBy</div>
+        }
+        @if (Model.SortBy == "Location")
+        {
+            <div>Showing properties in order of distance from @Model.Target</div>
+        }
 
-    <partial name="../Property/_PropertyTable"/>
+        <partial name="../Property/_PropertyTable"/>
 
-    @{ await Html.RenderPartialAsync("_PaginationPartial", new PaginationModel
-       {
-           Page = Model.Page,
-           Total = Model.Total,
-           ItemsPerPage = Model.PropPerPage,
-           ItemsOnPage = Model.Properties.Count,
-           HrefPrevious = Url.Action("PropertyList", "Property", new { sortBy = Model.SortBy, target = Model.Target, page = Model.Page - 1, propPerPage = Model.PropPerPage }),
-           HrefNext = Url.Action("PropertyList", "Property", new { sortBy = Model.SortBy, target = Model.Target, page = Model.Page + 1, propPerPage = Model.PropPerPage })
-       }); }
+        @{ await Html.RenderPartialAsync("_PaginationPartial", new PaginationModel
+           {
+               Page = Model.Page,
+               Total = Model.Total,
+               ItemsPerPage = Model.PropPerPage,
+               ItemsOnPage = Model.Properties.Count,
+               HrefPrevious = Url.Action("PropertyList", "Property", new { sortBy = Model.SortBy, target = Model.Target, page = Model.Page - 1, propPerPage = Model.PropPerPage }),
+               HrefNext = Url.Action("PropertyList", "Property", new { sortBy = Model.SortBy, target = Model.Target, page = Model.Page + 1, propPerPage = Model.PropPerPage })
+           }); }
+    </div>
 </div>
