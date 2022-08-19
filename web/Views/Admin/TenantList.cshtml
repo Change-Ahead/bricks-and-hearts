@@ -6,18 +6,22 @@
 
 <h2>Tenant List</h2>
 
+@using (Html.BeginForm("TenantList", "Admin", FormMethod.Get))
+{
+    <div class="row mb-4">
+        <input class="form-control" id="targetPostcode" name="targetPostcode" required placeholder="Enter postcode to sort by location" pattern="([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"/>
+        <div class="col-auto" style="align-self: center">
+            <button type="submit" class="btn btn-primary">Sort</button>
+        </div>
+    </div>    
+}
+
 <div class="dropdown-button">
     <a class="btn btn-primary mb-3" data-bs-toggle="collapse" href="#dropdown-contents" role="button" aria-expanded="false" aria-controls="dropdown-contents">
         <i class="bi bi-arrow-90deg-down"></i> Filter
     </a>
 </div>
-<div class="col-8">
-    @using (Html.BeginForm("SortTenantsByLocation", "Tenant", FormMethod.Get))
-    {
-        <input class="form-control" id="postcode" name="postcode" required placeholder="Enter postcode to sort by location" pattern="([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"/>
-        <button type="submit" class="btn custom-btn-primary">Sort</button>
-    }
-</div>
+
 <div class="collapse @(Model.Filter.GetList().SequenceEqual(new HousingRequirementModel().GetList()) ? "":"show")" id="dropdown-contents">
     <form method="get" asp-controller="Admin" asp-action="TenantList">
 
@@ -98,30 +102,37 @@
                     )
             </div>
         </div>
-        <input type="submit" value="Apply" class="btn btn-large btn-primary my-3"/>
+        <input type="submit" value="Apply filters" class="btn btn-large btn-primary my-3"/>
     </form>
 </div>
 
 <table class="table">
     <thead>
-    <tr>
-        <th scope="col">Name</th>
-        <th scope="col">Email</th>
-        <th scope="col">Phone</th>
-        <th scope="col">Postcode</th>
-        <th scope="col">Type</th>
-        <th scope="col">Has Pet?</th>
-        <th scope="col">In ETT?</th>
-        <th scope="col">On Universal Credit?</th>
-        <th scope="col">On Housing Benefits?</th>
-        <th scope="col">Over 35?</th>
-    </tr>
+        @if (Model.TenantList!.Count > 0)
+        {
+            <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Email</th>
+                <th scope="col">Phone</th>
+                <th scope="col">Postcode</th>
+                <th scope="col">Type</th>
+                <th scope="col">Has Pet?</th>
+                <th scope="col">In ETT?</th>
+                <th scope="col">On Universal Credit?</th>
+                <th scope="col">On Housing Benefits?</th>
+                <th scope="col">Over 35?</th>
+            </tr>
+        }
+        else
+        {
+            <div>There are no tenants which match this search.</div>
+        }
     </thead>
     <tbody>
     @foreach (var tenant in Model.TenantList!)
     {
         <tr>
-            <td>@tenant.Name</td>
+            <td>@tenant!.Name</td>
             <td>@tenant.Email</td>
             <td>@tenant.Phone</td>
             <td>@tenant.Postcode</td>
@@ -136,21 +147,33 @@
     </tbody>
 </table>
 
-<h2>Importing tenant information</h2>
+@{ await Html.RenderPartialAsync("_PaginationPartial", new PaginationModel
+   {
+       Page = Model.Page,
+       Total = Model.Total,
+       ItemsPerPage = Model.TenantsPerPage,
+       ItemsOnPage = Model.TenantList.Count,
+       HrefPrevious = Url.Action("TenantList", "Admin", new { targetPostcode = Model.TargetPostcode, page = Model.Page - 1, propPerPage = Model.TenantsPerPage }),
+       HrefNext = Url.Action("TenantList", "Admin", new { targetPostcode = Model.TargetPostcode, page = Model.Page + 1, propPerPage = Model.TenantsPerPage })
+   }); }
 
-@using (Html.BeginForm("ImportTenants", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
-{
-    <div>Please upload a CSV file containing tenant information. This information will replace all existing tenant records.</div>
-    <input name="csvFile" type="file" accept="file">
-    <input type="submit" value="Import Tenants" />
-}
+<div>
+    <h2>Importing tenant information</h2>
 
-<p></p>
-<p>Below is a CSV file which you may use as a template for the tenant data you wish to import. The first row is filled in as an example.</p>
-<p>Please do not change the column headings, or your data will not be recognised as aligning with the fields stored in the database.</p>
-<p>Data imported is case sensitive and registers white space. Certain fields require a Boolean input (TRUE or FALSE). Any field except for the tenant's name may be left blank.</p>
+    @using (Html.BeginForm("ImportTenants", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div>Please upload a CSV file containing tenant information. This information will replace all existing tenant records.</div>
+        <input name="csvFile" type="file" accept="file">
+        <input type="submit" value="Import Tenants" />
+    }
 
-@using (Html.BeginForm("GetSampleTenantCSV", "Admin", FormMethod.Post))
-{
-    <button type="submit" class="btn btn-primary">Download sample Tenant Data CSV</button>
-}
+    <p></p>
+    <p>Below is a CSV file which you may use as a template for the tenant data you wish to import. The first row is filled in as an example.</p>
+    <p>Please do not change the column headings, or your data will not be recognised as aligning with the fields stored in the database.</p>
+    <p>Data imported is case sensitive and registers white space. Certain fields require a Boolean input (TRUE or FALSE). Any field except for the tenant's name may be left blank.</p>
+
+    @using (Html.BeginForm("GetSampleTenantCSV", "Admin", FormMethod.Post))
+    {
+        <button type="submit" class="btn btn-primary">Download sample Tenant Data CSV</button>
+    }  
+</div>

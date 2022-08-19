@@ -15,6 +15,7 @@ public class AdminController : AbstractController
     private readonly IAdminService _adminService;
     private readonly ILandlordService _landlordService;
     private readonly IPropertyService _propertyService;
+    private readonly ITenantService _tenantService;
     private readonly ICsvImportService _csvImportService;
     private readonly ILogger<AdminController> _logger;
     private readonly IMailService _mailService;
@@ -23,7 +24,8 @@ public class AdminController : AbstractController
         ILogger<AdminController> logger,
         IAdminService adminService,
         ILandlordService landlordService,
-        IPropertyService propertyService, 
+        IPropertyService propertyService,
+        ITenantService tenantService,
         ICsvImportService csvImportService, 
         IMailService mailService)
     {
@@ -31,6 +33,7 @@ public class AdminController : AbstractController
         _adminService = adminService;
         _landlordService = landlordService;
         _propertyService = propertyService;
+        _tenantService = tenantService;
         _csvImportService = csvImportService;
         _mailService = mailService;
     }
@@ -133,20 +136,34 @@ public class AdminController : AbstractController
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
-    public async Task<IActionResult> LandlordList(LandlordListModel landlordListModel)
+    public async Task<IActionResult> LandlordList(bool? isApproved = null, bool? isAssigned = null, int page = 1, int landlordsPerPage = 10)
     {
-        landlordListModel.LandlordList = await _adminService.GetLandlordList(landlordListModel);
-        return View(landlordListModel);
-    }
-
-    [Authorize(Roles = "Admin")]
-    [HttpGet]
-    public async Task<IActionResult> TenantList(TenantListModel tenantListModel)
-    {
-        tenantListModel.TenantList = await _adminService.GetTenantList(tenantListModel.Filter);
-        return View("TenantList", tenantListModel);
+        var landlords = await _adminService.GetLandlordList(isApproved, isAssigned, page, landlordsPerPage);
+        return View(new LandlordListModel(landlords.LandlordList, landlords.Count, isApproved, isAssigned, page));
     }
     
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public async Task<IActionResult> TenantList(HousingRequirementModel filter, string? targetPostcode, int page = 1, int tenantsPerPage = 10)
+    {
+        if (targetPostcode != null)
+        {
+            var tenantsByLocation = await _tenantService.SortTenantsByLocation(targetPostcode, page, tenantsPerPage);
+
+            if (tenantsByLocation.Count > 0)
+            {
+                _logger.LogInformation("Successfully sorted by location");
+                return View(new TenantListModel(tenantsByLocation.TenantList, new HousingRequirementModel(), tenantsByLocation.Count, page, targetPostcode));
+            }
+
+            _logger.LogWarning($"Failed to find postcode {targetPostcode}");
+            AddFlashMessage("warning",$"Failed to sort tenants using postcode {targetPostcode}: invalid postcode");//TODO make this message actually display
+        }
+        
+        var tenantsByFilter = await _adminService.GetTenantList(filter, page, tenantsPerPage);
+        return View(new TenantListModel(tenantsByFilter.TenantList, filter, tenantsByFilter.Count, page, targetPostcode));
+    }
+
     [Authorize(Roles = "Admin")]
     [HttpGet("{currentPropertyId:int}/Matches")]
     public async Task<IActionResult> TenantMatchList(int currentPropertyId)

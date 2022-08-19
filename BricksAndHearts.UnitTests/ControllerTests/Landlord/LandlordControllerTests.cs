@@ -227,8 +227,11 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var adminUser = CreateAdminUser();
         adminUser.Id = 1;
         MakeUserPrincipalInController(adminUser, UnderTest);
-        A.CallTo(() => PropertyService.GetPropertiesByLandlord(2))
-            .Returns(A.CollectionOfFake<PropertyDbModel>(10).ToList());
+
+        var propertyList = A.CollectionOfFake<PropertyDbModel>(10).ToList();
+        var count = 15; //arbitrary
+        A.CallTo(() => PropertyService.GetPropertiesByLandlord(2, 1, 10))
+            .Returns((propertyList, count));
 
         // Act
         var result = await UnderTest.ViewProperties(2) as ViewResult;
@@ -236,8 +239,8 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Assert
         result.Should().BeOfType<ViewResult>();
         result.Should().NotBeNull();
-        result!.Model.Should().BeOfType<PropertiesDashboardViewModel>();
-        result.Model.As<PropertiesDashboardViewModel>().Properties.Count.Should()
+        result!.Model.Should().BeOfType<PropertyListModel>();
+        result.Model.As<PropertyListModel>().Properties.Count.Should()
             .Be(10);
     }
 
@@ -248,8 +251,11 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var unregisteredUser = CreateUnregisteredUser();
         unregisteredUser.Id = 1;
         MakeUserPrincipalInController(unregisteredUser, UnderTest);
-        A.CallTo(() => PropertyService.GetPropertiesByLandlord(2))
-            .Returns(A.CollectionOfFake<PropertyDbModel>(10).ToList());
+        
+        var propertyList = A.CollectionOfFake<PropertyDbModel>(10).ToList();
+        var count = 15; //arbitrary
+        A.CallTo(() => PropertyService.GetPropertiesByLandlord(2, 1, 10))
+            .Returns((propertyList, count));
 
         // Act
         var result = await UnderTest.ViewProperties(2) as StatusCodeResult;

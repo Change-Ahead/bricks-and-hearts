@@ -85,18 +85,23 @@ public class PropertyController : AbstractController
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpGet("SortProperties")]
-    public IActionResult SortProperties(string sortBy, int page = 1, int propPerPage = 10)
+    [HttpGet("PropertyList")]
+    public async Task<IActionResult> PropertyList(string sortBy, string? target, int page = 1, int propPerPage = 10)
     {
-        var properties = _propertyService.SortProperties(sortBy);
-
-        var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).ToList();
-
+        var properties = await _propertyService.GetPropertyList(sortBy, target, page, propPerPage);
+        
+        if (properties.Count == 0 && sortBy == "Location")
+        {
+            _logger.LogWarning($"Failed to find postcode {target}");
+            AddFlashMessage("warning", $"Failed to sort property using postcode {target}: invalid postcode");
+            sortBy = "";
+            properties = await _propertyService.GetPropertyList(sortBy, target, page, propPerPage);
+        }
+        
+        var listOfProperties = properties.PropertyList.Select(PropertyViewModel.FromDbModel).ToList();
         TempData["FullWidthPage"] = true;
-
         return View("~/Views/Admin/PropertyList.cshtml",
-            new PropertiesDashboardViewModel(listOfProperties.Skip((page - 1) * propPerPage).Take(propPerPage).ToList(),
-                listOfProperties.Count, null!, page, sortBy));
+            new PropertyListModel(listOfProperties, properties.Count, null!, page, sortBy, target));
     }
 
     [Authorize(Roles = "Admin")]
@@ -466,27 +471,4 @@ public class PropertyController : AbstractController
     }
 
     #endregion
-
-    [Authorize(Roles = "Admin")]
-    [HttpGet("SortPropertiesByLocation")]
-    public async Task<IActionResult> SortPropertiesByLocation(string postcode, int page = 1, int propPerPage = 10)
-    {
-        var properties = await _propertyService.SortPropertiesByLocation(postcode, page, propPerPage);
-
-        if (properties == null)
-        {
-            _logger.LogWarning($"Failed to find postcode {postcode}");
-            AddFlashMessage("warning", $"Failed to sort property using postcode {postcode}: invalid postcode");
-            return RedirectToAction("SortProperties", "Property", new { sortBy = "Availability" });
-        }
-
-        _logger.LogInformation("Successfully sorted by location");
-        var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).Skip((page - 1) * propPerPage)
-            .Take(propPerPage).ToList();
-
-        TempData["FullWidthPage"] = true;
-
-        return View("~/Views/Admin/PropertyList.cshtml",
-            new PropertiesDashboardViewModel(listOfProperties, listOfProperties.Count, null!, page, "Location"));
-    }
 }

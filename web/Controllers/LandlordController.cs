@@ -195,7 +195,7 @@ public class LandlordController : AbstractController
     [HttpGet]
     [Route("me/properties")]
     [Route("{id:int}/properties")]
-    public async Task<IActionResult> ViewProperties(int? id = null)
+    public async Task<IActionResult> ViewProperties(int? id = null, int page = 1, int propPerPage = 10)
     {
         if (id == null)
         {
@@ -210,13 +210,13 @@ public class LandlordController : AbstractController
             return StatusCode(403);
         }
 
-        var databaseResult = _propertyService.GetPropertiesByLandlord(id.Value);
-        var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
+        var properties = await _propertyService.GetPropertiesByLandlord(id.Value, page, propPerPage);
+        var listOfProperties = properties.PropertyList.Select(PropertyViewModel.FromDbModel).ToList();
         var landlordProfile = LandlordProfileModel.FromDbModel(await _landlordService.GetLandlordFromId((int)id));
 
         TempData["FullWidthPage"] = true;
         return View("Properties",
-            new PropertiesDashboardViewModel(listOfProperties, listOfProperties.Count, landlordProfile));
+            new PropertyListModel(listOfProperties, properties.Count, landlordProfile, page));
     }
 
     [HttpGet("{landlordId:int}/edit")]

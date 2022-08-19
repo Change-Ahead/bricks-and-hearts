@@ -38,10 +38,10 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         var service = new PropertyService(context, null!);
 
         // Act
-        var propertiesByLandlord = service.GetPropertiesByLandlord(landlordId);
+        var propertiesByLandlord = await service.GetPropertiesByLandlord(landlordId, 1, 10);
 
         // Assert
-        propertiesByLandlord.Should().OnlyContain(u => u.LandlordId == landlordId);
+        propertiesByLandlord.PropertyList.Should().OnlyContain(u => u.LandlordId == landlordId);
     }
 
     #endregion
@@ -415,7 +415,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     }
     
     [Fact]
-    public async void SortPropertiesByLocation_WhenCalledWithInvalidPostcode_ReturnsNull()
+    public async void SortPropertiesByLocation_WhenCalledWithInvalidPostcode_ReturnsEmptyList()
     {
         // Arrange
         var logger = A.Fake<ILogger<PostcodeService>>();
@@ -434,10 +434,11 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         var service = new PropertyService(null!, postcodeApiService);
 
         // Act
-        var result = await service.SortPropertiesByLocation(postcode, 1, 10);
+        var result = await service.GetPropertyList("Location", postcode, 1, 10);
         
         // Assert
-        result.Should().BeNull();
+        result.PropertyList.Count.Should().Be(0);
+        result.Count.Should().Be(0);
     }
 
     [Fact]
@@ -461,8 +462,8 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         
         
         // Act
-        var result = await service.SortPropertiesByLocation(postcode, 1, 10);
-        
+        var result = await service.GetPropertyList("Location", postcode, 1, 10);
+
         // Assert
         var correctList = new List<PropertyDbModel>
         {
@@ -471,7 +472,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
             context.Properties.Single(p => p.TownOrCity == "London"),
             context.Properties.Single(p => p.TownOrCity == "Brighton"),
         };
-        var propertyDbModelList = result!.FindAll(p => p.LandlordId == 3);
+        var propertyDbModelList = result.PropertyList.FindAll(p => p.LandlordId == 3);
         propertyDbModelList.Should().BeEquivalentTo(correctList, options => options.WithStrictOrdering());
     }
 }

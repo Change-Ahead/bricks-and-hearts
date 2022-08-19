@@ -7,13 +7,21 @@ function setValue(elementId, value) {
     document.getElementById(elementId).value = value;
 }
 
-function checkIfSelectedValueIsTarget(target){
-    if ($("#Select :selected").val() == target) {
+function checkIfSelectedValueIsTarget(target, id){
+    if ($("#"+id+" :selected").val() == target) {
         $("#ifTrue").show();
         $("#ifFalse").hide();
     } else {
         $("#ifTrue").hide();
         $("#ifFalse").show();
+    }
+}
+
+function insertDefaultPostcodeIfNotSortByLocation(id) {
+    if ($("#"+id+" :selected").val() == "Location") {
+        $("#target").val("");
+    } else {
+        $("#target").val("CB2 1LA");
     }
 }
 

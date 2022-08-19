@@ -1,5 +1,5 @@
 @using BricksAndHearts.Auth
-@model PropertiesDashboardViewModel
+@model PropertyListModel
 
 @{
     ViewData["Title"] = "Properties";
@@ -28,6 +28,17 @@
             <a asp-controller="Property" asp-action="AddNewProperty_Begin" asp-route-landlordId="@Model.Owner?.LandlordId" class="btn btn-primary">Add new property</a>
         </div>
     </div>
-
+    
     <partial name="../Property/_PropertyTable"/>
+
+    @{ await Html.RenderPartialAsync("_PaginationPartial", new PaginationModel
+       {
+           Page = Model.Page,
+           Total = Model.Total,
+           ItemsPerPage = Model.PropPerPage,
+           ItemsOnPage = Model.Properties.Count,
+           HrefPrevious = Url.Action("ViewProperties", "Landlord", new { sortBy = Model.SortBy, page = Model.Page - 1, propPerPage = Model.PropPerPage }),
+           HrefNext = Url.Action("ViewProperties", "Landlord", new { sortBy = Model.SortBy, page = Model.Page + 1, propPerPage = Model.PropPerPage })
+       }); }
+
 </div>
