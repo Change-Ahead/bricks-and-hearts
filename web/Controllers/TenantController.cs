@@ -1,4 +1,5 @@
-﻿using BricksAndHearts.Services;
+using BricksAndHearts.Database;
+using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,6 +22,20 @@ public class TenantController : AbstractController
         _propertyService = propertyService;
         _mailService = mailService;
         _csvImportService = csvImportService;
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpGet]
+    public async Task<IActionResult> TenantList(HousingRequirementModel filter, string? targetPostcode, int page = 1, int tenantsPerPage = 10)
+    {
+        var tenants = await _tenantService.FilterNearestTenantsToProperty(tenantListModel.Filter, false, postcode, page, tenantsPerPage);
+        if(tenants == null){
+            _logger.LogInformation("Couldn't find postcode");
+            AddFlashMessage("danger", "Postcode not found");
+            return View("~/Views/Admin/TenantList.cshtml", tenantListModel);
+        }
+        tenantListModel.TenantList = tenants;
+        return View("~/Views/Admin/TenantList.cshtml", tenantListModel);
     }
     
     [Authorize(Roles = "Admin")]
@@ -52,7 +67,7 @@ public class TenantController : AbstractController
         var currentProperty = PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(currentPropertyId)!);
         
         var tenantMatchListModel = new TenantMatchListModel{
-            TenantList = await _adminService.GetNearestTenantsToProperty(currentProperty),
+            TenantList = await _tenantService.GetNearestTenantsToProperty(currentProperty),
             CurrentProperty = currentProperty
         };
         return View("TenantMatchList", tenantMatchListModel);

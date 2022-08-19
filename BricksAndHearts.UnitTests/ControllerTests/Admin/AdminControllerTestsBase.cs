@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.IO;
 using BricksAndHearts.Controllers;
 using BricksAndHearts.Services;
 using FakeItEasy;

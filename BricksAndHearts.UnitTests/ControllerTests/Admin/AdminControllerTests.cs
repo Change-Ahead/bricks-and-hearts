@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using BricksAndHearts.Database;
-using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
@@ -217,56 +214,16 @@ public class AdminControllerTests : AdminControllerTestsBase
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
+        var landlordListModel = new LandlordListModel();
         
         // Act
-        var result = await UnderTest.LandlordList() as ViewResult;
+        var result = await UnderTest.LandlordList(landlordListModel) as ViewResult;
 
         // Assert
-        A.CallTo(() => AdminService.GetLandlordList(null ,null, 1, 10)).MustHaveHappened();
+        A.CallTo(() => AdminService.GetLandlordList(landlordListModel)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<LandlordListModel?>();
     }
-    
-    [Fact]
-    public async void TenantList_NotSortedByLocation_CallsGetTenantListAndReturnsTenantListView()
-    {
-        // Arrange
-        var adminUser = CreateAdminUser();
-        MakeUserPrincipalInController(adminUser, UnderTest);
-        var filter = new HousingRequirementModel();
 
-        // Act
-        var result = await UnderTest.TenantList(filter, null) as ViewResult;
-
-        // Assert
-        A.CallTo(() => AdminService.GetTenantList(filter, 1, 10)).MustHaveHappened();
-        result!.ViewData.Model.Should().BeOfType<TenantListModel?>();
-    }
-    
-    [Fact]
-    public async void TenantList_SortedByLocation_CallsSortTenantsByLocation_AndReturnsViewWithTenantList()
-    {
-        // Arrange
-        var adminUser = CreateAdminUser();
-        MakeUserPrincipalInController(adminUser, UnderTest);
-        var filter = new HousingRequirementModel();
-        var targetPostcode = "CB3 9AJ";
-
-        var tenant = CreateTenant();
-        var sortedList = new List<TenantDbModel>
-        {
-            tenant
-        };
-        A.CallTo(() => TenantService.SortTenantsByLocation(targetPostcode, 1, 10)).Returns((sortedList, 1));
-        
-        // Act
-        var result = await UnderTest.TenantList(filter, targetPostcode) as ViewResult;
-
-        // Assert
-        A.CallTo(() => TenantService.SortTenantsByLocation(targetPostcode, 1, 10)).MustHaveHappened();
-        A.CallTo(() => AdminService.GetTenantList(filter, 1, 10)).MustNotHaveHappened();
-        result!.ViewData.Model.Should().BeOfType<TenantListModel>();
-    }
-    
     [Fact]
     public void GetInviteLink_CalledOnLinkedLandlord_CallsFindUserByLandlordIdAndRedirectsToLandlordProfileWithWarningFLash()
     {

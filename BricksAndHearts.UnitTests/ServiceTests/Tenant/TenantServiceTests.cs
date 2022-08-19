@@ -5,8 +5,6 @@ using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
 using FluentAssertions;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ServiceTests.Tenant;
@@ -22,7 +20,7 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
     #region TenantListTests
 
     [Fact]
-    public async void SortTenantsByLocationAndFilter_WithInvalidPostcodeAndMatching_ReturnsFilteredUnorderedTenants()
+    public async void FilterNearestTenantsToProperty_WithInvalidPostcodeAndMatching_ReturnsFilteredUnorderedTenants()
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
@@ -39,14 +37,14 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
             AcceptsOver35 = true
         };
         //Act
-        var result = await (await service.SortTenantsByLocationAndFilter(filters, true,"",1,10))!.ToListAsync();
+        var result = await service.FilterNearestTenantsToProperty(filters, true,"",1,10);
         
         //Assert
         result.Should().BeOfType<List<TenantDbModel>>().Which.Count.Should().Be(context.Tenants.Count());
     }
     
     [Fact]
-    public async void SortTenantsByLocationAndFilter_WithInvalidPostcodeAndNoMatchingAndAllFilters_ReturnsNoTenants()
+    public async void FilterNearestTenantsToProperty_WithInvalidPostcodeAndNoMatchingAndAllFilters_ReturnsNoTenants()
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
@@ -63,14 +61,14 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
             AcceptsOver35 = true
         };
         //Act
-        var result = await (await service.SortTenantsByLocationAndFilter(filters, false,"",1,10))!.ToListAsync();
+        var result = await service.FilterNearestTenantsToProperty(filters, false,"",1,10);
         
         //Assert
         result.Should().BeOfType<List<TenantDbModel>>().Which.Count.Should().Be(0);
     }
     
     [Fact]
-    public async void SortTenantsByLocationAndFilter_WithValidPostcodeAndNoMatching_ReturnsClosestTenantFirst()
+    public async void FilterNearestTenantsToProperty_WithValidPostcodeAndNoMatching_ReturnsClosestTenantFirst()
     {
         // Arrange
         await using var context = Fixture.CreateReadContext();
@@ -87,7 +85,7 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
             AcceptsOver35 = false
         };
         //Act
-        var result = await (await service.SortTenantsByLocationAndFilter(filters, false,"PE11BF",1,10))!.ToListAsync();
+        var result = await service.FilterNearestTenantsToProperty(filters, false,"PE11BF",1,10);
         
         //Assert
         result.Should().BeOfType<List<TenantDbModel>>().Which.First().Postcode.Should().Be("PE1 1BF");
@@ -123,7 +121,7 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
 
         // Assert
         result.Should().BeOfType<List<TenantDbModel>>();
-        result.Count.Should().Be(context.Tenants.Where(t => t.UniversalCredit != true)
+        result!.Count.Should().Be(context.Tenants.Where(t => t.UniversalCredit != true)
             .Count(t => t.Type == "Single"));
         result.Count.Should().BeLessThan(6);
     }
@@ -158,7 +156,7 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
 
         // Assert
         result.Should().BeOfType<List<TenantDbModel>>();
-        result.Count.Should().Be(context.Tenants.Count(t => t.Type =="Single"));
+        result!.Count.Should().Be(context.Tenants.Count(t => t.Type =="Single"));
     }
     
     #endregion

@@ -81,7 +81,7 @@
                         @if (prop.Availability is AvailabilityState.Available or AvailabilityState.AvailableSoon)
                         {
                             // Allow matching
-                            <a asp-action="TenantMatchList" asp-controller="Admin" asp-route-currentPropertyId="@prop.PropertyId" class="btn btn-primary text-nowrap">Find potential tenants</a>
+                            <a asp-action="TenantMatchList" asp-controller="Tenant" asp-route-currentPropertyId="@prop.PropertyId" class="btn btn-primary text-nowrap">Find potential tenants</a>
                         }
                         else
                         {

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;

@@ -535,7 +535,7 @@ public class TestDatabaseFixture
             UniversalCredit = true,
             Postcode = "LS1 1AZ",
             Lat = (decimal?)53.796296,
-            Lon = (decimal?)-1.564095,
+            Lon = (decimal?)-1.564095
         };
     }
 
@@ -554,7 +554,6 @@ public class TestDatabaseFixture
             Postcode = "PE1 1BF",
             Lat = (decimal?)52.571459,
             Lon = (decimal?)-0.242008
-            
         };
     }
 
