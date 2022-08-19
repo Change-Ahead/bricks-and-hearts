@@ -25,9 +25,8 @@
             <div class="row">
                 <div class="col">
                     <div class="row">
-                        <div class="col-sm-auto">
-                            @* TODO BNH-99: Replace icon with profile picture *@
-                            <img alt="profile picture" src="https://www.softwire.com/wp-content/uploads/2019/07/Gareth-J-Final-Head-Shot.jpg" width="100" height="100" class="rounded-circle img-thumbnail img-fluid"/>
+                        <div class="col-sm-auto profile-photo-lg">
+                            <img src="@(Model.CurrentLandlord.GoogleProfileImageUrl ?? Url.Content("~/images/profileDefault.png"))" alt="profile picture">
                         </div>
                         <div class="col">
                             <h1 class="font-blue font-h1">@Model.CurrentLandlord.FirstName</h1>

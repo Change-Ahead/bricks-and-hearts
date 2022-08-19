@@ -27,8 +27,11 @@
 
     <div class="col-md d-flex flex-column pb-2">
         <div class="d-flex">
-            <h3 class="font-h3 d-inline-block">Tenant preferences</h3>
-            <a class="bi bi-pencil ms-auto" asp-action="EditProperty" asp-controller="Property" asp-route-propertyId="@Model.Property!.PropertyId"></a>
+            <h3 class="font-h3 d-inline-block">@(User.IsInRole("Landlord") || User.IsInRole("Admin") ? "Tenant preferences" : "Suitable for")</h3>
+            @if (User.IsInRole("Landlord") || User.IsInRole("Admin"))
+            {
+                <a class="bi bi-pencil ms-auto" asp-action="PropertyInputStepFiveTenantPreferences" asp-controller="Property" asp-route-operationType="edit" asp-route-propertyId="@Model.Property!.PropertyId"></a>
+            }
         </div>
         <partial name="Details/_TenantPreferences"/>
     </div>
