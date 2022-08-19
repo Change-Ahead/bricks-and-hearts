@@ -1,79 +1,33 @@
+@using BricksAndHearts.Auth
 @model PropertiesDashboardViewModel
 
 @{
-    ViewData["Title"] = "My Properties";
+    ViewData["Title"] = "Properties";
 }
 
-@if (Model.Owner == null)
-{
-    <h2>Landlord's properties</h2>
-}
-else
-{
-    <h2>
-        @Model.Owner.FirstName's properties
-    </h2>
-}
+<div class="mx-md-5">
+    <h1 class="font-h1 mt-5">
+        @if (Model.Owner == null)
+        {
+            @("Landlord's properties")
+        }
+        else if (Model.Owner.LandlordId == ((BricksAndHeartsUser)User.Identity!).LandlordId)
+        {
+            @("My properties")
+        }
+        else
+        {
+            @(Model.Owner.FirstName + "'s properties")
+        }
+    </h1>
 
-<table class="table">
-    <thead>
-    <tr>
-        <th scope="col">#</th>
-        <th scope="col">Address</th>
-        <th scope="col">Type</th>
-        <th scope="col">Bedrooms</th>
-        <th scope="col">Created</th>
-        <th scope="col">Rent (pcm)</th>
-        <th scope="col">Availability</th>
-        <th scope="col">Description</th>
-        <th scope="col">Total units</th>
-        <th scope="col">Occupied units</th>
-        <th scope="col">Available units</th>
-        <th scope="col">Property page</th>
-    </tr>
-    </thead>
-    <tbody>
-    @{
-        var i = 1;
-    }
-    @foreach (var prop in Model.Properties)
-    {
-        <tr>
-            <th scope="row">@i</th>
-            <td>
-                @prop.Address.AddressLine1,
-                @prop.Address.AddressLine2@(prop.Address.AddressLine2 != null ? "," : "")
-                @prop.Address.AddressLine3@(prop.Address.AddressLine3 != null ? "," : "")
-                @prop.Address.TownOrCity,
-                @prop.Address.County,
-                @prop.Address.Postcode
-            </td>
-            <td>@prop.PropertyType</td>
-            <td>@prop.NumOfBedrooms</td>
-            <td>@prop.CreationTime</td>
-            <td>@prop.Rent</td>
-            <td>@prop.Availability</td>
-            <td>
-                <div class="table-maxheight">@prop.Description</div>
-            </td>
-            <td>@prop.TotalUnits</td>
-            <td>@prop.OccupiedUnits</td>
-            <td>@prop.AvailableUnits</td>
-            <td>
-                <a class="btn btn-outline-primary position-relative" href="@Url.Action("ViewProperty", "Property", new { propertyId = prop.PropertyId })">
-                    <p>view</p>
-                    @if (prop.IsIncomplete)
-                    {
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-warning">
-                            <i class="bi bi-circle-half"></i> Incomplete
-                            <span class="visually-hidden">Property is incomplete</span>
-                        </span>
-                    }
-                </a>
-            </td>
-        </tr>
-        i++;
-    }
-    </tbody>
-</table>
-<a class="btn btn-primary" href="@Url.Action("AddNewProperty_Begin", "Property", new { Model.Owner?.LandlordId })">Add new property</a> @*Add landlord ID*@
+    <div class="row mt-4">
+        @* Sorting and filtering goes here *@
+
+        <div class="col-auto ms-sm-auto">
+            <a asp-controller="Property" asp-action="AddNewProperty_Begin" asp-route-landlordId="@Model.Owner?.LandlordId" class="btn btn-primary">Add new property</a>
+        </div>
+    </div>
+
+    <partial name="../Property/_PropertyTable"/>
+</div>

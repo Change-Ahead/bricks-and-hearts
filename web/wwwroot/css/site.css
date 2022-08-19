@@ -113,13 +113,18 @@ body {
     border-color: var(--red);
 }
 
-.card-home{
+.btn.disabled {
+    background-color: grey;
+    border-color: grey;
+}
+
+.card-home {
     width: 80%;
     height: 100%;
     background-color: var(--blue);
 }
 
-.bi-register{
+.bi-register {
     font-size: 85px;
     background-color: var(--blue);
     color: var(--white)
@@ -349,6 +354,7 @@ td, th {
     border-width: 1px;
     border-color: var(--blue50);
     padding-left: 1rem !important;
+    padding-right: 1rem !important;
 }
 
 th {
@@ -357,9 +363,12 @@ th {
 }
 
 .table-maxheight {
-    overflow-y: scroll;
-    overflow-x: auto;
+    overflow-y: auto;
     max-height: 200px;
+}
+
+.bg-pale-blue {
+    background-color: var(--paleBlue) !important;
 }
 
 .profile-photo-lg {
@@ -398,10 +407,6 @@ th {
     max-width: 688px;
     height: 100%;
     display: block;
-}
-
-.property-img-lg{
-    
 }
 
 .property-img-sm {

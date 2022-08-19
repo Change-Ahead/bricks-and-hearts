@@ -1,4 +1,4 @@
-﻿@model PropertyDetailsViewModel
+﻿@model PropertyViewModel
 
 @functions
 {
@@ -11,7 +11,7 @@
     }
 }
 
-@switch (Model.Property!.Availability)
+@switch (Model.Availability)
 {
     case AvailabilityState.Occupied:
         GetAvailabilityPill("Occupied", "people");

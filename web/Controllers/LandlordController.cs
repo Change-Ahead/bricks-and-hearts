@@ -17,7 +17,8 @@ public class LandlordController : AbstractController
     private readonly IAzureStorage _azureStorage;
 
     public LandlordController(ILogger<LandlordController> logger,
-        ILandlordService landlordService, IPropertyService propertyService, IMailService mailService, IAzureStorage azureStorage)
+        ILandlordService landlordService, IPropertyService propertyService, IMailService mailService,
+        IAzureStorage azureStorage)
     {
         _logger = logger;
         _landlordService = landlordService;
@@ -212,6 +213,8 @@ public class LandlordController : AbstractController
         var databaseResult = _propertyService.GetPropertiesByLandlord(id.Value);
         var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).ToList();
         var landlordProfile = LandlordProfileModel.FromDbModel(await _landlordService.GetLandlordFromId((int)id));
+
+        TempData["FullWidthPage"] = true;
         return View("Properties",
             new PropertiesDashboardViewModel(listOfProperties, listOfProperties.Count, landlordProfile));
     }
@@ -328,7 +331,9 @@ public class LandlordController : AbstractController
         {
             return StatusCode(404);
         }
-        var landlordViewProperties = landlord.Properties.Select(PropertyViewModel.FromDbModel).OrderByDescending(p => p.PropertyId).Take(2);
+
+        var landlordViewProperties = landlord.Properties.Select(PropertyViewModel.FromDbModel)
+            .OrderByDescending(p => p.PropertyId).Take(2);
         var allPropertyDetails = new List<PropertyDetailsViewModel>();
         foreach (var property in landlordViewProperties)
         {
@@ -339,6 +344,7 @@ public class LandlordController : AbstractController
                 Property = property
             });
         }
+
         var viewModel = new LandlordDashboardViewModel
         {
             CurrentLandlord = LandlordProfileModel.FromDbModel(landlord),
@@ -358,7 +364,7 @@ public class LandlordController : AbstractController
             })
             .ToList();
     }
-    
+
     [HttpGet("{propertyId:int}/{fileName}")]
     public async Task<IActionResult> GetImage(int propertyId, string fileName)
     {
