@@ -22,11 +22,11 @@ public abstract class AbstractController : Controller
         TempData["FlashMessages"] ??= new string[] {};
 
         var flashMessageArray = TempData["FlashMessages"] as string[];
-        var flashMessageList = new List<string>(flashMessageArray);
+        var flashMessageList = new List<string>(flashMessageArray!);
         flashMessageList.Add(flashMessage);
         
         var flashTypeArray = TempData["FlashTypes"] as string[];
-        var flashTypeList = new List<string>(flashTypeArray);
+        var flashTypeList = new List<string>(flashTypeArray!);
         flashTypeList.Add(flashType);
 
         TempData["FlashMessages"] = flashMessageList.ToArray();
