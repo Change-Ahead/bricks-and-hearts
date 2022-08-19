@@ -11,17 +11,20 @@ namespace BricksAndHearts.Controllers;
 public class PropertyController : AbstractController
 {
     private readonly IPropertyService _propertyService;
+    private readonly ILandlordService _landlordService;
     private readonly IAzureMapsApiService _azureMapsApiService;
     private readonly ILogger<PropertyController> _logger;
     private readonly IAzureStorage _azureStorage;
 
     public PropertyController(
         IPropertyService propertyService,
+        ILandlordService landlordService,
         IAzureMapsApiService azureMapsApiService,
         ILogger<PropertyController> logger,
         IAzureStorage azureStorage)
     {
         _propertyService = propertyService;
+        _landlordService = landlordService;
         _azureMapsApiService = azureMapsApiService;
         _logger = logger;
         _azureStorage = azureStorage;
@@ -451,9 +454,20 @@ public class PropertyController : AbstractController
         }
 
         var propertyViewModel = PropertyViewModel.FromDbModel(dbModel);
+
         var fileNames = await _azureStorage.ListFileNames("property", propertyViewModel.PropertyId);
         var imageFiles = GetFilesFromFileNames(fileNames, propertyViewModel.PropertyId);
-        var propertyDetailsModel = new PropertyDetailsViewModel { Property = propertyViewModel, Images = imageFiles };
+
+        var landlord =
+            LandlordProfileModel.FromDbModel(_propertyService.GetPropertyOwner(propertyViewModel.PropertyId));
+        landlord.GoogleProfileImageUrl = _landlordService.GetLandlordProfilePicture(landlord.LandlordId!.Value);
+
+        var propertyDetailsModel = new PropertyDetailsViewModel
+        {
+            Property = propertyViewModel,
+            Images = imageFiles,
+            Owner = landlord
+        };
         return View(propertyDetailsModel);
     }
 }

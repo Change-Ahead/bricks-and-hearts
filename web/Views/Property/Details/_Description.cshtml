@@ -2,7 +2,10 @@
 
 <div class="d-flex">
     <h3 class="font-h3 d-inline-block">Description</h3>
-    <a class="bi bi-pencil ms-auto" asp-action="EditProperty" asp-controller="Property" asp-route-propertyId="@Model.Property!.PropertyId"></a>
+    @if (User.IsInRole("Landlord") || User.IsInRole("Admin"))
+    {
+        <a class="bi bi-pencil ms-auto" asp-action="EditProperty" asp-controller="Property" asp-route-propertyId="@Model.Property!.PropertyId"></a>
+    }
 </div>
 
 <div class="card custom-card mt-2">

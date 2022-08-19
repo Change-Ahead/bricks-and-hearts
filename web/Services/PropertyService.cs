@@ -12,6 +12,7 @@ public interface IPropertyService
     public void DeleteProperty(PropertyDbModel property);
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId);
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId);
+    public LandlordDbModel GetPropertyOwner(int propertyId);
     public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string sortBy, string? target, int page, int propPerPage);
     public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertiesByLandlord(int landlordId, int page, int propPerPage);
     public PropertyCountModel CountProperties(int? landlordId = null);
@@ -169,6 +170,11 @@ public class PropertyService : IPropertyService
         return propertyLandlordId == userLandlordId;
     }
 
+    public LandlordDbModel GetPropertyOwner(int propertyId)
+    {
+        return _dbContext.Properties.Include(p => p.Landlord).Single(p => p.Id == propertyId).Landlord;
+    }
+    
     public async Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string? sortBy, string? target, int page, int propPerPage)
     {
         IQueryable<PropertyDbModel> properties;

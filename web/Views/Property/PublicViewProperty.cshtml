@@ -1,6 +1,56 @@
-﻿@model PropertyDetailsViewModel
+﻿@model PropertyDetailsViewModel?
 
-<div>
-    @Model.Property!.PublicViewLink
-    @Model.Property.Address.AddressLine1
+@{
+    ViewData["Title"] = "View Property";
+}
+
+@if (Model == null)
+{
+    <p>oh no</p>
+    return;
+}
+
+<div class="mt-5 mb-2">
+    <h1 class="font-h1">@Model.Property!.Address.ToShortAddressString()</h1>
+    <div class="d-flex align-items-center">
+        <i class="bi bi-check2-all fs-4 font-blue me-1"></i>
+        <p class="font-smallBody d-inline mb-0">
+            @if (Model.Property.TotalUnits > 1)
+            {
+                @(Model.Property.AvailableUnits + " units available of " + Model.Property.TotalUnits)
+            }
+            else if (Model.Property.Availability == AvailabilityState.Available && Model.Property.AvailableFrom.HasValue)
+            {
+                @("Available from " + Model.Property.AvailableFrom.Value.ToLongDateString())
+            }
+            else
+            {
+                @("Available now")
+            }
+        </p>
+    </div>
+</div>
+
+<partial name="Details/_ImageGallery"/>
+
+<div class="row mt-4 px-2">
+    <partial name="Details/_Description"/>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md pb-2">
+        <partial name="Details/_Details"/>
+        @if (Model.Owner != null)
+        {
+            <partial name="Details/_Landlord"/>
+        }
+    </div>
+
+    <div class="col-md d-flex flex-column pb-2">
+        <partial name="Details/_TenantPreferences"/>
+    </div>
+</div>
+
+<div class="mt-4">
+    <a asp-action="ContactUs" asp-controller="Home" class="btn btn-large btn-primary d-table-cell">Contact ChangeAhead</a>
 </div>
