@@ -126,6 +126,7 @@ public class AdminController : AbstractController
     [HttpGet]
     public async Task<ActionResult> GetAdminList()
     {
+        AddFlashMessage("success", "If you can see this, it's fixed!");
         var adminLists = await _adminService.GetAdminLists();
         AdminListModel adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
         return View("AdminList", adminListModel);

@@ -1,4 +1,5 @@
 ﻿@using BricksAndHearts.Auth
+@using System.Collections
 <!DOCTYPE html>
 <html lang="en" class="h-100">
 
@@ -86,13 +87,11 @@
 
 <main role="main">
     <div class="container@(TempData["FullWidthPage"] is true ? "-fluid" : "") mt-3 pb-4">
-        @if (TempData["FlashMessages"] != null && TempData["FlashTypes"] != null)
+        @if (TempData["FlashMessages"] is string[] flashMessages && TempData["FlashTypes"] is string[] flashTypes)
         {
-            var flashMessages = TempData["FlashMessages"] as List<string>;
-            var flashTypes = TempData["FlashTypes"] as List<string>;
-            for (var i = 0; i < flashMessages!.Count; i++)
+            for (var i = 0; i < flashMessages.Length; i++)
             {
-                <div class="alert alert-@flashTypes![i]" role="alert">
+                <div class="alert alert-@flashTypes[i]" role="alert">
                     @flashMessages[i]
                 </div>
             }
