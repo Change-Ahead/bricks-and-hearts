@@ -77,10 +77,7 @@ public class PropertyController : AbstractController
             return StatusCode(403);
         }
 
-        if (model.PublicViewLink == null)
-        {
-            _propertyService.CreatePublicViewLink(model.Id);
-        }
+        model.PublicViewLink ??= _propertyService.CreatePublicViewLink(model.Id);
 
         var propertyViewModel = PropertyViewModel.FromDbModel(model);
 
@@ -96,7 +93,7 @@ public class PropertyController : AbstractController
     public async Task<IActionResult> PropertyList(string sortBy, string? target, int page = 1, int propPerPage = 10)
     {
         var properties = await _propertyService.GetPropertyList(sortBy, target, page, propPerPage);
-        
+
         if (properties.Count == 0 && sortBy == "Location")
         {
             _logger.LogWarning($"Failed to find postcode {target}");
@@ -104,7 +101,7 @@ public class PropertyController : AbstractController
             sortBy = "";
             properties = await _propertyService.GetPropertyList(sortBy, target, page, propPerPage);
         }
-        
+
         var listOfProperties = properties.PropertyList.Select(PropertyViewModel.FromDbModel).ToList();
         TempData["FullWidthPage"] = true;
         return View("~/Views/Admin/PropertyList.cshtml",
@@ -442,7 +439,7 @@ public class PropertyController : AbstractController
     }
 
     #endregion
-    
+
     [HttpGet("public/{token}")]
     [AllowAnonymous]
     public async Task<ActionResult> PublicViewProperty(string token)

@@ -16,7 +16,7 @@ public interface IPropertyService
     public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string sortBy, string? target, int page, int propPerPage);
     public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertiesByLandlord(int landlordId, int page, int propPerPage);
     public PropertyCountModel CountProperties(int? landlordId = null);
-    public void CreatePublicViewLink(int propertyId);
+    public string CreatePublicViewLink(int propertyId);
     public PropertyDbModel? GetPropertyByPublicViewLink(string token);
 }
 
@@ -174,8 +174,9 @@ public class PropertyService : IPropertyService
     {
         return _dbContext.Properties.Include(p => p.Landlord).Single(p => p.Id == propertyId).Landlord;
     }
-    
-    public async Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string? sortBy, string? target, int page, int propPerPage)
+
+    public async Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string? sortBy, string? target,
+        int page, int propPerPage)
     {
         IQueryable<PropertyDbModel> properties;
         switch (sortBy)
@@ -263,11 +264,13 @@ public class PropertyService : IPropertyService
         };
     }
 
-    public void CreatePublicViewLink(int propertyId)
+    public string CreatePublicViewLink(int propertyId)
     {
         var property = _dbContext.Properties.Single(p => p.Id == propertyId);
-        property.PublicViewLink = Guid.NewGuid().ToString();
+        var token = Guid.NewGuid().ToString();
+        property.PublicViewLink = token;
         _dbContext.SaveChanges();
+        return token;
     }
 
     public PropertyDbModel? GetPropertyByPublicViewLink(string token)

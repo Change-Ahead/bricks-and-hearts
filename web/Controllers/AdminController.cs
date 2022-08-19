@@ -188,8 +188,17 @@ public class AdminController : AbstractController
 
     [Authorize(Roles = "Admin")]
     [HttpPost("{currentPropertyId:int}/Matches")]
-    public ActionResult SendMatchLinkEmail(string propertyLink, string tenantEmail, int currentPropertyId)
+    public ActionResult SendMatchLinkEmail(string? propertyLink, string tenantEmail, int currentPropertyId)
     {
+        if (propertyLink == null)
+        {
+            var property = PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(currentPropertyId)!);
+            if (property.PublicViewLink == null)
+            {
+                propertyLink = _propertyService.CreatePublicViewLink(currentPropertyId);
+            }
+        }
+
         var addressToSendTo = new List<string> { tenantEmail };
         var body = "Hi,\n\n" +
                    "We have found a property that we think you might be interested in. Check it out at the link below:\n\n" +
