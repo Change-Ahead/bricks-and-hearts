@@ -92,7 +92,7 @@ public class PropertyController : AbstractController
 
         var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).ToList();
 
-        TempData["Wide"] = true;
+        TempData["FullWidthPage"] = true;
 
         return View("~/Views/Admin/PropertyList.cshtml",
             new PropertiesDashboardViewModel(listOfProperties.Skip((page - 1) * propPerPage).Take(propPerPage).ToList(),
@@ -394,7 +394,7 @@ public class PropertyController : AbstractController
             })
             .ToList();
     }
-    
+
     [Authorize(Roles = "Landlord, Admin")]
     [HttpGet("{propertyId:int}/{fileName}")]
     public async Task<IActionResult> GetImage(int propertyId, string fileName)
@@ -484,7 +484,7 @@ public class PropertyController : AbstractController
         var listOfProperties = properties.Select(PropertyViewModel.FromDbModel).Skip((page - 1) * propPerPage)
             .Take(propPerPage).ToList();
 
-        TempData["Wide"] = true;
+        TempData["FullWidthPage"] = true;
 
         return View("~/Views/Admin/PropertyList.cshtml",
             new PropertiesDashboardViewModel(listOfProperties, listOfProperties.Count, null!, page, "Location"));
