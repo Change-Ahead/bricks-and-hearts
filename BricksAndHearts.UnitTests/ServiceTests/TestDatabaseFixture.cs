@@ -533,9 +533,7 @@ public class TestDatabaseFixture
             HasPet = false,
             ETT = true,
             UniversalCredit = true,
-            Postcode = "LS1 1AZ",
-            Lat = (decimal?)53.796296,
-            Lon = (decimal?)-1.564095
+            Postcode = Postcodes["LS1 1AZ"]
         };
     }
 
@@ -551,9 +549,7 @@ public class TestDatabaseFixture
             UniversalCredit = false,
             HousingBenefits = false,
             Over35 = false,
-            Postcode = "PE1 1BF",
-            Lat = (decimal?)52.571459,
-            Lon = (decimal?)-0.242008
+            Postcode = Postcodes["PE1 1BF"]
         };
     }
 

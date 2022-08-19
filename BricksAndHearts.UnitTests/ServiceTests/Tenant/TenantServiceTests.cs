@@ -40,7 +40,7 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
         var result = await service.FilterNearestTenantsToProperty(filters, true,"",1,10);
         
         //Assert
-        result.Should().BeOfType<List<TenantDbModel>>().Which.Count.Should().Be(context.Tenants.Count());
+        result.TenantList.Should().BeOfType<List<TenantDbModel>>().Which.Count.Should().Be(context.Tenants.Count());
     }
     
     [Fact]
@@ -64,7 +64,7 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
         var result = await service.FilterNearestTenantsToProperty(filters, false,"",1,10);
         
         //Assert
-        result.Should().BeOfType<List<TenantDbModel>>().Which.Count.Should().Be(0);
+        result.TenantList.Should().BeOfType<List<TenantDbModel>>().Which.Count.Should().Be(0);
     }
     
     [Fact]
@@ -88,7 +88,7 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
         var result = await service.FilterNearestTenantsToProperty(filters, false,"PE11BF",1,10);
         
         //Assert
-        result.Should().BeOfType<List<TenantDbModel>>().Which.First().Postcode.Should().Be("PE1 1BF");
+        result.TenantList.Should().BeOfType<List<TenantDbModel>>().Which.First().Postcode.Should().BeOfType<PostcodeDbModel>().Which.Postcode.Should().Be("PE1 1BF");
     }
     
     [Fact]
@@ -120,8 +120,8 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
         var result = await service.GetNearestTenantsToProperty(property);
 
         // Assert
-        result.Should().BeOfType<List<TenantDbModel>>();
-        result!.Count.Should().Be(context.Tenants.Where(t => t.UniversalCredit != true)
+        result.TenantList.Should().BeOfType<List<TenantDbModel>>();
+        result.Count.Should().Be(context.Tenants.Where(t => t.UniversalCredit != true)
             .Count(t => t.Type == "Single"));
         result.Count.Should().BeLessThan(6);
     }
@@ -155,8 +155,8 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
         var result = await service.GetNearestTenantsToProperty(property);
 
         // Assert
-        result.Should().BeOfType<List<TenantDbModel>>();
-        result!.Count.Should().Be(context.Tenants.Count(t => t.Type =="Single"));
+        result.TenantList.Should().BeOfType<List<TenantDbModel>>();
+        result.Count.Should().Be(context.Tenants.Count(t => t.Type =="Single"));
     }
     
     #endregion

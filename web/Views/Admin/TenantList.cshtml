@@ -6,30 +6,17 @@
 
 <h1 class="font-h1 mt-5">Tenants</h1>
 
-@using (Html.BeginForm("TenantList", "Tenant", FormMethod.Get))
-{
-    <div class="row mb-4">
-        <input class="form-control" id="targetPostcode" name="targetPostcode" required placeholder="Enter postcode to sort by location" pattern="([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"/>
-        <div class="col-auto" style="align-self: center">
-            <button type="submit" class="btn btn-primary">Sort</button>
-        </div>
-    </div>
-}
-
-<div class="row">
-    <div class="col-auto">
-        <a class="btn btn-primary mb-3" data-bs-toggle="collapse" href="#dropdown-contents" role="button" aria-expanded="false" aria-controls="dropdown-contents">
-            <i class="bi bi-arrow-90deg-down"></i> Filter
-        </a>
-    </div>
-    <div class="col-auto ms-auto">
-        <button type="button" data-bs-target="#csvImportModal" data-bs-toggle="modal" class="btn btn-primary">Import tenants</button>
-    </div>
+<div class="dropdown-button">
+    <a class="btn btn-primary mb-3" data-bs-toggle="collapse" href="#dropdown-contents" role="button" aria-expanded="false" aria-controls="dropdown-contents">
+        <i class="bi bi-arrow-90deg-down"></i> Filter
+    </a>
 </div>
-
-<div class="collapse @(Model.Filter.GetList().SequenceEqual(new HousingRequirementModel().GetList()) ? "" : "show")" id="dropdown-contents">
+<div class="collapse @(Model.Filter.GetList().SequenceEqual(new HousingRequirementModel().GetList()) ? "":"show")" id="dropdown-contents">
     <form method="get" asp-controller="Tenant" asp-action="TenantList">
-
+        <div class="col-8 my-3">
+            <input class="form-control" id="TargetPostcode" name="TargetPostcode" value="@Model.TargetPostcode" placeholder="Enter postcode to sort by location"
+                   pattern="([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})"/>
+        </div>
         <div class="row mb-3">
             <div class="col-auto d-grid">
                 @Html.CheckBox("Filter.AcceptsSingleTenant", Model.Filter.AcceptsSingleTenant ?? false, new { @class = "btn-check" })
@@ -119,8 +106,8 @@
        Total = Model.Total,
        ItemsPerPage = Model.TenantsPerPage,
        ItemsOnPage = Model.TenantList.Count,
-       HrefPrevious = Url.Action("TenantList", "Tenant", new { targetPostcode = Model.TargetPostcode, page = Model.Page - 1, propPerPage = Model.TenantsPerPage }),
-       HrefNext = Url.Action("TenantList", "Tenant", new { targetPostcode = Model.TargetPostcode, page = Model.Page + 1, propPerPage = Model.TenantsPerPage }),
+       HrefPrevious = Url.Action("TenantList", "Tenant", new {targetPostcode = Model.TargetPostcode, page = Model.Page-1, filter = Model.Filter}),
+       HrefNext = Url.Action("TenantList", "Tenant", new {targetPostcode = Model.TargetPostcode, page = Model.Page+1, filter = Model.Filter}),
        TypeOfData = "tenants"
    }); }
 

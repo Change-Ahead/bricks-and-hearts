@@ -110,7 +110,7 @@ public class TenantControllerTests : TenantControllerTestsBase
         
         // Act
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(A.Fake<PropertyDbModel>());
-        A.CallTo(() => TenantService.GetNearestTenantsToProperty(A.Fake<PropertyViewModel>())).Returns(A.Fake<List<TenantDbModel>>());
+        A.CallTo(() => TenantService.GetNearestTenantsToProperty(A.Fake<PropertyViewModel>())).Returns((A.Fake<List<TenantDbModel>>(), 1));
         var result = await UnderTest.TenantMatchList(1);
 
         // Assert

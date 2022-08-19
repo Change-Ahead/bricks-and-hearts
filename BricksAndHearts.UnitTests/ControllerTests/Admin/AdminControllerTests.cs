@@ -214,13 +214,12 @@ public class AdminControllerTests : AdminControllerTestsBase
         // Arrange
         var adminUser = CreateAdminUser();
         MakeUserPrincipalInController(adminUser, UnderTest);
-        var landlordListModel = new LandlordListModel();
-        
+
         // Act
-        var result = await UnderTest.LandlordList(landlordListModel) as ViewResult;
+        var result = await UnderTest.LandlordList() as ViewResult;
 
         // Assert
-        A.CallTo(() => AdminService.GetLandlordList(landlordListModel)).MustHaveHappened();
+        A.CallTo(() => AdminService.GetLandlordList(null,null,1,10)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<LandlordListModel?>();
     }
 

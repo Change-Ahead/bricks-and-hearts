@@ -1,9 +1,7 @@
-using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace BricksAndHearts.Controllers;
 
@@ -23,41 +21,31 @@ public class TenantController : AbstractController
         _mailService = mailService;
         _csvImportService = csvImportService;
     }
-    
+
     [Authorize(Roles = "Admin")]
     [HttpGet]
-    public async Task<IActionResult> TenantList(HousingRequirementModel filter, string? targetPostcode, int page = 1, int tenantsPerPage = 10)
+    public async Task<IActionResult> TenantList(TenantListModel tenantListModel, string? targetPostcode, HousingRequirementModel filter , int page = 1)
     {
-        var tenants = await _tenantService.FilterNearestTenantsToProperty(tenantListModel.Filter, false, postcode, page, tenantsPerPage);
-        if(tenants == null){
-            _logger.LogInformation("Couldn't find postcode");
-            AddFlashMessage("danger", "Postcode not found");
-            return View("~/Views/Admin/TenantList.cshtml", tenantListModel);
-        }
-        tenantListModel.TenantList = tenants;
-        return View("~/Views/Admin/TenantList.cshtml", tenantListModel);
-    }
-    
-    [Authorize(Roles = "Admin")]
-    [HttpGet]
-    public async Task<IActionResult> TenantList(HousingRequirementModel filter, string? targetPostcode, int page = 1, int tenantsPerPage = 10)
-    {
-        if (targetPostcode != null)
+        tenantListModel.Filter = filter;
+        tenantListModel.TargetPostcode = targetPostcode;
+        tenantListModel.Page = page;
+        var tenants = await _tenantService.FilterNearestTenantsToProperty(tenantListModel.Filter,
+            false, tenantListModel.TargetPostcode, tenantListModel.Page, tenantListModel.TenantsPerPage);
+        if (tenants.Count > 0)
         {
-            var tenantsByLocation = await _tenantService.SortTenantsByLocation(targetPostcode, page, tenantsPerPage);
-
-            if (tenantsByLocation.Count > 0)
+            _logger.LogInformation("Successfully filtered tenants");
+            if (tenantListModel.TargetPostcode != null)
             {
-                _logger.LogInformation("Successfully sorted by location");
-                return View(new TenantListModel(tenantsByLocation.TenantList, new HousingRequirementModel(), tenantsByLocation.Count, page, targetPostcode));
+                _logger.LogInformation("Successfully sorted tenants by location");
             }
-
-            _logger.LogWarning($"Failed to find postcode {targetPostcode}");
-            AddFlashMessage("warning",$"Failed to sort tenants using postcode {targetPostcode}: invalid postcode");//TODO make this message actually display
+            return View("~/Views/Admin/TenantList.cshtml", new TenantListModel(tenants.TenantList, 
+                tenantListModel.Filter, tenants.Count, tenantListModel.Page, tenantListModel.TargetPostcode));
         }
-        
-        var tenantsByFilter = await _adminService.GetTenantList(filter, page, tenantsPerPage);
-        return View(new TenantListModel(tenantsByFilter.TenantList, filter, tenantsByFilter.Count, page, targetPostcode));
+        //TODO: differentiate between a filtered search that filters everyone out and an invalid postcode
+        _logger.LogWarning($"Failed to find postcode {tenantListModel.TargetPostcode}");
+        AddFlashMessage("warning",$"Failed to sort tenants using postcode {tenantListModel.TargetPostcode}: invalid postcode");//TODO make this message actually display
+        return View("~/Views/Admin/TenantList.cshtml", new TenantListModel(tenants.TenantList, 
+            tenantListModel.Filter, tenants.Count, tenantListModel.Page, tenantListModel.TargetPostcode));
     }
 
     [Authorize(Roles = "Admin")]
@@ -67,10 +55,10 @@ public class TenantController : AbstractController
         var currentProperty = PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(currentPropertyId)!);
         
         var tenantMatchListModel = new TenantMatchListModel{
-            TenantList = await _tenantService.GetNearestTenantsToProperty(currentProperty),
+            TenantList = (await _tenantService.GetNearestTenantsToProperty(currentProperty)).TenantList,
             CurrentProperty = currentProperty
         };
-        return View("TenantMatchList", tenantMatchListModel);
+        return View("~/Views/Admin/TenantMatchList.cshtml", tenantMatchListModel);
     }
 
     [Authorize(Roles = "Admin")]
@@ -130,5 +118,12 @@ public class TenantController : AbstractController
         }
         
         return RedirectToAction(nameof(TenantList));
+    }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpGet("/sample-tenant-data")]
+    public ActionResult GetSampleTenantCSV()
+    {
+        return File("~/TenantImportCSVTemplate.csv", "text/csv");
     }
 }

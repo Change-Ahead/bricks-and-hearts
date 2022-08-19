@@ -15,18 +15,21 @@ public class AdminController : AbstractController
     private readonly IAdminService _adminService;
     private readonly ILandlordService _landlordService;
     private readonly IPropertyService _propertyService;
+    private readonly ITenantService _tenantService;
     private readonly ILogger<AdminController> _logger;
 
     public AdminController(
         ILogger<AdminController> logger,
         IAdminService adminService,
         ILandlordService landlordService,
-        IPropertyService propertyService)
+        IPropertyService propertyService,
+        ITenantService tenantService)
     {
         _logger = logger;
         _adminService = adminService;
         _landlordService = landlordService;
         _propertyService = propertyService;
+        _tenantService = tenantService;
     }
 
     [HttpGet("/admin")]
@@ -202,12 +205,5 @@ public class AdminController : AbstractController
         }
 
         return RedirectToAction("Profile", "Landlord", new { id = landlordId });
-    }
-
-    [Authorize(Roles = "Admin")]
-    [HttpGet("/sample-tenant-data")]
-    public ActionResult GetSampleTenantCSV()
-    {
-        return File("~/TenantImportCSVTemplate.csv", "text/csv");
     }
 }

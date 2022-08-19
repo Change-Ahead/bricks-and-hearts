@@ -14,6 +14,7 @@ public class AdminControllerTestsBase : ControllerTestsBase
     protected readonly IAdminService AdminService;
     protected readonly ILandlordService LandlordService;
     protected readonly IPropertyService PropertyService;
+    protected readonly ITenantService TenantService;
     protected IEnumerable<string>? FlashMessages => UnderTest.TempData["FlashMessages"] as List<string>;
     protected readonly AdminController UnderTest;
 
@@ -23,8 +24,9 @@ public class AdminControllerTestsBase : ControllerTestsBase
         AdminService = A.Fake<IAdminService>();
         LandlordService = A.Fake<ILandlordService>();
         PropertyService = A.Fake<IPropertyService>();
+        TenantService = A.Fake<ITenantService>();
         var httpContext = new DefaultHttpContext();
         var tempData = new TempDataDictionary(httpContext, A.Fake<ITempDataProvider>());
-        UnderTest = new AdminController(Logger, AdminService, LandlordService, PropertyService){TempData = tempData};
+        UnderTest = new AdminController(Logger, AdminService, LandlordService, PropertyService, TenantService){TempData = tempData};
     }
 }

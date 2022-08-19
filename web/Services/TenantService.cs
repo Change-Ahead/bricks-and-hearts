@@ -7,8 +7,8 @@ namespace BricksAndHearts.Services;
 public interface ITenantService
 {
     public TenantCountModel CountTenants();
-    public Task<List<TenantDbModel>?> FilterNearestTenantsToProperty(HousingRequirementModel filters, bool isMatching, string postcode, int currentPage, int tenantsPerPage);
-    public Task<List<TenantDbModel>?> GetNearestTenantsToProperty(PropertyViewModel currentProperty);
+    public Task<(List<TenantDbModel> TenantList, int Count)> FilterNearestTenantsToProperty(HousingRequirementModel filters, bool isMatching, string? postcode, int currentPage, int tenantsPerPage);
+    public Task<(List<TenantDbModel> TenantList, int Count)> GetNearestTenantsToProperty(PropertyViewModel currentProperty);
 }
 
 public class TenantService : ITenantService
@@ -31,31 +31,18 @@ public class TenantService : ITenantService
         };
     }
 
-    public async Task<(IQueryable<TenantDbModel>?, int Count)> SortTenantsByLocationAndFilter(HousingRequirementModel filters, bool isMatching, string postalCode, int page, int tenantsPerPage)
+    public async Task<(List<TenantDbModel> TenantList, int Count)> FilterNearestTenantsToProperty(HousingRequirementModel filters, bool isMatching, string? postcode, int currentPage, int tenantsPerPage)
     {
-        var postcode = _postcodeService.FormatPostcode(postalCode);
-        var postcodeList = new List<string> { postcode };
-        await _postcodeService.AddPostcodesToDatabaseIfAbsent(postcodeList);
-        var targetLocation = _dbContext.Postcodes.SingleOrDefault(p => p.Postcode == postcode);
-        var tenantQuery = GetFilteredTenantQuery(filters, isMatching);
-        if (targetLocation?.Location == null)
-        {
-            return (tenantQuery, 0);
-        }
-        
-        var tenants = _dbContext.Tenants
-            .Include(t => t.Postcode)
-            .Where(t => t.Postcode != null)
-            .OrderBy(p =>   p.Postcode!.Location!.Distance(targetLocation.Location))
-            .Skip(tenantsPerPage * (page - 1))
-            .Take(tenantsPerPage);
-        return (await tenants.ToListAsync(), _dbContext.Tenants.Count());
+        var sortedTenantQuery = await SortTenantsByLocationAndFilter(filters,
+            isMatching, postcode, currentPage, tenantsPerPage);
+        return (await sortedTenantQuery.TenantList.ToListAsync(), sortedTenantQuery.Count);
     }
     
-    public async Task<List<TenantDbModel>?> GetNearestTenantsToProperty(PropertyViewModel currentProperty)
+    public async Task<(List<TenantDbModel> TenantList, int Count)> GetNearestTenantsToProperty(PropertyViewModel currentProperty)
     {
-        var sortedFilteredTenantQuery = (await SortTenantsByLocationAndFilter(currentProperty.LandlordRequirements, true, currentProperty.Address.Postcode!, 1, 1000000000))!.Take(5);
-        return await sortedFilteredTenantQuery.ToListAsync();
+        var sortedTenantQuery = await SortTenantsByLocationAndFilter(currentProperty.LandlordRequirements, 
+            true, currentProperty.Address.Postcode, 1, 5);
+        return (await sortedTenantQuery.TenantList.ToListAsync(), sortedTenantQuery.Count);
     }
 
     private IQueryable<TenantDbModel> GetFilteredTenantQuery(HousingRequirementModel filters, bool isMatching)
@@ -76,7 +63,6 @@ public class TenantService : ITenantService
                                           && (filters.AcceptsBenefits == null || t.HousingBenefits == filters.AcceptsBenefits) 
                                           && (filters.AcceptsOver35 == null || t.Over35 == filters.AcceptsOver35));
             /*Above are EXCLUSIVE filters for the filters page*/
-            
         }
         if (filters.AcceptsPets == false)
         {
@@ -106,31 +92,30 @@ public class TenantService : ITenantService
         /*Above are INCLUSIVE filters for the matching page*/
     }
     
-    private async Task<IQueryable<TenantDbModel>?> SortTenantsByLocationAndFilter(HousingRequirementModel filters, bool isMatching, string postalCode, int page, int perPage)
+    private async Task<(IQueryable<TenantDbModel> TenantList, int Count)> SortTenantsByLocationAndFilter(HousingRequirementModel filters, bool isMatching, string? postalCode, int page, int tenantsPerPage)
     {
+        var tenantQuery = GetFilteredTenantQuery(filters, isMatching);
+        if (postalCode == null)
+        {
+            return (tenantQuery.Skip(tenantsPerPage * (page - 1))
+                .Take(tenantsPerPage), tenantQuery.Count());
+        }
         var postcode = _postcodeService.FormatPostcode(postalCode);
         var postcodeList = new List<string> { postcode };
         await _postcodeService.AddPostcodesToDatabaseIfAbsent(postcodeList);
         var targetLocation = _dbContext.Postcodes.SingleOrDefault(p => p.Postcode == postcode);
-        var tenantQuery = GetFilteredTenantQuery(filters, isMatching);
-        if (postcode == "")
-        {
-            return tenantQuery;
-        }
         if (targetLocation?.Location == null)
         {
-            return (tenantQuery, 0);
+            return (tenantQuery.Skip(tenantsPerPage * (page - 1))
+                .Take(tenantsPerPage), 0);
         }
         
-        var tenants = _dbContext.Tenants
+        var tenants = tenantQuery
             .Include(t => t.Postcode)
             .Where(t => t.Postcode != null)
             .OrderBy(p =>   p.Postcode!.Location!.Distance(targetLocation.Location))
             .Skip(tenantsPerPage * (page - 1))
             .Take(tenantsPerPage);
-        return (await tenants.ToListAsync(), _dbContext.Tenants.Count());
+        return (tenants, tenantQuery.Count());
     }
-        /*tenants = tenants.Intersect(tenantQuery);
-        return tenants;
-    }*/
 }
