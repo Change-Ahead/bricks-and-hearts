@@ -41,6 +41,10 @@ public class LandlordController : AbstractController
             return View("Register", new LandlordProfileModel { Unassigned = true });
         }
 
+        if (currentUser.IsAdmin)
+        {
+            AddFlashMessage("warning", "You are currently registering yourself as a landlord. If your intention is to create an unassigned landlord account on behalf of someone else, please use the 'Create Unassigned Landlord' link on the Landlord List page.");
+        }
         return View("Register", new LandlordProfileModel
         {
             Email = GetCurrentUser().GoogleEmail

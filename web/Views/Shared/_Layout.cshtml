@@ -86,11 +86,13 @@
 
 <main role="main">
     <div class="container mt-3 pb-4">
-        @if (TempData["FlashMessages"] is string[] flashMessages && TempData["FlashTypes"] is string[] flashTypes)
+        @if (TempData["FlashMessages"] != null && TempData["FlashTypes"] != null)
         {
-            for (var i = 0; i < flashMessages.Length; i++)
+            var flashMessages = TempData["FlashMessages"] as List<string>;
+            var flashTypes = TempData["FlashTypes"] as List<string>;
+            for (var i = 0; i < flashMessages!.Count; i++)
             {
-                <div class="alert alert-@flashTypes[i]" role="alert">
+                <div class="alert alert-@flashTypes![i]" role="alert">
                     @flashMessages[i]
                 </div>
             }
