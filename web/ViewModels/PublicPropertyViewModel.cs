@@ -62,7 +62,7 @@ public class PublicPropertyViewModel
                 AddressLine3 = property.AddressLine3,
                 TownOrCity = property.TownOrCity,
                 County = property.County,
-                Postcode = property.Postcode,
+                Postcode = property.Postcode?.Postcode,
             },
             LandlordRequirements = new HousingRequirementModel
             {

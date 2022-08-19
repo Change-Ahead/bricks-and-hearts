@@ -19,6 +19,8 @@ namespace BricksAndHearts.UnitTests.ServiceTests.Property;
 
 public class PropertyServiceTests : PropertyServiceTestsBase
 {
+    private IPostcodeService _postcodeService = A.Fake<IPostcodeService>();
+
     public PropertyServiceTests(TestDatabaseFixture fixture)
     {
         Fixture = fixture;
@@ -55,7 +57,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         await using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context, null!);
+        var service = new PropertyService(context, _postcodeService);
         var propertiesBeforeCount = context.Properties.Count();
         var createModel = new PropertyViewModel
         {
@@ -67,9 +69,11 @@ public class PropertyServiceTests : PropertyServiceTestsBase
                 Postcode = "CB1 1DX"
             }
         };
+        A.CallTo(() => _postcodeService.GetPostcodeAndAddIfAbsent(A<string>.Ignored))!
+            .Returns(Task.FromResult(TestDatabaseFixture.Postcodes["CB1 1DX"]));
 
         // Act
-        service.AddNewProperty(landlordId, createModel);
+        await service.AddNewProperty(landlordId, createModel);
         context.ChangeTracker.Clear();
 
         // Assert
@@ -112,7 +116,9 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     {
         // Arrange
         await using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context, null!);
+        A.CallTo(() => _postcodeService.GetPostcodeAndAddIfAbsent(A<string>.Ignored))!
+            .Returns(Task.FromResult(TestDatabaseFixture.Postcodes["CB1 1DX"]));
+        var service = new PropertyService(context, _postcodeService);
         context.Properties.Single(u => u.Id == 1).AcceptsBenefits = true;
         var propertiesBeforeCount = context.Properties.Count();
         var updateModel = new PropertyViewModel
@@ -131,7 +137,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         };
 
         // Act
-        service.UpdateProperty(1, updateModel, false);
+        await service.UpdateProperty(1, updateModel, false);
         context.ChangeTracker.Clear();
 
         // Assert
@@ -143,17 +149,19 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     }
 
     [Fact]
-    public void UpdateProperty_SetsStateToOccupied_IfAllUnitsOccupied()
+    public async Task UpdateProperty_SetsStateToOccupied_IfAllUnitsOccupied()
     {
         // Arrange
-        using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context, null!);
+        await using var context = Fixture.CreateWriteContext();
+        A.CallTo(() => _postcodeService.GetPostcodeAndAddIfAbsent(A<string>.Ignored))!
+            .Returns(Task.FromResult<PostcodeDbModel?>(null));
+        var service = new PropertyService(context, _postcodeService);
 
         var propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
         var propertyUpdate = new PropertyViewModel { OccupiedUnits = propertyDb.TotalUnits };
 
         // Act
-        service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
+        await service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
         context.ChangeTracker.Clear();
 
         // Assert
@@ -163,30 +171,34 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     }
 
     [Fact]
-    public void UpdateProperty_Fails_OccupiedGreaterThanTotal()
+    public async Task UpdateProperty_Fails_OccupiedGreaterThanTotal()
     {
         // Arrange
-        using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context, null!);
+        await using var context = Fixture.CreateWriteContext();
+        A.CallTo(() => _postcodeService.GetPostcodeAndAddIfAbsent(A<string>.Ignored))!
+            .Returns(Task.FromResult<PostcodeDbModel?>(null));
+        var service = new PropertyService(context, _postcodeService);
 
         var propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
         var propertyUpdate = new PropertyViewModel { OccupiedUnits = propertyDb.TotalUnits + 1 };
 
         // Act
-        var act = () => service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
+        var act = async () => await service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
         context.ChangeTracker.Clear();
 
         // Assert
-        act.Should().Throw<DbUpdateException>().WithInnerException<SqlException>()
+        (await act.Should().ThrowAsync<DbUpdateException>()).WithInnerException<SqlException>()
             .WithMessage("The UPDATE statement conflicted with the CHECK constraint \"OccupiedUnits\".*");
     }
 
     [Fact]
-    public void UpdateProperty_UpdatesAvailableFromDate_WhenAvailableSoon()
+    public async Task UpdateProperty_UpdatesAvailableFromDate_WhenAvailableSoon()
     {
         // Arrange
-        using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context, null!);
+        await using var context = Fixture.CreateWriteContext();
+        A.CallTo(() => _postcodeService.GetPostcodeAndAddIfAbsent(A<string>.Ignored))!
+            .Returns(Task.FromResult<PostcodeDbModel?>(null));
+        var service = new PropertyService(context, _postcodeService);
 
         var date = DateTime.Now;
         var propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
@@ -197,7 +209,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         };
 
         // Act
-        service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
+        await service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
         context.ChangeTracker.Clear();
 
         // Assert
@@ -207,11 +219,13 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     }
 
     [Fact]
-    public void UpdateProperty_DoesntChangeAvailableFromDate_WhenOccupiedStateOverrides()
+    public async Task UpdateProperty_DoesntChangeAvailableFromDate_WhenOccupiedStateOverrides()
     {
         // Arrange
-        using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context, null!);
+        await using var context = Fixture.CreateWriteContext();
+        A.CallTo(() => _postcodeService.GetPostcodeAndAddIfAbsent(A<string>.Ignored))!
+            .Returns(Task.FromResult<PostcodeDbModel?>(null));
+        var service = new PropertyService(context, _postcodeService);
 
         var date = DateTime.Now;
         var propertyDb = context.Properties.Single(p => p.AddressLine1 == "AvailableSoon Property");
@@ -221,7 +235,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         };
 
         // Act
-        service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
+        await service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
         context.ChangeTracker.Clear();
 
         // Assert
@@ -231,11 +245,13 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     }
 
     [Fact]
-    public void UpdateProperty_SetsAvailableFromDateToNull_WhenOccupiedStateOverrides()
+    public async Task UpdateProperty_SetsAvailableFromDateToNull_WhenOccupiedStateOverrides()
     {
         // Arrange
-        using var context = Fixture.CreateWriteContext();
-        var service = new PropertyService(context, null!);
+        await using var context = Fixture.CreateWriteContext();
+        A.CallTo(() => _postcodeService.GetPostcodeAndAddIfAbsent(A<string>.Ignored))!
+            .Returns(Task.FromResult<PostcodeDbModel?>(null));
+        var service = new PropertyService(context, _postcodeService);
 
         var date = DateTime.Now;
         var propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
@@ -247,7 +263,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         };
 
         // Act
-        service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
+        await service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
         context.ChangeTracker.Clear();
 
         // Assert
@@ -459,8 +475,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         var httpClient = new HttpClient(messageHandler);
         var postcodeApiService = new PostcodeService(logger, context, httpClient);
         var service = new PropertyService(context, postcodeApiService);
-        
-        
+
         // Act
         var result = await service.GetPropertyList("Location", postcode, 1, 10);
 

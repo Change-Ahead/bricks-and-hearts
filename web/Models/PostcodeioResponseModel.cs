@@ -13,7 +13,7 @@ public class PostcodeResult
     [JsonProperty("postcode")] 
     public string? Postcode { get; set; }
     [JsonProperty("latitude")] 
-    public decimal? Lat { get; set; }
+    public double Lat { get; set; }
     [JsonProperty("longitude")] 
-    public decimal? Lon { get; set; }
+    public double Lon { get; set; }
 }

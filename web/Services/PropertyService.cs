@@ -7,8 +7,8 @@ namespace BricksAndHearts.Services;
 
 public interface IPropertyService
 {
-    public int AddNewProperty(int landlordId, PropertyViewModel createModel, bool isIncomplete = true);
-    public void UpdateProperty(int propertyId, PropertyViewModel updateModel, bool isIncomplete = true);
+    public Task<int> AddNewProperty(int landlordId, PropertyViewModel createModel, bool isIncomplete = true);
+    public Task UpdateProperty(int propertyId, PropertyViewModel updateModel, bool isIncomplete = true);
     public void DeleteProperty(PropertyDbModel property);
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId);
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId);
@@ -16,7 +16,6 @@ public interface IPropertyService
     public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertiesByLandlord(int landlordId, int page, int propPerPage);
     public PropertyCountModel CountProperties(int? landlordId = null);
     string? CreateNewPublicViewLink(int propertyId);
-
 }
 
 public class PropertyService : IPropertyService
@@ -31,8 +30,9 @@ public class PropertyService : IPropertyService
     }
 
     // Create a new property record and associate it with a landlord
-    public int AddNewProperty(int landlordId, PropertyViewModel createModel, bool isIncomplete = true)
+    public async Task<int> AddNewProperty(int landlordId, PropertyViewModel createModel, bool isIncomplete = true)
     {
+        var postcode = await _postcodeService.GetPostcodeAndAddIfAbsent(createModel.Address.Postcode);
         var dbModel = new PropertyDbModel
         {
             LandlordId = landlordId,
@@ -45,9 +45,7 @@ public class PropertyService : IPropertyService
             AddressLine3 = createModel.Address.AddressLine3,
             TownOrCity = createModel.Address.TownOrCity,
             County = createModel.Address.County,
-            Postcode = createModel.Address.Postcode!,
-            Lat = createModel.Lat,
-            Lon = createModel.Lon,
+            PostcodeId = postcode?.Postcode,
 
             PropertyType = createModel.PropertyType,
             NumOfBedrooms = createModel.NumOfBedrooms,
@@ -68,24 +66,24 @@ public class PropertyService : IPropertyService
 
             Availability = createModel.Availability ?? AvailabilityState.Draft,
             TotalUnits = createModel.TotalUnits ?? 1,
-            OccupiedUnits = createModel.OccupiedUnits ?? 0
+            OccupiedUnits = createModel.OccupiedUnits ?? 0,
+            AvailableFrom = createModel.Availability == AvailabilityState.AvailableSoon
+                ? createModel.AvailableFrom
+                : null
         };
-
-        dbModel.AvailableFrom = createModel.Availability == AvailabilityState.AvailableSoon
-            ? createModel.AvailableFrom
-            : null;
 
         // Add the new property to the database
         _dbContext.Properties.Add(dbModel);
-        _dbContext.SaveChanges();
+        await _dbContext.SaveChangesAsync();
 
         return dbModel.Id;
     }
 
     // Update any fields that are not null in updateModel
-    public void UpdateProperty(int propertyId, PropertyViewModel updateModel, bool isIncomplete = true)
+    public async Task UpdateProperty(int propertyId, PropertyViewModel updateModel, bool isIncomplete = true)
     {
         var dbModel = _dbContext.Properties.Single(p => p.Id == propertyId);
+        var newPostcode = await _postcodeService.GetPostcodeAndAddIfAbsent(updateModel.Address.Postcode);
 
         // Update fields if they have been set (i.e. not null) in updateModel
         // Otherwise use the value we currently have in the database
@@ -94,9 +92,7 @@ public class PropertyService : IPropertyService
         dbModel.AddressLine3 = updateModel.Address.AddressLine3 ?? dbModel.AddressLine3;
         dbModel.TownOrCity = updateModel.Address.TownOrCity ?? dbModel.TownOrCity;
         dbModel.County = updateModel.Address.County ?? dbModel.County;
-        dbModel.Postcode = updateModel.Address.Postcode ?? dbModel.Postcode;
-        dbModel.Lat = updateModel.Lat ?? dbModel.Lat;
-        dbModel.Lon = updateModel.Lon ?? dbModel.Lon;
+        dbModel.PostcodeId = newPostcode?.Postcode ?? dbModel.Postcode?.Postcode;
 
         dbModel.PropertyType = updateModel.PropertyType ?? dbModel.PropertyType;
         dbModel.NumOfBedrooms = updateModel.NumOfBedrooms ?? dbModel.NumOfBedrooms;
@@ -139,7 +135,7 @@ public class PropertyService : IPropertyService
         }
 
         dbModel.IsIncomplete = isIncomplete;
-        _dbContext.SaveChanges();
+        await _dbContext.SaveChangesAsync();
     }
 
     public void DeleteProperty(PropertyDbModel property)
@@ -176,30 +172,18 @@ public class PropertyService : IPropertyService
                 {
                     return (new List<PropertyDbModel>(), 0);
                 }
+
                 var postcodeList = new List<string> { postcode };
                 await _postcodeService.AddPostcodesToDatabaseIfAbsent(postcodeList);
                 var model = _dbContext.Postcodes.SingleOrDefault(p => p.Postcode == postcode);
-                if (model?.Lat == null || model.Lon == null)
+                if (model?.Location == null)
                 {
                     return (new List<PropertyDbModel>(), 0);
                 }
 
                 properties = _dbContext.Properties
-                    .FromSqlInterpolated(
-                        @$"SELECT *, (
-                  6371 * acos (
-                  cos ( radians({model.Lat}) )
-                  * cos( radians( Lat ) )
-                  * cos( radians( Lon ) - radians({model.Lon}) )
-                  + sin ( radians({model.Lat}) )
-                  * sin( radians( Lat ) )
-                    )
-                ) AS distance 
-                FROM dbo.Property
-                WHERE Lon is not NULL and Lat is not NULL
-                ORDER BY distance
-                OFFSET 0 ROWS
-                ");
+                    .Where(p => p.Postcode != null && p.Postcode.Location != null)
+                    .OrderBy(p => p.Postcode!.Location!.Distance(model.Location));
                 break;
             case "Rent":
                 properties = _dbContext.Properties.OrderBy(m => m.Rent);
@@ -214,7 +198,7 @@ public class PropertyService : IPropertyService
 
         return (await properties.Skip((page - 1) * propPerPage).Take(propPerPage).ToListAsync(), properties.Count());
     }
-    
+
     public async Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertiesByLandlord(int landlordId, int page, int propPerPage)
     {
         var properties = _dbContext.Properties
@@ -225,17 +209,18 @@ public class PropertyService : IPropertyService
 
     public PropertyCountModel CountProperties(int? landlordId = null)
     {
-        if(landlordId == null)
+        if (landlordId == null)
         {
             return new PropertyCountModel
             {
                 RegisteredProperties = _dbContext.Properties.Count(),
                 LiveProperties = _dbContext.Properties.Count(p =>
-                    p.Availability != AvailabilityState.Draft 
+                    p.Availability != AvailabilityState.Draft
                     && p.Landlord.CharterApproved),
                 AvailableProperties = _dbContext.Properties.Count(p => p.Availability == AvailabilityState.Available)
-            };   
+            };
         }
+
         var landlord = _dbContext.Landlords.Include(l => l.Properties).SingleOrDefault(l => l.Id == landlordId);
         var properties = landlord?.Properties ?? new List<PropertyDbModel>();
         return new PropertyCountModel
@@ -255,6 +240,7 @@ public class PropertyService : IPropertyService
         {
             throw new Exception("Property should not have existing public view link!");
         }
+
         var g = Guid.NewGuid();
         var publicViewLink = g.ToString();
         propertyDbModel.PublicViewLink = publicViewLink;

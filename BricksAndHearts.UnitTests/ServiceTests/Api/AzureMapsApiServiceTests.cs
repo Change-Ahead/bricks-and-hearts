@@ -17,19 +17,16 @@ namespace BricksAndHearts.UnitTests.ServiceTests.Api;
 
 public class AzureMapsApiServiceTests
 {
-    private IOptions<AzureMapsOptions> _options; 
-    private ILogger<AzureMapsApiService> _logger; 
-    private HttpMessageHandler _messageHandler;
-    private HttpClient _httpClient;
-    private AzureMapsApiService _underTest;
+    private readonly HttpMessageHandler _messageHandler;
+    private readonly AzureMapsApiService _underTest;
 
     public AzureMapsApiServiceTests()
     {
-        _options = A.Fake<IOptions<AzureMapsOptions>>();
-        _logger= A.Fake<ILogger<AzureMapsApiService>>();
+        var options = A.Fake<IOptions<AzureMapsOptions>>();
+        var logger = A.Fake<ILogger<AzureMapsApiService>>();
         _messageHandler = A.Fake<HttpMessageHandler>();
-        _httpClient = new HttpClient(_messageHandler);
-        _underTest= new AzureMapsApiService(_logger, _options,_httpClient);
+        var httpClient = new HttpClient(_messageHandler);
+        _underTest= new AzureMapsApiService(logger, options,httpClient);
     }
     
     [Fact]
@@ -75,8 +72,8 @@ public class AzureMapsApiServiceTests
 
         results.Address!.Keys.ToList().Should().Contain("streetName");
         results.Address!["streetName"].Should().Be("Adam & Eve Street");
-        results.LatLon!["lat"].Should().Be((decimal)52.2046);
-        results.LatLon!["lon"].Should().Be((decimal)0.13244);
+        results.LatLon!["lat"].Should().Be(52.2046);
+        results.LatLon!["lon"].Should().Be(0.13244);
     }
     
     [Fact]
@@ -117,7 +114,8 @@ public class AzureMapsApiServiceTests
         model.Address.AddressLine2.Should().NotBeNull();
         model.Address.County.Should().NotBeNull();
         model.Address.TownOrCity.Should().NotBeNull();
-        model.Lat.Should().Be((decimal)52.2046);
-        model.Lon.Should().Be((decimal)0.13244);
+        model.Location.Should().NotBeNull();
+        model.Location!.Y.Should().Be(52.2046);
+        model.Location!.X.Should().Be(0.13244);
     }
 }

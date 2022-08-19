@@ -19,7 +19,7 @@ public class BricksAndHeartsDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer(_config.GetValue<string>("DBConnectionString"));
+        optionsBuilder.UseSqlServer(_config.GetValue<string>("DBConnectionString"), x => x.UseNetTopologySuite());
         optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
     }
 
@@ -39,12 +39,6 @@ public class BricksAndHeartsDbContext : DbContext
             .WithMany(l => l.Properties)
             .HasForeignKey(p => p.LandlordId)
             .OnDelete(DeleteBehavior.Restrict);
-        modelBuilder.Entity<PropertyDbModel>()
-            .Property(l => l.Lat)
-            .HasPrecision(12, 9);
-        modelBuilder.Entity<PropertyDbModel>()
-            .Property(l => l.Lon)
-            .HasPrecision(12, 9);
         modelBuilder.Entity<PropertyDbModel>()
             .HasCheckConstraint("OccupiedUnits", "[OccupiedUnits] <= [TotalUnits]");
     }

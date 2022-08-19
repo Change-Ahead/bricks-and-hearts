@@ -1,5 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations.Schema;
 
 namespace BricksAndHearts.Database;
 
@@ -11,10 +10,9 @@ public class TenantDbModel
     public string? Email { get; set; }
     public string? Phone { get; set; }
     
-    public string? Postcode { get; set; }
-    public decimal? Lat { get; set; }
-    public decimal? Lon { get; set; }
-    
+    public PostcodeDbModel? Postcode { get; set; }
+    public string? PostcodeId { get; set; }
+
     public string? Type { get; set; }
     public bool? HasPet { get; set; }
     public bool? ETT { get; set; }

@@ -15,7 +15,6 @@ public class PropertyControllerTestsBase : ControllerTestsBase
 {
     protected readonly IAzureMapsApiService AzureMapsApiService;
     protected readonly IAzureStorage AzureStorage;
-    protected readonly ILogger<PropertyController> Logger;
     protected readonly IPropertyService PropertyService;
     protected readonly PropertyController UnderTest;
 
@@ -24,13 +23,13 @@ public class PropertyControllerTestsBase : ControllerTestsBase
         PropertyService = A.Fake<IPropertyService>();
         AzureMapsApiService = A.Fake<IAzureMapsApiService>();
         AzureStorage = A.Fake<IAzureStorage>();
-        Logger = A.Fake<ILogger<PropertyController>>();
+        var logger = A.Fake<ILogger<PropertyController>>();
         var httpContext = new DefaultHttpContext();
         var tempData = new TempDataDictionary(httpContext, A.Fake<ITempDataProvider>());
-        UnderTest = new PropertyController(PropertyService, AzureMapsApiService, Logger, AzureStorage){TempData = tempData};
+        UnderTest = new PropertyController(PropertyService, AzureMapsApiService, logger, AzureStorage){TempData = tempData};
     }
 
-    protected PropertyViewModel CreateExamplePropertyViewModel()
+    protected static PropertyViewModel CreateExamplePropertyViewModel()
     {
         return new PropertyViewModel
         {
@@ -53,14 +52,17 @@ public class PropertyControllerTestsBase : ControllerTestsBase
         };
     }
 
-    protected PropertyDbModel CreateExamplePropertyDbModel()
+    protected static PropertyDbModel CreateExamplePropertyDbModel()
     {
         return new PropertyDbModel
         {
             LandlordId = 1,
             Id = 1,
             AddressLine1 = "10 Downing Street",
-            Postcode = "SW1A 2AA",
+            Postcode = new PostcodeDbModel
+            {
+                Postcode = "SW1A 2AA"
+            },
             NumOfBedrooms = 2,
             Rent = 750,
             Description = "Property description",
@@ -68,7 +70,7 @@ public class PropertyControllerTestsBase : ControllerTestsBase
         };
     }
 
-    protected IFormFile CreateExampleImage()
+    protected static IFormFile CreateExampleImage()
     {
         var stream = new MemoryStream();
         IFormFile fakeImage = new FormFile(stream, 0, 1, null!, "fakeImage.jpeg");

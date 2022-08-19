@@ -1,7 +1,11 @@
 ﻿using System.Collections.Generic;
+using System.Net.Http;
 using System.Security.Claims;
 using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
+using BricksAndHearts.Services;
+using FakeItEasy;
+using Microsoft.Extensions.Logging;
 using Xunit;
 
 namespace BricksAndHearts.UnitTests.ServiceTests.Property;

@@ -20,9 +20,8 @@ public class PropertyDbModel
     public string? AddressLine3 { get; set; }
     public string? TownOrCity { get; set; }
     public string? County { get; set; }
-    public string Postcode { get; set; } = string.Empty;
-    public decimal? Lat { get; set; } // latitude
-    public decimal? Lon { get; set; } // longitude
+    public PostcodeDbModel? Postcode { get; set; }
+    public string? PostcodeId { get; set; }
 
     // Property details
     public string? PropertyType { get; set; }

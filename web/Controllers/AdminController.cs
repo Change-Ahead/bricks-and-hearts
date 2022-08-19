@@ -263,7 +263,7 @@ public class AdminController : AbstractController
 
     [Authorize(Roles = "Admin")]
     [HttpPost]
-    public async Task<ActionResult> ImportTenants(IFormFile csvFile)
+    public async Task<ActionResult> ImportTenants(IFormFile? csvFile)
     {
         if (csvFile == null)
         {
@@ -284,7 +284,7 @@ public class AdminController : AbstractController
         }
         
         var flashResponse = _csvImportService.CheckIfImportWorks(csvFile);
-        for (int i = 0; i < flashResponse.FlashMessages.Count; i++)
+        for (var i = 0; i < flashResponse.FlashMessages.Count; i++)
         {
             AddFlashMessage(flashResponse.FlashTypes[i], flashResponse.FlashMessages[i]);
         }
@@ -295,7 +295,7 @@ public class AdminController : AbstractController
         }
         
         flashResponse = await _csvImportService.ImportTenants(csvFile);
-        for (int i = 0; i < flashResponse.FlashMessages.Count; i++)
+        for (var i = 0; i < flashResponse.FlashMessages.Count; i++)
         {
             AddFlashMessage(flashResponse.FlashTypes[i],  flashResponse.FlashMessages[i]);
         }
@@ -304,12 +304,6 @@ public class AdminController : AbstractController
         {
             _logger.LogInformation("Successfuly imported all tenant data.");
             AddFlashMessage("success", "Successfully imported all tenant data.");
-        }
-        
-        flashResponse =  _csvImportService.AddLatLonToTenantDb();
-        for (int i = 0; i < flashResponse.FlashMessages.Count; i++)
-        {
-            AddFlashMessage(flashResponse.FlashTypes[i],  flashResponse.FlashMessages[i]);
         }
         
         return RedirectToAction(nameof(TenantList));

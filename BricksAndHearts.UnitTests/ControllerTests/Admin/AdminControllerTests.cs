@@ -18,7 +18,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         // Arrange
         UnderTest.ControllerContext = new ControllerContext
         {
-            HttpContext = new DefaultHttpContext { User = _anonUser }
+            HttpContext = new DefaultHttpContext { User = AnonUser }
         };
 
         // Act

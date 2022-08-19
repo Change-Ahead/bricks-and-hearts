@@ -219,7 +219,7 @@ public class PropertyController : AbstractController
 
             // Create new record in the database for this property
             newPropertyModel.PropertyId =
-                _propertyService.AddNewProperty(newPropertyModel.LandlordId, newPropertyModel);
+                await _propertyService.AddNewProperty(newPropertyModel.LandlordId, newPropertyModel);
 
             // Go to step 2
             return View("AddNewProperty", new AddNewPropertyViewModel { Step = step + 1, Property = newPropertyModel });
