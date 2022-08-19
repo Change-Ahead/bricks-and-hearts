@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using BricksAndHearts.Database;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace BricksAndHearts.ViewModels.PropertyInput;
 
@@ -31,6 +32,9 @@ public class PropertyInputModelTenantPreferences : PropertyInputModelBase
 
     [Required]
     public bool? AcceptsWithoutGuarantor { get; set; }
+
+    [ValidateNever]
+    public override string PreviousAction { get; set; } = "PropertyInputStepFourDescription";
 
     public override void InitialiseViewModel(PropertyDbModel property)
     {

@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using BricksAndHearts.Database;
+using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace BricksAndHearts.ViewModels.PropertyInput;
 
@@ -17,6 +18,9 @@ public class PropertyInputModelAvailability : PropertyInputModelBase
 
     [Required]
     public int? Rent { get; set; }
+
+    [ValidateNever]
+    public override string PreviousAction { get; set; } = "PropertyInputStepFiveTenantPreferences";
 
     public override void InitialiseViewModel(PropertyDbModel property)
     {

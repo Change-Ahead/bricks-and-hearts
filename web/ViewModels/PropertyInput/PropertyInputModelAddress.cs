@@ -20,6 +20,8 @@ public class PropertyInputModelAddress : PropertyInputModelBase
     [Required]
     public string? Postcode { get; set; }
 
+    public override string PreviousAction { get; set; } = "PropertyInputStepOnePostcode";
+
     public override void InitialiseViewModel(PropertyDbModel property)
     {
         Title = "Address";
