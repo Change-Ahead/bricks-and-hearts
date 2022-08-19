@@ -32,8 +32,8 @@ public class PropertyController : AbstractController
     [Authorize(Roles = "Landlord, Admin")]
     public ActionResult DeleteProperty(int propertyId)
     {
-        var propDB = _propertyService.GetPropertyByPropertyId(propertyId);
-        if (propDB == null)
+        var propDb = _propertyService.GetPropertyByPropertyId(propertyId);
+        if (propDb == null)
         {
             _logger.LogWarning($"Property with Id {propertyId} does not exist");
             AddFlashMessage("danger", $"Property with Id {propertyId} does not exist");
@@ -45,15 +45,15 @@ public class PropertyController : AbstractController
             return RedirectToAction("Index", "Home");
         }
 
-        if (GetCurrentUser().IsAdmin == false && GetCurrentUser().LandlordId != propDB.LandlordId)
+        if (GetCurrentUser().IsAdmin == false && GetCurrentUser().LandlordId != propDb.LandlordId)
         {
             _logger.LogWarning(
                 $"User {GetCurrentUser().Id} does not have access to any property with ID {propertyId}.");
             return StatusCode(403);
         }
 
-        var landlordId = propDB.LandlordId;
-        _propertyService.DeleteProperty(propDB);
+        var landlordId = propDb.LandlordId;
+        _propertyService.DeleteProperty(propDb);
         _azureStorage.DeleteContainer("property", propertyId);
 
         AddFlashMessage("danger", $"Successfully deleted property with Id {propertyId}");
@@ -239,12 +239,12 @@ public class PropertyController : AbstractController
         if (step < AddNewPropertyViewModel.MaximumStep)
         {
             // Update the property's record with the values entered at this step
-            _propertyService.UpdateProperty(property.Id, newPropertyModel);
+            await _propertyService.UpdateProperty(property.Id, newPropertyModel);
             return View("AddNewProperty", new AddNewPropertyViewModel { Step = step + 1, Property = newPropertyModel });
         }
 
         // Update the property's record with the final set of values
-        _propertyService.UpdateProperty(property.Id, newPropertyModel, false);
+        await _propertyService.UpdateProperty(property.Id, newPropertyModel, false);
         return RedirectToAction("ViewProperties", "Landlord", new { id = property.LandlordId });
     }
 
@@ -357,14 +357,14 @@ public class PropertyController : AbstractController
 
             await _azureMapsApiService.AutofillAddress(newPropertyModel);
 
-            _propertyService.UpdateProperty(propertyId, newPropertyModel, newPropertyModel.IsIncomplete);
+            await _propertyService.UpdateProperty(propertyId, newPropertyModel, newPropertyModel.IsIncomplete);
             // Go to step 2
             newPropertyModel = PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(propertyId)!);
             return View("EditProperty", new AddNewPropertyViewModel { Step = step + 1, Property = newPropertyModel });
         }
 
         // Update the property's record with the final set of values
-        _propertyService.UpdateProperty(propertyId, newPropertyModel, newPropertyModel.IsIncomplete);
+        await _propertyService.UpdateProperty(propertyId, newPropertyModel, newPropertyModel.IsIncomplete);
         newPropertyModel = PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(propertyId)!);
 
         if (step < AddNewPropertyViewModel.MaximumStep)
@@ -373,7 +373,7 @@ public class PropertyController : AbstractController
             return View("EditProperty", new AddNewPropertyViewModel { Step = step + 1, Property = newPropertyModel });
         }
 
-        _propertyService.UpdateProperty(propertyId, newPropertyModel, false);
+        await _propertyService.UpdateProperty(propertyId, newPropertyModel, false);
         // Finished adding property, so go to View Properties page
         return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
     }

@@ -26,7 +26,7 @@ public class AzureMapsApiServiceTests
         var logger = A.Fake<ILogger<AzureMapsApiService>>();
         _messageHandler = A.Fake<HttpMessageHandler>();
         var httpClient = new HttpClient(_messageHandler);
-        _underTest= new AzureMapsApiService(logger, options,httpClient);
+        _underTest= new AzureMapsApiService(logger, options, httpClient);
     }
     
     [Fact]

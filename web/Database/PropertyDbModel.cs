@@ -20,8 +20,8 @@ public class PropertyDbModel
     public string? AddressLine3 { get; set; }
     public string? TownOrCity { get; set; }
     public string? County { get; set; }
-    public PostcodeDbModel? Postcode { get; set; }
     public string? PostcodeId { get; set; }
+    public PostcodeDbModel? Postcode { get; set; }
 
     // Property details
     public string? PropertyType { get; set; }
@@ -50,11 +50,11 @@ public class PropertyDbModel
     public int OccupiedUnits { get; set; }
 
     [DataType(DataType.Date)]
-    public DateTime? AvailableFrom { get; set; } = null;
+    public DateTime? AvailableFrom { get; set; }
 
     // Tenant
     public int? RenterUserId { get; set; } = null;
-    
+
     // Suffix to append to url for public view
     public string? PublicViewLink { get; set; }
 }

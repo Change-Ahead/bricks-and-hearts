@@ -125,7 +125,9 @@ public class PostcodeService : IPostcodeService
         var postcodeDbModels = postcodeResponses.Select(p => new PostcodeDbModel
         {
             Postcode = p.Result!.Postcode!,
-            Location = new Point(p.Result.Lon, p.Result.Lat) { SRID = 4326 }
+            Location = p.Result.Lon != null && p.Result.Lat != null 
+                ? new Point((double)p.Result.Lon, (double)p.Result.Lat) { SRID = 4326 } 
+                : null
         });
         _dbContext.Postcodes.AddRange(postcodeDbModels);
         _dbContext.SaveChanges();
