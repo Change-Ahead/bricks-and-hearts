@@ -18,7 +18,7 @@ public class AdminControllerTestsBase : ControllerTestsBase
     protected readonly ITenantService TenantService;
     protected readonly ICsvImportService CsvImportService;
     protected readonly IMailService MailService;
-    protected IEnumerable<string>? FlashMessages => UnderTest.TempData["FlashMessages"] as List<string>;
+    protected IEnumerable<string>? FlashMessages => UnderTest.TempData["FlashMessages"] as string[];
     protected readonly AdminController UnderTest;
 
     protected AdminControllerTestsBase()

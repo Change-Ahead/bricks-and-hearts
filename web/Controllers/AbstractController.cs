@@ -18,10 +18,18 @@ public abstract class AbstractController : Controller
 
     protected void AddFlashMessage(string flashType, string flashMessage)
     {
-        TempData["FlashTypes"] ??= new List<string>();
-        TempData["FlashMessages"] ??= new List<string>();
+        TempData["FlashTypes"] ??= new string[] {};
+        TempData["FlashMessages"] ??= new string[] {};
+
+        var flashMessageArray = TempData["FlashMessages"] as string[];
+        var flashMessageList = new List<string>(flashMessageArray!);
+        flashMessageList.Add(flashMessage);
         
-        (TempData["FlashTypes"] as List<string>)!.Add(flashType);
-        (TempData["FlashMessages"] as List<string>)!.Add(flashMessage);
+        var flashTypeArray = TempData["FlashTypes"] as string[];
+        var flashTypeList = new List<string>(flashTypeArray!);
+        flashTypeList.Add(flashType);
+
+        TempData["FlashMessages"] = flashMessageList.ToArray();
+        TempData["FlashTypes"] = flashTypeList.ToArray();
     }
 }

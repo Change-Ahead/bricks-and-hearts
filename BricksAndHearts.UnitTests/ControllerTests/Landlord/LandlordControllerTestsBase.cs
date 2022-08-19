@@ -20,7 +20,7 @@ public class LandlordControllerTestsBase : ControllerTestsBase
     protected readonly IMailService MailService;
     protected readonly IPropertyService PropertyService;
     protected readonly IAzureStorage AzureStorage;
-    protected IEnumerable<string>? FlashMessages => UnderTest.TempData["FlashMessages"] as List<string>;
+    protected IEnumerable<string>? FlashMessages => UnderTest.TempData["FlashMessages"] as string[];
     protected readonly LandlordController UnderTest;
 
     protected LandlordControllerTestsBase()
