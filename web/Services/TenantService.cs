@@ -30,7 +30,7 @@ public class TenantService : ITenantService
             return (new List<TenantDbModel>(), 0);
         }
 
-        var tenants = await _dbContext.Tenants
+        var tenants = _dbContext.Tenants
             .FromSqlInterpolated(
                 @$"SELECT *, (
                   6371 * acos (
@@ -44,10 +44,8 @@ public class TenantService : ITenantService
                 FROM dbo.Tenant
                 WHERE Lon is not NULL and Lat is not NULL
                 ORDER BY distance
-                OFFSET {tenantsPerPage * (page - 1)} ROWS
-                FETCH NEXT {tenantsPerPage} ROWS ONLY
-                ").ToListAsync();
-        var tenantCount = await _dbContext.Tenants.CountAsync();
-        return (tenants, tenantCount);
+                OFFSET 0 ROWS
+                ");
+        return (await tenants.Skip((page - 1) * tenantsPerPage).Take(tenantsPerPage).ToListAsync(), tenants.Count());
     }
 }

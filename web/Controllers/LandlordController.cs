@@ -210,14 +210,13 @@ public class LandlordController : AbstractController
             return StatusCode(403);
         }
 
-        var databaseResult = _propertyService.GetPropertiesByLandlord(id.Value);
-        var listOfProperties = databaseResult.Select(PropertyViewModel.FromDbModel).Skip((page - 1) * propPerPage)
-            .Take(propPerPage).ToList();
+        var properties = await _propertyService.GetPropertiesByLandlord(id.Value, page, propPerPage);
+        var listOfProperties = properties.PropertyList.Select(PropertyViewModel.FromDbModel).ToList();
         var landlordProfile = LandlordProfileModel.FromDbModel(await _landlordService.GetLandlordFromId((int)id));
 
         TempData["FullWidthPage"] = true;
         return View("Properties",
-            new PropertyListModel(listOfProperties, databaseResult.Count, landlordProfile, page));
+            new PropertyListModel(listOfProperties, properties.Count, landlordProfile, page));
     }
 
     [HttpGet("{landlordId:int}/edit")]

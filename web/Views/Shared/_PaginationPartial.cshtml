@@ -1,0 +1,25 @@
+﻿@model PaginationModel
+
+@{
+    var from = (Model.Page - 1) * Model.ItemsPerPage + 1;
+    var to = Math.Min((Model.Page - 1) * Model.ItemsPerPage + Model.ItemsPerPage, Model.Total);
+}
+
+@if (Model.ItemsOnPage > 0)
+{
+    <p>Displaying properties @from to @to of @Model.Total</p>
+}
+
+@if (Model.Page > 1)
+{
+    <a type="button" class="btn btn-outline-primary" href="@Model.HrefPrevious">
+        <i class="previous">Previous</i>
+    </a>
+}
+
+@if (Model.Page <= (Model.Total-1)/Model.ItemsPerPage)
+{
+    <a type="button" class="btn btn-outline-primary" href="@Model.HrefNext">
+        <i class="bi">Next</i>
+    </a>
+}

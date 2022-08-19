@@ -7,13 +7,13 @@ namespace BricksAndHearts.Services;
 
 public interface IPropertyService
 {
-    public List<PropertyDbModel> GetPropertiesByLandlord(int landlordId);
     public int AddNewProperty(int landlordId, PropertyViewModel createModel, bool isIncomplete = true);
     public void UpdateProperty(int propertyId, PropertyViewModel updateModel, bool isIncomplete = true);
     public void DeleteProperty(PropertyDbModel property);
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId);
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId);
     public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string sortBy, string? target, int page, int propPerPage);
+    public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertiesByLandlord(int landlordId, int page, int propPerPage);
     public PropertyCountModel CountProperties(int? landlordId = null);
     string? CreateNewPublicViewLink(int propertyId);
 
@@ -28,12 +28,6 @@ public class PropertyService : IPropertyService
     {
         _dbContext = dbContext;
         _postcodeService = postcodeService;
-    }
-
-    public List<PropertyDbModel> GetPropertiesByLandlord(int landlordId)
-    {
-        return _dbContext.Properties
-            .Where(p => p.LandlordId == landlordId).ToList();
     }
 
     // Create a new property record and associate it with a landlord
@@ -173,7 +167,7 @@ public class PropertyService : IPropertyService
 
     public async Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string? sortBy, string? target, int page, int propPerPage)
     {
-        List<PropertyDbModel> properties;
+        IQueryable<PropertyDbModel> properties;
         switch (sortBy)
         {
             case "Location":
@@ -190,7 +184,7 @@ public class PropertyService : IPropertyService
                     return (new List<PropertyDbModel>(), 0);
                 }
 
-                properties = await _dbContext.Properties
+                properties = _dbContext.Properties
                     .FromSqlInterpolated(
                         @$"SELECT *, (
                   6371 * acos (
@@ -204,21 +198,28 @@ public class PropertyService : IPropertyService
                 FROM dbo.Property
                 WHERE Lon is not NULL and Lat is not NULL
                 ORDER BY distance
-                OFFSET {propPerPage * (page - 1)} ROWS
-                FETCH NEXT {propPerPage} ROWS ONLY
-                ").ToListAsync();
+                OFFSET 0 ROWS
+                ");
                 break;
             case "Rent":
-                properties = await _dbContext.Properties.OrderBy(m => m.Rent).Skip((page - 1) * propPerPage).Take(propPerPage).ToListAsync();
+                properties = _dbContext.Properties.OrderBy(m => m.Rent);
                 break;
             case "Availability": //TODO once availability state logic is improved (BNH-122), make this a useful sort
-                properties = await _dbContext.Properties.OrderBy(m => m.AvailableFrom).Skip((page - 1) * propPerPage).Take(propPerPage).ToListAsync();
+                properties = _dbContext.Properties.OrderBy(m => m.AvailableFrom);
                 break;
             default:
-                properties = await _dbContext.Properties.Skip((page - 1) * propPerPage).Take(propPerPage).ToListAsync();
+                properties = _dbContext.Properties;
                 break;
         }
-        var propCount = await _dbContext.Properties.CountAsync();
+
+        return (await properties.Skip((page - 1) * propPerPage).Take(propPerPage).ToListAsync(), properties.Count());
+    }
+    
+    public async Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertiesByLandlord(int landlordId, int page, int propPerPage)
+    {
+        var properties = _dbContext.Properties
+            .Where(p => p.LandlordId == landlordId).Skip((page - 1) * propPerPage).Take(propPerPage).ToList();
+        var propCount = await _dbContext.Properties.Where(p => p.LandlordId == landlordId).CountAsync();
         return (properties, propCount);
     }
 

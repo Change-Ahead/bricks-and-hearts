@@ -38,10 +38,10 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         var service = new PropertyService(context, null!);
 
         // Act
-        var propertiesByLandlord = service.GetPropertiesByLandlord(landlordId);
+        var propertiesByLandlord = await service.GetPropertiesByLandlord(landlordId, 1, 10);
 
         // Assert
-        propertiesByLandlord.Should().OnlyContain(u => u.LandlordId == landlordId);
+        propertiesByLandlord.PropertyList.Should().OnlyContain(u => u.LandlordId == landlordId);
     }
 
     #endregion

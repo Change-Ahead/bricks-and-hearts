@@ -21,32 +21,24 @@
         }
     </h1>
 
-   <div class="row mt-4">
+    <div class="row mt-4">
         @* Sorting and filtering goes here *@
 
         <div class="col-auto ms-sm-auto">
             <a asp-controller="Property" asp-action="AddNewProperty_Begin" asp-route-landlordId="@Model.Owner?.LandlordId" class="btn btn-primary">Add new property</a>
         </div>
     </div>
+    
+    <partial name="../Property/_PropertyTable"/>
 
-    @{ var from = (Model.Page - 1) * Model.PropPerPage + 1;
-        var to = Math.Min((Model.Page - 1) * Model.PropPerPage + Model.PropPerPage, Model.Total);}
+    @{ await Html.RenderPartialAsync("_PaginationPartial", new PaginationModel
+       {
+           Page = Model.Page,
+           Total = Model.Total,
+           ItemsPerPage = Model.PropPerPage,
+           ItemsOnPage = Model.Properties.Count,
+           HrefPrevious = Url.Action("ViewProperties", "Landlord", new { sortBy = Model.SortBy, page = Model.Page - 1, propPerPage = Model.PropPerPage }),
+           HrefNext = Url.Action("ViewProperties", "Landlord", new { sortBy = Model.SortBy, page = Model.Page + 1, propPerPage = Model.PropPerPage })
+       }); }
 
-    @if (Model.Properties.Count > 0)
-    {<p>Displaying properties @from to @to of @Model.Total</p>}
-
-
-    @if (Model.Page > 1)
-    {
-        <a type="button" class="btn btn-outline-primary" href="@Url.Action("ViewProperties", "Landlord", new { sortBy = Model.SortBy, page = Model.Page - 1, propPerPage = Model.PropPerPage })">
-            <i class="previous"> Previous </i>
-        </a>
-    }
-
-    @if (Model.Page <= (Model.Total-1)/Model.PropPerPage)
-    {
-        <a type="button" class="btn btn-outline-primary" href="@Url.Action("ViewProperties", "Landlord", new { sortBy = Model.SortBy, page = Model.Page + 1, propPerPage = Model.PropPerPage })">
-            <i class="bi"> Next </i>
-        </a>
-    }
 </div>

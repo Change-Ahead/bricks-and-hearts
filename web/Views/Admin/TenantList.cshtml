@@ -147,41 +147,33 @@
     </tbody>
 </table>
 
-@{ var from = (Model.Page - 1) * Model.TenantsPerPage + 1;
-    var to = Math.Min((Model.Page - 1) * Model.TenantsPerPage + Model.TenantsPerPage, Model.Total);}
+@{ await Html.RenderPartialAsync("_PaginationPartial", new PaginationModel
+   {
+       Page = Model.Page,
+       Total = Model.Total,
+       ItemsPerPage = Model.TenantsPerPage,
+       ItemsOnPage = Model.TenantList.Count,
+       HrefPrevious = Url.Action("TenantList", "Admin", new { targetPostcode = Model.TargetPostcode, page = Model.Page - 1, propPerPage = Model.TenantsPerPage }),
+       HrefNext = Url.Action("TenantList", "Admin", new { targetPostcode = Model.TargetPostcode, page = Model.Page + 1, propPerPage = Model.TenantsPerPage })
+   }); }
 
-@if (Model.TenantList.Count > 0)
-{<p>Displaying tenants @from to @to of @Model.Total</p>}
+<div>
+    <h2>Importing tenant information</h2>
 
-@if (Model.Page > 1)
-{
-    <a type="button" class="btn btn-outline-primary" href="@Url.Action("TenantList", "Admin", new { targetPostcode = Model.TargetPostcode, page = Model.Page - 1, propPerPage = Model.TenantsPerPage })">
-        <i class="previous"> Previous </i>
-    </a>
-}
+    @using (Html.BeginForm("ImportTenants", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
+    {
+        <div>Please upload a CSV file containing tenant information. This information will replace all existing tenant records.</div>
+        <input name="csvFile" type="file" accept="file">
+        <input type="submit" value="Import Tenants" />
+    }
 
-@if (Model.Page <= (Model.Total-1)/Model.TenantsPerPage)
-{
-    <a type="button" class="btn btn-outline-primary" href="@Url.Action("TenantList", "Admin", new { targetPostcode = Model.TargetPostcode, page = Model.Page + 1, propPerPage = Model.TenantsPerPage })">
-        <i class="bi"> Next </i>
-    </a>
-}
+    <p></p>
+    <p>Below is a CSV file which you may use as a template for the tenant data you wish to import. The first row is filled in as an example.</p>
+    <p>Please do not change the column headings, or your data will not be recognised as aligning with the fields stored in the database.</p>
+    <p>Data imported is case sensitive and registers white space. Certain fields require a Boolean input (TRUE or FALSE). Any field except for the tenant's name may be left blank.</p>
 
-<h2>Importing tenant information</h2>
-
-@using (Html.BeginForm("ImportTenants", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
-{
-    <div>Please upload a CSV file containing tenant information. This information will replace all existing tenant records.</div>
-    <input name="csvFile" type="file" accept="file">
-    <input type="submit" value="Import Tenants" />
-}
-
-<p></p>
-<p>Below is a CSV file which you may use as a template for the tenant data you wish to import. The first row is filled in as an example.</p>
-<p>Please do not change the column headings, or your data will not be recognised as aligning with the fields stored in the database.</p>
-<p>Data imported is case sensitive and registers white space. Certain fields require a Boolean input (TRUE or FALSE). Any field except for the tenant's name may be left blank.</p>
-
-@using (Html.BeginForm("GetSampleTenantCSV", "Admin", FormMethod.Post))
-{
-    <button type="submit" class="btn btn-primary">Download sample Tenant Data CSV</button>
-}
+    @using (Html.BeginForm("GetSampleTenantCSV", "Admin", FormMethod.Post))
+    {
+        <button type="submit" class="btn btn-primary">Download sample Tenant Data CSV</button>
+    }  
+</div>

@@ -102,22 +102,12 @@
     </tbody>
 </table>
 
-@{ var from = (Model.Page - 1) * Model.LandlordsPerPage + 1;
-    var to = Math.Min((Model.Page - 1) * Model.LandlordsPerPage + Model.LandlordsPerPage, Model.Total);}
-
-@if (Model.LandlordList.Count > 0)
-{<p>Displaying properties @from to @to of @Model.Total</p>}
-
-@if (Model.Page > 1)
-{
-    <a type="button" class="btn btn-outline-primary" href="@Url.Action("LandlordList", "Admin", new { isApproved = Model.IsApproved, isAssigned = Model.IsAssigned, page = Model.Page - 1, landlordsPerPage = Model.LandlordsPerPage })">
-        <i class="previous"> Previous </i>
-    </a>
-}
-
-@if (Model.Page <= (Model.Total-1)/Model.LandlordsPerPage)
-{
-    <a type="button" class="btn btn-outline-primary" href="@Url.Action("LandlordList", "Admin", new { isApproved = Model.IsApproved, isAssigned = Model.IsAssigned, page = Model.Page + 1, landlordsPerPage = Model.LandlordsPerPage })">
-        <i class="bi"> Next </i>
-    </a>
-}
+@{ await Html.RenderPartialAsync("_PaginationPartial", new PaginationModel
+   {
+       Page = Model.Page,
+       Total = Model.Total,
+       ItemsPerPage = Model.LandlordsPerPage,
+       ItemsOnPage = Model.LandlordList.Count,
+       HrefPrevious = Url.Action("LandlordList", "Admin", new { isApproved = Model.IsApproved, isAssigned = Model.IsAssigned, page = Model.Page - 1, landlordsPerPage = Model.LandlordsPerPage }),
+       HrefNext = Url.Action("LandlordList", "Admin", new { isApproved = Model.IsApproved, isAssigned = Model.IsAssigned, page = Model.Page + 1, landlordsPerPage = Model.LandlordsPerPage })
+   }); }
