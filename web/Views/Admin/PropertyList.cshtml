@@ -10,10 +10,14 @@
     <div class="row mt-4">
         <div class="col-auto me-auto mb-2">
             <form asp-action="SortProperties" asp-controller="Property" method="get" class="row mx-0">
-                <select class="form-select col h-auto me-3" id="sortBy" name="sortBy">
-                    <option value="Availability">Sort by availability</option>
-                    <option value="Rent">Sort by rent</option>
-                </select>
+                @Html.DropDownListFor(
+                    model => model.SortBy,
+                    new List<SelectListItem>
+                    {
+                        new("Sort by availability", "Availability"),
+                        new("Sort by rent", "Rent")
+                    },
+                    new { @class = "form-select col h-auto me-3" })
                 <button type="submit" class="btn btn-outline-primary col">Sort</button>
             </form>
         </div>
