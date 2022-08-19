@@ -6,7 +6,15 @@
 
 <h1>Register as Landlord</h1>
 
-<p>Tell us a bit about yourself</p>
+@if (!Model.Unassigned)
+{
+    <p>Tell us a bit about yourself</p>
+}
+else
+{
+    <p>Tell us a bit about the landlord</p>
+}
+
 <hr/>
 
 <!-- Circles which indicates the steps of the form: -->
