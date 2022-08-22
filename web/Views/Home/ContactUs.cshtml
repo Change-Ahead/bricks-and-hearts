@@ -1,43 +1,97 @@
-﻿@model dynamic
+﻿@model ContactUsViewModel
 
 @{
     ViewData["Title"] = "Contact Us";
 }
 
-<div>
-    <h1>Contact Us</h1>
-    <br/>
-    <div>
-        <a class="icon-link" href="mailto:info@changeahead.org.uk">
-            <i class="bi bi-envelope-fill"></i>
-        </a>
-        <a class="icon-link" href="https://www.facebook.com/changeahead.org/" target="_blank">
-            <i class="bi bi-facebook"></i>
-        </a>
-        <a class="icon-link" href="https://twitter.com/changeaheaduk" target="_blank">
-            <i class="bi bi-twitter"></i>
-        </a>
-        <a class="icon-link" href="https://www.instagram.com/accounts/login/?next=/changeahead.org.uk/" target="_blank">
-            <i class="bi bi-instagram"></i>
-        </a>
-        <a class="icon-link" href="https://www.linkedin.com/company/changeaheaduk/" target="_blank">
-            <i class="bi bi-linkedin"></i>
-        </a>
-        <a class="icon-link" href="https://www.youtube.com/channel/UC0gZrrMIzBCfUMPnf4EOmzA" target="_blank">
-            <i class="bi bi-youtube"></i>
-        </a>
-        <a class="icon-link" href="https://www.tiktok.com/" target="_blank">
-            <i class="bi bi-tiktok"></i>
-        </a>
+<div class="container-fluid">
+    <div class="row mt-5">
+        <div class="col">
+            <div class="row">
+                <h1 class="font-h1">Contact us</h1>
+            </div>
+            <div class="row mb-5">
+                <div class="col-md-4 mb-5 mt-2">
+                    <img src="@Url.Content("~/images/BNH_Contact us_illustration.png")" alt="Contact image" class="w-100"/>
+                </div>
+                <div class="col-md-8 ml-4">
+                    <h1>Please feel free to contact us if you have any queries:</h1>
+                    <div class="card custom-card mt-2">
+                        <div class="card-body">
+                           <p><strong>Email</strong> - info@changeahead.org.uk</p>
+                           <p><strong>Helpline</strong> - 03337 729 259</p>
+                           <p><strong>Email</strong> - 85 Great Portland Street, First Floor, London, W1W 7LT</p>
+                           <p><strong>Or visit the Change Ahead website:</strong> - <a href="https://www.changeahead.org.uk/" target="_blank">https://www.changeahead.org.uk/</a></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <br/>
-    <strong>Please feel free to contact us if you have any queries:</strong>
-    <p>Email: info@changeahead.org.uk</p>
-    <p>Helpline: 03337 729 259 </p>
-    <p>Postal address: 85 Great Portland Street, First Floor, London, W1W 7LT</p>
-    <p>Or visit the Change Ahead website: <a href="https://www.changeahead.org.uk/" target="_blank">https://www.changeahead.org.uk/</a></p>
-    <br/>
-    @*TODO Populate this FAQ section with whatever questions and answers the client would like*@
-    <strong>Frequently Asked Questions</strong>
-
+    <div class="row">
+        <div class="col-md-3 mr-3 mb-5">
+            <div class="row">
+                <h1>Socials</h1>
+            </div>
+            <div class="card custom-card mt-2" style="max-width: 240px">
+                <div class="card-body" style="text-align: center">
+                    <div class="row">
+                        <div class="col d-grid">
+                            <a class="icon-link" href="mailto:info@changeahead.org.uk">
+                                <i class="icon-contact bi-envelope-fill"></i>
+                            </a>
+                        </div>
+                        <div class="col d-grid">
+                            <a class="icon-link" href="https://www.facebook.com/changeahead.org/" target="_blank">
+                                <i class="icon-contact bi-facebook"></i>
+                            </a>
+                        </div>
+                        <div class="col d-grid">
+                            <a class="icon-link" href="https://twitter.com/changeaheaduk" target="_blank">
+                                <i class="icon-contact bi-twitter"></i>
+                            </a>
+                        </div>
+                        <div class="col d-grid">
+                            <a class="icon-link" href="https://www.instagram.com/accounts/login/?next=/changeahead.org.uk/" target="_blank">
+                                <i class="icon-contact bi-instagram"></i>
+                            </a>
+                        </div>
+                        <div class="col d-grid">
+                            <a class="icon-link" href="https://www.linkedin.com/company/changeaheaduk/" target="_blank">
+                                <i class="icon-contact bi-linkedin"></i>
+                            </a>
+                        </div>
+                        <div class="col d-grid">
+                            <a class="icon-link" href="https://www.youtube.com/channel/UC0gZrrMIzBCfUMPnf4EOmzA" target="_blank">
+                                <i class="icon-contact bi-youtube"></i>
+                            </a>
+                        </div>
+                        <div class="col d-grid">
+                            <a class="icon-link" href="https://www.tiktok.com/" target="_blank">
+                                <i class="icon-contact bi-tiktok"></i>
+                            </a>
+                        </div>
+                        <div class="col d-grid">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-9">
+            <h1>FAQ</h1>
+            <div class="card custom-card mt-2">
+                <div class="card-body">
+                    <div class="collapse" id="faqCollapse">
+                        @foreach (var FAQ in Model.FAQs)
+                        {
+                            <strong>@FAQ.question</strong>
+                            <p>@FAQ.answer</p>
+                        }
+                    </div>
+                    <a class="collapsed" role="button" data-bs-toggle="collapse" href="#faqCollapse"></a>
+                </div>
+            </div>
+            
+        </div>
+    </div>
 </div>

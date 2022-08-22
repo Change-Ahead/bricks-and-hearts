@@ -334,6 +334,10 @@ input:checked + .pill-check i {
     text-decoration: none;
 }
 
+.icon-contact{
+    font-size: 32px;
+}
+
 /* Navbar */
 .navbar-primary a {
     text-transform: uppercase;
@@ -521,6 +525,24 @@ th {
 
 #descriptionCollapse + a:not(.collapsed)::after {
     content: "Read less";
+}
+
+#faqCollapse.collapse:not(.show) {
+    display: block;
+    height: 10rem;
+    overflow: hidden;
+}
+
+#faqCollapse.collapsing {
+    height: 10rem;
+}
+
+#faqCollapse + a.collapsed::after {
+    content: "See more FAQs";
+}
+
+#faqCollapse + a:not(.collapsed)::after {
+    content: "See less FAQs";
 }
 
 .placeholder-glow {
