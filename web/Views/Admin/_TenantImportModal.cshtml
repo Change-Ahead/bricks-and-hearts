@@ -1,0 +1,33 @@
+﻿<div class="modal fade" id="csvImportModal" tabindex="-1" aria-labelledby="csvImportModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="csvImportModalLabel">Import tenants</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form asp-action="ImportTenants" asp-controller="Admin" method="post" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <p>
+                        To import tenants, please upload a CSV file with their information.
+                        <strong>This will replace all existing tenant information.</strong>
+                    </p>
+                    <a asp-action="GetSampleTenantCSV" asp-controller="Admin" class="btn btn-outline-primary">Download sample tenant data</a>
+                    <p class="form-text">
+                        You may use this sample CSV file as a template for the tenant data you wish to import. The first row is filled in as an example.
+                    </p>
+                    <p class="form-text">
+                        Please do not change the column headings, or your data will not be recognised as aligning with the fields stored in the database.
+                    </p>
+                    <p class="form-text">
+                        Data imported is case sensitive and registers white space. Certain fields require a boolean input (TRUE or FALSE). Any field except for the tenant's name may be left blank.
+                    </p>
+                    <input name="csvFile" type="file" accept=".csv" class="form-control h-auto" required>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Import</button>
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

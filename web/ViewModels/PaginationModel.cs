@@ -8,4 +8,5 @@ public class PaginationModel
     public int ItemsOnPage { get; set; }
     public string? HrefPrevious { get; set; }
     public string? HrefNext { get; set; }
+    public string TypeOfData { get; set; } = string.Empty;
 }

@@ -46,6 +46,7 @@ public class AdminController : AbstractController
         {
             return RedirectToAction("Index", "Home");
         }
+
         var viewModel =
             new AdminDashboardViewModel(_landlordService.CountLandlords(), _propertyService.CountProperties(), _tenantService.CountTenants());
         viewModel.CurrentUser = CurrentUser;
@@ -279,7 +280,7 @@ public class AdminController : AbstractController
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpPost]
+    [HttpGet("/sample-tenant-data")]
     public ActionResult GetSampleTenantCSV()
     {
         return File("~/TenantImportCSVTemplate.csv", "text/csv");
