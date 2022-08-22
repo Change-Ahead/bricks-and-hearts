@@ -4,7 +4,7 @@
     ViewData["Title"] = "Tenant List";
 }
 
-<h2>Tenant List</h2>
+<h1 class="font-h1 mt-5">Tenants</h1>
 
 @using (Html.BeginForm("TenantList", "Admin", FormMethod.Get))
 {
@@ -16,10 +16,15 @@
     </div>
 }
 
-<div class="dropdown-button">
-    <a class="btn btn-primary mb-3" data-bs-toggle="collapse" href="#dropdown-contents" role="button" aria-expanded="false" aria-controls="dropdown-contents">
-        <i class="bi bi-arrow-90deg-down"></i> Filter
-    </a>
+<div class="row">
+    <div class="col-auto">
+        <a class="btn btn-primary mb-3" data-bs-toggle="collapse" href="#dropdown-contents" role="button" aria-expanded="false" aria-controls="dropdown-contents">
+            <i class="bi bi-arrow-90deg-down"></i> Filter
+        </a>
+    </div>
+    <div class="col-auto ms-auto">
+        <button type="button" data-bs-target="#csvImportModal" data-bs-toggle="modal" class="btn btn-primary">Import tenants</button>
+    </div>
 </div>
 
 <div class="collapse @(Model.Filter.GetList().SequenceEqual(new HousingRequirementModel().GetList()) ? "" : "show")" id="dropdown-contents">
@@ -106,46 +111,7 @@
     </form>
 </div>
 
-<table class="table">
-    <thead>
-    @if (Model.TenantList.Count > 0)
-    {
-        <tr>
-            <th scope="col">Name</th>
-            <th scope="col">Email</th>
-            <th scope="col">Phone</th>
-            <th scope="col">Postcode</th>
-            <th scope="col">Type</th>
-            <th scope="col">Has Pet?</th>
-            <th scope="col">In ETT?</th>
-            <th scope="col">On Universal Credit?</th>
-            <th scope="col">On Housing Benefits?</th>
-            <th scope="col">Over 35?</th>
-        </tr>
-    }
-    else
-    {
-        <div>There are no tenants which match this search.</div>
-    }
-    </thead>
-    <tbody>
-    @foreach (var tenant in Model.TenantList)
-    {
-        <tr>
-            <td>@tenant.Name</td>
-            <td>@tenant.Email</td>
-            <td>@tenant.Phone</td>
-            <td>@tenant.Postcode?.Postcode</td>
-            <td>@tenant.Type</td>
-            <td>@tenant.HasPet</td>
-            <td>@tenant.ETT</td>
-            <td>@tenant.UniversalCredit</td>
-            <td>@tenant.HousingBenefits</td>
-            <td>@tenant.Over35</td>
-        </tr>
-    }
-    </tbody>
-</table>
+<partial name="_TenantTable"/>
 
 @{ await Html.RenderPartialAsync("_PaginationPartial", new PaginationModel
    {
@@ -157,23 +123,4 @@
        HrefNext = Url.Action("TenantList", "Admin", new { targetPostcode = Model.TargetPostcode, page = Model.Page + 1, propPerPage = Model.TenantsPerPage })
    }); }
 
-<div>
-    <h2>Importing tenant information</h2>
-
-    @using (Html.BeginForm("ImportTenants", "Admin", FormMethod.Post, new { enctype = "multipart/form-data" }))
-    {
-        <div>Please upload a CSV file containing tenant information. This information will replace all existing tenant records.</div>
-        <input name="csvFile" type="file" accept="file">
-        <input type="submit" value="Import Tenants"/>
-    }
-
-    <p></p>
-    <p>Below is a CSV file which you may use as a template for the tenant data you wish to import. The first row is filled in as an example.</p>
-    <p>Please do not change the column headings, or your data will not be recognised as aligning with the fields stored in the database.</p>
-    <p>Data imported is case sensitive and registers white space. Certain fields require a Boolean input (TRUE or FALSE). Any field except for the tenant's name may be left blank.</p>
-
-    @using (Html.BeginForm("GetSampleTenantCSV", "Admin", FormMethod.Post))
-    {
-        <button type="submit" class="btn btn-primary">Download sample Tenant Data CSV</button>
-    }
-</div>
+<partial name="_TenantImportModal"/>
