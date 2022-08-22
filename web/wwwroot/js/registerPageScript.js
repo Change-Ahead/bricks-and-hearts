@@ -36,6 +36,7 @@ function showTab(currentTab) {
     }
     if (currentTab === (tabList.length - 1)) {
         document.getElementById("nextBtn").innerHTML = "Submit";
+        populateReviewTab();
     } else {
         document.getElementById("nextBtn").innerHTML = "Next";
     }
@@ -100,4 +101,32 @@ function fixStepIndicator(currentStep) {
     }
     //... and adds the "active" class to the current step:
     stepList[currentStep].className += " active";
+}
+
+function populateReviewTab() {
+    $("#TitleReview").text($("#Title").val());
+    $("#FirstNameReview").text($("#FirstName").val());
+    $("#LastNameReview").text($("#LastName").val());
+
+    let address = $("#Address_AddressLine1").val() + ",\n";
+    const adr2 = $("#Address_AddressLine2").val();
+    const adr3 = $("#Address_AddressLine3").val();
+    address += adr2 !== "" ? adr2 + ",\n" : "";
+    address += adr3 !== "" ? adr3 + ",\n" : "";
+    address += $("#Address_TownOrCity").val() + ",\n";
+    address += $("#Address_County").val() + ",\n";
+    address += $("#Address_Postcode").val();
+    $("#AddressReview").text(address);
+
+    $("#EmailReview").text($("#Email").val());
+    $("#PhoneReview").text($("#Phone").val());
+
+    $("#LandlordTypeReview").text($("#LandlordType").val());
+    const forProfit = $("#IsLandlordForProfit").val();
+    $("#IsLandlordForProfitReview").text(forProfit ? "For profit" : "Not for profit");
+    $("#CompanyNameReview").text($("#CompanyName").val());
+
+    const charterStatus = $("#Select").val();
+    $("#CharterStatusReview").text(charterStatus ? "Already approved" : "Not yet approved");
+    $("#MembershipIdReview").text($("#MembershipId").val());
 }

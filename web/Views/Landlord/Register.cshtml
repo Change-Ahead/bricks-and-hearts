@@ -4,33 +4,31 @@
     ViewData["Title"] = "Register";
 }
 
-<h1>Register as Landlord</h1>
+<!-- Circles which indicates the steps of the form: -->
+<div class="d-flex my-5">
+    <span class="step">1</span>
+    <span class="stepline"></span>
+    <span class="step">2</span>
+    <span class="stepline"></span>
+    <span class="step">3</span>
+    <span class="stepline"></span>
+    <span class="step">4</span>
+</div>
+
+<div class="mb-4">
+    <a href="#" id="prevBtn" onclick="nextPrev(-1)">&lt; Back</a>
+</div>
 
 @if (!Model.Unassigned)
 {
-    <p>Tell us a bit about yourself</p>
+    <h1 class="font-h1">Register as a landlord</h1>
 }
 else
 {
-    <p>Tell us a bit about the landlord</p>
+    <h1 class="font-h1">Create a new landlord</h1>
 }
 
-<hr/>
-
-<!-- Circles which indicates the steps of the form: -->
-<div class="d-flex justify-content-center">
-    <span class="step"></span>
-    <span class = "stepline"></span>
-    <span class="step"></span>
-    <span class = "stepline"></span>
-    <span class="step"></span>
-    <span class = "stepline"></span>
-    <span class="step"></span>
-</div>
-
-<div class="row">
-    <form method="post" asp-controller="Landlord" asp-action="RegisterPost" id="landlordEntry">
-        <div asp-validation-summary="All" class="text-danger"></div>
-        @{ await Html.RenderPartialAsync("_RegisterPagePartial", Model); }
-    </form>
-</div>
+<form method="post" asp-controller="Landlord" asp-action="RegisterPost" id="landlordEntry">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    @{ await Html.RenderPartialAsync("_RegisterPagePartial", Model); }
+</form>

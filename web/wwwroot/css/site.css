@@ -39,10 +39,6 @@ body {
     padding-right: 3%;
 }
 
-.form-group my-3 {
-    display: table;
-}
-
 .btn-large {
     width: 200px;
     height: 60px;
@@ -251,7 +247,7 @@ body {
 
 /*Javascript form styling:*/
 /* Mark input boxes that gets an error on validation: */
-input.invalid {
+input.invalid, select.invalid {
     background-color: #ffdddd;
 }
 
@@ -267,7 +263,7 @@ input.invalid {
     background-color: var(--paleOrange);
     border-radius: 50%;
     display: inline-block;
-    color: var(--white);
+    color: grey;
     z-index: 1000;
     text-align: center;
     line-height: 175%;
@@ -276,7 +272,7 @@ input.invalid {
 /* Make lines connecting the steps*/
 .stepline {
     height: 4px;
-    width: 25%;
+    width: 10%;
     margin-top: 14px;
     margin-left: -0.1%;
     margin-right: -0.1%;
@@ -296,8 +292,8 @@ input.invalid {
     box-shadow: 0 0 0 3px var(--lightOrange);
 }
 
-.property-steps .stepline {
-    width: 10%;
+.step.active, .step.finish {
+    color: white;
 }
 
 /*End of javascript form styling*/
