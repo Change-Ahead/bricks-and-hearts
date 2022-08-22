@@ -79,8 +79,15 @@ public class CsvImportService : ICsvImportService
             csvContext.Read<TenantUploadModel>(streamReader, csvFileDescription)?.ToList() 
             ?? new List<TenantUploadModel>();
 
-        List<string> flashTypes = new(),
-            flashMessages = new();
+        var postcodes = tenantUploadList
+            .Where(t => t.Postcode != null)
+            .Select(t => t.Postcode!)
+            .Distinct();
+
+        await _postcodeService.AddPostcodesToDatabaseIfAbsent(postcodes);
+
+        List<(int, string)> orderedFlashTypes = new(),
+            orderedFlashMessages = new();
         await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
         {
             foreach (var tenant in _dbContext.Tenants)
@@ -92,18 +99,33 @@ public class CsvImportService : ICsvImportService
             foreach (var tenant in tenantUploadList)
             {
                 lineNo += 1;
-                var addTenantResponse = await AddTenantToDb(tenant, lineNo);
-                flashTypes.AddRange(addTenantResponse.flashTypes);
-                flashMessages.AddRange(addTenantResponse.flashMessages);
+                await AddTenantAndUpdateFlash(tenant, lineNo, orderedFlashMessages, orderedFlashTypes);
             }
+            await _dbContext.SaveChangesAsync();
 
             await transaction.CommitAsync();
         }
 
+        var flashTypes = orderedFlashTypes.OrderBy(o => o.Item1).Select(o => o.Item2).ToList();
+        var flashMessages = orderedFlashMessages.OrderBy(o => o.Item1).Select(o => o.Item2).ToList();
+
         return (flashTypes, flashMessages);
     }
+
+    private async Task AddTenantAndUpdateFlash(
+        TenantUploadModel tenant, 
+        int lineNo, 
+        List<(int, string)> flashMessages,
+        List<(int, string)> flashTypes)
+    {
+        var addTenantResponse = await AddTenantToDb(tenant, lineNo);
+        flashTypes.AddRange(addTenantResponse.flashTypes.Select(f => (lineNo, f)));
+        flashMessages.AddRange(addTenantResponse.flashMessages.Select(f => (lineNo, f)));
+    }
     
-    private async Task<(List<string> flashTypes, List<string> flashMessages)> AddTenantToDb(TenantUploadModel tenant, int lineNo)
+    private async Task<(List<string> flashTypes, List<string> flashMessages)> AddTenantToDb(
+        TenantUploadModel tenant,
+        int lineNo)
     {
         List<string> flashTypes = new(), flashMessages = new();
         if (tenant.Name == null)
@@ -144,7 +166,6 @@ public class CsvImportService : ICsvImportService
         dbTenant.Over35 = CheckBoolInput("Over35",tenant.Over35, tenant.Name, flashTypes, flashMessages);
         
         _dbContext.Tenants.Add(dbTenant);
-        await _dbContext.SaveChangesAsync();
         return (flashTypes, flashMessages);
     }
     
