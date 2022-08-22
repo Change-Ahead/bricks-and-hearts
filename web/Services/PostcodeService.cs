@@ -88,10 +88,19 @@ public class PostcodeService : IPostcodeService
             UpdatePostcodes(postcodeUpdateGroups["valid"]);
         }
 
-        if (postcodeAddGroups.ContainsKey("invalid") && postcodeAddGroups["invalid"].Length > 0
-            || postcodeUpdateGroups.ContainsKey("invalid") && postcodeUpdateGroups["invalid"].Length > 0)
+        var invalidPostcodeCount = 0;
+        if (postcodeAddGroups.ContainsKey("invalid"))
         {
-            _logger.LogWarning($"{postcodeAddGroups["invalid"].Length + postcodeUpdateGroups["invalid"].Length} postcodes cannot be converted to coordinates.");
+            invalidPostcodeCount += postcodeAddGroups["invalid"].Length;
+        }
+        if (postcodeUpdateGroups.ContainsKey("invalid"))
+        {
+            invalidPostcodeCount += postcodeUpdateGroups["invalid"].Length;
+        }
+
+        if (invalidPostcodeCount > 0)
+        {
+            _logger.LogWarning($"{invalidPostcodeCount} postcodes cannot be converted to coordinates.");
         }
     }
 
