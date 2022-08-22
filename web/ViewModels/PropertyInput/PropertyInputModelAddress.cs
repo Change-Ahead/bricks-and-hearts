@@ -24,14 +24,15 @@ public class PropertyInputModelAddress : PropertyInputModelBase
 
     public override void InitialiseViewModel(PropertyDbModel property)
     {
-        Title = "Address";
         base.InitialiseViewModel(property);
+        Title = "Address";
+        Step = 2;
         AddressLine1 = property.AddressLine1;
         AddressLine2 = property.AddressLine2;
         AddressLine3 = property.AddressLine3;
         TownOrCity = property.TownOrCity;
         County = property.County;
-        Postcode = property.Postcode;
+        Postcode = property.Postcode?.Postcode;
     }
 
     public override PropertyViewModel FormToViewModel()

@@ -8,7 +8,7 @@ public abstract class PropertyInputModelBase
     public static readonly int MaximumStep = 6;
 
     [ValidateNever]
-    public virtual string Title { get; set; }
+    public virtual string? Title { get; set; }
 
     public int LandlordId { get; set; }
     public int PropertyId { get; set; }

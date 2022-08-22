@@ -39,6 +39,7 @@ public class PropertyInputModelTenantPreferences : PropertyInputModelBase
     public override void InitialiseViewModel(PropertyDbModel property)
     {
         base.InitialiseViewModel(property);
+        Step = 5;
         Title = "What kind of tenant would you prefer?";
         AcceptsSingleTenant = property.AcceptsSingleTenant;
         AcceptsCouple = property.AcceptsCouple;
@@ -72,8 +73,7 @@ public class PropertyInputModelTenantPreferences : PropertyInputModelBase
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (AcceptsSingleTenant == false && AcceptsCouple == false &&
-            AcceptsFamily == false)
+        if (AcceptsSingleTenant == false && AcceptsCouple == false && AcceptsFamily == false)
         {
             yield return new ValidationResult("At least one type of tenant must be selected");
         }

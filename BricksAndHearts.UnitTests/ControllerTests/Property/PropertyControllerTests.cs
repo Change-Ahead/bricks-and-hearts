@@ -261,7 +261,6 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var landlordUser = CreateLandlordUser();
         landlordUser.Id = 1;
         MakeUserPrincipalInController(landlordUser, UnderTest);
-        var prop = A.Fake<PropertyDbModel>();
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(0)).Returns(null);
 
         // Act
@@ -305,9 +304,11 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         var landlordUser = CreateLandlordUser();
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
-        var formResultModel = new PropertyInputModelInitialAddress();
-        formResultModel.LandlordId = 1;
-        formResultModel.IsEdit = isEdit;
+        var formResultModel = new PropertyInputModelInitialAddress
+        {
+            LandlordId = 1,
+            IsEdit = isEdit
+        };
         UnderTest.ViewData.ModelState.AddModelError("Key", "ErrorMessage");
 
         // Act
@@ -391,7 +392,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     [Theory]
     [InlineData("add")]
     [InlineData("edit")]
-    public void PropertyInputPost_AtStepTwo_UpdatesRecord_ThenOnAddAndRedirectsToNextStep_OrOnEditReturnsToView(
+    public async void PropertyInputPost_AtStepTwo_UpdatesRecord_ThenOnAddAndRedirectsToNextStep_OrOnEditReturnsToView(
         string operationType)
     {
         // Arrange
@@ -409,27 +410,19 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         // Act
         var result =
-            UnderTest.PropertyInputStepTwoAddress(formResultModel, formResultModel.PropertyId, operationType) as
+            await UnderTest.PropertyInputStepTwoAddress(formResultModel, formResultModel.PropertyId, operationType) as
                 RedirectToActionResult;
 
         // Assert
         A.CallTo(() => PropertyService.UpdateProperty(1, A<PropertyViewModel>._, A<bool>._)).MustHaveHappened();
-        if (operationType == "add")
-        {
-            result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should()
-                .Be("PropertyInputStepThreeDetails");
-        }
-        else
-        {
-            result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should()
-                .Be("ViewProperty");
-        }
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should()
+            .Be(operationType == "add" ? "PropertyInputStepThreeDetails" : "ViewProperty");
     }
 
     [Theory]
     [InlineData("add")]
     [InlineData("edit")]
-    public void PropertyInputPost_AtStepThree_UpdatesRecord_ThenOnAddAndRedirectsToNextStep_OrOnEditReturnsToView(
+    public async void PropertyInputPost_AtStepThree_UpdatesRecord_ThenOnAddAndRedirectsToNextStep_OrOnEditReturnsToView(
         string operationType)
     {
         // Arrange
@@ -447,27 +440,19 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         // Act
         var result =
-            UnderTest.PropertyInputStepThreeDetails(formResultModel, formResultModel.PropertyId, operationType) as
+            await UnderTest.PropertyInputStepThreeDetails(formResultModel, formResultModel.PropertyId, operationType) as
                 RedirectToActionResult;
 
         // Assert
         A.CallTo(() => PropertyService.UpdateProperty(1, A<PropertyViewModel>._, A<bool>._)).MustHaveHappened();
-        if (operationType == "add")
-        {
-            result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should()
-                .Be("PropertyInputStepFourDescription");
-        }
-        else
-        {
-            result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should()
-                .Be("ViewProperty");
-        }
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should()
+            .Be(operationType == "add" ? "PropertyInputStepFourDescription" : "ViewProperty");
     }
 
     [Theory]
     [InlineData("add")]
     [InlineData("edit")]
-    public void PropertyInputPost_AtStepFour_UpdatesRecord_ThenOnAddAndRedirectsToNextStep_OrOnEditReturnsToView(
+    public async void PropertyInputPost_AtStepFour_UpdatesRecord_ThenOnAddAndRedirectsToNextStep_OrOnEditReturnsToView(
         string operationType)
     {
         // Arrange
@@ -484,27 +469,20 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         // Act
         var result =
-            UnderTest.PropertyInputStepFourDescription(formResultModel, formResultModel.PropertyId, operationType) as
+            await UnderTest.PropertyInputStepFourDescription(formResultModel, formResultModel.PropertyId, operationType)
+                as
                 RedirectToActionResult;
 
         // Assert
         A.CallTo(() => PropertyService.UpdateProperty(1, A<PropertyViewModel>._, A<bool>._)).MustHaveHappened();
-        if (operationType == "add")
-        {
-            result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should()
-                .Be("PropertyInputStepFiveTenantPreferences");
-        }
-        else
-        {
-            result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should()
-                .Be("ViewProperty");
-        }
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should()
+            .Be(operationType == "add" ? "PropertyInputStepFiveTenantPreferences" : "ViewProperty");
     }
 
     [Theory]
     [InlineData("add")]
     [InlineData("edit")]
-    public void PropertyInputPost_AtStepFive_UpdatesRecord_ThenOnAddAndRedirectsToNextStep_OrOnEditReturnsToView(
+    public async void PropertyInputPost_AtStepFive_UpdatesRecord_ThenOnAddAndRedirectsToNextStep_OrOnEditReturnsToView(
         string operationType)
     {
         // Arrange
@@ -521,28 +499,21 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         // Act
         var result =
-            UnderTest.PropertyInputStepFiveTenantPreferences(formResultModel, formResultModel.PropertyId, operationType)
+            await UnderTest.PropertyInputStepFiveTenantPreferences(formResultModel, formResultModel.PropertyId,
+                    operationType)
                 as
                 RedirectToActionResult;
 
         // Assert
         A.CallTo(() => PropertyService.UpdateProperty(1, A<PropertyViewModel>._, A<bool>._)).MustHaveHappened();
-        if (operationType == "add")
-        {
-            result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should()
-                .Be("PropertyInputStepSixAvailability");
-        }
-        else
-        {
-            result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should()
-                .Be("ViewProperty");
-        }
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should()
+            .Be(operationType == "add" ? "PropertyInputStepSixAvailability" : "ViewProperty");
     }
 
     [Theory]
     [InlineData("add")]
     [InlineData("edit")]
-    public void PropertyInputPost_AtStepSix_UpdatesRecord_ThenReturnsToView(string operationType)
+    public async void PropertyInputPost_AtStepSix_UpdatesRecord_ThenReturnsToView(string operationType)
     {
         // Arrange
         A.CallTo(() => PropertyService.IsUserAdminOrCorrectLandlord(A<BricksAndHeartsUser>._, A<int>._))
@@ -558,7 +529,8 @@ public class PropertyControllerTests : PropertyControllerTestsBase
 
         // Act
         var result =
-            UnderTest.PropertyInputStepSixAvailability(formResultModel, formResultModel.PropertyId, operationType) as
+            await UnderTest.PropertyInputStepSixAvailability(formResultModel, formResultModel.PropertyId, operationType)
+                as
                 RedirectToActionResult;
 
         // Assert
@@ -580,7 +552,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     [InlineData("edit", 5)]
     [InlineData("add", 6)]
     [InlineData("edit", 6)]
-    public async void PropertyInputPostStep_CalledByNonOwnerNonAdmin_Returns403(string operationType, int step)
+    public async Task PropertyInputPostStep_CalledByNonOwnerNonAdmin_Returns403(string operationType, int step)
     {
         // Arrange
         MakeUserPrincipalInController(CreateLandlordUser(), UnderTest);
@@ -594,15 +566,18 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         {
             1 => await UnderTest.PropertyInputStepOnePostcode(A.Fake<PropertyInputModelInitialAddress>(), 1,
                 operationType, 1) as StatusCodeResult,
-            2 => UnderTest.PropertyInputStepTwoAddress(A.Fake<PropertyInputModelAddress>(), 1, operationType) as
+            2 => await UnderTest.PropertyInputStepTwoAddress(A.Fake<PropertyInputModelAddress>(), 1, operationType) as
                 StatusCodeResult,
-            3 => UnderTest.PropertyInputStepThreeDetails(A.Fake<PropertyInputModelDetails>(), 1, operationType) as
+            3 => await UnderTest.PropertyInputStepThreeDetails(A.Fake<PropertyInputModelDetails>(), 1, operationType) as
                 StatusCodeResult,
-            4 => UnderTest.PropertyInputStepFourDescription(A.Fake<PropertyInputModelDescription>(), 1, operationType)
+            4 => await UnderTest.PropertyInputStepFourDescription(A.Fake<PropertyInputModelDescription>(), 1,
+                    operationType)
                 as StatusCodeResult,
-            5 => UnderTest.PropertyInputStepFiveTenantPreferences(A.Fake<PropertyInputModelTenantPreferences>(), 1,
+            5 => await UnderTest.PropertyInputStepFiveTenantPreferences(A.Fake<PropertyInputModelTenantPreferences>(),
+                1,
                 operationType) as StatusCodeResult,
-            6 => UnderTest.PropertyInputStepSixAvailability(A.Fake<PropertyInputModelAvailability>(), 1, operationType)
+            6 => await UnderTest.PropertyInputStepSixAvailability(A.Fake<PropertyInputModelAvailability>(), 1,
+                    operationType)
                 as StatusCodeResult,
             _ => null
         };
@@ -669,7 +644,7 @@ public class PropertyControllerTests : PropertyControllerTestsBase
             .WithAnyArguments().Returns(true);
 
         // Act
-        var result = await UnderTest.PropertyInputCancel(1, landlordUser.Id, "add");
+        var result = await UnderTest.PropertyInputCancel(1, landlordUser.Id);
 
         // Assert
         A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustHaveHappened();
@@ -688,53 +663,12 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         // Act
-        var result = await UnderTest.PropertyInputCancel(1, landlordUser.Id, "add");
+        var result = await UnderTest.PropertyInputCancel(1, landlordUser.Id);
 
         // Assert
         A.CallTo(() => PropertyService.DeleteProperty(fakePropertyDbModel)).MustNotHaveHappened();
         A.CallTo(() => AzureStorage.DeleteContainer("property", fakePropertyDbModel.Id)).MustNotHaveHappened();
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("ViewProperties");
-    }
-
-
-    [Theory]
-    [ClassData(typeof(StepTestData))]
-    public async void EditProperty_AtEachStep_WhenPerformedByNonOwnerNonAdmin_ReturnsForbidden(int step)
-    {
-        // Arrange
-        var landlordUser = CreateLandlordUser();
-        landlordUser.LandlordId = 2;
-        MakeUserPrincipalInController(landlordUser, UnderTest);
-
-        var formResultModel = CreateExamplePropertyViewModel();
-        formResultModel.LandlordId = 1;
-
-        // Act
-        var result =
-            await UnderTest.EditProperty_Continue(step, 1, formResultModel,
-                landlordUser.Id);
-
-        // Assert
-        A.CallTo(() => PropertyService.UpdateProperty(formResultModel.PropertyId, formResultModel, A<bool>._))
-            .MustNotHaveHappened();
-        result.Should().BeOfType<StatusCodeResult>().Which.StatusCode.Should().Be(403);
-    }
-
-    #endregion
-
-    #region AvailableUnits
-
-    [Fact]
-    public void AvailableUnits_CalculatesCorrectly()
-    {
-        // Arrange
-        var property = CreateExamplePropertyViewModel();
-
-        // Act
-        var availableUnits = property.AvailableUnits;
-
-        // Assert
-        availableUnits.Should().Be(3);
     }
 
     #endregion

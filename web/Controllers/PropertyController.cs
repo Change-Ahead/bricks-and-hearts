@@ -12,14 +12,14 @@ namespace BricksAndHearts.Controllers;
 [Route("/property")]
 public class PropertyController : AbstractController
 {
-    private readonly IPropertyService _propertyService;
-    private readonly ILandlordService _landlordService;
     private readonly IAzureMapsApiService _azureMapsApiService;
     private readonly IAzureStorage _azureStorage;
+    private readonly ILandlordService _landlordService;
     private readonly ILogger<PropertyController> _logger;
     private readonly IPropertyService _propertyService;
 
-    public PropertyController(IPropertyService propertyService,ILandlordService landlordService, IAzureMapsApiService azureMapsApiService,
+    public PropertyController(IPropertyService propertyService, ILandlordService landlordService,
+        IAzureMapsApiService azureMapsApiService,
         ILogger<PropertyController> logger, IAzureStorage azureStorage)
     {
         _propertyService = propertyService;
@@ -27,6 +27,34 @@ public class PropertyController : AbstractController
         _azureMapsApiService = azureMapsApiService;
         _logger = logger;
         _azureStorage = azureStorage;
+    }
+
+    [HttpGet("public/{token}")]
+    [AllowAnonymous]
+    public async Task<ActionResult> PublicViewProperty(string token)
+    {
+        var dbModel = _propertyService.GetPropertyByPublicViewLink(token);
+        if (dbModel == null)
+        {
+            return View();
+        }
+
+        var propertyViewModel = PropertyViewModel.FromDbModel(dbModel);
+
+        var fileNames = await _azureStorage.ListFileNames("property", propertyViewModel.PropertyId);
+        var imageFiles = GetFilesFromFileNames(fileNames, propertyViewModel.PropertyId);
+
+        var landlord =
+            LandlordProfileModel.FromDbModel(_propertyService.GetPropertyOwner(propertyViewModel.PropertyId));
+        landlord.GoogleProfileImageUrl = _landlordService.GetLandlordProfilePicture(landlord.LandlordId!.Value);
+
+        var propertyDetailsModel = new PropertyDetailsViewModel
+        {
+            Property = propertyViewModel,
+            Images = imageFiles,
+            Owner = landlord
+        };
+        return View(propertyDetailsModel);
     }
 
     #region Misc
@@ -127,7 +155,7 @@ public class PropertyController : AbstractController
             if (string.IsNullOrEmpty(publicViewLink))
             {
                 flashMessageBody = "Successfully created a new public view link";
-                publicViewLink = _propertyService.CreateNewPublicViewLink(propertyId);
+                publicViewLink = _propertyService.CreatePublicViewLink(propertyId);
                 _logger.LogInformation("Created public view link for property {PropertyId}: {PublicViewLink}",
                     propertyId, publicViewLink);
             }
@@ -163,7 +191,6 @@ public class PropertyController : AbstractController
             return StatusCode(403);
         }
 
-
         property ??= new PropertyDbModel
         {
             Id = propertyId,
@@ -172,8 +199,7 @@ public class PropertyController : AbstractController
 
         var model = new PropertyInputModelInitialAddress
         {
-            IsEdit = OperationTypeToIsEdit(operationType),
-            Step = 1
+            IsEdit = OperationTypeToIsEdit(operationType)
         };
         model.InitialiseViewModel(property);
         return View("PropertyInputForm/InitialAddress", model);
@@ -208,12 +234,13 @@ public class PropertyController : AbstractController
 
         if (property != null)
         {
-            _propertyService.UpdateProperty(propertyId, propertyView);
+            await _propertyService.UpdateProperty(propertyId, propertyView);
         }
         else
         {
             propertyId = await _propertyService.AddNewProperty(landlordId, propertyView);
         }
+
         return RedirectToAction("PropertyInputStepTwoAddress", "Property",
             new { operationType, propertyId });
     }
@@ -225,7 +252,6 @@ public class PropertyController : AbstractController
         const string viewName = "PropertyInputForm/FullAddress";
         var model = new PropertyInputModelAddress
         {
-            Step = 2,
             IsEdit = OperationTypeToIsEdit(operationType)
         };
 
@@ -234,20 +260,12 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("{propertyId:int}/{operationType:regex(^(add|edit)$)}/step/2")]
-    public ActionResult PropertyInputStepTwoAddress([FromForm] PropertyInputModelAddress model,
+    public async Task<ActionResult> PropertyInputStepTwoAddress([FromForm] PropertyInputModelAddress model,
         [FromRoute] int propertyId, [FromRoute] string operationType)
     {
         const string nextActionName = "PropertyInputStepThreeDetails";
 
-        return StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName);
-    }
-
-        // Update the property's record with the values entered at this step
-        await _propertyService.UpdateProperty(propertyId, propertyView);
-
-        //Redirect to next step (could be subverted with a bool for the edit function?)
-        return RedirectToAction("PropertyInputStepThreeDetails", "Property",
-            new { landlordId, operationType, propertyId });
+        return await StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName);
     }
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -257,7 +275,6 @@ public class PropertyController : AbstractController
         const string viewName = "PropertyInputForm/Details";
         var model = new PropertyInputModelDetails
         {
-            Step = 3,
             IsEdit = OperationTypeToIsEdit(operationType)
         };
 
@@ -266,13 +283,13 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("{propertyId:int}/{operationType:regex(^(add|edit)$)}/step/3")]
-    public ActionResult PropertyInputStepThreeDetails([FromForm] PropertyInputModelDetails model,
+    public async Task<ActionResult> PropertyInputStepThreeDetails([FromForm] PropertyInputModelDetails model,
         [FromRoute] int propertyId,
         [FromRoute] string operationType)
     {
         const string nextActionName = "PropertyInputStepFourDescription";
 
-        return StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName);
+        return await StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName);
     }
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -282,7 +299,6 @@ public class PropertyController : AbstractController
         const string viewName = "PropertyInputForm/Description";
         var model = new PropertyInputModelDescription
         {
-            Step = 4,
             IsEdit = OperationTypeToIsEdit(operationType)
         };
 
@@ -291,12 +307,12 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("{propertyId:int}/{operationType:regex(^(add|edit)$)}/step/4")]
-    public ActionResult PropertyInputStepFourDescription([FromForm] PropertyInputModelDescription model,
+    public async Task<ActionResult> PropertyInputStepFourDescription([FromForm] PropertyInputModelDescription model,
         [FromRoute] int propertyId, [FromRoute] string operationType)
     {
         const string nextActionName = "PropertyInputStepFiveTenantPreferences";
 
-        return StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName);
+        return await StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName);
     }
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -307,7 +323,6 @@ public class PropertyController : AbstractController
         const string viewName = "PropertyInputForm/TenantPreferences";
         var model = new PropertyInputModelTenantPreferences
         {
-            Step = 5,
             IsEdit = OperationTypeToIsEdit(operationType)
         };
 
@@ -316,12 +331,13 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("{propertyId:int}/{operationType:regex(^(add|edit)$)}/step/5")]
-    public ActionResult PropertyInputStepFiveTenantPreferences([FromForm] PropertyInputModelTenantPreferences model,
+    public async Task<ActionResult> PropertyInputStepFiveTenantPreferences(
+        [FromForm] PropertyInputModelTenantPreferences model,
         [FromRoute] int propertyId, [FromRoute] string operationType)
     {
         const string nextActionName = "PropertyInputStepSixAvailability";
 
-        return StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName);
+        return await StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName);
     }
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -331,7 +347,6 @@ public class PropertyController : AbstractController
         const string viewName = "PropertyInputForm/Availability";
         var model = new PropertyInputModelAvailability
         {
-            Step = 6,
             IsEdit = OperationTypeToIsEdit(operationType)
         };
 
@@ -340,7 +355,7 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpPost("{propertyId:int}/{operationType:regex(^(add|edit)$)}/step/6")]
-    public ActionResult PropertyInputStepSixAvailability([FromForm] PropertyInputModelAvailability model,
+    public async Task<ActionResult> PropertyInputStepSixAvailability([FromForm] PropertyInputModelAvailability model,
         [FromRoute] int propertyId, [FromRoute] string operationType)
     {
         if (!ModelState.IsValid)
@@ -360,39 +375,15 @@ public class PropertyController : AbstractController
 
         var propertyView = model.FormToViewModel();
 
-        _propertyService.UpdateProperty(propertyId, propertyView);
+        await _propertyService.UpdateProperty(propertyId, propertyView);
 
         return RedirectToAction("ViewProperty", "Property", new { propertyId });
     }
 
     [Authorize(Roles = "Landlord, Admin")]
-    [HttpGet("{operationType:regex(^(add|edit)$)})/{propertyId:int}/step/{step:int}/back")]
-    public ActionResult PropertyInputBack([FromRoute] int step,
-        [FromRoute] string operationType, [FromRoute] int propertyId, [FromQuery] int landlordId)
-    {
-        return step switch
-        {
-            1 => RedirectToAction("PropertyInputStepOnePostcode", new { propertyId, operationType, landlordId }),
-            2 => RedirectToAction("PropertyInputStepTwoAddress", new { propertyId, operationType }),
-            3 => RedirectToAction("PropertyInputStepThreeDetails", new { propertyId, operationType }),
-            4 => RedirectToAction("PropertyInputStepFourDescription", new { propertyId, operationType }),
-            5 => RedirectToAction("PropertyInputStepFiveTenantPreferences",
-                new { propertyId, operationType }),
-            6 => RedirectToAction("PropertyInputStepSixAvailability", new { propertyId, operationType }),
-            _ => StatusCode(404)
-        };
-    }
-
-        _propertyService.UpdateProperty(propertyId, newPropertyModel, false);
-        // Finished adding property, so go to View Properties page
-        return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
-    }
-
-    [Authorize(Roles = "Landlord, Admin")]
     [HttpGet(
-        @"/landlord/{landlordId:int}/property/{operationType:regex(^(add|edit)$)})/{propertyId:int}/cancel")]
-    public async Task<ActionResult> PropertyInputCancel([FromRoute] int propertyId, [FromRoute] int landlordId,
-        string operationType)
+        "/landlord/{landlordId:int}/property/{propertyId:int}/cancel")]
+    public async Task<ActionResult> PropertyInputCancel([FromRoute] int propertyId, [FromRoute] int landlordId)
     {
         var property = _propertyService.GetPropertyByPropertyId(propertyId);
 
@@ -412,12 +403,12 @@ public class PropertyController : AbstractController
         return RedirectToAction("ViewProperties", "Landlord", new { id = landlordId });
     }
 
-    private bool OperationTypeToIsEdit(string input)
+    private static bool OperationTypeToIsEdit(string input)
     {
         return input.ToUpper() != "ADD";
     }
 
-    private ActionResult StandardPropertyInputPostMethod(PropertyInputModelBase model, int propertyId,
+    private async Task<ActionResult> StandardPropertyInputPostMethod(PropertyInputModelBase model, int propertyId,
         string operationType, string nextActionName)
     {
         if (!ModelState.IsValid)
@@ -437,8 +428,8 @@ public class PropertyController : AbstractController
 
         var propertyView = model.FormToViewModel();
 
-
-        _propertyService.UpdateProperty(propertyId, propertyView);
+        // Update the property's record with the values entered at this step
+        await _propertyService.UpdateProperty(propertyId, propertyView);
 
         return operationType == "add"
             ? RedirectToAction(nextActionName, "Property", new { propertyId, operationType })
@@ -548,32 +539,4 @@ public class PropertyController : AbstractController
     }
 
     #endregion
-
-    [HttpGet("public/{token}")]
-    [AllowAnonymous]
-    public async Task<ActionResult> PublicViewProperty(string token)
-    {
-        var dbModel = _propertyService.GetPropertyByPublicViewLink(token);
-        if (dbModel == null)
-        {
-            return View();
-        }
-
-        var propertyViewModel = PropertyViewModel.FromDbModel(dbModel);
-
-        var fileNames = await _azureStorage.ListFileNames("property", propertyViewModel.PropertyId);
-        var imageFiles = GetFilesFromFileNames(fileNames, propertyViewModel.PropertyId);
-
-        var landlord =
-            LandlordProfileModel.FromDbModel(_propertyService.GetPropertyOwner(propertyViewModel.PropertyId));
-        landlord.GoogleProfileImageUrl = _landlordService.GetLandlordProfilePicture(landlord.LandlordId!.Value);
-
-        var propertyDetailsModel = new PropertyDetailsViewModel
-        {
-            Property = propertyViewModel,
-            Images = imageFiles,
-            Owner = landlord
-        };
-        return View(propertyDetailsModel);
-    }
 }

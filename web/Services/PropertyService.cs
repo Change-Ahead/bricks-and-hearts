@@ -12,9 +12,10 @@ public interface IPropertyService
     public void DeleteProperty(PropertyDbModel property);
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId);
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId);
-    public LandlordDbModel GetPropertyOwner(int propertyId);
-    public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string sortBy, string? target, int page, int propPerPage);
-    public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertiesByLandlord(int landlordId, int page, int propPerPage);
+    public LandlordDbModel GetPropertyOwner(int propertyId);    public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string sortBy, string? target,
+        int page, int propPerPage);
+    public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertiesByLandlord(int landlordId, int page,
+        int propPerPage);
     public PropertyCountModel CountProperties(int? landlordId = null);
     public string CreatePublicViewLink(int propertyId);
     public PropertyDbModel? GetPropertyByPublicViewLink(string token);
@@ -114,8 +115,7 @@ public class PropertyService : IPropertyService
         dbModel.AcceptsNotEET = updateModel.LandlordRequirements.AcceptsNotEET ?? dbModel.AcceptsNotEET;
         dbModel.AcceptsOver35 = updateModel.LandlordRequirements.AcceptsOver35 ?? dbModel.AcceptsOver35;
         dbModel.AcceptsWithoutGuarantor = updateModel.LandlordRequirements.AcceptsWithoutGuarantor
-                                          ??
-                                          dbModel.AcceptsWithoutGuarantor;
+                                          ?? dbModel.AcceptsWithoutGuarantor;
 
         dbModel.Rent = updateModel.Rent ?? dbModel.Rent;
 
@@ -166,8 +166,8 @@ public class PropertyService : IPropertyService
             return true;
         }
 
-        return currentUser.LandlordId != null &&
-               GetPropertyByPropertyId(propertyId)?.LandlordId == currentUser.LandlordId;
+        return currentUser.LandlordId != null
+               && GetPropertyByPropertyId(propertyId)?.LandlordId == currentUser.LandlordId;
     }
 
     public LandlordDbModel GetPropertyOwner(int propertyId)
@@ -227,7 +227,8 @@ public class PropertyService : IPropertyService
         );
     }
 
-    public async Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertiesByLandlord(int landlordId, int page, int propPerPage)
+    public async Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertiesByLandlord(int landlordId, int page,
+        int propPerPage)
     {
         var properties = _dbContext.Properties
             .Include(p => p.Postcode)
@@ -277,51 +278,5 @@ public class PropertyService : IPropertyService
     public PropertyDbModel? GetPropertyByPublicViewLink(string token)
     {
         return _dbContext.Properties.SingleOrDefault(p => p.PublicViewLink == token);
-    }
-
-    public async Task<List<PropertyDbModel>?> SortPropertiesByLocation(string postalCode, int page, int perPage)
-    {
-        var postcode = _postcodeService.FormatPostcode(postalCode);
-        var postcodeList = new List<string> { postcode };
-        await _postcodeService.AddPostcodesToDatabaseIfAbsent(postcodeList);
-        if (postcode == "")
-        {
-            return null;
-        }
-
-        var model = _dbContext.Postcodes.SingleOrDefault(p => p.Postcode == postcode);
-        if (model?.Lat == null || model.Lon == null)
-        {
-            return null;
-        }
-
-        var properties = _dbContext.Properties
-            // This is a simpler method using pythagoras, not too accurate
-            /*.FromSqlInterpolated(
-                @$"
-                SELECT *
-                FROM dbo.Property
-                WHERE Lon is not NULL and Lat is not NULL
-                ORDER BY ((Lat-{model.Result.Lat})*(Lat-{model.Result.Lat})) + ((Lon - {model.Result.Lon})*(Lon - {model.Result.Lon})) ASC");
-            */
-            // This is a more complicated method, if things break, use method 1 and try again
-            .FromSqlInterpolated(
-                @$"SELECT *, (
-                  6371 * acos (
-                  cos ( radians({model.Lat}) )
-                  * cos( radians( Lat ) )
-                  * cos( radians( Lon ) - radians({model.Lon}) )
-                  + sin ( radians({model.Lat}) )
-                  * sin( radians( Lat ) )
-                    )
-                ) AS distance 
-                FROM dbo.Property
-                WHERE Lon is not NULL and Lat is not NULL
-                ORDER BY distance
-                OFFSET {perPage * (page - 1)} ROWS
-                FETCH NEXT {perPage} ROWS ONLY
-                "
-            );
-        return await properties.ToListAsync();
     }
 }

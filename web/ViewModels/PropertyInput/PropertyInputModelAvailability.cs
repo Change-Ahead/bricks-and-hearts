@@ -24,8 +24,9 @@ public class PropertyInputModelAvailability : PropertyInputModelBase
 
     public override void InitialiseViewModel(PropertyDbModel property)
     {
-        var title = "Rent, Deposits, Availability, and Duration";
         base.InitialiseViewModel(property);
+        Step = 6;
+        Title = "Rent, Deposits, Availability, and Duration";
         Rent = property.Rent;
         Availability = property.Availability;
         AvailableFrom = property.AvailableFrom;

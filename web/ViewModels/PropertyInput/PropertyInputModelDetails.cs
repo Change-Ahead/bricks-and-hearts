@@ -17,8 +17,9 @@ public class PropertyInputModelDetails : PropertyInputModelBase
 
     public override void InitialiseViewModel(PropertyDbModel property)
     {
-        Title = "Property Details";
         base.InitialiseViewModel(property);
+        Step = 3;
+        Title = "Property Details";
         PropertyType = property.PropertyType;
         NumOfBedrooms = property.NumOfBedrooms;
         LandlordId = property.LandlordId;

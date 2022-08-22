@@ -18,9 +18,11 @@ public class PropertyInputModelInitialAddress : PropertyInputModelBase
 
     public override void InitialiseViewModel(PropertyDbModel property)
     {
+        base.InitialiseViewModel(property);
+        Step = 1;
         Title = "Address";
         AddressLine1 = property.AddressLine1;
-        Postcode = property.Postcode;
+        Postcode = property.Postcode?.Postcode;
     }
 
     public override PropertyViewModel FormToViewModel()
