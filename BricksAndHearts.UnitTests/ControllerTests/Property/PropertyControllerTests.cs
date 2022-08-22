@@ -674,4 +674,48 @@ public class PropertyControllerTests : PropertyControllerTestsBase
     }
 
     #endregion
+
+    #region PublicLinks
+
+    [Fact]
+    public async Task PublicViewProperty_CalledWithValidLink_ReturnCorrectModel()
+    {
+        // Arrange
+        var property = CreateExamplePropertyDbModel();
+        const string token = "token";
+        property.PublicViewLink = token;
+        property.Landlord.Id = 1;
+        A.CallTo(() => PropertyService.GetPropertyByPublicViewLink(token)).Returns(property);
+        A.CallTo(() => AzureStorage.ListFileNames("property", property.Id)).Returns(new List<string>());
+        A.CallTo(() => PropertyService.GetPropertyOwner(property.Id)).Returns(property.Landlord);
+        A.CallTo(() => LandlordService.GetLandlordProfilePicture(property.LandlordId)).Returns("image url");
+        var propertyViewModel = PropertyViewModel.FromDbModel(property);
+        var landlordProfileModel = LandlordProfileModel.FromDbModel(property.Landlord);
+        landlordProfileModel.GoogleProfileImageUrl = "image url";
+
+        // Act
+        var result = await UnderTest.PublicViewProperty(token) as ViewResult;
+
+        // Assert
+        result!.Model.Should().BeOfType<PropertyDetailsViewModel>().Which.Property.Should()
+            .BeEquivalentTo(propertyViewModel);
+        result.Model.As<PropertyDetailsViewModel>().Images.Should().BeEquivalentTo(new List<ImageFileUrlModel>());
+        result.Model.As<PropertyDetailsViewModel>().Owner.Should().BeEquivalentTo(landlordProfileModel);
+    }
+
+    [Fact]
+    public async Task PublicViewProperty_CalledWithInvalidLink_ReturnNullModel()
+    {
+        // Arrange
+        const string token = "token";
+        A.CallTo(() => PropertyService.GetPropertyByPublicViewLink(token)).Returns(null);
+
+        // Act
+        var result = await UnderTest.PublicViewProperty(token) as ViewResult;
+
+        // Assert
+        result!.Model.Should().BeNull();
+    }
+
+    #endregion
 }
