@@ -35,6 +35,8 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         MakeUserPrincipalInController(unregisteredUser, UnderTest);
         var formResultModel = new LandlordProfileModel();
         var returnedLandlord = new LandlordDbModel();
+        formResultModel.Address.Postcode = "N3 2FT";
+        formResultModel.Address.AddressLine1 = "Test Road";
 
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel, unregisteredUser))
             .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));
@@ -251,7 +253,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var unregisteredUser = CreateUnregisteredUser();
         unregisteredUser.Id = 1;
         MakeUserPrincipalInController(unregisteredUser, UnderTest);
-        
+
         var propertyList = A.CollectionOfFake<PropertyDbModel>(10).ToList();
         var count = 15; //arbitrary
         A.CallTo(() => PropertyService.GetPropertiesByLandlord(2, 1, 10))
@@ -321,6 +323,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Assert
         result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("MyProfile");
         FlashMessages.Should()
-            .Contain($"User {nonLandlordUser.Id} successfully linked with landlord (landlordId = {nonLandlordUser.LandlordId})");
+            .Contain(
+                $"User {nonLandlordUser.Id} successfully linked with landlord (landlordId = {nonLandlordUser.LandlordId})");
     }
 }

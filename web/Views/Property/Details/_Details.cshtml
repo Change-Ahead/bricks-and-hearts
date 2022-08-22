@@ -4,7 +4,7 @@
     <h3 class="font-h3 d-inline-block">Details</h3>
     @if (User.IsInRole("Landlord") || User.IsInRole("Admin"))
     {
-        <a class="bi bi-pencil ms-auto" asp-action="EditProperty" asp-controller="Property" asp-route-propertyId="@Model.Property!.PropertyId"></a>
+        <a class="bi bi-pencil ms-auto" asp-action="PropertyInputStepThreeDetails" asp-controller="Property" asp-route-operationType="edit" asp-route-propertyId="@Model.Property!.PropertyId"></a>
     }
 </div>
 

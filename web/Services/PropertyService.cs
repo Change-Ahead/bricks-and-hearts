@@ -12,9 +12,10 @@ public interface IPropertyService
     public void DeleteProperty(PropertyDbModel property);
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId);
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId);
-    public LandlordDbModel GetPropertyOwner(int propertyId);
-    public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string sortBy, string? target, int page, int propPerPage);
-    public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertiesByLandlord(int landlordId, int page, int propPerPage);
+    public LandlordDbModel GetPropertyOwner(int propertyId);    public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string sortBy, string? target,
+        int page, int propPerPage);
+    public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertiesByLandlord(int landlordId, int page,
+        int propPerPage);
     public PropertyCountModel CountProperties(int? landlordId = null);
     public string CreatePublicViewLink(int propertyId);
     public PropertyDbModel? GetPropertyByPublicViewLink(string token);
@@ -165,9 +166,8 @@ public class PropertyService : IPropertyService
             return true;
         }
 
-        var propertyLandlordId = GetPropertyByPropertyId(propertyId)!.LandlordId;
-        var userLandlordId = currentUser.LandlordId;
-        return propertyLandlordId == userLandlordId;
+        return currentUser.LandlordId != null
+               && GetPropertyByPropertyId(propertyId)?.LandlordId == currentUser.LandlordId;
     }
 
     public LandlordDbModel GetPropertyOwner(int propertyId)
@@ -227,7 +227,8 @@ public class PropertyService : IPropertyService
         );
     }
 
-    public async Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertiesByLandlord(int landlordId, int page, int propPerPage)
+    public async Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertiesByLandlord(int landlordId, int page,
+        int propPerPage)
     {
         var properties = _dbContext.Properties
             .Include(p => p.Postcode)

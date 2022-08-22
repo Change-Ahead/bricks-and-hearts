@@ -1,0 +1,48 @@
+﻿@model BricksAndHearts.ViewModels.PropertyInput.PropertyInputModelBase
+@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@{
+    ViewData["Title"] = (Model.IsEdit ? "Edit" : "Add") + " Property";
+
+    string GetStepClass(int step)
+    {
+        if (step == Model.Step)
+        {
+            return "active";
+        }
+        return step < Model.Step ? "finish" : "";
+    }
+}
+
+<!-- Circles which indicate the steps of the form: -->
+<div class="d-flex property-steps my-5">
+    <span class="step @GetStepClass(1)">1</span>
+    <span class="stepline"></span>
+    <span class="step @GetStepClass(2)">2</span>
+    <span class="stepline"></span>
+    <span class="step @GetStepClass(3)">3</span>
+    <span class="stepline"></span>
+    <span class="step @GetStepClass(4)">4</span>
+    <span class="stepline"></span>
+    <span class="step @GetStepClass(5)">5</span>
+    <span class="stepline"></span>
+    <span class="step @GetStepClass(6)">6</span>
+</div>
+
+
+@if (Model.Step > 1)
+{
+    <div class="mb-4">
+        <a asp-controller="Property" asp-action="@Model.PreviousAction" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId" asp-route-operationType="@(Model.IsEdit ? "edit" : "add")">&lt; Back</a>
+    </div>
+}
+
+<h1 class="font-h1">@Model.Title</h1>
+
+<div asp-validation-summary="All" class="text-danger"></div>
+<form method="post">
+    @RenderBody()
+    @{ await Html.RenderPartialAsync("PropertyInputForm/_PropertyFormButtons", Model); }
+</form>

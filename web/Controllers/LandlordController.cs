@@ -30,7 +30,7 @@ public class LandlordController : AbstractController
     [HttpGet("register")]
     public ActionResult RegisterGet(bool createUnassigned = false)
     {
-        var currentUser = GetCurrentUser();
+        var currentUser = CurrentUser;
         if (currentUser.LandlordId != null && !currentUser.IsAdmin)
         {
             _logger.LogWarning("User {UserId} is already registered, will redirect to profile", currentUser.Id);
@@ -44,11 +44,13 @@ public class LandlordController : AbstractController
 
         if (currentUser.IsAdmin)
         {
-            AddFlashMessage("warning", "You are currently registering yourself as a landlord. If your intention is to create an unassigned landlord account on behalf of someone else, please use the 'Create Unassigned Landlord' link on the Landlord List page.");
+            AddFlashMessage("warning",
+                "You are currently registering yourself as a landlord. If your intention is to create an unassigned landlord account on behalf of someone else, please use the 'Create Unassigned Landlord' link on the Landlord List page.");
         }
+
         return View("Register", new LandlordProfileModel
         {
-            Email = GetCurrentUser().GoogleEmail
+            Email = CurrentUser.GoogleEmail
         });
     }
 
@@ -61,7 +63,7 @@ public class LandlordController : AbstractController
             return View("Register", createModel);
         }
 
-        var user = GetCurrentUser();
+        var user = CurrentUser;
         ILandlordService.LandlordRegistrationResult result;
         LandlordDbModel? landlord;
 
@@ -117,7 +119,7 @@ public class LandlordController : AbstractController
     [HttpGet("{id:int}/profile")]
     public async Task<ActionResult> Profile([FromRoute] int id)
     {
-        var user = GetCurrentUser();
+        var user = CurrentUser;
         if (user.LandlordId != id && !user.IsAdmin)
         {
             return StatusCode(403);
@@ -137,7 +139,7 @@ public class LandlordController : AbstractController
     [HttpGet("me/profile")]
     public async Task<ActionResult> MyProfile()
     {
-        var landlordId = GetCurrentUser().LandlordId;
+        var landlordId = CurrentUser.LandlordId;
         if (landlordId == null)
         {
             return StatusCode(404);
@@ -158,7 +160,7 @@ public class LandlordController : AbstractController
             return RedirectToAction("Profile", "Landlord", new { Id = landlord.LandlordId!.Value });
         }
 
-        var user = GetCurrentUser();
+        var user = CurrentUser;
         var result = await _landlordService.ApproveLandlord(landlord.LandlordId!.Value, user, landlord.MembershipId);
 
         string flashMessageBody,
@@ -199,13 +201,13 @@ public class LandlordController : AbstractController
     {
         if (id == null)
         {
-            id = GetCurrentUser().LandlordId;
+            id = CurrentUser.LandlordId;
             if (id == null)
             {
                 return StatusCode(404);
             }
         }
-        else if (!GetCurrentUser().IsAdmin && id != GetCurrentUser().LandlordId)
+        else if (!CurrentUser.IsAdmin && id != CurrentUser.LandlordId)
         {
             return StatusCode(403);
         }
@@ -222,7 +224,7 @@ public class LandlordController : AbstractController
     [HttpGet("{landlordId:int}/edit")]
     public async Task<ActionResult> EditProfilePage(int? landlordId)
     {
-        var user = GetCurrentUser();
+        var user = CurrentUser;
         var landlordFromDb = await _landlordService.GetLandlordIfExistsFromId(landlordId);
         if (landlordFromDb == null)
         {
@@ -240,7 +242,7 @@ public class LandlordController : AbstractController
     [HttpPost("edit")]
     public async Task<ActionResult> EditProfileUpdate([FromForm] LandlordProfileModel editModel)
     {
-        var user = GetCurrentUser();
+        var user = CurrentUser;
         if (!ModelState.IsValid || !TryValidateModel(editModel.Address, nameof(AddressModel)))
         {
             return View("EditProfilePage", editModel);
@@ -296,7 +298,7 @@ public class LandlordController : AbstractController
     [HttpPost("/invite/{inviteLink}/accepted")]
     public async Task<IActionResult> TieUserWithLandlord(string inviteLink)
     {
-        var user = GetCurrentUser();
+        var user = CurrentUser;
         var result = await _landlordService.LinkExistingLandlordWithUser(inviteLink, user);
         switch (result)
         {
@@ -320,7 +322,7 @@ public class LandlordController : AbstractController
     [HttpGet("{id:int}/dashboard")]
     public async Task<ActionResult> Dashboard([FromRoute] int id)
     {
-        var user = GetCurrentUser();
+        var user = CurrentUser;
         if (user.LandlordId != id && !user.IsAdmin)
         {
             return StatusCode(403);
@@ -376,7 +378,7 @@ public class LandlordController : AbstractController
     [HttpGet("me/dashboard")]
     public async Task<ActionResult> MyDashboard()
     {
-        var landlordId = GetCurrentUser().LandlordId;
+        var landlordId = CurrentUser.LandlordId;
         if (landlordId == null)
         {
             return StatusCode(404);

@@ -1,0 +1,40 @@
+@model BricksAndHearts.ViewModels.PropertyInput.PropertyInputModelAddress
+@{
+    Layout = "PropertyInputForm/_LayoutPropertyInputForm";
+}
+<div class="row">
+    <div class="col-auto">
+        <div class="my-3">
+            <label asp-for="AddressLine1" class="form-label">Address Line 1</label>
+            <input asp-for="AddressLine1" class="form-control" required/>
+            <span asp-validation-for="AddressLine1" class="text-danger"></span>
+        </div>
+        <div class="my-3">
+            <label asp-for="AddressLine2" class="form-label">Address Line 2</label>
+            <input asp-for="AddressLine2" class="form-control"/>
+            <span asp-validation-for="AddressLine2" class="text-danger"></span>
+        </div>
+        <div class="my-3">
+            <label asp-for="AddressLine3" class="form-label">Address Line 3</label>
+            <input asp-for="AddressLine3" class="form-control"/>
+            <span asp-validation-for="AddressLine3" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="col-auto">
+        <div class="my-3">
+            <label asp-for="TownOrCity" class="form-label">Town or City</label>
+            <input asp-for="TownOrCity" class="form-control" required/>
+            <span asp-validation-for="TownOrCity" class="text-danger"></span>
+        </div>
+        <div class="my-3">
+            <label asp-for="County" class="form-label">County</label>
+            <input asp-for="County" class="form-control" required/>
+            <span asp-validation-for="County" class="text-danger"></span>
+        </div>
+        <div class="my-3">
+            <label asp-for="Postcode" class="form-label">Postcode</label>
+            <input asp-for="Postcode" class="form-control" value="@Model.Postcode" required readonly/>
+            <span asp-validation-for="Postcode" class="text-danger"></span>
+        </div>
+    </div>
+</div>

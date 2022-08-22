@@ -9,9 +9,14 @@ namespace BricksAndHearts.Controllers;
 
 public abstract class AbstractController : Controller
 {
-    protected BricksAndHeartsUser GetCurrentUser()
+    protected BricksAndHeartsUser CurrentUser => GetCurrentUser();
+
+    private BricksAndHeartsUser GetCurrentUser()
     {
-        if (User.Identity?.IsAuthenticated != true) throw new Exception("GetCurrentUser called when not authenticated");
+        if (User.Identity?.IsAuthenticated != true)
+        {
+            throw new Exception("GetCurrentUser called when not authenticated");
+        }
 
         return (BricksAndHeartsUser)User.Identity;
     }
@@ -24,7 +29,7 @@ public abstract class AbstractController : Controller
         var flashMessageArray = TempData["FlashMessages"] as string[];
         var flashMessageList = new List<string>(flashMessageArray!);
         flashMessageList.Add(flashMessage);
-        
+
         var flashTypeArray = TempData["FlashTypes"] as string[];
         var flashTypeList = new List<string>(flashTypeArray!);
         flashTypeList.Add(flashType);

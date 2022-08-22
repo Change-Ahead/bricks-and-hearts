@@ -26,19 +26,27 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
         {
             Unassigned = true
         };
-        var msgBody = $"A Landlord has just registered\n"
+        formResultModel.Address.AddressLine1 = "Test Road";
+        formResultModel.Address.Postcode = "N3 2FT";
+        var msgBody = "A Landlord has just registered\n"
                       + "\n"
                       + $"Title: {formResultModel.Title}\n"
-                      + $"First Name: {formResultModel.FirstName}" + "\n"
-                      + $"Last Name: {formResultModel.LastName}" + "\n"
-                      + $"Company Name: {formResultModel.CompanyName}" + "\n"
-                      + $"Email: {formResultModel.Email}" + "\n"
-                      + $"Phone: {formResultModel.Phone}" + "\n";
+                      + $"First Name: {formResultModel.FirstName}"
+                      + "\n"
+                      + $"Last Name: {formResultModel.LastName}"
+                      + "\n"
+                      + $"Company Name: {formResultModel.CompanyName}"
+                      + "\n"
+                      + $"Email: {formResultModel.Email}"
+                      + "\n"
+                      + $"Phone: {formResultModel.Phone}"
+                      + "\n";
         var subject = "Bricks&Hearts - landlord registration notification";
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel))
             .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));
         A.CallTo(() => MailService.SendMsg(
-            A<string>.That.Matches(s => s == msgBody), A<string>.That.Matches(s => s == subject), A<List<string>>.Ignored, A<string>.Ignored,
+            A<string>.That.Matches(s => s == msgBody), A<string>.That.Matches(s => s == subject),
+            A<List<string>>.Ignored, A<string>.Ignored,
             A<string>.Ignored
         )).WithAnyArguments().DoesNothing();
 
@@ -66,19 +74,20 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
         var returnedLandlord = A.Fake<LandlordDbModel>();
         var formResultModel = A.Fake<LandlordProfileModel>();
         formResultModel.Unassigned = true;
-
+        formResultModel.Address.Postcode = "N3 2FT";
+        formResultModel.Address.AddressLine1 = "Test Road";
         // Act
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel))
             .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));
         A.CallTo(() => MailService.SendMsg(
-            A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored,A<string>.Ignored, A<string>.Ignored
+            A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored
         )).WithAnyArguments().DoesNothing();
         var result = await UnderTest.RegisterPost(formResultModel) as StatusCodeResult;
 
         // Assert
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel)).WithAnyArguments().MustNotHaveHappened();
         A.CallTo(() => MailService.SendMsg(
-            A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored,A<string>.Ignored, A<string>.Ignored
+            A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored
         )).WithAnyArguments().MustNotHaveHappened();
         result.Should().NotBeNull();
         result?.StatusCode.Should().Be(403);

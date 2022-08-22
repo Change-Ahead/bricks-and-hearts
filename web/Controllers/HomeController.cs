@@ -19,7 +19,7 @@ public class HomeController : AbstractController
         var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
         if (isAuthenticated)
         {
-            var user = GetCurrentUser();
+            var user = CurrentUser;
             if (user.IsAdmin)
             {
                 return RedirectToAction("AdminDashboard", "Admin");
@@ -30,6 +30,7 @@ public class HomeController : AbstractController
                 return RedirectToAction("MyDashboard", "Landlord");
             }
         }
+
         var model = new HomeViewModel
         {
             IsLoggedIn = isAuthenticated,
@@ -37,19 +38,19 @@ public class HomeController : AbstractController
         };
         return View(model);
     }
-    
+
     [HttpGet]
     public IActionResult Privacy()
     {
         return View();
     }
-    
+
     [HttpGet]
     public IActionResult ContactUs()
     {
         return View(new ContactUsViewModel());
     }
-    
+
     [HttpGet]
     [Route("/Error/{status:int}")]
     public IActionResult Error(int status)
@@ -70,5 +71,4 @@ public class HomeController : AbstractController
     {
         throw new Exception("For testing purposes only");
     }
-    
 }

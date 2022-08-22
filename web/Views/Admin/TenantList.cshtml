@@ -13,7 +13,7 @@
         <div class="col-auto" style="align-self: center">
             <button type="submit" class="btn btn-primary">Sort</button>
         </div>
-    </div>    
+    </div>
 }
 
 <div class="dropdown-button">
@@ -22,7 +22,7 @@
     </a>
 </div>
 
-<div class="collapse @(Model.Filter.GetList().SequenceEqual(new HousingRequirementModel().GetList()) ? "":"show")" id="dropdown-contents">
+<div class="collapse @(Model.Filter.GetList().SequenceEqual(new HousingRequirementModel().GetList()) ? "" : "show")" id="dropdown-contents">
     <form method="get" asp-controller="Admin" asp-action="TenantList">
 
         <div class="row mb-3">
@@ -48,9 +48,9 @@
                     {
                         new("Has pet", "true"),
                         new("Does not have pet", "false")
-                    }, 
+                    },
                     "Filter by Pets",
-                    new { @class="form-select" }
+                    new { @class = "form-select" }
                     )
             </div>
             <div class="col-auto d-grid">
@@ -60,9 +60,9 @@
                     {
                         new("In ETT", "true"),
                         new("Not in ETT", "false")
-                    }, 
+                    },
                     "Filter by ETT",
-                    new { @class="form-select" }
+                    new { @class = "form-select" }
                     )
             </div>
             <div class="col-auto d-grid">
@@ -72,9 +72,9 @@
                     {
                         new("On Universal Credit", "true"),
                         new("Not on Universal Credit", "false")
-                    }, 
+                    },
                     "Filter by Universal Credit",
-                    new { @class="form-select" }
+                    new { @class = "form-select" }
                     )
             </div>
             <div class="col-auto d-grid">
@@ -84,9 +84,9 @@
                     {
                         new("On Housing Benefits", "true"),
                         new("Not on Housing Benefits", "false")
-                    }, 
+                    },
                     "Filter by Housing Benefits",
-                    new { @class="form-select" }
+                    new { @class = "form-select" }
                     )
             </div>
             <div class="col-auto d-grid">
@@ -96,9 +96,9 @@
                     {
                         new("Over 35", "true"),
                         new("35 or under", "false")
-                    }, 
+                    },
                     "Filter by Over 35",
-                    new { @class="form-select" }
+                    new { @class = "form-select" }
                     )
             </div>
         </div>
@@ -108,25 +108,25 @@
 
 <table class="table">
     <thead>
-        @if (Model.TenantList.Count > 0)
-        {
-            <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Email</th>
-                <th scope="col">Phone</th>
-                <th scope="col">Postcode</th>
-                <th scope="col">Type</th>
-                <th scope="col">Has Pet?</th>
-                <th scope="col">In ETT?</th>
-                <th scope="col">On Universal Credit?</th>
-                <th scope="col">On Housing Benefits?</th>
-                <th scope="col">Over 35?</th>
-            </tr>
-        }
-        else
-        {
-            <div>There are no tenants which match this search.</div>
-        }
+    @if (Model.TenantList.Count > 0)
+    {
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Postcode</th>
+            <th scope="col">Type</th>
+            <th scope="col">Has Pet?</th>
+            <th scope="col">In ETT?</th>
+            <th scope="col">On Universal Credit?</th>
+            <th scope="col">On Housing Benefits?</th>
+            <th scope="col">Over 35?</th>
+        </tr>
+    }
+    else
+    {
+        <div>There are no tenants which match this search.</div>
+    }
     </thead>
     <tbody>
     @foreach (var tenant in Model.TenantList)
@@ -164,7 +164,7 @@
     {
         <div>Please upload a CSV file containing tenant information. This information will replace all existing tenant records.</div>
         <input name="csvFile" type="file" accept="file">
-        <input type="submit" value="Import Tenants" />
+        <input type="submit" value="Import Tenants"/>
     }
 
     <p></p>
@@ -175,5 +175,5 @@
     @using (Html.BeginForm("GetSampleTenantCSV", "Admin", FormMethod.Post))
     {
         <button type="submit" class="btn btn-primary">Download sample Tenant Data CSV</button>
-    }  
+    }
 </div>

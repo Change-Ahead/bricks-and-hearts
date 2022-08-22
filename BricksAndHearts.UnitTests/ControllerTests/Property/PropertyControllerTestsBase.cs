@@ -15,6 +15,7 @@ public class PropertyControllerTestsBase : ControllerTestsBase
 {
     protected readonly IAzureMapsApiService AzureMapsApiService;
     protected readonly IAzureStorage AzureStorage;
+    protected readonly ILogger<PropertyController>? Logger;
     protected readonly IPropertyService PropertyService;
     protected readonly ILandlordService LandlordService;
     protected readonly PropertyController UnderTest;
@@ -55,13 +56,16 @@ public class PropertyControllerTestsBase : ControllerTestsBase
         };
     }
 
-    protected static PropertyDbModel CreateExamplePropertyDbModel()
+    protected PropertyDbModel CreateExamplePropertyDbModel()
     {
         return new PropertyDbModel
         {
             LandlordId = 1,
             Id = 1,
             AddressLine1 = "10 Downing Street",
+            AddressLine2 = "London",
+            TownOrCity = "City",
+            County = "County",
             Postcode = new PostcodeDbModel
             {
                 Postcode = "SW1A 2AA"
@@ -69,7 +73,21 @@ public class PropertyControllerTestsBase : ControllerTestsBase
             NumOfBedrooms = 2,
             Rent = 750,
             Description = "Property description",
-            Landlord = A.Fake<LandlordDbModel>()
+            Landlord = A.Fake<LandlordDbModel>(),
+            AcceptsSingleTenant = false,
+            AcceptsCouple = false,
+            AcceptsFamily = true,
+            AcceptsPets = true,
+            AcceptsNotEET = false,
+            AcceptsCredit = true,
+            AcceptsBenefits = false,
+            AcceptsOver35 = true,
+            AcceptsWithoutGuarantor = true,
+            OccupiedUnits = 2,
+            TotalUnits = 5,
+            AvailableFrom = null,
+            Availability = "draft",
+            PropertyType = "Detached"
         };
     }
 

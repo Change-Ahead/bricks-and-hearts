@@ -25,7 +25,7 @@
         @* Sorting and filtering goes here *@
 
         <div class="col-auto ms-sm-auto">
-            <a asp-controller="Property" asp-action="AddNewProperty_Begin" asp-route-landlordId="@Model.Owner?.LandlordId" class="btn btn-primary">Add new property</a>
+            <a class="btn btn-primary" href="@Url.Action("PropertyInputStepOnePostcode", "Property", new { landlordId = Model.Owner?.LandlordId, propertyId = 0, operationType = "add"})">Add new property</a>
         </div>
     </div>
     

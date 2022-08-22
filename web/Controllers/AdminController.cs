@@ -48,7 +48,7 @@ public class AdminController : AbstractController
         }
         var viewModel =
             new AdminDashboardViewModel(_landlordService.CountLandlords(), _propertyService.CountProperties(), _tenantService.CountTenants());
-        viewModel.CurrentUser = GetCurrentUser();
+        viewModel.CurrentUser = CurrentUser;
 
         return View(viewModel);
     }
@@ -57,7 +57,7 @@ public class AdminController : AbstractController
     [HttpPost]
     public IActionResult RequestAdminAccess()
     {
-        var user = GetCurrentUser();
+        var user = CurrentUser;
         if (user.IsAdmin)
         {
             LoggerAlreadyAdminWarning(_logger, user);
@@ -72,7 +72,7 @@ public class AdminController : AbstractController
 
     public IActionResult CancelAdminAccessRequest()
     {
-        var user = GetCurrentUser();
+        var user = CurrentUser;
         if (user.IsAdmin)
         {
             LoggerAlreadyAdminWarning(_logger, user);
@@ -96,7 +96,7 @@ public class AdminController : AbstractController
     public ActionResult AcceptAdminRequest(int userToAcceptId)
     {
         _adminService.ApproveAdminAccessRequest(userToAcceptId);
-        _logger.LogInformation($"Admin request of user {userToAcceptId} approved by user {GetCurrentUser().Id}");
+        _logger.LogInformation($"Admin request of user {userToAcceptId} approved by user {CurrentUser.Id}");
         return RedirectToAction("GetAdminList");
     }
 
@@ -105,7 +105,7 @@ public class AdminController : AbstractController
     public ActionResult RejectAdminRequest(int userToRejectId)
     {
         _adminService.RejectAdminAccessRequest(userToRejectId);
-        _logger.LogInformation($"Admin request of user {userToRejectId} rejected by user {GetCurrentUser().Id}");
+        _logger.LogInformation($"Admin request of user {userToRejectId} rejected by user {CurrentUser.Id}");
         return RedirectToAction("GetAdminList");
     }
 
@@ -113,10 +113,10 @@ public class AdminController : AbstractController
     [HttpPost]
     public ActionResult RemoveAdmin(int userToRemoveId)
     {
-        if (userToRemoveId != GetCurrentUser().Id)
+        if (userToRemoveId != CurrentUser.Id)
         {
             _adminService.RemoveAdmin(userToRemoveId);
-            _logger.LogInformation($"Admin status of user {userToRemoveId} revoked by user {GetCurrentUser().Id}");
+            _logger.LogInformation($"Admin status of user {userToRemoveId} revoked by user {CurrentUser.Id}");
         }
         else
         {
@@ -332,7 +332,7 @@ public class AdminController : AbstractController
             _logger.LogInformation("Successfuly imported all tenant data.");
             AddFlashMessage("success", "Successfully imported all tenant data.");
         }
-        
+
         return RedirectToAction(nameof(TenantList));
     }
 }
