@@ -113,8 +113,8 @@ public class PropertyService : IPropertyService
         dbModel.AcceptsBenefits = updateModel.LandlordRequirements.AcceptsBenefits ?? dbModel.AcceptsBenefits;
         dbModel.AcceptsNotEET = updateModel.LandlordRequirements.AcceptsNotEET ?? dbModel.AcceptsNotEET;
         dbModel.AcceptsOver35 = updateModel.LandlordRequirements.AcceptsOver35 ?? dbModel.AcceptsOver35;
-        dbModel.AcceptsWithoutGuarantor = updateModel.LandlordRequirements.AcceptsWithoutGuarantor ??
-                                          dbModel.AcceptsWithoutGuarantor;
+        dbModel.AcceptsWithoutGuarantor = updateModel.LandlordRequirements.AcceptsWithoutGuarantor
+                                          ?? dbModel.AcceptsWithoutGuarantor;
 
         dbModel.Rent = updateModel.Rent ?? dbModel.Rent;
 
@@ -172,7 +172,8 @@ public class PropertyService : IPropertyService
 
     public LandlordDbModel GetPropertyOwner(int propertyId)
     {
-        return _dbContext.Properties.Include(p => p.Landlord).Single(p => p.Id == propertyId).Landlord;
+        return _dbContext.Properties.Include(p => p.Landlord).ThenInclude(l => l.Postcode)
+            .Single(p => p.Id == propertyId).Landlord;
     }
 
     public async Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string? sortBy, string? target,
