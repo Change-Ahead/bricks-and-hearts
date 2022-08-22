@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace BricksAndHearts.ViewModels.PropertyInput;
 
-public class PropertyInputModelAvailability : PropertyInputModelBase
+public class PropertyInputModelAvailability : PropertyInputModelBase, IValidatableObject
 {
     public int OccupiedUnits { get; set; }
 
@@ -21,6 +21,29 @@ public class PropertyInputModelAvailability : PropertyInputModelBase
 
     [ValidateNever]
     public override string PreviousAction { get; set; } = "PropertyInputStepFiveTenantPreferences";
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (Availability == AvailabilityState.AvailableSoon)
+        {
+            if (AvailableFrom == null)
+            {
+                yield return new ValidationResult("Available From must be provided if property is Available Soon");
+            }
+
+            if (AvailableFrom < DateTime.Today)
+            {
+                yield return new ValidationResult("Available From must be in the future");
+            }
+        }
+
+
+        if (OccupiedUnits > TotalUnits)
+        {
+            yield return new ValidationResult(
+                "The number of occupied units must be less than or equal to the total units at the property.");
+        }
+    }
 
     public override void InitialiseViewModel(PropertyDbModel property)
     {
@@ -44,19 +67,5 @@ public class PropertyInputModelAvailability : PropertyInputModelBase
             TotalUnits = TotalUnits,
             OccupiedUnits = OccupiedUnits
         };
-    }
-
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-    {
-        if (Availability == AvailabilityState.AvailableSoon && AvailableFrom == null)
-        {
-            yield return new ValidationResult("Available From must be provided if property is Available Soon");
-        }
-
-        if (OccupiedUnits > TotalUnits)
-        {
-            yield return new ValidationResult(
-                "The number of occupied units must be less than or equal to the total units at the property.");
-        }
     }
 }

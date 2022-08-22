@@ -17,7 +17,7 @@
     <div class="col-auto">
         <label asp-for="Availability" class="form-label">Availability</label>
         <select asp-for="Availability" class="form-select" required
-                id="Select" onclick="checkIfSelectedValueIsTarget('@AvailabilityState.AvailableSoon')">
+                id="Select" onclick="checkIfSelectedValueIsTarget('@AvailabilityState.AvailableSoon', 'Select'); makeRequiredIfSelectedValueIsTarget('@AvailabilityState.AvailableSoon', 'Select', 'dateInput')">
             <option selected>@AvailabilityState.Draft</option>
             <option>@AvailabilityState.Available</option>
             <option>@AvailabilityState.AvailableSoon</option>
@@ -27,9 +27,8 @@
     </div>
     <div class="col-auto" id="ifTrue" style="@(Model.Availability == AvailabilityState.AvailableSoon ? "" : "display: none;")">
         <label asp-for="AvailableFrom" class="form-label">Available from</label>
-        <input asp-for="AvailableFrom" class="form-control empty"/>
+        <input id="dateInput" asp-for="AvailableFrom" class="form-control empty" type="date" asp-format="{0:yyyy-MM-dd}" min="@DateTime.Today.ToString("yyyy-MM-dd")" step="1"/>
         <span asp-validation-for="AvailableFrom" class="text-danger"></span>
-        @*TODO require AvailableFrom date to be in future*@
     </div>
     <div class="d-none" id="ifFalse"></div>
 </div>
