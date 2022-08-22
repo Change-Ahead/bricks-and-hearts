@@ -35,7 +35,7 @@
 @if (Model.Step > 1)
 {
     <div class="mb-4">
-        <a asp-controller="Property" asp-action="@Model.PreviousAction" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId" asp-route-operationType="@(Model.IsEdit ? "edit" : "add")" class="link-secondary">Back</a>
+        <a asp-controller="Property" asp-action="@Model.PreviousAction" asp-route-propertyId="@Model.PropertyId" asp-route-landlordId="@Model.LandlordId" asp-route-operationType="@(Model.IsEdit ? "edit" : "add")">&lt; Back</a>
     </div>
 }
 
