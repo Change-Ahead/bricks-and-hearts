@@ -9,9 +9,9 @@
 {
     <div>
         <div class="row">
-            <div class="col-8">@*page left*@
+            <div class="col-sm-8">@*page left*@
                 <div class="row mb-4 mt-4">@*welcome section*@
-                    <div class="col-7">
+                    <div class="col-6">
                         <div class="row">
                             <div class="col-sm-auto profile-photo-lg mb-4">
                                 <img src="@(((BricksAndHeartsUser)User.Identity!).GoogleProfileImageUrl ?? Url.Content("~/images/profileDefault.png"))" alt="profile picture">
@@ -20,7 +20,7 @@
                                 <div class="row">
                                     <h6 class="font-body">Hello</h6>
                                     <h2 class="font-blue font-h1">@Model.CurrentUser.Name</h2>
-                                    <h6>You are an admin for the ChangeAhead Bricks&Hearts project.</h6>
+                                    <h6>You are an admin for the ChangeAhead Bricks & Hearts project.</h6>
                                 </div>
                             </div>
                         </div>
@@ -44,7 +44,7 @@
                                    Stat = Model.LandlordCounts.RegisteredLandlords.ToString(),
                                    StatDescription = "Registered"
                                }); }
-                            <div style="align-self: center">
+                            <div class="mb-3" style="align-self: center">
                                 <a class="btn btn-primary btn-large w-auto d-table-cell" asp-controller="Admin" asp-action="LandlordList">View landlord list</a>
                             </div>
                         </div>
@@ -66,7 +66,7 @@
                                    Stat = Model.PropertyCounts.RegisteredProperties.ToString(),
                                    StatDescription = "Registered"
                                }); }
-                            <div style="align-self: center">
+                            <div class="mb-3" style="align-self: center">
                                 <a class="btn btn-primary btn-large w-auto d-table-cell" asp-controller="Property" asp-action="PropertyList">View property list</a>
                             </div>
                         </div>
@@ -74,7 +74,7 @@
                     <div class="col-lg-3 d-flex justify-content-center mb-5" style="width: 280px">
                         <div class="card card-stat rounded-custom" style="align-self: center">
                             <div class="card-body">
-                                Admin
+                                Tenants
                             </div>
                             @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
                                {
@@ -88,14 +88,14 @@
                                    Stat = Model.TenantCounts.RegisteredTenants.ToString(),
                                    StatDescription = "Registered"
                                }); }
-                            <div style="align-self: center">
+                            <div class="mb-3" style="align-self: center">
                                 <a class="btn btn-primary btn-large w-auto d-table-cell" asp-controller="Admin" asp-action="TenantList">View tenant list</a>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-4">@*actions*@
+            <div class="col-sm-4">@*actions*@
                 <div class="row mb-5 mt-5">
                     <div class="mb-4">
                         <h1>Admin actions</h1>

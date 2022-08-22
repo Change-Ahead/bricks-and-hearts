@@ -121,6 +121,7 @@ body {
 .statbox-icon{
     color: var(--blue);
     background-color: var(--paleBlue);
+    border-radius: 20px;
     font-size: 80px;
     text-align: center;
 }
