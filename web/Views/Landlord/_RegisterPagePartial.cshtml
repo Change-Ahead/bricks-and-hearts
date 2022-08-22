@@ -1,6 +1,20 @@
 @model LandlordProfileModel
-<div class="registerTab col-md-5" id="Name">
-    <div class="form-group my-3">
+
+@functions
+{
+    void GenerateReviewTableRow(string id, string name)
+    {
+        <tr>
+            <th class="w-25">@name</th>
+            <td class="property-description" id="@(id)Review"></td>
+        </tr>
+    }
+}
+
+<div class="registerTab" id="Name">
+    <h2 class="font-h3 mb-5">You are just a few steps away</h2>
+
+    <div class="my-3">
         @Html.HiddenFor(m => m.Unassigned, new { value = Model.Unassigned })
         <label asp-for="Title" class="form-label"></label>
         <select asp-for="Title" class="form-select" required>
@@ -13,69 +27,85 @@
         </select>
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
-    <div class="form-group my-3">
+    <div class="my-3">
         <label asp-for="FirstName" class="form-label"></label>
         <input asp-for="FirstName" class="form-control"/>
         <span asp-validation-for="FirstName" class="text-danger"></span>
     </div>
-    <div class="form-group my-3">
+    <div class="my-3">
         <label asp-for="LastName" class="form-label"></label>
         <input asp-for="LastName" class="form-control"/>
         <span asp-validation-for="LastName" class="text-danger"></span>
     </div>
 </div>
 
-<div class="registerTab col-md-5 row" id="Contact details">
-    <div class="my-3">
-        <label asp-for="Address.AddressLine1" class="form-label">Address Line 1</label>
-        <input asp-for="Address.AddressLine1" class="form-control" required/>
-        <span asp-validation-for="Address.AddressLine1" class="text-danger"></span>
+<div class="registerTab" id="Contact details">
+    <h2 class="font-h3 mb-5">@(!Model.Unassigned ? "Let us get to know you better" : "Tell us a bit about the landlord")</h2>
+
+    <div class="row">
+        <div class="col-auto">
+            <div class="my-3">
+                <label asp-for="Address.AddressLine1" class="form-label">Address line 1</label>
+                <input asp-for="Address.AddressLine1" class="form-control" required/>
+                <span asp-validation-for="Address.AddressLine1" class="text-danger"></span>
+            </div>
+            <div class="my-3">
+                <label asp-for="Address.AddressLine2" class="form-label">Address line 2 (optional)</label>
+                <input asp-for="Address.AddressLine2" class="form-control empty"/>
+                <span asp-validation-for="Address.AddressLine2" class="text-danger"></span>
+            </div>
+            <div class="my-3">
+                <label asp-for="Address.AddressLine3" class="form-label">Address line 3 (optional)</label>
+                <input asp-for="Address.AddressLine3" class="form-control empty"/>
+                <span asp-validation-for="Address.AddressLine3" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-auto">
+            <div class="my-3">
+                <label asp-for="Address.TownOrCity" class="form-label">Town or city</label>
+                <input asp-for="Address.TownOrCity" class="form-control" required/>
+                <span asp-validation-for="Address.TownOrCity" class="text-danger"></span>
+            </div>
+            <div class="my-3">
+                <label asp-for="Address.County" class="form-label">County</label>
+                <input asp-for="Address.County" class="form-control" required/>
+                <span asp-validation-for="Address.County" class="text-danger"></span>
+            </div>
+            <div class="my-3">
+                <label asp-for="Address.Postcode" class="form-label">Postcode</label>
+                <input asp-for="Address.Postcode" class="form-control" required/>
+                <span asp-validation-for="Address.Postcode" class="text-danger"></span>
+            </div>
+        </div>
     </div>
-    <div class="my-3">
-        <label asp-for="Address.AddressLine2" class="form-label">Address Line 2</label>
-        <input asp-for="Address.AddressLine2" class="form-control empty"/>
-        <span asp-validation-for="Address.AddressLine2" class="text-danger"></span>
-    </div>
-    <div class="my-3">
-        <label asp-for="Address.AddressLine3" class="form-label">Address Line 3</label>
-        <input asp-for="Address.AddressLine3" class="form-control empty"/>
-        <span asp-validation-for="Address.AddressLine3" class="text-danger"></span>
-    </div>
-    <div class="my-3">
-        <label asp-for="Address.TownOrCity" class="form-label">Town or City</label>
-        <input asp-for="Address.TownOrCity" class="form-control" required/>
-        <span asp-validation-for="Address.TownOrCity" class="text-danger"></span>
-    </div>
-    <div class="my-3">
-        <label asp-for="Address.County" class="form-label">County</label>
-        <input asp-for="Address.County" class="form-control" required/>
-        <span asp-validation-for="Address.County" class="text-danger"></span>
-    </div>
-    <div class="my-3">
-        <label asp-for="Address.Postcode" class="form-label">Postcode</label>
-        <input asp-for="Address.Postcode" class="form-control" required/>
-        <span asp-validation-for="Address.Postcode" class="text-danger"></span>
-    </div>
-    <div class="form-group my-3">
-        <label asp-for="Email" class="form-label"></label>
-        <input type="email" asp-for="Email" class="form-control"/>
-        <span asp-validation-for="Email" class="text-danger"></span>
-    </div>
-    <div class="form-group my-3">
-        <label asp-for="Phone" class="form-label"></label>
-        <input type="tel" asp-for="Phone" class="form-control"/>
-        <span asp-validation-for="Phone" class="text-danger"></span>
+
+    <div class="row mt-3">
+        <div class="col-auto">
+            <div class="my-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input type="email" asp-for="Email" class="form-control"/>
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="col-auto">
+            <div class="my-3">
+                <label asp-for="Phone" class="form-label"></label>
+                <input type="tel" asp-for="Phone" class="form-control"/>
+                <span asp-validation-for="Phone" class="text-danger"></span>
+            </div>
+        </div>
     </div>
 </div>
 
-
 <div class="registerTab" id="Landlord details">
+    <h2 class="font-h3 mb-5">@(!Model.Unassigned ? "Let us get to know you better" : "Tell us a bit about the landlord")</h2>
+
     <div class="row">
-        <div class="col-md-5">
-            <div class="form-group my-3">
+        <div class="col-auto">
+            <div class="my-3">
                 <label asp-for="LandlordType" class="form-label"></label>
                 <select asp-for="LandlordType" class="form-select" required>
-                    <option selected disabled value="">Landlord Type</option>
+                    <option selected disabled value="">Choose a type</option>
                     <option value="Charity">Charity</option>
                     <option value="Private Residential Sector">Private Residential Sector</option>
                     <option value="Registered Provider">Registered Provider</option>
@@ -83,51 +113,87 @@
                 </select>
                 <span asp-validation-for="LandlordType" class="text-danger"></span>
             </div>
-            <div class="form-group my-3">
+            <div class="my-3">
                 <label asp-for="IsLandlordForProfit" class="form-label"></label>
                 <select asp-for="IsLandlordForProfit" class="form-select" required>
                     <option selected disabled value="">For / Not for profit</option>
-                    <option value="true">For Profit</option>
-                    <option value="false">Not For Profit</option>
+                    <option value="true">For profit</option>
+                    <option value="false">Not for profit</option>
                 </select>
                 <span asp-validation-for="IsLandlordForProfit" class="text-danger"></span>
             </div>
-            <div class="form-group my-3">
+            <div class="my-3">
                 <label asp-for="CompanyName" class="form-label">Company name (optional)</label>
                 <input asp-for="CompanyName" class="form-control empty"/>
                 <span asp-validation-for="CompanyName" class="text-danger"></span>
             </div>
         </div>
-        <div class="col-1"></div>
-        <div class="col-md-5">
-            <div class="form-group my-3">
+
+        <div class="col-auto">
+            <div class="my-3">
                 <label for="Select" class="form-label">Charter status</label>
                 <select class="form-select" required
                         id="Select" onchange="checkIfSelectedValueIsTarget('true', 'Select'); clearMembershipIdIfFalse()">
                     <!option @(Model.MembershipId != null ? "selected" : "") value="true">Already approved</!option>
                     <!option @(Model.MembershipId == null ? "selected" : "") value="false">Not yet approved</!option>
                 </select>
+                <div id="ifFalse" class="form-text" style="@(Model.MembershipId != null ? "display: none;" : "")">
+                    ChangeAhead require your participation in a charter system.<br/>
+                    Please get in touch with ChangeAhead if you are not sure what this means.
+                </div>
             </div>
-
-            <div id="ifTrue" class="form-group my-3" style="@(Model.MembershipId == null ? "display: none;" : "")">
+            <div id="ifTrue" class="my-3" style="@(Model.MembershipId == null ? "display: none;" : "")">
                 <label asp-for="MembershipId" class="form-label">Membership ID</label>
                 <input asp-for="MembershipId" class="form-control empty"/>
                 <span asp-validation-for="MembershipId" class="text-danger"></span>
-            </div>
-            <div id="ifFalse" style="@(Model.MembershipId != null ? "display: none;" : "")">
-                ChangeAhead require your participation in a charter system.<br/>
-                Please get in touch with ChangeAhead if you are not sure what this means.
             </div>
         </div>
     </div>
 </div>
 
-<div class="registerTab" id="Terms and conditions">
-    @*tickbox and submit button*@
+<div class="registerTab" id="Review and submit">
+    <h2 class="font-h3 mb-5">Review and submit</h2>
+
+    <div class="row">
+        <div class="col col-lg-7">
+            <div class="mb-4">
+                <h3 class="font-h3">Personal details</h3>
+                <table class="table">
+                    @{ GenerateReviewTableRow("Title", "Title"); }
+                    @{ GenerateReviewTableRow("FirstName", "First name"); }
+                    @{ GenerateReviewTableRow("LastName", "Last name"); }
+                </table>
+            </div>
+
+            <div class="mb-4">
+                <h3 class="font-h3">Contact</h3>
+                <table class="table">
+                    @{ GenerateReviewTableRow("Address", "Address"); }
+                    @{ GenerateReviewTableRow("Email", "Email"); }
+                    @{ GenerateReviewTableRow("Phone", "Phone"); }
+                </table>
+            </div>
+
+            <div class="mb-4">
+                <h3 class="font-h3">Landlord details</h3>
+                <table class="table">
+                    @{ GenerateReviewTableRow("LandlordType", "Type"); }
+                    @{ GenerateReviewTableRow("IsLandlordForProfit", "For / not for profit"); }
+                    @{ GenerateReviewTableRow("CompanyName", "Company"); }
+                </table>
+            </div>
+
+            <div class="mb-4">
+                <h3 class="font-h3">Charter</h3>
+                <table class="table">
+                    @{ GenerateReviewTableRow("CharterStatus", "Status"); }
+                    @{ GenerateReviewTableRow("MembershipId", "Membership ID"); }
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
-<hr/>
-<button type="button" class="btn btn-outline-primary" id="prevBtn" onclick="nextPrev(-1)">Previous</button>
-<button type="button" class="btn btn-primary" id="nextBtn" onclick="nextPrev(1)">Next</button>
-<hr/>
+<button type="button" class="btn btn-large btn-primary my-4" id="nextBtn" onclick="nextPrev(1)">Next</button>
+
 <script src="~/js/registerPageScript.js" asp-append-version="true"></script>
