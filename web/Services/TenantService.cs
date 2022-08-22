@@ -1,10 +1,12 @@
 ﻿using BricksAndHearts.Database;
+using BricksAndHearts.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
 namespace BricksAndHearts.Services;
 
 public interface ITenantService
 {
+    public TenantCountModel CountTenants();
     public Task<(List<TenantDbModel> TenantList, int Count)> SortTenantsByLocation(string postalCode, int page, int tenantsPerPage);
 }
 
@@ -17,6 +19,15 @@ public class TenantService : ITenantService
     {
         _dbContext = dbContext;
         _postcodeService = postcodeService;
+    }
+    
+    public TenantCountModel CountTenants()
+    {
+        return new TenantCountModel
+        {
+            RegisteredTenants = _dbContext.Tenants.Count(),
+            LocatedTenants = _dbContext.Tenants.Count(t => t.Postcode != null)
+        };
     }
 
     public async Task<(List<TenantDbModel> TenantList, int Count)> SortTenantsByLocation(string postalCode, int page, int tenantsPerPage)

@@ -1,124 +1,157 @@
 ﻿@using BricksAndHearts.Auth
 @model AdminDashboardViewModel
 @{
-    ViewData["Title"] = "Admin Page";
+    ViewData["Title"] = "Admin Dashboard";
 }
 
 
-@if (Model.CurrentUser != null)
+@if (Model.CurrentUser!.IsAdmin)
 {
-    if (Model.CurrentUser.IsAdmin)
-    {
-        <div>
-            <div class="row">
-                <div class="col-1 mt-4 profile-photo-lg">
-                    <img src="@(((BricksAndHeartsUser)User.Identity!).GoogleProfileImageUrl ?? Url.Content("~/images/profileDefault.png"))" alt="profile picture">
-                </div>
-                <div class="col-7">
-                    <div class="row">
-                        <div class="col-7">
-                            <h6>Hello</h6>
-                            <h2>@Model.CurrentUser.Name</h2>
-                            <h6>You are an admin for the ChangeAhead Bricks&Hearts project.</h6>
-                        </div>
-                    </div>
-                    <div class="row mt-4">
-                        <div class="col-5">
-                            <div class="row">
-                                <div class="col-8">
-                                    <h1 class="text-center">
-                                        <i class="bi bi-person"></i>
-                                    </h1>
-                                    <div class="text-center">
-                                        <a class="btn btn-primary" asp-controller="Admin" asp-action="LandlordList">Landlords</a>
-                                    </div>
-                                    <p></p>
-                                    <p>@Model.LandlordCounts.RegisteredLandlords Registered Landlord</p>
-                                    <p>@Model.LandlordCounts.ApprovedLandlords Approved Landlords</p>
-                                </div>
+    <div>
+        <div class="row">
+            <div class="col-8">@*page left*@
+                <div class="row mb-4 mt-4">@*welcome section*@
+                    <div class="col-7">
+                        <div class="row">
+                            <div class="col-sm-auto profile-photo-lg mb-4">
+                                <img src="@(((BricksAndHeartsUser)User.Identity!).GoogleProfileImageUrl ?? Url.Content("~/images/profileDefault.png"))" alt="profile picture">
                             </div>
-                        </div>
-                        <div class="col-5">
-                            <div class="row">
-                                <div class="col-9">
-                                    <h1 class="text-center">
-                                        <i class="bi bi-house-door"></i>
-                                    </h1>
-                                    <div class="text-center">
-                                        <a class="btn btn-primary" asp-controller="Property" asp-action="PropertyList">Properties</a>
-                                    </div>
-                                    <p></p>
-                                    <p>@Model.PropertyCounts.RegisteredProperties Registered Properties</p>
-                                    <p>@Model.PropertyCounts.LiveProperties Live Properties</p>
-                                    <p>@Model.PropertyCounts.AvailableProperties Available Properties</p>
+                            <div class="col">
+                                <div class="row">
+                                    <h6 class="font-body">Hello</h6>
+                                    <h2 class="font-blue font-h1">@Model.CurrentUser.Name</h2>
+                                    <h6>You are an admin for the ChangeAhead Bricks&Hearts project.</h6>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-4">
-                    <h6>Admin Actions</h6>
-                    <a class="btn btn-primary" asp-controller="Admin" asp-action="GetAdminList">View Admins</a> <br/>
-                    <p></p>
-                    <a class="btn btn-primary" asp-controller="Landlord" asp-action="RegisterGet" asp-route-createUnassigned="true">Create Unassigned Landlord</a> <br/>
+                <div class="row justify-content-center mt-4">@*stats area*@
+                    <div class="col-lg-3 d-flex justify-content-center mb-5" style="width: 280px">
+                        <div class="card card-stat rounded-custom" style="align-self: center">
+                            <div class="card-body">
+                                Landlords
+                            </div>
+                            @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
+                               {
+                                   IconName = "bi-person",
+                                   Stat = Model.LandlordCounts.ApprovedLandlords.ToString(),
+                                   StatDescription = "Approved"
+                               }); }
+                            @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
+                               {
+                                   IconName = "bi-person",
+                                   Stat = Model.LandlordCounts.RegisteredLandlords.ToString(),
+                                   StatDescription = "Registered"
+                               }); }
+                            <div style="align-self: center">
+                                <a class="btn btn-primary btn-large w-auto d-table-cell" asp-controller="Admin" asp-action="LandlordList">View landlord list</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 d-flex justify-content-center mb-5" style="width: 280px">
+                        <div class="card card-stat rounded-custom" style="align-self: center">
+                            <div class="card-body">
+                                Properties
+                            </div>
+                            @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
+                               {
+                                   IconName = "bi-house",
+                                   Stat = Model.PropertyCounts.LiveProperties.ToString(),
+                                   StatDescription = "Live"
+                               }); }
+                            @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
+                               {
+                                   IconName = "bi-house",
+                                   Stat = Model.PropertyCounts.RegisteredProperties.ToString(),
+                                   StatDescription = "Registered"
+                               }); }
+                            <div style="align-self: center">
+                                <a class="btn btn-primary btn-large w-auto d-table-cell" asp-controller="Property" asp-action="PropertyList">View property list</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3 d-flex justify-content-center mb-5" style="width: 280px">
+                        <div class="card card-stat rounded-custom" style="align-self: center">
+                            <div class="card-body">
+                                Admin
+                            </div>
+                            @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
+                               {
+                                   IconName = "bi-person",
+                                   Stat = Model.TenantCounts.LocatedTenants.ToString(),
+                                   StatDescription = "Located"
+                               }); }
+                            @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
+                               {
+                                   IconName = "bi-person",
+                                   Stat = Model.TenantCounts.RegisteredTenants.ToString(),
+                                   StatDescription = "Registered"
+                               }); }
+                            <div style="align-self: center">
+                                <a class="btn btn-primary btn-large w-auto d-table-cell" asp-controller="Admin" asp-action="TenantList">View tenant list</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-4">@*actions*@
+                <div class="row mb-5 mt-5">
+                    <div class="mb-4">
+                        <h1>Admin actions</h1>
+                    </div>
+                    <div class="mb-4">
+                        <a class="btn btn-primary btn-large w-auto d-table-cell" asp-controller="Admin" asp-action="GetAdminList">View and approve admins</a>
+                    </div>
+                    <div class="mb-4">
+                        <a class="btn btn-primary btn-large w-auto d-table-cell" asp-controller="Landlord" asp-action="RegisterGet" asp-route-createUnassigned="true">Create unassigned landlord</a>
+                    </div>
                 </div>
             </div>
         </div>
-    }
-    else
-    {
-        <div>
-            <div class="row">
-                <div class="col-1 mt-4">
-                    <h1>
-                        <i class="bi bi-person-square"></i>
-                    </h1>
-                </div>
-                <div class="col-7">
-                    <div class="row">
-                        <div class="col-7">
-                            <h6>Hello</h6>
-                            <h2>@Model.CurrentUser.Name</h2>
-                            <h6>You are not an admin for the ChangeAhead Bricks&Hearts project.</h6>
-                            @if (Model.CurrentUser.HasRequestedAdmin)
-                            {
-                                <p>If you no longer believe that you should be an admin, please cancel your admin access request:</p>
+    </div>
+}
+
+else
+{
+    <div class="row">
+        <div class="col-8">
+            <div class="row mb-4 mt-4">
+                <div class="col-7" style="width: 420px">
+                    <div class="row mb-3">
+                        <div class="col-sm-auto profile-photo-lg mb-4">
+                            <img src="@(((BricksAndHeartsUser)User.Identity!).GoogleProfileImageUrl ?? Url.Content("~/images/profileDefault.png"))" alt="profile picture">
+                        </div>
+                        <div class="col">
+                            <div class="row">
+                                <h6 class="font-body">Hello</h6>
+                                <h2 class="font-blue font-h1">@Model.CurrentUser.Name</h2>
+                                <h6>You are not an admin for the ChangeAhead Bricks&Hearts project.</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-5">
+                        @if (Model.CurrentUser.HasRequestedAdmin)
+                        {
+                            <p>Your admin access request is awaiting approval.</p>
+                            <p>If you no longer believe that you should be an admin, please cancel your admin access request:</p>
+                            <div style="text-align: center">
                                 @using (Html.BeginForm("CancelAdminAccessRequest", "Admin", FormMethod.Post))
                                 {
                                     <button type="submit" class="btn btn-danger">Cancel Admin Access Request</button>
                                 }
-                            }
-                            else
-                            {
-                                <p>If you believe that you should be an admin, please request admin access:</p>
+                            </div>    
+                        }
+                        else
+                        {
+                            <p>If you believe that you should be an admin, please request admin access:</p>
+                            <div style="text-align: center">
                                 @using (Html.BeginForm("RequestAdminAccess", "Admin", FormMethod.Post))
                                 {
                                     <button type="submit" class="btn btn-primary">Request Admin Access</button>
                                 }
-                            }
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
-}
-else
-{
-    <div>
-        <div class="row">
-            <div class="col-1 mt-4">
-                <h1>
-                    <i class="bi bi-person-square"></i>
-                </h1>
-            </div>
-            <div class="col-7">
-                <div class="row">
-                    <div class="col-7">
-                        <h6>Hello</h6>
-                        <h2>Welcome to the ChangeAhead Bricks&Hearts Project</h2>
-                        <h6>Please login with Google in order to access the site.</h6>
-                        <a class="btn btn-primary" href="@Url.Action("Google", "Login")">Login</a>
+                            </div>
+                        }
                     </div>
                 </div>
             </div>
