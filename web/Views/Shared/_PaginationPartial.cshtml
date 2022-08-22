@@ -7,19 +7,15 @@
 
 @if (Model.ItemsOnPage > 0)
 {
-    <p>Displaying properties @from to @to of @Model.Total</p>
+    <p>Displaying @Model.TypeOfData @from to @to of @Model.Total</p>
 }
 
 @if (Model.Page > 1)
 {
-    <a type="button" class="btn btn-outline-primary" href="@Model.HrefPrevious">
-        <i class="previous">Previous</i>
-    </a>
+    <a type="button" class="btn btn-outline-primary" href="@Model.HrefPrevious">Previous</a>
 }
 
-@if (Model.Page <= (Model.Total-1)/Model.ItemsPerPage)
+@if (Model.Page <= (Model.Total - 1) / Model.ItemsPerPage)
 {
-    <a type="button" class="btn btn-outline-primary" href="@Model.HrefNext">
-        <i class="bi">Next</i>
-    </a>
+    <a type="button" class="btn btn-outline-primary" href="@Model.HrefNext">Next</a>
 }

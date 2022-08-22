@@ -1,0 +1,69 @@
+﻿@model TenantListModel
+
+@functions
+{
+    static string GetPreferenceFont(bool? preference)
+    {
+        return preference == true ? "" : "font-orange";
+    }
+
+    static string GetPreferenceIcon(bool? preference)
+    {
+        return preference == true ? "bi-check-lg" : "bi-x-lg";
+    }
+}
+
+@if (Model.TenantList.Count == 0)
+{
+    <h2 class="font-h3">There are no tenants which match these search criteria.</h2>
+    return;
+}
+
+<div class="table-responsive mt-4">
+    <table class="table">
+        <thead class="bg-pale-blue">
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Postcode</th>
+            <th scope="col">Type</th>
+            <th scope="col">Criteria</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var tenant in Model.TenantList)
+        {
+            <tr>
+                <td>@tenant.Name</td>
+                <td>@tenant.Email</td>
+                <td>@tenant.Phone</td>
+                <td>@tenant.Postcode?.Postcode</td>
+                <td>@tenant.Type</td>
+                <td>
+                    <div class="@GetPreferenceFont(tenant.HasPet)">
+                        <i class="bi me-1 @GetPreferenceIcon(tenant.HasPet)"></i>
+                        Has pets
+                    </div>
+                    <div class="@GetPreferenceFont(tenant.Over35)">
+                        <i class="bi me-1 @GetPreferenceIcon(tenant.Over35)"></i>
+                        Is over 35 years old
+                    </div>
+                    <div class="@GetPreferenceFont(tenant.UniversalCredit)">
+                        <i class="bi me-1 @GetPreferenceIcon(tenant.UniversalCredit)"></i>
+                        On Universal Credit
+                    </div>
+                    <div class="@GetPreferenceFont(tenant.HousingBenefits)">
+                        <i class="bi me-1 @GetPreferenceIcon(tenant.HousingBenefits)"></i>
+                        On housing benefits
+                    </div>
+                    <div class="@GetPreferenceFont(tenant.ETT)">
+                        <i class="bi me-1 @GetPreferenceIcon(tenant.ETT)"></i>
+                        In EET (Employment, Education, or Training)
+                    </div>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
