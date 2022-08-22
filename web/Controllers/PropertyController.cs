@@ -170,7 +170,7 @@ public class PropertyController : AbstractController
             LandlordId = landlordId
         };
 
-        var model = new PropertyInputModelAddress
+        var model = new PropertyInputModelInitialAddress
         {
             IsEdit = OperationTypeToIsEdit(operationType),
             Step = 1
@@ -220,8 +220,7 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpGet("{propertyId:int}/{operationType:regex(^(add|edit)$)}/step/2")]
-    public ActionResult PropertyInputStepTwoAddress([FromRoute] string operationType,
-        [FromRoute] int propertyId)
+    public ActionResult PropertyInputStepTwoAddress([FromRoute] int propertyId, [FromRoute] string operationType)
     {
         const string viewName = "PropertyInputForm/FullAddress";
         var model = new PropertyInputModelAddress
@@ -253,7 +252,7 @@ public class PropertyController : AbstractController
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpGet("{propertyId:int}/{operationType:regex(^(add|edit)$)}/step/3")]
-    public ActionResult PropertyInputStepThreeDetails([FromRoute] string operationType, [FromRoute] int propertyId)
+    public ActionResult PropertyInputStepThreeDetails([FromRoute] int propertyId, [FromRoute] string operationType)
     {
         const string viewName = "PropertyInputForm/Details";
         var model = new PropertyInputModelDetails
@@ -354,12 +353,12 @@ public class PropertyController : AbstractController
                 });
         }
 
-        var propertyView = model.FormToViewModel();
-
         if (!_propertyService.IsUserAdminOrCorrectLandlord(CurrentUser, propertyId))
         {
             return StatusCode(403);
         }
+
+        var propertyView = model.FormToViewModel();
 
         _propertyService.UpdateProperty(propertyId, propertyView);
 
@@ -393,7 +392,7 @@ public class PropertyController : AbstractController
     [HttpGet(
         @"/landlord/{landlordId:int}/property/{operationType:regex(^(add|edit)$)})/{propertyId:int}/cancel")]
     public async Task<ActionResult> PropertyInputCancel([FromRoute] int propertyId, [FromRoute] int landlordId,
-        [FromRoute] string operationType)
+        string operationType)
     {
         var property = _propertyService.GetPropertyByPropertyId(propertyId);
 
@@ -441,12 +440,9 @@ public class PropertyController : AbstractController
 
         _propertyService.UpdateProperty(propertyId, propertyView);
 
-        if (operationType == "add")
-        {
-            return RedirectToAction(nextActionName, "Property", new { propertyId, operationType });
-        }
-
-        return RedirectToAction("ViewProperty", "Property", new { propertyId });
+        return operationType == "add"
+            ? RedirectToAction(nextActionName, "Property", new { propertyId, operationType })
+            : RedirectToAction("ViewProperty", "Property", new { propertyId });
     }
 
     private ActionResult StandardPropertyInputGetMethod(PropertyInputModelBase model, int propertyId, string viewName)

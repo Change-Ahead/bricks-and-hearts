@@ -4,7 +4,6 @@ using BricksAndHearts.Controllers;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
-using BricksAndHearts.ViewModels.PropertyInput;
 using FakeItEasy;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.ViewFeatures;
@@ -57,66 +56,35 @@ public class PropertyControllerTestsBase : ControllerTestsBase
         };
     }
 
-    protected PropertyInputFormViewModel CreateExamplePropertyInputFormViewModel()
+    protected PropertyDbModel CreateExamplePropertyDbModel()
     {
-        return new PropertyInputFormViewModel
+        return new PropertyDbModel
         {
-            Step1 = new PropertyInputModelAddressStep
-            {
-                Address = new AddressModel
-                {
-                    AddressLine1 = "Adr1",
-                    AddressLine2 = "Adr2",
-                    AddressLine3 = "Adr3",
-                    TownOrCity = "City",
-                    County = "County",
-                    Postcode = "Postcode"
-                }
-            },
-            Step2 = new PropertyInputModelStep2
-            {
-                Address = new AddressModel
-                {
-                    AddressLine1 = "Adr1",
-                    AddressLine2 = "Adr2",
-                    AddressLine3 = "Adr3",
-                    TownOrCity = "City",
-                    County = "County",
-                    Postcode = "Postcode"
-                }
-            },
-            Step3 = new PropertyInputModelDetails
-            {
-                NumOfBedrooms = 12,
-                PropertyType = "Detached"
-            },
-            Step4 = new PropertyInputModelDescriptionStep
-            {
-                Description = "Sample Description"
-            },
-            Step5 = new PropertyInputModelTenantPreferences
-            {
-                HousingRequirementModel = new HousingRequirementModel
-                {
-                    AcceptsSingleTenant = false,
-                    AcceptsCouple = false,
-                    AcceptsFamily = true,
-                    AcceptsPets = true,
-                    AcceptsNotEET = false,
-                    AcceptsCredit = true,
-                    AcceptsBenefits = false,
-                    AcceptsOver35 = true,
-                    AcceptsWithoutGuarantor = true
-                }
-            },
-            Step6 = new PropertyInputModelAvailability
-            {
-                OccupiedUnits = 2,
-                TotalUnits = 5,
-                AvailableFrom = null,
-                Availability = "draft",
-                Rent = 1000
-            }
+            LandlordId = 1,
+            Id = 1,
+            AddressLine1 = "10 Downing Street",
+            AddressLine2 = "London",
+            TownOrCity = "City",
+            County = "County",
+            Postcode = "SW1A 2AA",
+            NumOfBedrooms = 2,
+            Rent = 750,
+            Description = "Property description",
+            Landlord = A.Fake<LandlordDbModel>(),
+            AcceptsSingleTenant = false,
+            AcceptsCouple = false,
+            AcceptsFamily = true,
+            AcceptsPets = true,
+            AcceptsNotEET = false,
+            AcceptsCredit = true,
+            AcceptsBenefits = false,
+            AcceptsOver35 = true,
+            AcceptsWithoutGuarantor = true,
+            OccupiedUnits = 2,
+            TotalUnits = 5,
+            AvailableFrom = null,
+            Availability = "draft",
+            PropertyType = "Detached"
         };
     }
 
