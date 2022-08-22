@@ -14,12 +14,10 @@ public class PropertyViewModel : IValidatableObject
     public DateTime? CreationTime { get; set; }
     public string? PublicViewLink { get; set; }
 
-
     // Location
     public AddressModel Address { get; set; } = new();
     public Point? Location { get; set; }
-
-
+    
     // Property details
     [StringLength(10000)]
     public string? PropertyType { get; set; }
@@ -44,7 +42,7 @@ public class PropertyViewModel : IValidatableObject
     [Range(0, 100000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
     public int? Rent { get; set; }
 
-// Availability and units
+    // Availability and units
     public string? Availability { get; set; }
 
     [DataType(DataType.Date)]
@@ -54,12 +52,11 @@ public class PropertyViewModel : IValidatableObject
     public int? TotalUnits { get; set; }
 
     public int? OccupiedUnits { get; set; }
-
+    
+    public int? AvailableUnits => TotalUnits - OccupiedUnits;
 
     // Tenant
     public int? UserWhoRented { get; set; }
-
-    public int? AvailableUnits => TotalUnits - OccupiedUnits;
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
@@ -80,8 +77,7 @@ public class PropertyViewModel : IValidatableObject
                 "The number of occupied units must be less than or equal to the total units at the property.");
         }
     }
-
-
+    
     public static PropertyViewModel FromDbModel(PropertyDbModel property)
     {
         return new PropertyViewModel
