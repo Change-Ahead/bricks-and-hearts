@@ -1,0 +1,67 @@
+﻿@model LandlordListModel
+
+@functions
+{
+    void GetCharterStatusPill(string status, string colourClass, string icon)
+    {
+        <td class="text-nowrap align-middle">
+            <span class="status-pill-@colourClass rounded-pill px-3 py-1">
+                <i class="bi bi-@icon me-1"></i>
+                @status
+            </span>
+        </td>
+    }
+}
+
+@if (Model.LandlordList?.Count == 0)
+{
+    <h2 class="font-h3">There are no landlords which match these search criteria.</h2>
+    return;
+}
+
+<div class="table-responsive mt-3">
+    <table class="table">
+        <thead class="bg-pale-blue">
+        <tr>
+            <th scope="col">First name</th>
+            <th scope="col">Last name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Type</th>
+            <th scope="col">Company</th>
+            <th scope="col">Charter status</th>
+            <th scope="col">Properties</th>
+            <th scope="col">Profile</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var landlord in Model.LandlordList!)
+        {
+            <tr>
+                <td>@landlord.FirstName</td>
+                <td>@landlord.LastName</td>
+                <td>@landlord.Email</td>
+                <td>@landlord.LandlordType</td>
+                <td>@landlord.CompanyName</td>
+                @if (landlord.CharterApproved && landlord.MembershipId != null)
+                {
+                    GetCharterStatusPill("Approved", "live", "check2-all");
+                }
+                else
+                {
+                    GetCharterStatusPill("Pending", "draft", "clock");
+                }
+                <td>
+                    <a asp-action="ViewProperties" asp-controller="Landlord" asp-route-id="@landlord.Id" type="button" class="btn btn-primary">
+                        Properties
+                    </a>
+                </td>
+                <td>
+                    <a asp-action="Profile" asp-controller="Landlord" asp-route-id="@landlord.Id" type="button" class="btn btn-primary">
+                        Profile
+                    </a>
+                </td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
