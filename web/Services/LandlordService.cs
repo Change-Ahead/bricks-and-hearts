@@ -326,10 +326,11 @@ public class LandlordService : ILandlordService
 
     public LandlordCountModel CountLandlords()
     {
-        LandlordCountModel landlordCounts = new LandlordCountModel();
-        landlordCounts.RegisteredLandlords = _dbContext.Landlords.Count();
-        landlordCounts.ApprovedLandlords = _dbContext.Landlords.Count(l => l.CharterApproved == true);
-        return landlordCounts;
+        return new LandlordCountModel
+        {
+            RegisteredLandlords = _dbContext.Landlords.Count(),
+            ApprovedLandlords = _dbContext.Landlords.Count(l => l.CharterApproved == true)
+        };
     }
 
     public string? GetLandlordProfilePicture(int landlordId)

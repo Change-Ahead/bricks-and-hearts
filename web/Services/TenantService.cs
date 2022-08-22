@@ -23,10 +23,11 @@ public class TenantService : ITenantService
     
     public TenantCountModel CountTenants()
     {
-        TenantCountModel tenantCounts = new TenantCountModel();
-        tenantCounts.RegisteredTenants = _dbContext.Tenants.Count();
-        tenantCounts.LocatedTenants = _dbContext.Tenants.Count(t => t.Postcode != null);
-        return tenantCounts;
+        return new TenantCountModel
+        {
+            RegisteredTenants = _dbContext.Tenants.Count(),
+            LocatedTenants = _dbContext.Tenants.Count(t => t.Postcode != null)
+        };
     }
 
     public async Task<(List<TenantDbModel> TenantList, int Count)> SortTenantsByLocation(string postalCode, int page, int tenantsPerPage)

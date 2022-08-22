@@ -48,13 +48,14 @@ public class AdminService : IAdminService
         UserDbModel userFromId = _dbContext.Users.SingleOrDefault(u => u.Id == userId)!;
         return userFromId;
     }
-    
+
     public AdminCountModel CountAdmins()
     {
-        AdminCountModel adminCounts = new AdminCountModel();
-        adminCounts.CurrentAdmins = _dbContext.Users.Count(u => u.IsAdmin == true);
-        adminCounts.PendingAdmins = _dbContext.Users.Count(u => u.HasRequestedAdmin == true && u.IsAdmin == false);
-        return adminCounts;
+        return new AdminCountModel
+        {
+            CurrentAdmins = _dbContext.Users.Count(u => u.IsAdmin == true),
+            PendingAdmins = _dbContext.Users.Count(u => u.HasRequestedAdmin == true && u.IsAdmin == false)
+        };
     }
 
     public void RequestAdminAccess(BricksAndHeartsUser user)
