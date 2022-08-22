@@ -20,7 +20,7 @@ public class PublicControllerTests : PublicControllerTestsBase
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(propertyId)).Returns(property);
         UnderTest.ControllerContext = new ControllerContext
         {
-            HttpContext = new DefaultHttpContext { User = _anonUser }
+            HttpContext = new DefaultHttpContext { User = AnonUser }
         };
 
         // Act
@@ -41,7 +41,7 @@ public class PublicControllerTests : PublicControllerTestsBase
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(propertyId)).Returns(property);
         UnderTest.ControllerContext = new ControllerContext
         {
-            HttpContext = new DefaultHttpContext { User = _anonUser }
+            HttpContext = new DefaultHttpContext { User = AnonUser }
         };
 
         // Act

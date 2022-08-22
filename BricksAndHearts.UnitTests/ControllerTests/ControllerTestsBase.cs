@@ -10,21 +10,21 @@ namespace BricksAndHearts.UnitTests.ControllerTests;
 
 public class ControllerTestsBase
 {
-    protected readonly ClaimsPrincipal _anonUser = A.Fake<ClaimsPrincipal>();
+    protected readonly ClaimsPrincipal AnonUser = A.Fake<ClaimsPrincipal>();
 
-    protected void MakeUserPrincipalInController(BricksAndHeartsUser user, Controller _underTest)
+    protected static void MakeUserPrincipalInController(BricksAndHeartsUser user, Controller underTest)
     {
         var userPrincipal = new ClaimsPrincipal(user);
-        _underTest.ControllerContext = new ControllerContext
+        underTest.ControllerContext = new ControllerContext
         {
             HttpContext = new DefaultHttpContext { User = userPrincipal }
         };
     }
     
     // Create a user that is logged into Google but is not a landlord or admin
-    protected UserDbModel CreateUserDbModel(bool isAdmin, bool isLandlord)
+    protected static UserDbModel CreateUserDbModel(bool isAdmin, bool isLandlord)
     {
-        var userDbModel = new UserDbModel()
+        var userDbModel = new UserDbModel
         {
             Id = 1,
             GoogleUserName = "John Doe",
@@ -34,7 +34,7 @@ public class ControllerTestsBase
         if (isLandlord)
         {
             userDbModel.LandlordId = 1;
-            var landlordDbModel = new LandlordDbModel()
+            userDbModel.Landlord = new LandlordDbModel
             {
                 Id = 1,
                 FirstName = "John",
@@ -49,9 +49,9 @@ public class ControllerTestsBase
         return userDbModel;
     }
     
-    protected BricksAndHeartsUser CreateUnregisteredUser()
+    protected static BricksAndHeartsUser CreateUnregisteredUser()
     {
-        var userDbModel = new UserDbModel()
+        var userDbModel = new UserDbModel
         {
             Id = 1,
             GoogleUserName = "John Doe",
@@ -64,9 +64,9 @@ public class ControllerTestsBase
         return unregisteredUser;
     }
     
-    protected BricksAndHeartsUser CreateNonAdminNonLandlordUser()
+    protected static BricksAndHeartsUser CreateNonAdminNonLandlordUser()
     {
-        var userDbModel = new UserDbModel()
+        var userDbModel = new UserDbModel
         {
             Id = 1,
             GoogleUserName = "John Doe",
@@ -79,9 +79,9 @@ public class ControllerTestsBase
         return nonAdminNonLandlordUser;
     }
     
-    protected BricksAndHeartsUser CreateAdminUser()
+    protected static BricksAndHeartsUser CreateAdminUser()
     {
-        var userDbModel = new UserDbModel()
+        var userDbModel = new UserDbModel
         {
             Id = 1,
             GoogleUserName = "John Doe",
@@ -94,35 +94,36 @@ public class ControllerTestsBase
         return adminUser;
     }
     
-    protected BricksAndHeartsUser CreateLandlordUser()
+    protected static BricksAndHeartsUser CreateLandlordUser()
     {
-        var userDbModel = new UserDbModel()
+        var userDbModel = new UserDbModel
         {
             Id = 1,
             GoogleUserName = "John Doe",
             GoogleEmail = "test.email@gmail.com",
             IsAdmin = false,
-            LandlordId = 1
-        };
-
-        var landlordDbModel = new LandlordDbModel()
-        {
-            Id = 1,
-            FirstName = "John",
-            LastName = "Doe",
-            User = userDbModel
-        };
+            LandlordId = 1,
+            Landlord = new LandlordDbModel
+            {
+                Id = 1,
+                FirstName = "John",
+                LastName = "Doe"
+            }
+        }; 
         
         var landlordUser = new BricksAndHeartsUser(userDbModel, new List<Claim>(), "google");
         return landlordUser;
     }
 
-    protected TenantDbModel CreateTenant()
+    protected static TenantDbModel CreateTenant()
     {
         return new TenantDbModel
         {
             Name = "Test Tenant",
-            Postcode = "CB2 1LA"
+            Postcode = new PostcodeDbModel
+            {
+                Postcode = "CB2 1LA"
+            }
         };
     }
 }

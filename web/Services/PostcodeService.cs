@@ -1,6 +1,7 @@
 ﻿using System.Text.RegularExpressions;
 using BricksAndHearts.Database;
 using BricksAndHearts.Models;
+using NetTopologySuite.Geometries;
 using Newtonsoft.Json.Linq;
 
 namespace BricksAndHearts.Services;
@@ -8,6 +9,7 @@ namespace BricksAndHearts.Services;
 public interface IPostcodeService
 {
     public string FormatPostcode(string postcode);
+    public Task<PostcodeDbModel?> GetPostcodeAndAddIfAbsent(string? postcode);
     public Task AddPostcodesToDatabaseIfAbsent(IEnumerable<string> postcodes);
 }
 
@@ -26,33 +28,70 @@ public class PostcodeService : IPostcodeService
 
     public string FormatPostcode(string postcode)
     {
-        const string postcodePattern = @"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})";
+        const string postcodePattern =
+            @"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})";
         return Regex.IsMatch(postcode, postcodePattern)
             ? Regex.Replace(postcode, @"^(\S+?)\s*?(\d\w\w)$", "$1 $2").ToUpper()
             : "";
     }
 
+    public async Task<PostcodeDbModel?> GetPostcodeAndAddIfAbsent(string? postcode)
+    {
+        if (string.IsNullOrEmpty(postcode))
+        {
+            return null;
+        }
+
+        postcode = FormatPostcode(postcode);
+
+        var dbModel = await _dbContext.Postcodes.FindAsync(postcode);
+        if (dbModel != null)
+        {
+            return dbModel;
+        }
+
+        await AddPostcodesToDatabaseIfAbsent(new[] { postcode });
+
+        return await _dbContext.Postcodes.FindAsync(postcode);
+    }
+
     public async Task AddPostcodesToDatabaseIfAbsent(IEnumerable<string> postcodes)
     {
-        var postcodeResponseList = new List<PostcodeioResponseModel>();
-        var postcodesToLookupChunks = postcodes.Distinct()
+        var formattedPostcodes = postcodes.Select(FormatPostcode).Distinct().ToList();
+        var postcodesToAddChunks = formattedPostcodes
             .Where(p => p != "" && _dbContext.Postcodes.All(dbRecord => dbRecord.Postcode != p))
             .Chunk(100);
 
-        var addPostcodeChunkToResponseList = postcodesToLookupChunks.Select(async p => postcodeResponseList.AddRange(await GetPostcodeDetails(p)));
-        await Task.WhenAll(addPostcodeChunkToResponseList);
-        
-        var postcodeGroups = postcodeResponseList
-                .GroupBy(p => p.Result?.Lat == null || p.Result.Lon == null || p.Result.Postcode == null)
-                .ToDictionary(grouping => grouping.Key ? "invalid" : "valid", grouping => grouping.ToArray());
-    
-        if (postcodeGroups.ContainsKey("valid"))
+        var postcodesToUpdateChunks = formattedPostcodes
+            .Where(p => p != "" && _dbContext.Postcodes.Any(dbRecord => dbRecord.Postcode == p && dbRecord.Location == null))
+            .Chunk(100);
+
+        var postcodeAddResponses = await Task.WhenAll(postcodesToAddChunks.Select(async p => await GetPostcodeDetails(p)));
+        var postcodeUpdateResponses = await Task.WhenAll(postcodesToUpdateChunks.Select(async p => await GetPostcodeDetails(p)));
+
+        var postcodeAddGroups = postcodeAddResponses
+            .SelectMany(p => p)
+            .GroupBy(p => p.Result?.Lat == null || p.Result.Lon == null || p.Result.Postcode == null)
+            .ToDictionary(grouping => grouping.Key ? "invalid" : "valid", grouping => grouping.ToArray());
+        var postcodeUpdateGroups = postcodeUpdateResponses
+            .SelectMany(p => p)
+            .GroupBy(p => p.Result?.Lat == null || p.Result.Lon == null || p.Result.Postcode == null)
+            .ToDictionary(grouping => grouping.Key ? "invalid" : "valid", grouping => grouping.ToArray());
+
+        if (postcodeAddGroups.ContainsKey("valid"))
         {
-            AddPostcodesToPostcodeDb(postcodeGroups["valid"]);
+            AddPostcodesToPostcodeDb(postcodeAddGroups["valid"]);
         }
-        if (postcodeGroups.ContainsKey("invalid") && postcodeGroups["invalid"].Length > 0)
+
+        if (postcodeUpdateGroups.ContainsKey("valid"))
         {
-            _logger.LogWarning($"{postcodeGroups["invalid"].Length} postcodes cannot be converted to coordinates.");
+            UpdatePostcodes(postcodeUpdateGroups["valid"]);
+        }
+
+        if (postcodeAddGroups.ContainsKey("invalid") && postcodeAddGroups["invalid"].Length > 0
+            || postcodeUpdateGroups.ContainsKey("invalid") && postcodeUpdateGroups["invalid"].Length > 0)
+        {
+            _logger.LogWarning($"{postcodeAddGroups["invalid"].Length + postcodeUpdateGroups["invalid"].Length} postcodes cannot be converted to coordinates.");
         }
     }
 
@@ -90,20 +129,34 @@ public class PostcodeService : IPostcodeService
         {
             return new List<PostcodeioResponseModel>();
         }
+
         var jObjectResponse = JObject.Parse(bulkResponseBody);
         var postcodeList = jObjectResponse["result"]!;
         return postcodeList.Select(postcode => postcode.ToObject<PostcodeioResponseModel>()!);
     }
-    
+
     private void AddPostcodesToPostcodeDb(IEnumerable<PostcodeioResponseModel> postcodeResponses)
     {
         var postcodeDbModels = postcodeResponses.Select(p => new PostcodeDbModel
         {
             Postcode = p.Result!.Postcode!,
-            Lat = p.Result.Lat,
-            Lon = p.Result.Lon,
+            Location = p.Result.Lon != null && p.Result.Lat != null
+                ? new Point((double)p.Result.Lon, (double)p.Result.Lat) { SRID = 4326 }
+                : null
         });
         _dbContext.Postcodes.AddRange(postcodeDbModels);
+        _dbContext.SaveChanges();
+    }
+    
+    private void UpdatePostcodes(IEnumerable<PostcodeioResponseModel> postcodeResponses)
+    {
+        foreach (var postcode in postcodeResponses)
+        {
+            var postcodeDbModel = _dbContext.Postcodes.Single(p => p.Postcode == postcode.Result!.Postcode);
+            postcodeDbModel.Location = postcode.Result is { Lon: not null, Lat: not null }
+                ? new Point((double)postcode.Result.Lon, (double)postcode.Result.Lat) { SRID = 4326 }
+                : null;
+        }
         _dbContext.SaveChanges();
     }
 }

@@ -192,7 +192,9 @@ public class AdminService : IAdminService
     
     private IQueryable<TenantDbModel> GetFilteredTenantQuery(HousingRequirementModel filters, bool isMatching)
     {
-        var tenantQuery = from tenants in _dbContext.Tenants select tenants;
+        var tenantQuery = _dbContext.Tenants
+            .Include(p => p.Postcode)
+            .AsQueryable();
         tenantQuery = tenantQuery.Where(t => (t.Type == "Single" && filters.AcceptsSingleTenant == true) 
                                              || (t.Type == "Couple" && filters.AcceptsCouple == true) 
                                              || (t.Type == "Family" && filters.AcceptsFamily == true) 

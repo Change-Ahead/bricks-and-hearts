@@ -1,7 +1,9 @@
-﻿using System;
+using System;
+using System.Collections.Generic;
 using BricksAndHearts.Database;
 using BricksAndHearts.ViewModels;
 using Microsoft.Extensions.Configuration;
+using NetTopologySuite.Geometries;
 
 namespace BricksAndHearts.UnitTests.ServiceTests;
 
@@ -9,6 +11,17 @@ public class TestDatabaseFixture
 {
     private static readonly object Lock = new();
     private static bool _databaseInitialised;
+
+    public static readonly Dictionary<string, PostcodeDbModel> Postcodes = new()
+    {
+        { "CB1 1DX", AddPostcode("CB1 1DX") },
+        { "BN1 1AJ", AddPostcode("BN1 1AJ", -0.14256, 50.821451) },
+        { "CB2 1LA", AddPostcode("CB2 1LA", 0.129235, 52.196849) },
+        { "NW5 1TL", AddPostcode("NW5 1TL", -0.144754, 51.553935) },
+        { "PE1 1BF", AddPostcode("PE1 1BF", -0.242008, 52.571459) },
+        { "LS1 1AZ", AddPostcode("LS1 1AZ", -1.564095, 53.796296) },
+        { "SE1 9BG", AddPostcode("SE1 9BG", -0.087584, 51.506543) }
+    };
 
     public TestDatabaseFixture()
     {
@@ -23,6 +36,10 @@ public class TestDatabaseFixture
             {
                 context.Database.EnsureDeleted();
                 context.Database.EnsureCreated();
+
+                context.Postcodes.AddRange(
+                    Postcodes.Values
+                );
 
                 context.Landlords.AddRange(
                     CreateApprovedLandlord(), // landlordId = 1
@@ -66,11 +83,6 @@ public class TestDatabaseFixture
                 context.Tenants.AddRange(
                     CreateTenant(),
                     CreateFalseTenant()
-                );
-                
-                context.Postcodes.AddRange(
-                    AddPostcode1(),
-                    AddPostcode2()
                 );
 
                 context.SaveChanges();
@@ -299,8 +311,7 @@ public class TestDatabaseFixture
             Postcode = "cb2 1la"
         };
     }
-    
-        
+
     public LandlordProfileModel CreateLandlordProfileWithEditedEmail(string email)
     {
         return new LandlordProfileModel
@@ -325,7 +336,7 @@ public class TestDatabaseFixture
             }
         };
     }
-    
+
     public LandlordProfileModel CreateLandlordProfileWithEditedMemberId(int memberId)
     {
         return new LandlordProfileModel
@@ -352,7 +363,7 @@ public class TestDatabaseFixture
         };
     }
 
-    private static PropertyDbModel CreateCompleteProperty()
+    private PropertyDbModel CreateCompleteProperty()
     {
         return new PropertyDbModel
         {
@@ -362,14 +373,14 @@ public class TestDatabaseFixture
             AddressLine2 = "Complete Street",
             TownOrCity = "Complete Town",
             County = "Complete County",
-            Postcode = "CB2 1LA",
+            Postcode = Postcodes["CB2 1LA"],
             Availability = AvailabilityState.Occupied,
             TotalUnits = 1,
             OccupiedUnits = 1
         };
     }
 
-    private static PropertyDbModel CreateIncompleteProperty()
+    private PropertyDbModel CreateIncompleteProperty()
     {
         return new PropertyDbModel
         {
@@ -379,12 +390,12 @@ public class TestDatabaseFixture
             AddressLine2 = "Incomplete Street",
             TownOrCity = "Incomplete Town",
             County = "Incomplete County",
-            Postcode = "CB2 1LA",
+            Postcode = Postcodes["CB2 1LA"],
             Availability = AvailabilityState.Draft
         };
     }
 
-    private static PropertyDbModel CreateAvailableProperty()
+    private PropertyDbModel CreateAvailableProperty()
     {
         return new PropertyDbModel
         {
@@ -394,12 +405,12 @@ public class TestDatabaseFixture
             AddressLine2 = "Available Street",
             TownOrCity = "Available Town",
             County = "Available County",
-            Postcode = "CB2 1LA",
+            Postcode = Postcodes["CB2 1LA"],
             Availability = AvailabilityState.Available
         };
     }
 
-    private static PropertyDbModel CreateAvailableSoonProperty()
+    private PropertyDbModel CreateAvailableSoonProperty()
     {
         return new PropertyDbModel
         {
@@ -409,13 +420,13 @@ public class TestDatabaseFixture
             AddressLine2 = "Available Street",
             TownOrCity = "Available Town",
             County = "Available County",
-            Postcode = "CB2 1LA",
+            Postcode = Postcodes["CB2 1LA"],
             Availability = AvailabilityState.AvailableSoon,
             AvailableFrom = DateTime.MinValue
         };
     }
 
-    private static PropertyDbModel CreateMultiUnitProperty()
+    private PropertyDbModel CreateMultiUnitProperty()
     {
         return new PropertyDbModel
         {
@@ -425,14 +436,14 @@ public class TestDatabaseFixture
             AddressLine2 = "Available Street",
             TownOrCity = "Available Town",
             County = "Available County",
-            Postcode = "CB2 1LA",
+            Postcode = Postcodes["CB2 1LA"],
             Availability = AvailabilityState.Available,
             TotalUnits = 5,
             OccupiedUnits = 0
         };
     }
 
-    private static PropertyDbModel CreateDraftProperty()
+    private PropertyDbModel CreateDraftProperty()
     {
         return new PropertyDbModel
         {
@@ -442,12 +453,12 @@ public class TestDatabaseFixture
             AddressLine2 = "Draft Street",
             TownOrCity = "Draft Town",
             County = "Draft County",
-            Postcode = "CB2 1LA",
+            Postcode = Postcodes["CB2 1LA"],
             Availability = AvailabilityState.Draft
         };
     }
 
-    private static PropertyDbModel CreateIncompleteProperty(int landlordId)
+    private PropertyDbModel CreateIncompleteProperty(int landlordId)
     {
         return new PropertyDbModel
         {
@@ -455,12 +466,12 @@ public class TestDatabaseFixture
             AddressLine1 = "22 Test Road",
             County = "Cambridgeshire",
             TownOrCity = "Cambridge",
-            Postcode = "CB1 1DX",
+            Postcode = Postcodes["CB1 1DX"],
             IsIncomplete = true
         };
     }
 
-    private static PropertyDbModel CreateBrightonProperty(int landlordId)
+    private PropertyDbModel CreateBrightonProperty(int landlordId)
     {
         return new PropertyDbModel
         {
@@ -468,14 +479,12 @@ public class TestDatabaseFixture
             AddressLine1 = "Brighton Property",
             County = "East Sussex",
             TownOrCity = "Brighton",
-            Postcode = "BN1 1AJ",
+            Postcode = Postcodes["BN1 1AJ"],
             IsIncomplete = true,
-            Lat = (decimal?)50.821451,
-            Lon = (decimal?)-0.14256,
-        }; 
+        };
     }
-    
-    private static PropertyDbModel CreateLondonProperty(int landlordId)
+
+    private PropertyDbModel CreateLondonProperty(int landlordId)
     {
         return new PropertyDbModel
         {
@@ -483,14 +492,12 @@ public class TestDatabaseFixture
             AddressLine1 = "London Property",
             County = "Greater London",
             TownOrCity = "London",
-            Postcode = "SE1 9BG",
-            IsIncomplete = true,
-            Lat = (decimal?)51.506543,
-            Lon = (decimal?)-0.087584
-        }; 
+            Postcode = Postcodes["SE1 9BG"],
+            IsIncomplete = true
+        };
     }
-    
-    private static PropertyDbModel CreatePeterboroughProperty(int landlordId)
+
+    private PropertyDbModel CreatePeterboroughProperty(int landlordId)
     {
         return new PropertyDbModel
         {
@@ -498,14 +505,12 @@ public class TestDatabaseFixture
             AddressLine1 = "Peterborough Property",
             County = "Cambridgeshire",
             TownOrCity = "Peterborough",
-            Postcode = "PE1 1BF",
-            IsIncomplete = true,
-            Lat = (decimal?)52.571459,
-            Lon = (decimal?)-0.242008,
-        }; 
+            Postcode = Postcodes["PE1 1BF"],
+            IsIncomplete = true
+        };
     }
-    
-    private static PropertyDbModel CreateLeedsProperty(int landlordId)
+
+    private PropertyDbModel CreateLeedsProperty(int landlordId)
     {
         return new PropertyDbModel
         {
@@ -513,11 +518,9 @@ public class TestDatabaseFixture
             AddressLine1 = "Leeds Property",
             County = "West Yorkshire",
             TownOrCity = "Leeds",
-            Postcode = "LS1 1AZ",
-            IsIncomplete = true,
-            Lat = (decimal?)53.796296,
-            Lon = (decimal?)-1.564095,
-        }; 
+            Postcode = Postcodes["LS1 1AZ"],
+            IsIncomplete = true
+        };
     }
 
     private static TenantDbModel CreateTenant()
@@ -532,7 +535,7 @@ public class TestDatabaseFixture
             UniversalCredit = true
         };
     }
-    
+
     private static TenantDbModel CreateFalseTenant()
     {
         return new TenantDbModel
@@ -543,8 +546,7 @@ public class TestDatabaseFixture
         };
     }
 
-
-    private static PropertyDbModel CreateCompleteProperty(int landlordId)
+    private PropertyDbModel CreateCompleteProperty(int landlordId)
     {
         return new PropertyDbModel
         {
@@ -559,28 +561,25 @@ public class TestDatabaseFixture
             County = "Cambridgeshire",
             TownOrCity = "Cambridge",
             AcceptsWithoutGuarantor = true,
-            Postcode = "CB1 1DX",
+            Postcode = Postcodes["CB1 1DX"],
             IsIncomplete = false
         };
     }
-    
-    private static PostcodeDbModel AddPostcode1()
+
+    private static PostcodeDbModel AddPostcode(string postcode, double lon, double lat)
     {
         return new PostcodeDbModel
         {
-            Postcode = "CB2 1LA",
-            Lat = (decimal?)52.196849,
-            Lon = (decimal?)0.129235
+            Postcode = postcode,
+            Location = new Point(lon, lat) { SRID = 4326 }
         };
     }
-    
-    private static PostcodeDbModel AddPostcode2()
+
+    private static PostcodeDbModel AddPostcode(string postcode)
     {
         return new PostcodeDbModel
         {
-            Postcode = "NW5 1TL",
-            Lat = (decimal?)51.553935,
-            Lon = (decimal?)-0.144754
+            Postcode = postcode
         };
     }
 }

@@ -1,8 +1,8 @@
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Diagnostics.CodeAnalysis;
 using BricksAndHearts.Database;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
+using NetTopologySuite.Geometries;
 
 namespace BricksAndHearts.ViewModels;
 
@@ -16,8 +16,7 @@ public class PropertyViewModel : IValidatableObject
 
     // Location
     public AddressModel Address { get; set; } = new();
-    public decimal? Lat { get; set; }
-    public decimal? Lon { get; set; }
+    public Point? Location { get; set; }
 
 
     // Property details
@@ -94,8 +93,7 @@ public class PropertyViewModel : IValidatableObject
             UserWhoRented = property.RenterUserId,
             IsIncomplete = property.IsIncomplete,
             Description = property.Description,
-            Lat = property.Lat,
-            Lon = property.Lon,
+            Location = property.Postcode?.Location,
             Address = new AddressModel
             {
                 AddressLine1 = property.AddressLine1,
@@ -103,7 +101,7 @@ public class PropertyViewModel : IValidatableObject
                 AddressLine3 = property.AddressLine3,
                 TownOrCity = property.TownOrCity,
                 County = property.County,
-                Postcode = property.Postcode
+                Postcode = property.Postcode?.Postcode
             },
             LandlordRequirements = new HousingRequirementModel
             {

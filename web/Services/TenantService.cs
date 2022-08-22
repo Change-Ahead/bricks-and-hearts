@@ -25,27 +25,17 @@ public class TenantService : ITenantService
         var postcodeList = new List<string> { postcode };
         await _postcodeService.AddPostcodesToDatabaseIfAbsent(postcodeList);
         var targetLocation = _dbContext.Postcodes.SingleOrDefault(p => p.Postcode == postcode);
-        if (targetLocation?.Lat == null || targetLocation.Lon == null)
+        if (targetLocation?.Location == null)
         {
             return (new List<TenantDbModel>(), 0);
         }
 
         var tenants = _dbContext.Tenants
-            .FromSqlInterpolated(
-                @$"SELECT *, (
-                  6371 * acos (
-                  cos ( radians({targetLocation.Lat}) )
-                  * cos( radians( Lat ) )
-                  * cos( radians( Lon ) - radians({targetLocation.Lon}) )
-                  + sin ( radians({targetLocation.Lat}) )
-                  * sin( radians( Lat ) )
-                    )
-                ) AS distance 
-                FROM dbo.Tenant
-                WHERE Lon is not NULL and Lat is not NULL
-                ORDER BY distance
-                OFFSET 0 ROWS
-                ");
-        return (await tenants.Skip((page - 1) * tenantsPerPage).Take(tenantsPerPage).ToListAsync(), tenants.Count());
+            .Include(t => t.Postcode)
+            .Where(t => t.Postcode != null)
+            .OrderBy(p =>   p.Postcode!.Location!.Distance(targetLocation.Location))
+            .Skip(tenantsPerPage * (page - 1))
+            .Take(tenantsPerPage);
+        return (await tenants.ToListAsync(), _dbContext.Tenants.Count());
     }
 }

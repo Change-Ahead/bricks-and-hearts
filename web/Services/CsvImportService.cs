@@ -10,7 +10,6 @@ public interface ICsvImportService
 {
     public (List<string> FlashTypes, List<string> FlashMessages) CheckIfImportWorks(IFormFile csvFile);
     public Task<(List<string> FlashTypes, List<string> FlashMessages)> ImportTenants(IFormFile csvFile);
-    public (List<string> FlashTypes, List<string> FlashMessages) AddLatLonToTenantDb();
 }
 
 public class CsvImportService : ICsvImportService
@@ -30,13 +29,13 @@ public class CsvImportService : ICsvImportService
     {
         List<string> flashTypes = new(),
             flashMessages = new();
-        var headerLine = "";
+        string headerLine;
         using (var streamReader = new StreamReader(csvFile.OpenReadStream()))
         {
-            headerLine = streamReader.ReadLine();
+            headerLine = streamReader.ReadLine() ?? "";
         }
         
-        var headers = headerLine!.Split(",");
+        var headers = headerLine.Split(",");
         var databaseHeaders = new List<string>();
         
         //check for missing columns in csv file
@@ -77,11 +76,11 @@ public class CsvImportService : ICsvImportService
         var csvContext = new CsvContext();
         var streamReader = new StreamReader(csvFile.OpenReadStream());
         var tenantUploadList =
-            csvContext.Read<TenantUploadModel>(streamReader, csvFileDescription);
+            csvContext.Read<TenantUploadModel>(streamReader, csvFileDescription)?.ToList() 
+            ?? new List<TenantUploadModel>();
 
         List<string> flashTypes = new(),
-            flashMessages = new(),
-            postcodes = new();
+            flashMessages = new();
         await using (var transaction = await _dbContext.Database.BeginTransactionAsync(IsolationLevel.Serializable))
         {
             foreach (var tenant in _dbContext.Tenants)
@@ -89,61 +88,30 @@ public class CsvImportService : ICsvImportService
                 _dbContext.Tenants.Remove(tenant);
             }
 
-            int lineNo = 0;
+            var lineNo = 0;
             foreach (var tenant in tenantUploadList)
             {
                 lineNo += 1;
-                var addTenantResponse = AddTenantToDb(tenant, lineNo);
+                var addTenantResponse = await AddTenantToDb(tenant, lineNo);
                 flashTypes.AddRange(addTenantResponse.flashTypes);
                 flashMessages.AddRange(addTenantResponse.flashMessages);
-                if (addTenantResponse.postcode != "")
-                {
-                    postcodes.Add(addTenantResponse.postcode);
-                }
             }
 
             await transaction.CommitAsync();
         }
 
-        await _postcodeService.AddPostcodesToDatabaseIfAbsent(postcodes);
         return (flashTypes, flashMessages);
     }
     
-    public (List<string> FlashTypes, List<string> FlashMessages) AddLatLonToTenantDb()
+    private async Task<(List<string> flashTypes, List<string> flashMessages)> AddTenantToDb(TenantUploadModel tenant, int lineNo)
     {
         List<string> flashTypes = new(), flashMessages = new();
-        var tenantsWithPostcodesToConvert =
-            _dbContext.Tenants.Where(t => t.Postcode != null && t.Lat == null && t.Lon == null).ToList();
-        
-        foreach (var tenant in tenantsWithPostcodesToConvert)
-        {
-            var postcodeDbModel = _dbContext.Postcodes.FirstOrDefault(p => p.Postcode == tenant.Postcode);
-            if (postcodeDbModel?.Lat == null || postcodeDbModel.Lon == null)
-            {
-                _logger.LogWarning($"Postcode {tenant.Postcode} is absent from Postcode table");
-                flashTypes.Add("danger");
-                flashMessages.Add($"Postcode {tenant.Postcode} cannot be converted to coordinates. This will affect the inclusion of tenant {tenant.Name} in the matching process.");
-            }
-            else
-            {
-                tenant.Lat = postcodeDbModel.Lat;
-                tenant.Lon = postcodeDbModel.Lon;
-            }
-        }
-        _dbContext.SaveChanges();
-        return (flashTypes, flashMessages);
-    }
-    
-    private (List<string> flashTypes, List<string> flashMessages, string postcode) AddTenantToDb(TenantUploadModel tenant, int lineNo)
-    {
-        List<string> flashTypes = new(), flashMessages = new();
-        var postcode = "";
         if (tenant.Name == null)
         {
             _logger.LogWarning($"Name is missing from record {tenant.Email}.");
             flashTypes.Add("danger");
             flashMessages.Add($"Name is missing from record on line {lineNo} (email address provided is {tenant.Email}). This record has not been added to the database. Please add a name to this tenant in order to import their information.");
-            return (flashTypes, flashMessages, postcode);
+            return (flashTypes, flashMessages);
         }
        
         var dbTenant = new TenantDbModel
@@ -155,8 +123,8 @@ public class CsvImportService : ICsvImportService
 
         if (tenant.Postcode is not null)
         {
-            postcode = _postcodeService.FormatPostcode(tenant.Postcode);
-            if (postcode != "")
+            var postcode = await _postcodeService.GetPostcodeAndAddIfAbsent(tenant.Postcode);
+            if (postcode is not null)
             {
                 dbTenant.Postcode = postcode;
             }
@@ -176,8 +144,8 @@ public class CsvImportService : ICsvImportService
         dbTenant.Over35 = CheckBoolInput("Over35",tenant.Over35, tenant.Name, flashTypes, flashMessages);
         
         _dbContext.Tenants.Add(dbTenant);
-        _dbContext.SaveChanges();
-        return (flashTypes, flashMessages, postcode);
+        await _dbContext.SaveChangesAsync();
+        return (flashTypes, flashMessages);
     }
     
     private bool? CheckBoolInput(string propName, string? propValue, string tenantName, ICollection<string> flashTypes, ICollection<string> flashMessages)
@@ -195,6 +163,5 @@ public class CsvImportService : ICsvImportService
     {
         _logger.LogWarning($"Invalid input for {propName} in record for {tenantName}.");
         return $"Invalid input in record for tenant {tenantName}: '{propName}' cannot be '{propValue}' as this is the wrong data type. This input has been ignored.";
-
     }
 }

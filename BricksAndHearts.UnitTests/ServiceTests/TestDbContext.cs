@@ -20,7 +20,7 @@ public class TestDbContext : BricksAndHeartsDbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.UseSqlServer(_config["TestDBConnectionString"]);
+        optionsBuilder.UseSqlServer(_config["TestDBConnectionString"], x => x.UseNetTopologySuite());
     }
 
     public override int SaveChanges(bool acceptAllChangesOnSuccess)

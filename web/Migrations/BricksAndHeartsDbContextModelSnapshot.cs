@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NetTopologySuite.Geometries;
 
 #nullable disable
 
@@ -107,11 +108,8 @@ namespace BricksAndHearts.Migrations
                     b.Property<string>("Postcode")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<decimal?>("Lat")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("Lon")
-                        .HasColumnType("decimal(18,2)");
+                    b.Property<Point>("Location")
+                        .HasColumnType("geography");
 
                     b.HasKey("Postcode");
 
@@ -185,23 +183,14 @@ namespace BricksAndHearts.Migrations
                     b.Property<int>("LandlordId")
                         .HasColumnType("int");
 
-                    b.Property<decimal?>("Lat")
-                        .HasPrecision(12, 9)
-                        .HasColumnType("decimal(12,9)");
-
-                    b.Property<decimal?>("Lon")
-                        .HasPrecision(12, 9)
-                        .HasColumnType("decimal(12,9)");
-
                     b.Property<int?>("NumOfBedrooms")
                         .HasColumnType("int");
 
                     b.Property<int>("OccupiedUnits")
                         .HasColumnType("int");
 
-                    b.Property<string>("Postcode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("PostcodeId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("PropertyType")
                         .HasColumnType("nvarchar(max)");
@@ -224,6 +213,8 @@ namespace BricksAndHearts.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("LandlordId");
+
+                    b.HasIndex("PostcodeId");
 
                     b.ToTable("Property");
 
@@ -250,12 +241,6 @@ namespace BricksAndHearts.Migrations
                     b.Property<bool?>("HousingBenefits")
                         .HasColumnType("bit");
 
-                    b.Property<decimal?>("Lat")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal?>("Lon")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -266,8 +251,8 @@ namespace BricksAndHearts.Migrations
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Postcode")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<string>("PostcodeId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
@@ -276,6 +261,8 @@ namespace BricksAndHearts.Migrations
                         .HasColumnType("bit");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("PostcodeId");
 
                     b.ToTable("Tenant");
                 });
@@ -332,7 +319,22 @@ namespace BricksAndHearts.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("BricksAndHearts.Database.PostcodeDbModel", "Postcode")
+                        .WithMany()
+                        .HasForeignKey("PostcodeId");
+
                     b.Navigation("Landlord");
+
+                    b.Navigation("Postcode");
+                });
+
+            modelBuilder.Entity("BricksAndHearts.Database.TenantDbModel", b =>
+                {
+                    b.HasOne("BricksAndHearts.Database.PostcodeDbModel", "Postcode")
+                        .WithMany()
+                        .HasForeignKey("PostcodeId");
+
+                    b.Navigation("Postcode");
                 });
 
             modelBuilder.Entity("BricksAndHearts.Database.UserDbModel", b =>

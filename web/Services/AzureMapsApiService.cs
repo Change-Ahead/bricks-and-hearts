@@ -2,6 +2,7 @@
 using BricksAndHearts.Models;
 using BricksAndHearts.ViewModels;
 using Microsoft.Extensions.Options;
+using NetTopologySuite.Geometries;
 using Newtonsoft.Json;
 
 namespace BricksAndHearts.Services;
@@ -18,7 +19,7 @@ public class AzureMapsApiService : IAzureMapsApiService
     private readonly IOptions<AzureMapsOptions> _options;
 
     public AzureMapsApiService(ILogger<AzureMapsApiService> logger, IOptions<AzureMapsOptions> options,
-    HttpClient client)
+        HttpClient client)
     {
         _logger = logger;
         _options = options;
@@ -39,10 +40,11 @@ public class AzureMapsApiService : IAzureMapsApiService
             responseBody = await response.Content.ReadAsStringAsync();
             _logger.LogInformation("Successful API request to {Uri}", uri);
         }
-        catch(Exception e)
+        catch (Exception e)
         {
-            _logger.LogWarning("Message :{Message} ",e.Message);
+            _logger.LogWarning("Message :{Message} ", e.Message);
         }
+
         return responseBody;
     }
 
@@ -75,12 +77,12 @@ public class AzureMapsApiService : IAzureMapsApiService
         var postcodeResponse = TurnResponseBodyToModel(responseBody);
         if (postcodeResponse.ListOfResults == null || postcodeResponse.ListOfResults.Count < 1)
         {
-            var address = new AddressModel()
+            var address = new AddressModel
             {
                 Postcode = model.Address.Postcode,
                 AddressLine1 = model.Address.AddressLine1
             };
-            model = new PropertyViewModel()
+            model = new PropertyViewModel
             {
                 Address = address
             };
@@ -90,61 +92,29 @@ public class AzureMapsApiService : IAzureMapsApiService
         var results = postcodeResponse.ListOfResults[0];
         if (results.Address == null)
         {
-            var address = new AddressModel()
+            var address = new AddressModel
             {
                 Postcode = model.Address.Postcode,
                 AddressLine1 = model.Address.AddressLine1
             };
-            model = new PropertyViewModel()
+            model = new PropertyViewModel
             {
                 Address = address
             };
             return model;
         }
 
-        if (results.Address.ContainsKey("streetName"))
-        {
-            model.Address.AddressLine2 = results.Address["streetName"];
-        }
-        else
-        {
-            model.Address.AddressLine2 = null;
-        }
-        
-        if (results.Address.ContainsKey("municipality"))
-        {
-            model.Address.TownOrCity = results.Address["municipality"];
-        }
-        else
-        {
-            model.Address.TownOrCity = null;
-        }
-        
-        if (results.Address.ContainsKey("countrySecondarySubdivision"))
-        {
-            model.Address.County = results.Address["countrySecondarySubdivision"];
-        }
-        else
-        {
-            model.Address.County = null;
-        }
-        
-        if (results.LatLon != null && results.LatLon.ContainsKey("lat"))
-        {
-            model.Lat = results.LatLon["lat"];
-        }
-        else
-        {
-            model.Lat = null;
-        }
+        model.Address.AddressLine2 = results.Address.ContainsKey("streetName") ? results.Address["streetName"] : null;
+        model.Address.TownOrCity = results.Address.ContainsKey("municipality") ? results.Address["municipality"] : null;
+        model.Address.County = results.Address.ContainsKey("countrySecondarySubdivision") ? results.Address["countrySecondarySubdivision"] : null;
 
-        if (results.LatLon != null && results.LatLon.ContainsKey("lon"))
+        if (results.LatLon != null && results.LatLon.ContainsKey("lat") && results.LatLon.ContainsKey("lon"))
         {
-            model.Lon = results.LatLon["lon"];
+            model.Location = new Point(results.LatLon["lon"], results.LatLon["lat"]) { SRID = 4326 };
         }
         else
         {
-            model.Lon = null;
+            model.Location = null;
         }
 
         return model;

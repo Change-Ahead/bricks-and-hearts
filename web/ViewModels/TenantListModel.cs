@@ -3,7 +3,7 @@ namespace BricksAndHearts.ViewModels;
 
 public class TenantListModel
 {
-    public List<TenantDbModel> TenantList { get; set; }
+    public List<TenantDbModel> TenantList { get; set; } = new();
 
     public HousingRequirementModel Filter { get; set; } = new ();
 
