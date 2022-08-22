@@ -86,6 +86,72 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         A.CallTo(() => LandlordService.ApproveLandlord(landlordUser.Id, adminUser, null!)).MustNotHaveHappened();
         FlashMessages.Should().Contain("Membership ID is required.");
     }
+    
+    [Theory]
+    [InlineData("disable")]
+    [InlineData("enable")]
+    public async void DisableOrEnableLandlord_CallsDisableOrEnableLandlord_AndDisplaysSuccessMessageIfReturnsSuccess(string action)
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        var landlordUser = CreateLandlordUser();
+        var landlordProfile = new LandlordProfileModel { LandlordId = landlordUser.Id, MembershipId = "abc" };
+        A.CallTo(() => LandlordService.DisableOrEnableLandlord(landlordUser.Id, action))
+            .Returns(ILandlordService.DisableOrEnableLandlordResult.Success);
+
+        // Act
+        var result = await UnderTest.DisableOrEnableLandlord(landlordProfile, action);
+
+        // Assert
+        A.CallTo(() => LandlordService.DisableOrEnableLandlord(landlordUser.Id, action)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("Profile");
+        FlashMessages.Should().Contain($"Successfully {action}d landlord.");
+    }
+    
+    [Theory]
+    [InlineData("disable")]
+    [InlineData("enable")]
+    public async void DisableOrEnableLandlord_CallsDisableOrEnableLandlord_AndDisplaysErrorIfLandlordAbsent(string action)
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        var landlordUser = CreateLandlordUser();
+        var landlordProfile = new LandlordProfileModel { LandlordId = landlordUser.Id, MembershipId = "abc" };
+        A.CallTo(() => LandlordService.DisableOrEnableLandlord(landlordUser.Id, action))
+            .Returns(ILandlordService.DisableOrEnableLandlordResult.ErrorLandlordNotFound);
+
+        // Act
+        var result = await UnderTest.DisableOrEnableLandlord(landlordProfile, action);
+
+        // Assert
+        A.CallTo(() => LandlordService.DisableOrEnableLandlord(landlordUser.Id, action)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("Profile");
+        FlashMessages.Should().Contain("Sorry, it appears that no landlord with this ID exists.");
+    }
+    
+    [Theory]
+    [InlineData("disable")]
+    [InlineData("enable")]
+    public async void DisableOrEnableLandlord_CallsDisableOrEnableLandlord_AndDisplaysErrorIfLandlordAlreadyInState(string action)
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        var landlordUser = CreateLandlordUser();
+        var landlordProfile = new LandlordProfileModel { LandlordId = landlordUser.Id, MembershipId = "abc" };
+        A.CallTo(() => LandlordService.DisableOrEnableLandlord(landlordUser.Id, action))
+            .Returns(ILandlordService.DisableOrEnableLandlordResult.ErrorAlreadyInState);
+
+        // Act
+        var result = await UnderTest.DisableOrEnableLandlord(landlordProfile, action);
+
+        // Assert
+        A.CallTo(() => LandlordService.DisableOrEnableLandlord(landlordUser.Id, action)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("Profile");
+        FlashMessages.Should().Contain($"This landlord has already been {action}d.");
+    }
 
     [Fact]
     public async void EditProfilePage_CalledUsingUserId_ReturnsEditProfileViewWithLandlordProfile()
@@ -172,7 +238,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
     [Fact]
     public async void
-        EditProfileUpdate_CalledUsingLandlordDatabaseModelWithDuplicateMembershipId_ReturnsEditProfileViewWithLandlordProfile()
+    EditProfileUpdate_CalledUsingLandlordDatabaseModelWithDuplicateMembershipId_ReturnsEditProfileViewWithLandlordProfile()
     {
         // Arrange 
         var adminUser = CreateAdminUser();

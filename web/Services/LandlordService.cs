@@ -31,10 +31,10 @@ public interface ILandlordService
         Success
     }
     
-    public enum DisableLandlordResult
+    public enum DisableOrEnableLandlordResult
     {
         ErrorLandlordNotFound,
-        ErrorAlreadyDisabled,
+        ErrorAlreadyInState,
         Success
     }
 
@@ -54,7 +54,7 @@ public interface ILandlordService
     public bool CheckForDuplicateMembershipId(LandlordProfileModel editModel);
     public Task<ApproveLandlordResult> ApproveLandlord(int landlordId, BricksAndHeartsUser user, string membershipId);
     public Task UnapproveLandlord(int landlordId);
-    public Task<DisableLandlordResult> DisOrEnableLandlord(int landlordId, string action);
+    public Task<DisableOrEnableLandlordResult> DisableOrEnableLandlord(int landlordId, string action);
     public LandlordDbModel? FindLandlordWithInviteLink(string inviteLink);
     public string? GetLandlordProfilePicture(int landlordId);
 
@@ -239,34 +239,33 @@ public class LandlordService : ILandlordService
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task<ILandlordService.DisableLandlordResult> DisOrEnableLandlord(int landlordId, string action)
+    public async Task<ILandlordService.DisableOrEnableLandlordResult> DisableOrEnableLandlord(int landlordId, string action)
     {
         var landlord = await GetLandlordIfExistsFromId(landlordId);
         if (landlord is null)
         {
-            return ILandlordService.DisableLandlordResult.ErrorLandlordNotFound;
+            return ILandlordService.DisableOrEnableLandlordResult.ErrorLandlordNotFound;
         }
 
         if (action == "disable")
         {
             if (landlord.Disabled)
             {
-                return ILandlordService.DisableLandlordResult.ErrorAlreadyDisabled;
+                return ILandlordService.DisableOrEnableLandlordResult.ErrorAlreadyInState;
             }
-
             landlord.Disabled = true;
         }
         else
         {
             if (!landlord.Disabled)
             {
-                return ILandlordService.DisableLandlordResult.ErrorAlreadyDisabled;
+                return ILandlordService.DisableOrEnableLandlordResult.ErrorAlreadyInState;
             }
             landlord.Disabled = false;
         }
         
         await _dbContext.SaveChangesAsync();
-        return ILandlordService.DisableLandlordResult.Success;
+        return ILandlordService.DisableOrEnableLandlordResult.Success;
     }
 
     public LandlordDbModel? FindLandlordWithInviteLink(string inviteLink)

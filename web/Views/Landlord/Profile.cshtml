@@ -150,21 +150,10 @@ else
     {
         <a class="btn btn-primary my-3" type="button" id="copyBtn" onclick="copyLinkToClipboard('@Model.InviteLink');"><i class="bi bi-files"></i> Copy invite link</a>
     }
-    if (Model.Disabled)
+    using (Html.BeginForm("DisableOrEnableLandlord", "Landlord", new { landlordId = Model.LandlordId}, FormMethod.Post))
     {
-        using (Html.BeginForm("DisOrEnableLandlord", "Landlord", new { landlordId = Model.LandlordId }, FormMethod.Post))
-        {
-            <input type="hidden" asp-for="Action" value="enable">
-            <button type="submit" class="btn btn-primary"><i class="bi bi-link"></i>Re-enable landlord</button>
-        }
-    }
-   else
-    {
-        using (Html.BeginForm("DisOrEnableLandlord", "Landlord", new { landlordId = Model.LandlordId}, FormMethod.Post))
-        {
-            <input type="hidden" asp-for="Action" value="disable">
-            <button type="submit" class="btn btn-primary"><i class="bi bi-link"></i>Disable landlord</button>
-        }
+        <input type="hidden" asp-for="Action" value=@(Model.Disabled ? "enable" : "disable")>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-link"></i>@(Model.Disabled ? "Re-enable landlord" : "Disable landlord")</button>
     }
 }
 

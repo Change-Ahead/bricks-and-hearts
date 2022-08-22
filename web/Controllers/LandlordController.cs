@@ -203,22 +203,22 @@ public class LandlordController : AbstractController
     
     [Authorize(Roles = "Admin")]
     [HttpPost("{id:int}/{action}")]
-    public async Task<ActionResult> DisOrEnableLandlord(LandlordProfileModel landlord, string action)
+    public async Task<ActionResult> DisableOrEnableLandlord(LandlordProfileModel landlord, string action)
     {
-        var result = await _landlordService.DisOrEnableLandlord(landlord.LandlordId!.Value, action);
+        var result = await _landlordService.DisableOrEnableLandlord(landlord.LandlordId!.Value, action);
 
         string flashMessageBody, flashMessageType;
         switch (result)
         {
-            case ILandlordService.DisableLandlordResult.ErrorLandlordNotFound:
+            case ILandlordService.DisableOrEnableLandlordResult.ErrorLandlordNotFound:
                 flashMessageBody = "Sorry, it appears that no landlord with this ID exists.";
                 flashMessageType = "warning";
                 break;
-            case ILandlordService.DisableLandlordResult.ErrorAlreadyDisabled:
+            case ILandlordService.DisableOrEnableLandlordResult.ErrorAlreadyInState:
                 flashMessageBody = $"This landlord has already been {action}d.";
                 flashMessageType = "warning";
                 break;
-            case ILandlordService.DisableLandlordResult.Success:
+            case ILandlordService.DisableOrEnableLandlordResult.Success:
                 flashMessageBody = $"Successfully {action}d landlord.";
                 flashMessageType = "success";
                 break;
