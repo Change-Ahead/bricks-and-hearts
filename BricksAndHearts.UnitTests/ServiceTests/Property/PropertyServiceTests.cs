@@ -415,21 +415,60 @@ public class PropertyServiceTests : PropertyServiceTestsBase
 
     #endregion
 
+    #region PublicLink
+
     [Fact]
-    public void CreateNewPublicViewLink_UpdateDatabase()
+    public void CreatePublicViewLink_UpdatesDatabase()
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
         var service = new PropertyService(context, null!);
+        var property = context.Properties.Single(p => p.AddressLine1 == "Complete Property");
 
         // Act
-        var result = service.CreateNewPublicViewLink(1);
+        var result = service.CreatePublicViewLink(property.Id);
+        context.ChangeTracker.Clear();
 
         // Assert
         result.Should().NotBeNullOrEmpty();
-        context.Properties.Single(p => p.Id == 1).PublicViewLink.Should().Be(result);
+        context.Properties.Single(p => p.AddressLine1 == "Complete Property").PublicViewLink.Should().Be(result);
     }
-    
+
+    [Fact]
+    public void GetPropertyByPublicViewLink_ReturnsCorrectProperty()
+    {
+        // Arrange
+        using var context = Fixture.CreateWriteContext();
+        var service = new PropertyService(context, null!);
+        var property = context.Properties.Single(p => p.AddressLine1 == "Complete Property");
+        var token = service.CreatePublicViewLink(property.Id);
+        context.ChangeTracker.Clear();
+
+        // Act
+        var result = service.GetPropertyByPublicViewLink(token);
+
+        // Assert
+        property = context.Properties.Single(p => p.AddressLine1 == "Complete Property");
+        result.Should().NotBeNull().And.Be(property);
+    }
+
+    [Fact]
+    public void GetPropertyByPublicViewLink_ReturnsNull_ForInvalidToken()
+    {
+        // Arrange
+        using var context = Fixture.CreateWriteContext();
+        var service = new PropertyService(context, null!);
+        const string token = "invalid token";
+
+        // Act
+        var result = service.GetPropertyByPublicViewLink(token);
+
+        // Assert
+        result.Should().BeNull();
+    }
+
+    #endregion
+
     [Fact]
     public async void SortPropertiesByLocation_WhenCalledWithInvalidPostcode_ReturnsEmptyList()
     {
@@ -444,14 +483,15 @@ public class PropertyServiceTests : PropertyServiceTestsBase
             Content = new StringContent(responseBody)
         };
         // Slightly icky because "SendAsync" is protected
-        A.CallTo(messageHandler).Where(c => c.Method.Name == "SendAsync").WithReturnType<Task<HttpResponseMessage>>().Returns(response);
+        A.CallTo(messageHandler).Where(c => c.Method.Name == "SendAsync").WithReturnType<Task<HttpResponseMessage>>()
+            .Returns(response);
         var httpClient = new HttpClient(messageHandler);
         var postcodeApiService = new PostcodeService(logger, null!, httpClient);
         var service = new PropertyService(null!, postcodeApiService);
 
         // Act
         var result = await service.GetPropertyList("Location", postcode, 1, 10);
-        
+
         // Assert
         result.PropertyList.Count.Should().Be(0);
         result.Count.Should().Be(0);
@@ -465,13 +505,16 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         var logger = A.Fake<ILogger<PostcodeService>>();
         var messageHandler = A.Fake<HttpMessageHandler>();
         const string postcode = "eh11ad";
-        var responseBody = await File.ReadAllTextAsync($"{AppDomain.CurrentDomain.BaseDirectory}/../../../ServiceTests/Api/PostcodeioApiBulkResponse.json");
+        var responseBody =
+            await File.ReadAllTextAsync(
+                $"{AppDomain.CurrentDomain.BaseDirectory}/../../../ServiceTests/Api/PostcodeioApiBulkResponse.json");
         var response = new HttpResponseMessage
         {
             StatusCode = HttpStatusCode.OK,
             Content = new StringContent(responseBody)
         };
-        A.CallTo(messageHandler).Where(c => c.Method.Name == "SendAsync").WithReturnType<Task<HttpResponseMessage>>().Returns(response);
+        A.CallTo(messageHandler).Where(c => c.Method.Name == "SendAsync").WithReturnType<Task<HttpResponseMessage>>()
+            .Returns(response);
         var httpClient = new HttpClient(messageHandler);
         var postcodeApiService = new PostcodeService(logger, context, httpClient);
         var service = new PropertyService(context, postcodeApiService);

@@ -1,7 +1,6 @@
 using System.Text.RegularExpressions;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
-using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -12,17 +11,20 @@ namespace BricksAndHearts.Controllers;
 public class PropertyController : AbstractController
 {
     private readonly IPropertyService _propertyService;
+    private readonly ILandlordService _landlordService;
     private readonly IAzureMapsApiService _azureMapsApiService;
     private readonly ILogger<PropertyController> _logger;
     private readonly IAzureStorage _azureStorage;
 
     public PropertyController(
         IPropertyService propertyService,
+        ILandlordService landlordService,
         IAzureMapsApiService azureMapsApiService,
         ILogger<PropertyController> logger,
         IAzureStorage azureStorage)
     {
         _propertyService = propertyService;
+        _landlordService = landlordService;
         _azureMapsApiService = azureMapsApiService;
         _logger = logger;
         _azureStorage = azureStorage;
@@ -75,6 +77,8 @@ public class PropertyController : AbstractController
             return StatusCode(403);
         }
 
+        model.PublicViewLink ??= _propertyService.CreatePublicViewLink(model.Id);
+
         var propertyViewModel = PropertyViewModel.FromDbModel(model);
 
         var fileNames = await _azureStorage.ListFileNames("property", propertyId);
@@ -89,7 +93,7 @@ public class PropertyController : AbstractController
     public async Task<IActionResult> PropertyList(string sortBy, string? target, int page = 1, int propPerPage = 10)
     {
         var properties = await _propertyService.GetPropertyList(sortBy, target, page, propPerPage);
-        
+
         if (properties.Count == 0 && sortBy == "Location")
         {
             _logger.LogWarning($"Failed to find postcode {target}");
@@ -97,47 +101,11 @@ public class PropertyController : AbstractController
             sortBy = "";
             properties = await _propertyService.GetPropertyList(sortBy, target, page, propPerPage);
         }
-        
+
         var listOfProperties = properties.PropertyList.Select(PropertyViewModel.FromDbModel).ToList();
         TempData["FullWidthPage"] = true;
         return View("~/Views/Admin/PropertyList.cshtml",
             new PropertyListModel(listOfProperties, properties.Count, null!, page, sortBy, target));
-    }
-
-    [Authorize(Roles = "Admin")]
-    [HttpGet("/admin/get-public-view-link/{propertyId:int}")]
-    public ActionResult GetPublicViewLink(int propertyId)
-    {
-        var property = _propertyService.GetPropertyByPropertyId(propertyId);
-        if (property == null) // If property does not exist
-        {
-            var flashMessageBody = $"Property with ID: {propertyId} does not exist";
-            _logger.LogInformation(flashMessageBody);
-            AddFlashMessage("warning", flashMessageBody);
-        }
-        else
-        {
-            var publicViewLink = property.PublicViewLink;
-            string flashMessageBody;
-            if (string.IsNullOrEmpty(publicViewLink))
-            {
-                flashMessageBody = "Successfully created a new public view link";
-                publicViewLink = _propertyService.CreateNewPublicViewLink(propertyId);
-                _logger.LogInformation("Created public view link for property {PropertyId}: {PublicViewLink}",
-                    propertyId, publicViewLink);
-            }
-            else
-            {
-                flashMessageBody = "Property already has a public view link";
-            }
-
-            var baseUrl = HttpContext.Request.GetUri().Authority;
-            _logger.LogInformation(flashMessageBody);
-            AddFlashMessage("success",
-                flashMessageBody + ": " + baseUrl + $"/public/propertyid/{propertyId}/{publicViewLink}");
-        }
-
-        return RedirectToAction("ViewProperty", "Property", new { propertyId });
     }
 
     #region AddProperty
@@ -471,4 +439,32 @@ public class PropertyController : AbstractController
     }
 
     #endregion
+
+    [HttpGet("public/{token}")]
+    [AllowAnonymous]
+    public async Task<ActionResult> PublicViewProperty(string token)
+    {
+        var dbModel = _propertyService.GetPropertyByPublicViewLink(token);
+        if (dbModel == null)
+        {
+            return View();
+        }
+
+        var propertyViewModel = PropertyViewModel.FromDbModel(dbModel);
+
+        var fileNames = await _azureStorage.ListFileNames("property", propertyViewModel.PropertyId);
+        var imageFiles = GetFilesFromFileNames(fileNames, propertyViewModel.PropertyId);
+
+        var landlord =
+            LandlordProfileModel.FromDbModel(_propertyService.GetPropertyOwner(propertyViewModel.PropertyId));
+        landlord.GoogleProfileImageUrl = _landlordService.GetLandlordProfilePicture(landlord.LandlordId!.Value);
+
+        var propertyDetailsModel = new PropertyDetailsViewModel
+        {
+            Property = propertyViewModel,
+            Images = imageFiles,
+            Owner = landlord
+        };
+        return View(propertyDetailsModel);
+    }
 }

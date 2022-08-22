@@ -26,7 +26,7 @@ public class AdminController : AbstractController
         ILandlordService landlordService,
         IPropertyService propertyService,
         ITenantService tenantService,
-        ICsvImportService csvImportService, 
+        ICsvImportService csvImportService,
         IMailService mailService)
     {
         _logger = logger;
@@ -84,13 +84,13 @@ public class AdminController : AbstractController
         AddFlashMessage("success", "Successfully cancelled admin access request.");
         return RedirectToAction(nameof(AdminDashboard));
     }
-    
+
     private void LoggerAlreadyAdminWarning(ILogger logger, BricksAndHeartsUser user)
     {
         logger.LogInformation($"User {user.Id} already an admin");
         AddFlashMessage("danger", "Already an admin");
     }
-    
+
     [Authorize(Roles = "Admin")]
     [HttpPost]
     public ActionResult AcceptAdminRequest(int userToAcceptId)
@@ -108,7 +108,7 @@ public class AdminController : AbstractController
         _logger.LogInformation($"Admin request of user {userToRejectId} rejected by user {GetCurrentUser().Id}");
         return RedirectToAction("GetAdminList");
     }
-    
+
     [Authorize(Roles = "Admin")]
     [HttpPost]
     public ActionResult RemoveAdmin(int userToRemoveId)
@@ -123,6 +123,7 @@ public class AdminController : AbstractController
             _logger.LogWarning($"User {userToRemoveId} may not remove their own admin status");
             AddFlashMessage("warning", "You may not remove your own admin status");
         }
+
         return RedirectToAction("GetAdminList");
     }
 
@@ -137,15 +138,17 @@ public class AdminController : AbstractController
 
     [Authorize(Roles = "Admin")]
     [HttpGet]
-    public async Task<IActionResult> LandlordList(bool? isApproved = null, bool? isAssigned = null, int page = 1, int landlordsPerPage = 10)
+    public async Task<IActionResult> LandlordList(bool? isApproved = null, bool? isAssigned = null, int page = 1,
+        int landlordsPerPage = 10)
     {
         var landlords = await _adminService.GetLandlordList(isApproved, isAssigned, page, landlordsPerPage);
         return View(new LandlordListModel(landlords.LandlordList, landlords.Count, isApproved, isAssigned, page));
     }
-    
+
     [Authorize(Roles = "Admin")]
     [HttpGet]
-    public async Task<IActionResult> TenantList(HousingRequirementModel filter, string? targetPostcode, int page = 1, int tenantsPerPage = 10)
+    public async Task<IActionResult> TenantList(HousingRequirementModel filter, string? targetPostcode, int page = 1,
+        int tenantsPerPage = 10)
     {
         if (targetPostcode != null)
         {
@@ -154,24 +157,29 @@ public class AdminController : AbstractController
             if (tenantsByLocation.Count > 0)
             {
                 _logger.LogInformation("Successfully sorted by location");
-                return View(new TenantListModel(tenantsByLocation.TenantList, new HousingRequirementModel(), tenantsByLocation.Count, page, targetPostcode));
+                return View(new TenantListModel(tenantsByLocation.TenantList, new HousingRequirementModel(),
+                    tenantsByLocation.Count, page, targetPostcode));
             }
 
             _logger.LogWarning($"Failed to find postcode {targetPostcode}");
-            AddFlashMessage("warning",$"Failed to sort tenants using postcode {targetPostcode}: invalid postcode");//TODO make this message actually display
+            AddFlashMessage("warning",
+                $"Failed to sort tenants using postcode {targetPostcode}: invalid postcode"); //TODO make this message actually display
         }
-        
+
         var tenantsByFilter = await _adminService.GetTenantList(filter, page, tenantsPerPage);
-        return View(new TenantListModel(tenantsByFilter.TenantList, filter, tenantsByFilter.Count, page, targetPostcode));
+        return View(
+            new TenantListModel(tenantsByFilter.TenantList, filter, tenantsByFilter.Count, page, targetPostcode));
     }
 
     [Authorize(Roles = "Admin")]
     [HttpGet("{currentPropertyId:int}/Matches")]
     public async Task<IActionResult> TenantMatchList(int currentPropertyId)
     {
-        var currentProperty = PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(currentPropertyId)!);
-        
-        var tenantMatchListModel = new TenantMatchListModel{
+        var currentProperty =
+            PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(currentPropertyId)!);
+
+        var tenantMatchListModel = new TenantMatchListModel
+        {
             TenantList = await _adminService.GetNearestTenantsToProperty(currentProperty),
             CurrentProperty = currentProperty
         };
@@ -180,15 +188,29 @@ public class AdminController : AbstractController
 
     [Authorize(Roles = "Admin")]
     [HttpPost("{currentPropertyId:int}/Matches")]
-    public ActionResult SendMatchLinkEmail(string propertyLink, string tenantEmail, int currentPropertyId)
+    public ActionResult SendMatchLinkEmail(string? propertyLink, string tenantEmail, int currentPropertyId)
     {
+        if (propertyLink == null)
+        {
+            var property = PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(currentPropertyId)!);
+            if (property.PublicViewLink == null)
+            {
+                propertyLink = _propertyService.CreatePublicViewLink(currentPropertyId);
+            }
+        }
+
         var addressToSendTo = new List<string> { tenantEmail };
-        _mailService.TrySendMsgInBackground(propertyLink, tenantEmail, addressToSendTo);
+        var body = "Hi,\n\n" +
+                   "We have found a property that we think you might be interested in. Check it out at the link below:\n\n" +
+                   $"https://bricks-and-hearts.changeahead.org.uk/property/public/{propertyLink}\n\n" +
+                   "If you are interested, contact ChangeAhead to arrange a viewing.";
+
+        _mailService.TrySendMsgInBackground(body, "Check out this property from ChangeAhead", addressToSendTo);
         _logger.LogInformation($"Successfully emailed tenant {tenantEmail}");
-        AddFlashMessage("success", $"successfully emailed {tenantEmail}");
-        return RedirectToAction("TenantMatchList", new {currentPropertyId});
+        AddFlashMessage("success", $"Successfully emailed {tenantEmail}");
+        return RedirectToAction("TenantMatchList", new { currentPropertyId });
     }
-    
+
     [Authorize(Roles = "Admin")]
     [HttpPost]
     public ActionResult GetInviteLink(int landlordId)
@@ -215,7 +237,8 @@ public class AdminController : AbstractController
             }
 
             _logger.LogInformation(logMessage);
-            var flashMessage = logMessage + $": {(HttpContext.Request.IsHttps ? "https" : "http")}://{HttpContext.Request.Host}/invite/{inviteLink}";
+            var flashMessage = logMessage +
+                               $": {(HttpContext.Request.IsHttps ? "https" : "http")}://{HttpContext.Request.Host}/invite/{inviteLink}";
             AddFlashMessage("success", flashMessage);
         }
 
@@ -270,37 +293,40 @@ public class AdminController : AbstractController
         {
             return RedirectToAction(nameof(TenantList));
         }
+
         var fileName = csvFile.FileName;
         if (csvFile.Length == 0)
         {
             _logger.LogWarning($"{fileName} has length zero.");
-            AddFlashMessage("danger", $"{fileName} contains no data. Please upload a file containing the tenant data you would like to import.");
+            AddFlashMessage("danger",
+                $"{fileName} contains no data. Please upload a file containing the tenant data you would like to import.");
             return RedirectToAction(nameof(TenantList));
         }
+
         if (fileName.Substring(fileName.Length - 3) != "csv")
         {
             _logger.LogWarning($"{fileName} not a CSV file.");
             AddFlashMessage("danger", $"{fileName} is not a CSV file. Please upload your data as a CSV file.");
             return RedirectToAction(nameof(TenantList));
         }
-        
+
         var flashResponse = _csvImportService.CheckIfImportWorks(csvFile);
         for (var i = 0; i < flashResponse.FlashMessages.Count; i++)
         {
             AddFlashMessage(flashResponse.FlashTypes[i], flashResponse.FlashMessages[i]);
         }
-        
+
         if (flashResponse.FlashTypes.Contains("danger"))
         {
             return RedirectToAction(nameof(TenantList));
         }
-        
+
         flashResponse = await _csvImportService.ImportTenants(csvFile);
         for (var i = 0; i < flashResponse.FlashMessages.Count; i++)
         {
-            AddFlashMessage(flashResponse.FlashTypes[i],  flashResponse.FlashMessages[i]);
+            AddFlashMessage(flashResponse.FlashTypes[i], flashResponse.FlashMessages[i]);
         }
-        
+
         if (flashResponse.FlashMessages.Count == 0)
         {
             _logger.LogInformation("Successfuly imported all tenant data.");

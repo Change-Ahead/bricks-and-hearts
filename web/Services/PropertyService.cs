@@ -12,10 +12,12 @@ public interface IPropertyService
     public void DeleteProperty(PropertyDbModel property);
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId);
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId);
+    public LandlordDbModel GetPropertyOwner(int propertyId);
     public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string sortBy, string? target, int page, int propPerPage);
     public Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertiesByLandlord(int landlordId, int page, int propPerPage);
     public PropertyCountModel CountProperties(int? landlordId = null);
-    string? CreateNewPublicViewLink(int propertyId);
+    public string CreatePublicViewLink(int propertyId);
+    public PropertyDbModel? GetPropertyByPublicViewLink(string token);
 }
 
 public class PropertyService : IPropertyService
@@ -38,6 +40,7 @@ public class PropertyService : IPropertyService
             LandlordId = landlordId,
             CreationTime = DateTime.Now,
             IsIncomplete = isIncomplete,
+            PublicViewLink = Guid.NewGuid().ToString(),
 
             // Address line 1 and postcode should not be null by this point
             AddressLine1 = createModel.Address.AddressLine1!,
@@ -101,7 +104,8 @@ public class PropertyService : IPropertyService
 
         dbModel.Description = updateModel.Description ?? dbModel.Description;
 
-        dbModel.AcceptsSingleTenant = updateModel.LandlordRequirements.AcceptsSingleTenant ?? dbModel.AcceptsSingleTenant;
+        dbModel.AcceptsSingleTenant =
+            updateModel.LandlordRequirements.AcceptsSingleTenant ?? dbModel.AcceptsSingleTenant;
         dbModel.AcceptsCouple = updateModel.LandlordRequirements.AcceptsCouple ?? dbModel.AcceptsCouple;
         dbModel.AcceptsFamily = updateModel.LandlordRequirements.AcceptsFamily ?? dbModel.AcceptsFamily;
         dbModel.AcceptsPets = updateModel.LandlordRequirements.AcceptsPets ?? dbModel.AcceptsPets;
@@ -109,7 +113,8 @@ public class PropertyService : IPropertyService
         dbModel.AcceptsBenefits = updateModel.LandlordRequirements.AcceptsBenefits ?? dbModel.AcceptsBenefits;
         dbModel.AcceptsNotEET = updateModel.LandlordRequirements.AcceptsNotEET ?? dbModel.AcceptsNotEET;
         dbModel.AcceptsOver35 = updateModel.LandlordRequirements.AcceptsOver35 ?? dbModel.AcceptsOver35;
-        dbModel.AcceptsWithoutGuarantor = updateModel.LandlordRequirements.AcceptsWithoutGuarantor ?? dbModel.AcceptsWithoutGuarantor;
+        dbModel.AcceptsWithoutGuarantor = updateModel.LandlordRequirements.AcceptsWithoutGuarantor
+                                          ?? dbModel.AcceptsWithoutGuarantor;
 
         dbModel.Rent = updateModel.Rent ?? dbModel.Rent;
 
@@ -165,7 +170,14 @@ public class PropertyService : IPropertyService
         return propertyLandlordId == userLandlordId;
     }
 
-    public async Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string? sortBy, string? target, int page, int propPerPage)
+    public LandlordDbModel GetPropertyOwner(int propertyId)
+    {
+        return _dbContext.Properties.Include(p => p.Landlord).ThenInclude(l => l.Postcode)
+            .Single(p => p.Id == propertyId).Landlord;
+    }
+
+    public async Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string? sortBy, string? target,
+        int page, int propPerPage)
     {
         IQueryable<PropertyDbModel> properties;
         switch (sortBy)
@@ -253,20 +265,17 @@ public class PropertyService : IPropertyService
         };
     }
 
-    public string CreateNewPublicViewLink(int propertyId)
+    public string CreatePublicViewLink(int propertyId)
     {
-        var propertyDbModel = _dbContext.Properties
-            .Include(p => p.Postcode)
-            .Single(u => u.Id == propertyId);
-        if (!string.IsNullOrEmpty(propertyDbModel.PublicViewLink))
-        {
-            throw new Exception("Property should not have existing public view link!");
-        }
-
-        var g = Guid.NewGuid();
-        var publicViewLink = g.ToString();
-        propertyDbModel.PublicViewLink = publicViewLink;
+        var property = _dbContext.Properties.Single(p => p.Id == propertyId);
+        var token = Guid.NewGuid().ToString();
+        property.PublicViewLink = token;
         _dbContext.SaveChanges();
-        return publicViewLink;
+        return token;
+    }
+
+    public PropertyDbModel? GetPropertyByPublicViewLink(string token)
+    {
+        return _dbContext.Properties.SingleOrDefault(p => p.PublicViewLink == token);
     }
 }

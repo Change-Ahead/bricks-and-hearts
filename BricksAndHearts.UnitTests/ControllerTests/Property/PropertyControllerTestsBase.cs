@@ -16,17 +16,20 @@ public class PropertyControllerTestsBase : ControllerTestsBase
     protected readonly IAzureMapsApiService AzureMapsApiService;
     protected readonly IAzureStorage AzureStorage;
     protected readonly IPropertyService PropertyService;
+    protected readonly ILandlordService LandlordService;
     protected readonly PropertyController UnderTest;
 
     protected PropertyControllerTestsBase()
     {
         PropertyService = A.Fake<IPropertyService>();
+        LandlordService = A.Fake<ILandlordService>();
         AzureMapsApiService = A.Fake<IAzureMapsApiService>();
         AzureStorage = A.Fake<IAzureStorage>();
         var logger = A.Fake<ILogger<PropertyController>>();
         var httpContext = new DefaultHttpContext();
         var tempData = new TempDataDictionary(httpContext, A.Fake<ITempDataProvider>());
-        UnderTest = new PropertyController(PropertyService, AzureMapsApiService, logger, AzureStorage){TempData = tempData};
+        UnderTest = new PropertyController(PropertyService, LandlordService, AzureMapsApiService, logger, AzureStorage)
+            { TempData = tempData };
     }
 
     protected static PropertyViewModel CreateExamplePropertyViewModel()

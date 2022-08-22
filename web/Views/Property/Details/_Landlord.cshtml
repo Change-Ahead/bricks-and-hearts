@@ -1,0 +1,18 @@
+﻿@model PropertyDetailsViewModel
+
+<h3 class="font-h3 d-inline-block mt-3">Let out by</h3>
+
+<div class="card custom-card mt-2">
+    <div class="card-body text-left">
+        <div class="row">
+            <div class="col-auto profile-photo-lg">
+                <img src="@(Model.Owner!.GoogleProfileImageUrl ?? Url.Content("~/images/profileDefault.png"))" alt="profile picture">
+            </div>
+            <div class="col">
+                <h4 class="font-h1 font-blue">@Model.Owner.FirstName</h4>
+                <p class="font-smallBody text-muted mb-0">@Model.Owner.LandlordType landlord</p>
+                <p class="font-smallBody mb-0">@Model.Owner.NumOfProperties @(Model.Owner.NumOfProperties == 1 ? "property" : "properties")</p>
+            </div>
+        </div>
+    </div>
+</div>

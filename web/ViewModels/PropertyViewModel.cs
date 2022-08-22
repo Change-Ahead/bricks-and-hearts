@@ -12,13 +12,12 @@ public class PropertyViewModel : IValidatableObject
     public int PropertyId;
     public int LandlordId { get; set; }
     public DateTime? CreationTime { get; set; }
-
+    public string? PublicViewLink { get; set; }
 
     // Location
     public AddressModel Address { get; set; } = new();
     public Point? Location { get; set; }
-
-
+    
     // Property details
     [StringLength(10000)]
     public string? PropertyType { get; set; }
@@ -38,12 +37,12 @@ public class PropertyViewModel : IValidatableObject
     // checks for this are done manually in the override
     [ValidateNever]
     public HousingRequirementModel LandlordRequirements { get; set; } = new();
-    
+
     // Rent, deposits, and duration
     [Range(0, 100000, ErrorMessage = "Value for {0} must be between {1} and {2}.")]
     public int? Rent { get; set; }
 
-// Availability and units
+    // Availability and units
     public string? Availability { get; set; }
 
     [DataType(DataType.Date)]
@@ -53,16 +52,16 @@ public class PropertyViewModel : IValidatableObject
     public int? TotalUnits { get; set; }
 
     public int? OccupiedUnits { get; set; }
-
+    
+    public int? AvailableUnits => TotalUnits - OccupiedUnits;
 
     // Tenant
     public int? UserWhoRented { get; set; }
 
-    public int? AvailableUnits => TotalUnits - OccupiedUnits;
-
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (LandlordRequirements.AcceptsSingleTenant == false && LandlordRequirements.AcceptsCouple == false && LandlordRequirements.AcceptsFamily == false)
+        if (LandlordRequirements.AcceptsSingleTenant == false && LandlordRequirements.AcceptsCouple == false &&
+            LandlordRequirements.AcceptsFamily == false)
         {
             yield return new ValidationResult("At least one type of tenant must be selected");
         }
@@ -78,8 +77,7 @@ public class PropertyViewModel : IValidatableObject
                 "The number of occupied units must be less than or equal to the total units at the property.");
         }
     }
-
-
+    
     public static PropertyViewModel FromDbModel(PropertyDbModel property)
     {
         return new PropertyViewModel
@@ -113,12 +111,13 @@ public class PropertyViewModel : IValidatableObject
                 AcceptsBenefits = property.AcceptsBenefits,
                 AcceptsNotEET = property.AcceptsNotEET,
                 AcceptsOver35 = property.AcceptsOver35,
-                AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor  
+                AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor
             },
             Availability = property.Availability,
             AvailableFrom = property.AvailableFrom,
             TotalUnits = property.TotalUnits,
-            OccupiedUnits = property.OccupiedUnits
+            OccupiedUnits = property.OccupiedUnits,
+            PublicViewLink = property.PublicViewLink
         };
     }
 }
