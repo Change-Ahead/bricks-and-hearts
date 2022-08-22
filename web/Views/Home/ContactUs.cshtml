@@ -1,4 +1,4 @@
-﻿@model dynamic
+﻿@model ContactUsViewModel
 
 @{
     ViewData["Title"] = "Contact Us";
@@ -79,7 +79,19 @@
         </div>
         <div class="col-md-9">
             <h1>FAQ</h1>
-            @{ await Html.RenderPartialAsync("_FAQPartial"); }
+            <div class="card custom-card mt-2">
+                <div class="card-body">
+                    <div class="collapse" id="faqCollapse">
+                        @foreach (var FAQ in Model.FAQs)
+                        {
+                            <strong>@FAQ.question</strong>
+                            <p>@FAQ.answer</p>
+                        }
+                    </div>
+                    <a class="collapsed" role="button" data-bs-toggle="collapse" href="#faqCollapse"></a>
+                </div>
+            </div>
+            
         </div>
     </div>
 </div>

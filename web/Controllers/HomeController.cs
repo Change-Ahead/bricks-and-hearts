@@ -47,7 +47,7 @@ public class HomeController : AbstractController
     [HttpGet]
     public IActionResult ContactUs()
     {
-        return View();
+        return View(new ContactUsViewModel());
     }
     
     [HttpGet]
