@@ -5,6 +5,24 @@
     ViewData["Title"] = "Dashboard";
 }
 
+@if (Model.CurrentLandlord.Disabled)
+{
+    <div class="row">
+        <div class="col-sm-auto profile-photo-lg">
+            <img src="@(((BricksAndHeartsUser)User.Identity!).GoogleProfileImageUrl ?? Url.Content("~/images/profileDefault.png"))" alt="profile picture">
+        </div>
+        <div class="col">
+            <div class="row">
+                <h6 class="font-body">Hello</h6>
+                <h2 class="font-blue font-h1">@Model.CurrentLandlord.FirstName</h2>
+                <p class="font-body font-orange mt-1">
+                    Your landlord status has been disabled. Please contact Change Ahead for more information.
+                </p>
+            </div>
+        </div>
+    </div>
+    return;
+}
 <div>
     <div class="row">
         <div class="col">

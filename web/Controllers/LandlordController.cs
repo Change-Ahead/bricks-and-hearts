@@ -121,6 +121,7 @@ public class LandlordController : AbstractController
         }
     }
 
+    [Authorize(Roles = "Admin, Landlord")]
     [HttpGet("{id:int}/profile")]
     public async Task<ActionResult> Profile([FromRoute] int id)
     {
@@ -141,6 +142,7 @@ public class LandlordController : AbstractController
         return View("Profile", viewModel);
     }
 
+    [Authorize(Roles = "Admin, Landlord")]
     [HttpGet("me/profile")]
     public async Task<ActionResult> MyProfile()
     {
@@ -231,6 +233,7 @@ public class LandlordController : AbstractController
         return RedirectToAction("Profile", "Landlord", new { Id = landlord.LandlordId.Value });
     }
 
+    [Authorize(Roles = "Admin, Landlord")]
     [HttpGet]
     [Route("me/properties")]
     [Route("{id:int}/properties")]
@@ -258,6 +261,7 @@ public class LandlordController : AbstractController
             new PropertyListModel(listOfProperties, properties.Count, landlordProfile, page));
     }
 
+    [Authorize(Roles = "Admin, Landlord")]
     [HttpGet("{landlordId:int}/profile/edit")]
     public async Task<ActionResult> EditProfilePage(int? landlordId)
     {
@@ -276,6 +280,7 @@ public class LandlordController : AbstractController
         return View("EditProfilePage", LandlordProfileModel.FromDbModel(landlordFromDb));
     }
 
+    [Authorize(Roles = "Admin, Landlord")]
     [HttpPost("profile/edit")]
     public async Task<ActionResult> EditProfileUpdate([FromForm] LandlordProfileModel editModel)
     {
