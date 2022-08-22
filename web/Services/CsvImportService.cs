@@ -78,12 +78,6 @@ public class CsvImportService : ICsvImportService
         var tenantUploadList =
             csvContext.Read<TenantUploadModel>(streamReader, csvFileDescription)?.ToList() 
             ?? new List<TenantUploadModel>();
-        var postcodes = tenantUploadList
-            .Where(t => t.Postcode != null)
-            .Select(t => _postcodeService.FormatPostcode(t.Postcode!))
-            .Distinct();
-
-        await _postcodeService.AddPostcodesToDatabaseIfAbsent(postcodes);
 
         List<string> flashTypes = new(),
             flashMessages = new();
@@ -98,7 +92,7 @@ public class CsvImportService : ICsvImportService
             foreach (var tenant in tenantUploadList)
             {
                 lineNo += 1;
-                var addTenantResponse = AddTenantToDb(tenant, lineNo);
+                var addTenantResponse = await AddTenantToDb(tenant, lineNo);
                 flashTypes.AddRange(addTenantResponse.flashTypes);
                 flashMessages.AddRange(addTenantResponse.flashMessages);
             }
@@ -109,7 +103,7 @@ public class CsvImportService : ICsvImportService
         return (flashTypes, flashMessages);
     }
     
-    private (List<string> flashTypes, List<string> flashMessages) AddTenantToDb(TenantUploadModel tenant, int lineNo)
+    private async Task<(List<string> flashTypes, List<string> flashMessages)> AddTenantToDb(TenantUploadModel tenant, int lineNo)
     {
         List<string> flashTypes = new(), flashMessages = new();
         if (tenant.Name == null)
@@ -129,10 +123,10 @@ public class CsvImportService : ICsvImportService
 
         if (tenant.Postcode is not null)
         {
-            var postcode = _postcodeService.FormatPostcode(tenant.Postcode);
-            if (postcode != "")
+            var postcode = await _postcodeService.GetPostcodeAndAddIfAbsent(tenant.Postcode);
+            if (postcode is not null)
             {
-                dbTenant.PostcodeId = postcode;
+                dbTenant.Postcode = postcode;
             }
             else
             {
@@ -150,7 +144,7 @@ public class CsvImportService : ICsvImportService
         dbTenant.Over35 = CheckBoolInput("Over35",tenant.Over35, tenant.Name, flashTypes, flashMessages);
         
         _dbContext.Tenants.Add(dbTenant);
-        _dbContext.SaveChanges();
+        await _dbContext.SaveChangesAsync();
         return (flashTypes, flashMessages);
     }
     

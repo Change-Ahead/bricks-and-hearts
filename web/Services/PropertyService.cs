@@ -82,7 +82,9 @@ public class PropertyService : IPropertyService
     // Update any fields that are not null in updateModel
     public async Task UpdateProperty(int propertyId, PropertyViewModel updateModel, bool isIncomplete = true)
     {
-        var dbModel = _dbContext.Properties.Single(p => p.Id == propertyId);
+        var dbModel = _dbContext.Properties
+            .Include(p => p.Postcode)
+            .Single(p => p.Id == propertyId);
         var newPostcode = await _postcodeService.GetPostcodeAndAddIfAbsent(updateModel.Address.Postcode);
 
         // Update fields if they have been set (i.e. not null) in updateModel
@@ -146,7 +148,9 @@ public class PropertyService : IPropertyService
 
     public PropertyDbModel? GetPropertyByPropertyId(int propertyId)
     {
-        return _dbContext.Properties.SingleOrDefault(p => p.Id == propertyId);
+        return _dbContext.Properties
+            .Include(p => p.Postcode)
+            .SingleOrDefault(p => p.Id == propertyId);
     }
 
     public bool IsUserAdminOrCorrectLandlord(BricksAndHeartsUser currentUser, int propertyId)
@@ -182,27 +186,43 @@ public class PropertyService : IPropertyService
                 }
 
                 properties = _dbContext.Properties
+                    .Include(p => p.Postcode)
                     .Where(p => p.Postcode != null && p.Postcode.Location != null)
                     .OrderBy(p => p.Postcode!.Location!.Distance(model.Location));
                 break;
             case "Rent":
-                properties = _dbContext.Properties.OrderBy(m => m.Rent);
+                properties = _dbContext.Properties
+                    .Include(p => p.Postcode)
+                    .OrderBy(m => m.Rent);
                 break;
             case "Availability": //TODO once availability state logic is improved (BNH-122), make this a useful sort
-                properties = _dbContext.Properties.OrderBy(m => m.AvailableFrom);
+                properties = _dbContext.Properties
+                    .Include(p => p.Postcode)
+                    .OrderBy(m => m.AvailableFrom);
                 break;
             default:
-                properties = _dbContext.Properties;
+                properties = _dbContext.Properties.Include(p => p.Postcode);
                 break;
         }
 
-        return (await properties.Skip((page - 1) * propPerPage).Take(propPerPage).ToListAsync(), properties.Count());
+        return (
+            await properties
+                .Include(t => t.Postcode)
+                .Skip((page - 1) * propPerPage)
+                .Take(propPerPage)
+                .ToListAsync(),
+            properties.Count()
+        );
     }
 
     public async Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertiesByLandlord(int landlordId, int page, int propPerPage)
     {
         var properties = _dbContext.Properties
-            .Where(p => p.LandlordId == landlordId).Skip((page - 1) * propPerPage).Take(propPerPage).ToList();
+            .Include(p => p.Postcode)
+            .Where(p => p.LandlordId == landlordId)
+            .Skip((page - 1) * propPerPage)
+            .Take(propPerPage)
+            .ToList();
         var propCount = await _dbContext.Properties.Where(p => p.LandlordId == landlordId).CountAsync();
         return (properties, propCount);
     }
@@ -235,7 +255,9 @@ public class PropertyService : IPropertyService
 
     public string CreateNewPublicViewLink(int propertyId)
     {
-        var propertyDbModel = _dbContext.Properties.Single(u => u.Id == propertyId);
+        var propertyDbModel = _dbContext.Properties
+            .Include(p => p.Postcode)
+            .Single(u => u.Id == propertyId);
         if (!string.IsNullOrEmpty(propertyDbModel.PublicViewLink))
         {
             throw new Exception("Property should not have existing public view link!");

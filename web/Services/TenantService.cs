@@ -31,6 +31,8 @@ public class TenantService : ITenantService
         }
 
         var tenants = _dbContext.Tenants
+            .Include(t => t.Postcode)
+            .Where(t => t.Postcode != null)
             .OrderBy(p =>   p.Postcode!.Location!.Distance(targetLocation.Location))
             .Skip(tenantsPerPage * (page - 1))
             .Take(tenantsPerPage);

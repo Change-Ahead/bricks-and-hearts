@@ -57,26 +57,41 @@ public class PostcodeService : IPostcodeService
 
     public async Task AddPostcodesToDatabaseIfAbsent(IEnumerable<string> postcodes)
     {
-        var postcodeResponseList = new List<PostcodeioResponseModel>();
-        var postcodesToLookupChunks = postcodes.Distinct()
+        var formattedPostcodes = postcodes.Select(FormatPostcode).Distinct().ToList();
+        var postcodesToAddChunks = formattedPostcodes
             .Where(p => p != "" && _dbContext.Postcodes.All(dbRecord => dbRecord.Postcode != p))
             .Chunk(100);
 
-        var addPostcodeChunkToResponseList = postcodesToLookupChunks.Select(async p => postcodeResponseList.AddRange(await GetPostcodeDetails(p)));
-        await Task.WhenAll(addPostcodeChunkToResponseList);
+        var postcodesToUpdateChunks = formattedPostcodes
+            .Where(p => p != "" && _dbContext.Postcodes.Any(dbRecord => dbRecord.Postcode == p && dbRecord.Location == null))
+            .Chunk(100);
 
-        var postcodeGroups = postcodeResponseList
+        var postcodeAddResponses = await Task.WhenAll(postcodesToAddChunks.Select(async p => await GetPostcodeDetails(p)));
+        var postcodeUpdateResponses = await Task.WhenAll(postcodesToUpdateChunks.Select(async p => await GetPostcodeDetails(p)));
+
+        var postcodeAddGroups = postcodeAddResponses
+            .SelectMany(p => p)
+            .GroupBy(p => p.Result?.Lat == null || p.Result.Lon == null || p.Result.Postcode == null)
+            .ToDictionary(grouping => grouping.Key ? "invalid" : "valid", grouping => grouping.ToArray());
+        var postcodeUpdateGroups = postcodeUpdateResponses
+            .SelectMany(p => p)
             .GroupBy(p => p.Result?.Lat == null || p.Result.Lon == null || p.Result.Postcode == null)
             .ToDictionary(grouping => grouping.Key ? "invalid" : "valid", grouping => grouping.ToArray());
 
-        if (postcodeGroups.ContainsKey("valid"))
+        if (postcodeAddGroups.ContainsKey("valid"))
         {
-            AddPostcodesToPostcodeDb(postcodeGroups["valid"]);
+            AddPostcodesToPostcodeDb(postcodeAddGroups["valid"]);
         }
 
-        if (postcodeGroups.ContainsKey("invalid") && postcodeGroups["invalid"].Length > 0)
+        if (postcodeUpdateGroups.ContainsKey("valid"))
         {
-            _logger.LogWarning($"{postcodeGroups["invalid"].Length} postcodes cannot be converted to coordinates.");
+            UpdatePostcodes(postcodeUpdateGroups["valid"]);
+        }
+
+        if (postcodeAddGroups.ContainsKey("invalid") && postcodeAddGroups["invalid"].Length > 0
+            || postcodeUpdateGroups.ContainsKey("invalid") && postcodeUpdateGroups["invalid"].Length > 0)
+        {
+            _logger.LogWarning($"{postcodeAddGroups["invalid"].Length + postcodeUpdateGroups["invalid"].Length} postcodes cannot be converted to coordinates.");
         }
     }
 
@@ -125,11 +140,23 @@ public class PostcodeService : IPostcodeService
         var postcodeDbModels = postcodeResponses.Select(p => new PostcodeDbModel
         {
             Postcode = p.Result!.Postcode!,
-            Location = p.Result.Lon != null && p.Result.Lat != null 
-                ? new Point((double)p.Result.Lon, (double)p.Result.Lat) { SRID = 4326 } 
+            Location = p.Result.Lon != null && p.Result.Lat != null
+                ? new Point((double)p.Result.Lon, (double)p.Result.Lat) { SRID = 4326 }
                 : null
         });
         _dbContext.Postcodes.AddRange(postcodeDbModels);
+        _dbContext.SaveChanges();
+    }
+    
+    private void UpdatePostcodes(IEnumerable<PostcodeioResponseModel> postcodeResponses)
+    {
+        foreach (var postcode in postcodeResponses)
+        {
+            var postcodeDbModel = _dbContext.Postcodes.Single(p => p.Postcode == postcode.Result!.Postcode);
+            postcodeDbModel.Location = postcode.Result is { Lon: not null, Lat: not null }
+                ? new Point((double)postcode.Result.Lon, (double)postcode.Result.Lat) { SRID = 4326 }
+                : null;
+        }
         _dbContext.SaveChanges();
     }
 }
