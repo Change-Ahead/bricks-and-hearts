@@ -120,7 +120,8 @@
        ItemsPerPage = Model.TenantsPerPage,
        ItemsOnPage = Model.TenantList.Count,
        HrefPrevious = Url.Action("TenantList", "Admin", new { targetPostcode = Model.TargetPostcode, page = Model.Page - 1, propPerPage = Model.TenantsPerPage }),
-       HrefNext = Url.Action("TenantList", "Admin", new { targetPostcode = Model.TargetPostcode, page = Model.Page + 1, propPerPage = Model.TenantsPerPage })
+       HrefNext = Url.Action("TenantList", "Admin", new { targetPostcode = Model.TargetPostcode, page = Model.Page + 1, propPerPage = Model.TenantsPerPage }),
+       TypeOfData = "tenants"
    }); }
 
 <partial name="_TenantImportModal"/>

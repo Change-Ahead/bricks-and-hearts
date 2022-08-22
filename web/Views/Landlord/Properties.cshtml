@@ -28,7 +28,7 @@
             <a class="btn btn-primary" href="@Url.Action("PropertyInputStepOnePostcode", "Property", new { landlordId = Model.Owner?.LandlordId, propertyId = 0, operationType = "add"})">Add new property</a>
         </div>
     </div>
-    
+
     <partial name="../Property/_PropertyTable"/>
 
     @{ await Html.RenderPartialAsync("_PaginationPartial", new PaginationModel
@@ -38,7 +38,8 @@
            ItemsPerPage = Model.PropPerPage,
            ItemsOnPage = Model.Properties.Count,
            HrefPrevious = Url.Action("ViewProperties", "Landlord", new { sortBy = Model.SortBy, page = Model.Page - 1, propPerPage = Model.PropPerPage }),
-           HrefNext = Url.Action("ViewProperties", "Landlord", new { sortBy = Model.SortBy, page = Model.Page + 1, propPerPage = Model.PropPerPage })
+           HrefNext = Url.Action("ViewProperties", "Landlord", new { sortBy = Model.SortBy, page = Model.Page + 1, propPerPage = Model.PropPerPage }),
+           TypeOfData = "properties"
        }); }
 
 </div>
