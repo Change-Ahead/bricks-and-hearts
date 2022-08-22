@@ -34,6 +34,6 @@ public class LandlordDbModel
     public virtual List<PropertyDbModel> Properties { get; set; } = new();
 
     public string? InviteLink { get; set; } = null; //Nullable & initialised as null as it should be the default value
-
+    public bool Disabled { get; set; }
     public bool IsLandlordForProfit { get; set; }
 }

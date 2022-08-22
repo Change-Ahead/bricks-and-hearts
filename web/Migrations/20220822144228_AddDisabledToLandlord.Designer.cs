@@ -4,6 +4,7 @@ using BricksAndHearts.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 
@@ -12,13 +13,14 @@ using NetTopologySuite.Geometries;
 namespace BricksAndHearts.Migrations
 {
     [DbContext(typeof(BricksAndHeartsDbContext))]
-    partial class BricksAndHeartsDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220822144228_AddDisabledToLandlord")]
+    partial class AddDisabledToLandlord
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "6.0.8")
+                .HasAnnotation("ProductVersion", "6.0.7")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
@@ -139,16 +141,16 @@ namespace BricksAndHearts.Migrations
                     b.Property<bool?>("AcceptsFamily")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("AcceptsNotInEET")
+                    b.Property<bool?>("AcceptsNotEET")
+                        .HasColumnType("bit");
+
+                    b.Property<bool?>("AcceptsOver35")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("AcceptsPets")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("AcceptsSingleTenant")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("AcceptsUnder35")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("AcceptsWithoutGuarantor")
@@ -232,6 +234,9 @@ namespace BricksAndHearts.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
+                    b.Property<bool?>("ETT")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
@@ -245,7 +250,7 @@ namespace BricksAndHearts.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("NotInEET")
+                    b.Property<bool?>("Over35")
                         .HasColumnType("bit");
 
                     b.Property<string>("Phone")
@@ -256,9 +261,6 @@ namespace BricksAndHearts.Migrations
 
                     b.Property<string>("Type")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("Under35")
-                        .HasColumnType("bit");
 
                     b.Property<bool?>("UniversalCredit")
                         .HasColumnType("bit");

@@ -198,6 +198,38 @@ public class LandlordController : AbstractController
         AddFlashMessage(flashMessageType, flashMessageBody);
         return RedirectToAction(nameof(Profile), "Landlord", new { Id = landlord.LandlordId.Value });
     }
+    
+    [Authorize(Roles = "Admin")]
+    [HttpPost("{id:int}/{action}")]
+    public async Task<ActionResult> DisOrEnableLandlord(LandlordProfileModel landlord, string action)
+    {
+        var result = await _landlordService.DisOrEnableLandlord(landlord.LandlordId!.Value, action);
+
+        string flashMessageBody, flashMessageType;
+        switch (result)
+        {
+            case ILandlordService.DisableLandlordResult.ErrorLandlordNotFound:
+                flashMessageBody = "Sorry, it appears that no landlord with this ID exists.";
+                flashMessageType = "warning";
+                break;
+            case ILandlordService.DisableLandlordResult.ErrorAlreadyDisabled:
+                flashMessageBody = $"This landlord has already been {action}d.";
+                flashMessageType = "warning";
+                break;
+            case ILandlordService.DisableLandlordResult.Success:
+                flashMessageBody = $"Successfully {action}d landlord.";
+                flashMessageType = "success";
+                break;
+            default:
+                flashMessageBody = "Unknown error occurred.";
+                flashMessageType = "warning";
+                break;
+        }
+
+        _logger.LogInformation(flashMessageBody);
+        AddFlashMessage(flashMessageType, flashMessageBody);
+        return RedirectToAction("Profile", "Landlord", new { Id = landlord.LandlordId.Value });
+    }
 
     [HttpGet]
     [Route("me/properties")]

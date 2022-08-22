@@ -30,6 +30,13 @@ public interface ILandlordService
         ErrorDuplicateMembershipId,
         Success
     }
+    
+    public enum DisableLandlordResult
+    {
+        ErrorLandlordNotFound,
+        ErrorAlreadyDisabled,
+        Success
+    }
 
     public Task<(LandlordRegistrationResult result, LandlordDbModel? dbModel)> RegisterLandlord(
         LandlordProfileModel createModel,
@@ -47,6 +54,7 @@ public interface ILandlordService
     public bool CheckForDuplicateMembershipId(LandlordProfileModel editModel);
     public Task<ApproveLandlordResult> ApproveLandlord(int landlordId, BricksAndHeartsUser user, string membershipId);
     public Task UnapproveLandlord(int landlordId);
+    public Task<DisableLandlordResult> DisOrEnableLandlord(int landlordId, string action);
     public LandlordDbModel? FindLandlordWithInviteLink(string inviteLink);
     public string? GetLandlordProfilePicture(int landlordId);
 
@@ -229,6 +237,36 @@ public class LandlordService : ILandlordService
         landlord.ApprovalAdminId = null;
 
         await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<ILandlordService.DisableLandlordResult> DisOrEnableLandlord(int landlordId, string action)
+    {
+        var landlord = await GetLandlordIfExistsFromId(landlordId);
+        if (landlord is null)
+        {
+            return ILandlordService.DisableLandlordResult.ErrorLandlordNotFound;
+        }
+
+        if (action == "disable")
+        {
+            if (landlord.Disabled)
+            {
+                return ILandlordService.DisableLandlordResult.ErrorAlreadyDisabled;
+            }
+
+            landlord.Disabled = true;
+        }
+        else
+        {
+            if (!landlord.Disabled)
+            {
+                return ILandlordService.DisableLandlordResult.ErrorAlreadyDisabled;
+            }
+            landlord.Disabled = false;
+        }
+        
+        await _dbContext.SaveChangesAsync();
+        return ILandlordService.DisableLandlordResult.Success;
     }
 
     public LandlordDbModel? FindLandlordWithInviteLink(string inviteLink)

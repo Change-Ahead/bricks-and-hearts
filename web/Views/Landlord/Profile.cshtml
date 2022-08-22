@@ -142,15 +142,32 @@ else
 
 @if (User.IsInRole("Admin"))
 {
-    @using (Html.BeginForm("GetInviteLink", "Admin", new { landlordId = Model.LandlordId }, FormMethod.Post))
+    using (Html.BeginForm("GetInviteLink", "Admin", new { landlordId = Model.LandlordId }, FormMethod.Post))
     {
         <button type="submit" class="btn btn-primary"><i class="bi bi-link"></i> Get invite link</button>
     }
+    if (Model.InviteLink != null)
+    {
+        <a class="btn btn-primary my-3" type="button" id="copyBtn" onclick="copyLinkToClipboard('@Model.InviteLink');"><i class="bi bi-files"></i> Copy invite link</a>
+    }
+    if (Model.Disabled)
+    {
+        using (Html.BeginForm("DisOrEnableLandlord", "Landlord", new { landlordId = Model.LandlordId }, FormMethod.Post))
+        {
+            <input type="hidden" asp-for="Action" value="enable">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-link"></i>Re-enable landlord</button>
+        }
+    }
+   else
+    {
+        using (Html.BeginForm("DisOrEnableLandlord", "Landlord", new { landlordId = Model.LandlordId}, FormMethod.Post))
+        {
+            <input type="hidden" asp-for="Action" value="disable">
+            <button type="submit" class="btn btn-primary"><i class="bi bi-link"></i>Disable landlord</button>
+        }
+    }
 }
-@if (Model.InviteLink != null)
-{
-    <a class="btn btn-primary my-3" type="button" id="copyBtn" onclick="copyLinkToClipboard('@Model.InviteLink');"><i class="bi bi-files"></i> Copy invite link</a>
-}
+
 
 <!-- Modal -->
 <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
