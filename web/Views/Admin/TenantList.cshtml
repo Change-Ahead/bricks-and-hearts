@@ -51,10 +51,10 @@
                     model => model.Filter.AcceptsPets,
                     new List<SelectListItem>
                     {
-                        new("Has pet", "true"),
-                        new("Does not have pet", "false")
+                        new("Has pets", "true"),
+                        new("No pets", "false")
                     },
-                    "Filter by Pets",
+                    "Filter by pets",
                     new { @class = "form-select" }
                     )
             </div>
@@ -63,10 +63,10 @@
                     model => model.Filter.AcceptsNotEET,
                     new List<SelectListItem>
                     {
-                        new("In ETT", "true"),
-                        new("Not in ETT", "false")
+                        new("In EET", "true"),
+                        new("Not in EET", "false")
                     },
-                    "Filter by ETT",
+                    "Filter by EET",
                     new { @class = "form-select" }
                     )
             </div>
@@ -87,10 +87,10 @@
                     model => model.Filter.AcceptsBenefits,
                     new List<SelectListItem>
                     {
-                        new("On Housing Benefits", "true"),
-                        new("Not on Housing Benefits", "false")
+                        new("On housing benefits", "true"),
+                        new("Not on housing benefits", "false")
                     },
-                    "Filter by Housing Benefits",
+                    "Filter by housing benefits",
                     new { @class = "form-select" }
                     )
             </div>
@@ -102,7 +102,7 @@
                         new("Over 35", "true"),
                         new("35 or under", "false")
                     },
-                    "Filter by Over 35",
+                    "Filter by age",
                     new { @class = "form-select" }
                     )
             </div>

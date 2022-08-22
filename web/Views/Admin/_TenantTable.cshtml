@@ -15,7 +15,7 @@
 
 @if (Model.TenantList.Count == 0)
 {
-    <h2 class="font-h2">There are no tenants which match these search criteria.</h2>
+    <h2 class="font-h3">There are no tenants which match these search criteria.</h2>
     return;
 }
 
@@ -47,11 +47,15 @@
                     </div>
                     <div class="@GetPreferenceFont(tenant.Over35)">
                         <i class="bi me-1 @GetPreferenceIcon(tenant.Over35)"></i>
-                        Is 35 or over
+                        Is over 35 years old
+                    </div>
+                    <div class="@GetPreferenceFont(tenant.UniversalCredit)">
+                        <i class="bi me-1 @GetPreferenceIcon(tenant.UniversalCredit)"></i>
+                        On Universal Credit
                     </div>
                     <div class="@GetPreferenceFont(tenant.HousingBenefits)">
                         <i class="bi me-1 @GetPreferenceIcon(tenant.HousingBenefits)"></i>
-                        On Universal Credit or housing benefits
+                        On housing benefits
                     </div>
                     <div class="@GetPreferenceFont(tenant.ETT)">
                         <i class="bi me-1 @GetPreferenceIcon(tenant.ETT)"></i>
