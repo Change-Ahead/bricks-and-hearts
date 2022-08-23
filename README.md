@@ -126,3 +126,7 @@ There are currently two categories of unit tests:
 
 Some service tests check whether database operations are executed correctly. Database unit tests work slightly
 differently to normal tests &ndash; see the [guide](DATABASE_UNIT_TESTS.MD) for how to use them.
+
+## Copyright
+
+Copyright © 2022 Change Ahead, the trading name of Homeless To Wellness Ltd.
