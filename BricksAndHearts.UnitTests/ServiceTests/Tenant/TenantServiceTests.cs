@@ -31,10 +31,10 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
             AcceptsCouple = true,
             AcceptsFamily = true,
             AcceptsPets = true,
-            AcceptsNotEET = true,
+            AcceptsNotInEET = true,
             AcceptsCredit = true,
             AcceptsBenefits = true,
-            AcceptsOver35 = true
+            AcceptsUnder35 = true
         };
         //Act
         var result = await service.FilterNearestTenantsToProperty(filters, true,"",1,10);
@@ -55,10 +55,10 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
             AcceptsCouple = true,
             AcceptsFamily = true,
             AcceptsPets = true,
-            AcceptsNotEET = true,
+            AcceptsNotInEET = true,
             AcceptsCredit = true,
             AcceptsBenefits = true,
-            AcceptsOver35 = true
+            AcceptsUnder35 = true
         };
         //Act
         var result = await service.FilterNearestTenantsToProperty(filters, false,"",1,10);
@@ -79,10 +79,10 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
             AcceptsCouple = true,
             AcceptsFamily = true,
             AcceptsPets = false,
-            AcceptsNotEET = false,
+            AcceptsNotInEET = false,
             AcceptsCredit = false,
             AcceptsBenefits = false,
-            AcceptsOver35 = false
+            AcceptsUnder35 = false
         };
         //Act
         var result = await service.FilterNearestTenantsToProperty(filters, false,"PE11BF",1,10);
@@ -109,10 +109,10 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
                 AcceptsCouple = false,
                 AcceptsFamily = false,
                 AcceptsPets = true,
-                AcceptsNotEET = true,
+                AcceptsNotInEET = true,
                 AcceptsCredit = false,
                 AcceptsBenefits = true,
-                AcceptsOver35 = true
+                AcceptsUnder35 = true
             }
         };
 
@@ -144,10 +144,10 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
                 AcceptsCouple = false,
                 AcceptsFamily = false,
                 AcceptsPets = true,
-                AcceptsNotEET = true,
+                AcceptsNotInEET = true,
                 AcceptsCredit = true,
                 AcceptsBenefits = true,
-                AcceptsOver35 = true
+                AcceptsUnder35 = true
             }
         };
 

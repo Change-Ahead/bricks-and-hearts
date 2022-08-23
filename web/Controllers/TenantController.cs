@@ -177,6 +177,6 @@ public class TenantController : AbstractController
     [HttpGet("/sample-tenant-data")]
     public ActionResult GetSampleTenantCsv()
     {
-        return File("~/TenantImportCSVTemplate.csv", "text/csv");
+        return File("~/TenantImportCSV_Template.csv", "text/csv");
     }
 }

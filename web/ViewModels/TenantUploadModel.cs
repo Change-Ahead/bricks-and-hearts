@@ -6,11 +6,11 @@ public class TenantUploadModel
     public string? Email { get; set; }
     public string? Phone { get; set; }
     public string? Postcode { get; set; }
-    
+
     public string? Type { get; set; }
     public string? HasPet { get; set; }
-    public string? ETT { get; set; }
+    public string? NotInEET { get; set; }
     public string? UniversalCredit { get; set; }
     public string? HousingBenefits { get; set; }
-    public string? Over35 { get; set; }
+    public string? Under35 { get; set; }
 }

@@ -9,14 +9,14 @@ public class TenantDbModel
     public string Name { get; set; } = null!;
     public string? Email { get; set; }
     public string? Phone { get; set; }
-    
+
     public PostcodeDbModel? Postcode { get; set; }
     public string? PostcodeId { get; set; }
 
     public string? Type { get; set; }
     public bool? HasPet { get; set; }
-    public bool? ETT { get; set; }
+    public bool? NotInEET { get; set; }
     public bool? UniversalCredit { get; set; }
     public bool? HousingBenefits { get; set; }
-    public bool? Over35 { get; set; }
+    public bool? Under35 { get; set; }
 }

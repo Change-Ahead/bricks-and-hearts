@@ -4,7 +4,7 @@
 {
     static string GetPreferenceFont(bool? preference)
     {
-        return preference == true ? "" : "font-orange";
+        return preference == true ? "" : "font-blue";
     }
 
     static string GetPreferenceIcon(bool? preference)
@@ -46,9 +46,9 @@
                         <i class="bi me-1 @GetPreferenceIcon(tenant.HasPet)"></i>
                         Has pets
                     </div>
-                    <div class="@GetPreferenceFont(tenant.Over35)">
-                        <i class="bi me-1 @GetPreferenceIcon(tenant.Over35)"></i>
-                        Is over 35 years old
+                    <div class="@GetPreferenceFont(tenant.Under35)">
+                        <i class="bi me-1 @GetPreferenceIcon(tenant.Under35)"></i>
+                        Is under 35 years old
                     </div>
                     <div class="@GetPreferenceFont(tenant.UniversalCredit)">
                         <i class="bi me-1 @GetPreferenceIcon(tenant.UniversalCredit)"></i>
@@ -58,8 +58,8 @@
                         <i class="bi me-1 @GetPreferenceIcon(tenant.HousingBenefits)"></i>
                         On housing benefits
                     </div>
-                    <div class="@GetPreferenceFont(tenant.ETT)">
-                        <i class="bi me-1 @GetPreferenceIcon(tenant.ETT)"></i>
+                    <div class="@GetPreferenceFont(!tenant.NotInEET)">
+                        <i class="bi me-1 @GetPreferenceIcon(!tenant.NotInEET)"></i>
                         In EET (Employment, Education, or Training)
                     </div>
                 </td>

@@ -531,10 +531,10 @@ public class TestDatabaseFixture
             Email = "exampletenant@gmail.com",
             Type = "Single",
             HasPet = false,
-            ETT = true,
+            NotInEET = true,
             UniversalCredit = true,
             HousingBenefits = false,
-            Over35 = false,
+            Under35 = false,
             Postcode = Postcodes["LS1 1AZ"]
         };
     }
@@ -547,10 +547,10 @@ public class TestDatabaseFixture
             Email = "exampletenant@gmail.com",
             Type = "Single",
             HasPet = false,
-            ETT = false,
+            NotInEET = false,
             UniversalCredit = false,
             HousingBenefits = false,
-            Over35 = false,
+            Under35 = false,
             Postcode = Postcodes["PE1 1BF"]
         };
     }
@@ -563,7 +563,7 @@ public class TestDatabaseFixture
             AcceptsCouple = true,
             AcceptsFamily = true,
             AcceptsPets = false,
-            AcceptsNotEET = true,
+            AcceptsNotInEET = true,
             AcceptsSingleTenant = true,
             LandlordId = landlordId,
             AddressLine1 = "22 Test Road",

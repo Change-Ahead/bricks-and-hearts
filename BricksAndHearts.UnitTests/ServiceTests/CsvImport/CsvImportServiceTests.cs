@@ -34,7 +34,7 @@ public class CsvImportServiceTests : IClassFixture<TestDatabaseFixture>
         await using var context = Fixture.CreateReadContext();
         var service = new CsvImportService(context, PostcodeService, Logger);
 
-        var data = Encoding.UTF8.GetBytes("Name,Phone,Postcode,Type,HasPet,ETT,UniversalCredit,HousingBenefits,Over35");
+        var data = Encoding.UTF8.GetBytes("Name,Phone,Postcode,Type,HasPet,NotInEET,UniversalCredit,HousingBenefits,Under35");
         var csvFile = new FormFile(new MemoryStream(data), 0, data.Length, null!, "fakeFile.csv");
 
         // Act
@@ -52,7 +52,7 @@ public class CsvImportServiceTests : IClassFixture<TestDatabaseFixture>
         await using var context = Fixture.CreateReadContext();
         var service = new CsvImportService(context, PostcodeService, Logger);
 
-        var data = Encoding.UTF8.GetBytes("Extra,Name,Email,Phone,Postcode,Type,HasPet,ETT,UniversalCredit,HousingBenefits,Over35");
+        var data = Encoding.UTF8.GetBytes("Extra,Name,Email,Phone,Postcode,Type,HasPet,NotInEET,UniversalCredit,HousingBenefits,Under35");
         var csvFile = new FormFile(new MemoryStream(data), 0, data.Length, null!, "fakeFile.csv");
 
         // Act
@@ -70,7 +70,7 @@ public class CsvImportServiceTests : IClassFixture<TestDatabaseFixture>
         await using var context = Fixture.CreateReadContext();
         var service = new CsvImportService(context, PostcodeService, Logger);
 
-        var data = Encoding.UTF8.GetBytes("Name,Email,Phone,Postcode,Type,HasPet,ETT,UniversalCredit,HousingBenefits,Over35");
+        var data = Encoding.UTF8.GetBytes("Name,Email,Phone,Postcode,Type,HasPet,NotInEET,UniversalCredit,HousingBenefits,Under35");
         var csvFile = new FormFile(new MemoryStream(data), 0, data.Length, null!, "fakeFile.csv");
 
         // Act

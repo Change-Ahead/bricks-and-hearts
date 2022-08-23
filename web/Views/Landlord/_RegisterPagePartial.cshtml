@@ -28,7 +28,7 @@
             <option value="Prof">Prof</option>
             <option value="Other">Other</option>
         </select>
-        <div id="titleOther" class="my-3" style="@(Model.MembershipId == null ? "display: none;" : "")">
+        <div id="titleOther" class="my-3" style="@(Model.TitleInput == null ? "display: none;" : "")">
             <label asp-for="TitleInput" class="form-label">Title (other)*</label>
             <input id="TitleInput" asp-for="TitleInput" class="form-control empty"/>
             <span asp-validation-for="TitleInput" class="text-danger"></span>

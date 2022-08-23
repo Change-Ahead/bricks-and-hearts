@@ -16,7 +16,7 @@
         <button type="button" data-bs-target="#csvImportModal" data-bs-toggle="modal" class="btn btn-primary">Import tenants</button>
     </div>
 </div>
-<div class="collapse @(Model.Filter.AllAreNull ? "":"show")" id="dropdown-contents">
+<div class="collapse @(Model.Filter.AllAreNull ? "" : "show")" id="dropdown-contents">
     <form method="get" asp-controller="Tenant" asp-action="TenantList">
         <div class="col-8 my-3">
             <input class="form-control" id="TargetPostcode" name="TargetPostcode" value="@Model.TargetPostcode" placeholder="Enter postcode to sort by location"
@@ -52,11 +52,11 @@
             </div>
             <div class="col-auto d-grid">
                 @Html.DropDownListFor(
-                    model => model.Filter.AcceptsNotEET,
+                    model => model.Filter.AcceptsNotInEET,
                     new List<SelectListItem>
                     {
-                        new("In EET", "true"),
-                        new("Not in EET", "false")
+                        new("In EET", "false"),
+                        new("Not in EET", "true")
                     },
                     "Filter by EET",
                     new { @class = "form-select" }
@@ -88,11 +88,11 @@
             </div>
             <div class="col-auto d-grid">
                 @Html.DropDownListFor(
-                    model => model.Filter.AcceptsOver35,
+                    model => model.Filter.AcceptsUnder35,
                     new List<SelectListItem>
                     {
-                        new("Over 35", "true"),
-                        new("35 or under", "false")
+                        new("Under 35", "true"),
+                        new("35 or over", "false")
                     },
                     "Filter by age",
                     new { @class = "form-select" }

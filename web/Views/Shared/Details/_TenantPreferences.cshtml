@@ -4,7 +4,7 @@
 {
     string GetPreferenceFont(bool? preference)
     {
-        return preference == true ? "" : "font-orange";
+        return preference == true ? "" : "font-blue";
     }
 
     string GetPreferenceIcon(bool? preference)
@@ -33,8 +33,8 @@
         </div>
         @if (User.IsLandlordOrAdmin())
         {
-            <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsOver35)">
-                <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsOver35)"></i>
+            <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsUnder35)">
+                <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsUnder35)"></i>
                 Is over 35
             </div>
             <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsCredit)">
@@ -45,9 +45,9 @@
                 <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsBenefits)"></i>
                 On universal credit
             </div>
-            <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsNotEET)">
-                <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsNotEET)"></i>
-                Not in EET (Employment, Education, or Training)
+            <div class="@GetPreferenceFont(!Model.Property.LandlordRequirements.AcceptsNotInEET)">
+                <i class="bi me-1 @GetPreferenceIcon(!Model.Property.LandlordRequirements.AcceptsNotInEET)"></i>
+                In EET (Employment, Education, or Training)
             </div>
             <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsWithoutGuarantor)">
                 <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsWithoutGuarantor)"></i>

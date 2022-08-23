@@ -17,7 +17,7 @@ public class PropertyViewModel : IValidatableObject
     // Location
     public AddressModel Address { get; set; } = new();
     public Point? Location { get; set; }
-    
+
     // Property details
     [StringLength(10000)]
     public string? PropertyType { get; set; }
@@ -52,7 +52,7 @@ public class PropertyViewModel : IValidatableObject
     public int? TotalUnits { get; set; }
 
     public int? OccupiedUnits { get; set; }
-    
+
     public int? AvailableUnits => TotalUnits - OccupiedUnits;
 
     // Tenant
@@ -60,8 +60,9 @@ public class PropertyViewModel : IValidatableObject
 
     public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
     {
-        if (LandlordRequirements.AcceptsSingleTenant == false && LandlordRequirements.AcceptsCouple == false &&
-            LandlordRequirements.AcceptsFamily == false)
+        if (LandlordRequirements.AcceptsSingleTenant == false
+            && LandlordRequirements.AcceptsCouple == false
+            && LandlordRequirements.AcceptsFamily == false)
         {
             yield return new ValidationResult("At least one type of tenant must be selected");
         }
@@ -77,7 +78,7 @@ public class PropertyViewModel : IValidatableObject
                 "The number of occupied units must be less than or equal to the total units at the property.");
         }
     }
-    
+
     public static PropertyViewModel FromDbModel(PropertyDbModel property)
     {
         return new PropertyViewModel
@@ -109,8 +110,8 @@ public class PropertyViewModel : IValidatableObject
                 AcceptsPets = property.AcceptsPets,
                 AcceptsCredit = property.AcceptsCredit,
                 AcceptsBenefits = property.AcceptsBenefits,
-                AcceptsNotEET = property.AcceptsNotEET,
-                AcceptsOver35 = property.AcceptsOver35,
+                AcceptsNotInEET = property.AcceptsNotInEET,
+                AcceptsUnder35 = property.AcceptsUnder35,
                 AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor
             },
             Availability = property.Availability,
