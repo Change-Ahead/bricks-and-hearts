@@ -1,77 +1,58 @@
 @model AdminListModel
 
 @{
-    ViewData["Title"] = "Admin List";
+    ViewData["Title"] = "Admins";
 }
 
-<div class="tables">
-    <h2>Pending Admins</h2>
-    <table class="display table" id="pendingAdminTable">
-        @if (Model.PendingAdmins.Count > 0)
-        {
-            <thead>
-            <tr>
-                <th scope="col">Google Email</th>
-                <th scope="col">Google Name</th>
-                <th></th>
-                <th></th>
-            </tr>
-            </thead>
-        }
-        else
-        {
-            <div>There are no pending admin access requests.</div>
-        }
-        <tbody>
-        @foreach (var pendingAdmin in Model.PendingAdmins)
-        {
-            <tr>
-                <td>@pendingAdmin.GoogleEmail</td>
-                <td>@pendingAdmin.GoogleUserName</td>
-                <td>
-                    @using (Html.BeginForm("AcceptAdminRequest", "Admin", new { userToAcceptId = pendingAdmin.Id }, FormMethod.Post))
-                    {
-                        <button type="submit" class="btn btn-outline-success">Accept</button>
-                    }
-                </td>
-                <td>
-                    @using (Html.BeginForm("RejectAdminRequest", "Admin", new { userToRejectId = pendingAdmin.Id }, FormMethod.Post))
-                    {
-                        <button type="submit" class="btn btn-outline-danger">Reject</button>
-                    }
-                </td>
-            </tr>
-        }
-        </tbody>
-    </table>
-    <br/>
-    <h2>Current Admins</h2>
-    <table class="display table" id="adminTable">
-        @if (Model.CurrentAdmins.Count > 0)
-        {
-            <thead>
-            <tr>
-                <th scope="col">Google Email</th>
-                <th scope="col">Google Name</th>
-                <th></th>
-            </tr>
-            </thead>
-        }
-        else
-        {
-            <div>There are no current admins.</div> //this should never be the case (if so, who is seeing this message?)
-        }
+<h1 class="font-h1 my-4">Admins</h1>
+
+<div class="table-responsive">
+    <table class="table">
+        <thead class="bg-pale-blue">
+        <tr>
+            <th scope="col">Status</th>
+            <th scope="col">Name</th>
+            <th scope="col">Email</th>
+            <th scope="col">Actions</th>
+        </tr>
+        </thead>
         <tbody>
         @foreach (var currentAdmin in Model.CurrentAdmins)
         {
             <tr>
-                <td>@currentAdmin.GoogleEmail</td>
+                <td class="align-middle">
+                    <span class="status-pill-live rounded-pill px-3 py-1">
+                        <i class="bi bi-check2-all me-1"></i>
+                        Active
+                    </span>
+                </td>
                 <td>@currentAdmin.GoogleUserName</td>
+                <td>@currentAdmin.GoogleEmail</td>
                 <td>
-                    @using (Html.BeginForm("RemoveAdmin", "Admin", new { userToRemoveId = currentAdmin.Id }, FormMethod.Post))
-                    {
-                        <button type="submit" class="btn btn-outline-danger">Revoke admin rights</button>
-                    }
+                    <form asp-action="RemoveAdmin" asp-controller="Admin" method="post" asp-route-userToRemoveId="@currentAdmin.Id">
+                        <button type="submit" class="btn btn-outline-primary">Revoke admin rights</button>
+                    </form>
+                </td>
+            </tr>
+        }
+        @foreach (var pendingAdmin in Model.PendingAdmins)
+        {
+            <tr>
+                <td class="align-middle">
+                    <span class="status-pill-draft rounded-pill px-3 py-1">
+                        <i class="bi bi-clock me-1"></i>
+                        Pending
+                    </span>
+                </td>
+                <td>@pendingAdmin.GoogleUserName</td>
+                <td>@pendingAdmin.GoogleEmail</td>
+                <td>
+                    <form asp-action="AcceptAdminRequest" asp-controller="Admin" asp-route-userToAcceptId="@pendingAdmin.Id" method="post" class="d-inline-block">
+                        <button type="submit" class="btn btn-primary">Accept</button>
+                    </form>
+                    <form asp-action="RejectAdminRequest" asp-controller="Admin" asp-route-userToRejectId="@pendingAdmin.Id" method="post" class="d-inline-block">
+                        <button type="submit" class="btn btn-outline-primary">Reject</button>
+                    </form>
                 </td>
             </tr>
         }
