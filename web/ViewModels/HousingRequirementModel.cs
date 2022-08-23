@@ -1,8 +1,6 @@
-﻿using System.Collections;
+﻿namespace BricksAndHearts.ViewModels;
 
-namespace BricksAndHearts.ViewModels;
-
-public class HousingRequirementModel : IEnumerable
+public class HousingRequirementModel
 {
     public bool? AcceptsSingleTenant { get; set; }
     public bool? AcceptsCouple { get; set; }
@@ -13,30 +11,13 @@ public class HousingRequirementModel : IEnumerable
     public bool? AcceptsBenefits { get; set; }
     public bool? AcceptsOver35 { get; set; }
     public bool? AcceptsWithoutGuarantor { get; set; }
-
-    IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
-
-    public IEnumerator<bool?> GetEnumerator()
-    {
-        yield return AcceptsSingleTenant;
-        yield return AcceptsCouple;
-        yield return AcceptsFamily;
-        yield return AcceptsPets;
-        yield return AcceptsNotEET;
-        yield return AcceptsCredit;
-        yield return AcceptsBenefits;
-        yield return AcceptsOver35;
-        yield return AcceptsWithoutGuarantor;
-    }
-
-    public List<bool?> GetList()
-    {
-        var listOfFilters = new List<bool?>();
-        foreach (var filter in this) listOfFilters.Add(filter);
-
-        return listOfFilters;
-    }
+    public bool AllAreNull => AcceptsSingleTenant == null 
+                              && AcceptsCouple == null
+                              && AcceptsFamily == null
+                              && AcceptsPets == null
+                              && AcceptsNotEET == null
+                              && AcceptsCredit == null
+                              && AcceptsBenefits == null
+                              && AcceptsOver35 == null
+                              && AcceptsWithoutGuarantor == null;
 }

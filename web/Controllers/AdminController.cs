@@ -137,7 +137,7 @@ public class AdminController : AbstractController
         int landlordsPerPage = 10)
     {
         var landlords = await _adminService.GetLandlordList(isApproved, isAssigned, page, landlordsPerPage);
-        return View(new LandlordListModel(landlords.LandlordList, landlords.Count, isApproved, isAssigned, page));
+        return View(new LandlordListModel(landlords.LandlordList, landlords.Count, isApproved, isAssigned, page, landlordsPerPage));
     }
 
     [Authorize(Roles = "Admin")]

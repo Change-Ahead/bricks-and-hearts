@@ -12,7 +12,8 @@ public class TenantListModel
     public int Total { get; set; }
     public string? TargetPostcode { get; set; }
     public int TenantsPerPage { get; set; } = 10;
-
+    public RouteValueDictionary PreviousPageRouteValues { get; set; } = new ();
+    public RouteValueDictionary NextPageRouteValues { get; set; } = new ();
     public TenantListModel()
     {
         TenantList = new List<TenantDbModel>();
@@ -29,42 +30,27 @@ public class TenantListModel
         Total = total;
         Page = page;
         TargetPostcode = targetPostcode;
-    }
-    /*public RouteValueDictionary ToRouteValueDictionary(int pageChange)
-    {
-        return new RouteValueDictionary
-        {
-            { "AcceptsSingleTenant", Filter.AcceptsSingleTenant },
-            { "AcceptsCouple", Filter.AcceptsCouple },
-            { "AcceptsFamily", Filter.AcceptsFamily },
-            { "AcceptsPets", Filter.AcceptsPets },
-            { "AcceptsNotEET", Filter.AcceptsNotEET },
-            { "AcceptsCredit", Filter.AcceptsCredit },
-            { "AcceptsBenefits", Filter.AcceptsBenefits },
-            { "AcceptsOver35", Filter.AcceptsOver35 },
-            { "Page", Page + pageChange },
-            { "TargetPostcode", TargetPostcode }
-        };
-    }
 
-    public TenantListModel FromRouteValueDictionary(RouteValueDictionary routeValueDictionary)
+        PreviousPageRouteValues = GetRouteValueDictionary(-1);
+        NextPageRouteValues = GetRouteValueDictionary(1);
+    }
+    
+    private RouteValueDictionary GetRouteValueDictionary(int pageChange)
     {
-        return new TenantListModel
+        var possibleRouteValues = new RouteValueDictionary
         {
-            Filter = new HousingRequirementModel
-            {
-                AcceptsSingleTenant = (bool?)routeValueDictionary["AcceptsSingleTenant"],
-                AcceptsCouple = (bool?)routeValueDictionary["AcceptsCouple"],
-                AcceptsFamily = (bool?)routeValueDictionary["AcceptsFamily"],
-                AcceptsPets = (bool?)routeValueDictionary["AcceptsPets"],
-                AcceptsNotEET = (bool?)routeValueDictionary["AcceptsNotEET"],
-                AcceptsCredit = (bool?)routeValueDictionary["AcceptsCredit"],
-                AcceptsBenefits = (bool?)routeValueDictionary["AcceptsBenefits"],
-                AcceptsOver35 = (bool?)routeValueDictionary["AcceptsOver35"]   
-            },
-            Page = (int)(routeValueDictionary["Page"] ?? 1),
-            TargetPostcode = (string?)routeValueDictionary["TargetPostcode"]
+            { nameof(Filter.AcceptsSingleTenant), Filter.AcceptsSingleTenant },
+            { nameof(Filter.AcceptsCouple), Filter.AcceptsCouple },
+            { nameof(Filter.AcceptsFamily), Filter.AcceptsFamily },
+            { nameof(Filter.AcceptsPets), Filter.AcceptsPets },
+            { nameof(Filter.AcceptsNotEET), Filter.AcceptsNotEET },
+            { nameof(Filter.AcceptsCredit), Filter.AcceptsCredit },
+            { nameof(Filter.AcceptsBenefits), Filter.AcceptsBenefits },
+            { nameof(Filter.AcceptsOver35), Filter.AcceptsOver35 },
+            { nameof(Page), Page + pageChange },
+            { nameof(TargetPostcode), TargetPostcode }
         };
-    }*/
+        return new RouteValueDictionary(possibleRouteValues.Where(entry => entry.Value != null));
+    }
     
 }
