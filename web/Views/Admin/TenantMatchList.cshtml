@@ -1,4 +1,4 @@
-﻿@model TenantMatchListModel
+@model TenantMatchListModel
 
 @{
     ViewData["Title"] = "Tenant List";
@@ -36,7 +36,7 @@
             <td>@tenant.Name</td>
             <td>@tenant.Email</td>
             <td>@tenant.Phone</td>
-            <td>@tenant.Postcode</td>
+            <td>@tenant.Postcode!.Postcode</td>
             <td>@tenant.Type</td>
             <td>@tenant.HasPet</td>
             <td>@tenant.ETT</td>
@@ -44,7 +44,7 @@
             <td>@tenant.HousingBenefits</td>
             <td>@tenant.Over35</td>
             <td>
-                @using (Html.BeginForm("SendMatchLinkEmail", "Admin", new
+                @using (Html.BeginForm("SendMatchLinkEmail", "Tenant", new
                 {
                     propertyLink = Model.CurrentProperty.PublicViewLink,
                     tenantEmail = tenant.Email,

@@ -26,12 +26,11 @@ public class PostcodeService : IPostcodeService
         _client = client;
     }
 
-    public string FormatPostcode(string postcode)
+    public string FormatPostcode(string? postcode)
     {
-        const string postcodePattern =
-            @"([Gg][Ii][Rr] 0[Aa]{2})|((([A-Za-z][0-9]{1,2})|(([A-Za-z][A-Ha-hJ-Yj-y][0-9]{1,2})|(([A-Za-z][0-9][A-Za-z])|([A-Za-z][A-Ha-hJ-Yj-y][0-9][A-Za-z]?))))\s?[0-9][A-Za-z]{2})";
-        return Regex.IsMatch(postcode, postcodePattern)
-            ? Regex.Replace(postcode, @"^(\S+?)\s*?(\d\w\w)$", "$1 $2").ToUpper()
+        if (postcode == null) return "";
+        return Regex.IsMatch(postcode, Constants.PostcodeValidationRegex)
+            ? Regex.Replace(postcode, Constants.PostcodeFormatRegex, "$1 $2").ToUpper()
             : "";
     }
 

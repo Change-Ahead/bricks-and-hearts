@@ -532,7 +532,10 @@ public class TestDatabaseFixture
             Type = "Single",
             HasPet = false,
             ETT = true,
-            UniversalCredit = true
+            UniversalCredit = true,
+            HousingBenefits = false,
+            Over35 = false,
+            Postcode = Postcodes["LS1 1AZ"]
         };
     }
 
@@ -542,7 +545,13 @@ public class TestDatabaseFixture
         {
             Name = "Example Tenant",
             Email = "exampletenant@gmail.com",
-            Type = "Single"
+            Type = "Single",
+            HasPet = false,
+            ETT = false,
+            UniversalCredit = false,
+            HousingBenefits = false,
+            Over35 = false,
+            Postcode = Postcodes["PE1 1BF"]
         };
     }
 

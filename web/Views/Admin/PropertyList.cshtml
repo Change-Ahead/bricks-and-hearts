@@ -44,8 +44,8 @@
            Total = Model.Total,
            ItemsPerPage = Model.PropPerPage,
            ItemsOnPage = Model.Properties.Count,
-           HrefPrevious = Url.Action("PropertyList", "Property", new { sortBy = Model.SortBy, target = Model.Target, page = Model.Page - 1, propPerPage = Model.PropPerPage }),
-           HrefNext = Url.Action("PropertyList", "Property", new { sortBy = Model.SortBy, target = Model.Target, page = Model.Page + 1, propPerPage = Model.PropPerPage }),
+           HrefPrevious = Url.Action("PropertyList", "Property", new { Model.SortBy, Model.Target, page = Model.Page - 1, Model.PropPerPage }),
+           HrefNext = Url.Action("PropertyList", "Property", new { Model.SortBy, Model.Target, page = Model.Page + 1, Model.PropPerPage }),
            TypeOfData = "properties"
        }); }
 </div>

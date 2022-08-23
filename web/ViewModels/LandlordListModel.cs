@@ -11,11 +11,12 @@ public class LandlordListModel
     public int Total { get; set; }
     public int LandlordsPerPage { get; set; } = 10;
     
-    public LandlordListModel(List<LandlordDbModel> landlordList, int total, bool? isApproved, bool? isAssigned, int page = 1)
+    public LandlordListModel(List<LandlordDbModel> landlordList, int total, bool? isApproved, bool? isAssigned, int page = 1, int landlordsPerPage = 10)
     {
         LandlordList = landlordList;
         Total = total;
         Page = page;
+        LandlordsPerPage = landlordsPerPage;
         IsApproved = isApproved;
         IsAssigned = isAssigned;
     }

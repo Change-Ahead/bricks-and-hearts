@@ -59,7 +59,7 @@
        Total = Model.Total,
        ItemsPerPage = Model.LandlordsPerPage,
        ItemsOnPage = Model.LandlordList!.Count,
-       HrefPrevious = Url.Action("LandlordList", "Admin", new { isApproved = Model.IsApproved, isAssigned = Model.IsAssigned, page = Model.Page - 1, landlordsPerPage = Model.LandlordsPerPage }),
-       HrefNext = Url.Action("LandlordList", "Admin", new { isApproved = Model.IsApproved, isAssigned = Model.IsAssigned, page = Model.Page + 1, landlordsPerPage = Model.LandlordsPerPage }),
+       HrefPrevious = Url.Action("LandlordList", "Admin", new { Model.IsApproved, Model.IsAssigned, page = Model.Page - 1, Model.LandlordsPerPage }),
+       HrefNext = Url.Action("LandlordList", "Admin", new { Model.IsApproved, Model.IsAssigned, page = Model.Page + 1, Model.LandlordsPerPage }),
        TypeOfData = "landlords"
    }); }

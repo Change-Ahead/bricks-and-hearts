@@ -111,7 +111,7 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
     {
         // Arrange
         using var context = Fixture.CreateWriteContext();
-        var service = new AdminService(context,  A.Fake<ILogger<AdminService>>());
+        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
 
         var nonAdminUser = context.Users.Single(u => u.GoogleUserName == "NonAdminUser");
 
@@ -205,99 +205,6 @@ public class AdminServiceTests : IClassFixture<TestDatabaseFixture>
             .Count(l => context.Users.SingleOrDefault(u => u.LandlordId == l.Id) == null));
     }
 
-    #region TenantListTests
-
-    [Fact]
-    public async void GetTenantList_CalledWithNoFilter_ReturnsAllTenants()
-    {
-        // Arrange
-        await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
-        var filter = new HousingRequirementModel();
-
-        // Act
-        var result = await service.GetTenantList(filter, 1, 10);
-
-        // Assert
-        result.TenantList.Should().BeOfType<List<TenantDbModel>>();
-        result.Count.Should().Be(context.Tenants.Count());
-    }
-
-    [Fact]
-    public async void GetTenantList_CalledWithFilters_ReturnsCorrectlyFilteredTenantList()
-    {
-        // Arrange
-        await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
-        var filter = new HousingRequirementModel
-        {
-            AcceptsSingleTenant = true,
-            AcceptsNotEET = true,
-            AcceptsCredit = true
-        };
-
-        // Act
-        var result = await service.GetTenantList(filter, 1, 10);
-
-        // Assert
-        result.TenantList.Should().BeOfType<List<TenantDbModel>>();
-        result.Count.Should().Be(context.Tenants.Where(t => t.ETT == true)
-            .Where(t => t.UniversalCredit == true)
-            .Count(t => t.Type == "Single"));
-    }
-
-    [Fact]
-    public async void GetNearestTenantsToProperty_CalledWithFilters_ReturnsCorrectlyFilteredTenantListMaxLength5()
-    {
-        // Arrange
-        await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
-        var filter = new HousingRequirementModel
-        {
-            AcceptsSingleTenant = true,
-            AcceptsNotEET = true,
-            AcceptsCredit = false
-        };
-
-        // Act
-        var result = await service.GetTenantList(filter, 1, 10);
-
-        // Assert
-        result.TenantList.Should().BeOfType<List<TenantDbModel>>();
-        result.Count.Should().Be(context.Tenants.Where(t => t.ETT == true)
-            .Where(t => t.UniversalCredit != true)
-            .Count(t => t.Type == "Single"));
-        result.Count.Should().BeLessThan(6);
-    }
-    
-    [Fact]
-    public async void GetNearestTenantsToProperty_CalledWithAllFalseFilters_ReturnsNoTenants()
-    {
-        // Arrange
-        await using var context = Fixture.CreateReadContext();
-        var service = new AdminService(context, A.Fake<ILogger<AdminService>>());
-        var filter = new HousingRequirementModel
-        {
-            AcceptsSingleTenant = false,
-            AcceptsCouple = false,
-            AcceptsFamily = false,
-            AcceptsPets = false,
-            AcceptsNotEET = false,
-            AcceptsCredit = false,
-            AcceptsBenefits = false,
-            AcceptsOver35 = false
-        };
-
-        // Act
-        var result = await service.GetTenantList(filter, 1, 10);
-
-        // Assert
-        result.TenantList.Should().BeOfType<List<TenantDbModel>>();
-        result.Count.Should().Be(0);
-    }
-    
-    #endregion
-    
     [Fact]
     public void FindUserById_GivenCorrectId_FindsUser()
     {
