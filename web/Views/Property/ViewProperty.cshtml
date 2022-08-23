@@ -41,7 +41,16 @@
 {
     <div class="row mt-4">
         <div class="col-auto mb-2">
-            <a asp-action="TenantMatchList" asp-controller="Tenant" asp-route-currentPropertyId="@Model.Property.PropertyId" class="btn btn-large btn-outline-primary d-table-cell">View matches</a>
+            @if (Model.Property.Availability is AvailabilityState.Available or AvailabilityState.AvailableSoon)
+            {
+                // Allow matching
+                <a asp-action="TenantMatchList" asp-controller="Tenant" asp-route-currentPropertyId="@Model.Property.PropertyId" class="btn btn-large btn-outline-primary d-table-cell">Find potential tenants</a>
+            }
+            else
+            {
+                // Don't allow matching
+                <a class="btn btn-large btn-primary d-table-cell text-nowrap disabled bg-grey">Find potential tenants</a>
+            }
         </div>
         <div class="col-auto mb-2">
             <button role="button" id="copyBtn" class="btn btn-large btn-outline-primary" onclick="copyShareableLink('@Model.Property.PublicViewLink')">Copy shareable link</button>
