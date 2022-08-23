@@ -18,8 +18,8 @@
                         new("Sort by rent", "Rent"),
                         new("Sort by location", "Location")
                     },
-                    new { @class = "form-select col h-auto me-3", onchange = "checkIfSelectedValueIsTarget('Location', 'SortBy'); insertDefaultPostcodeIfNotSortByLocation(id)" })
-                <div id="ifTrue" class="col-auto" style="@(Model.SortBy != "Location" ? "display: none;" : "")">
+                    new { @class = "form-select col h-auto me-3", onchange = "displayIfSelectedValueIsTarget('Location', 'SortBy', 'postcode'); insertDefaultPostcodeIfNotSortByLocation(id)" })
+                <div id="postcode" class="col-auto" style="@(Model.SortBy != "Location" ? "display: none;" : "")">
                     <input class="form-control col h-auto me-3" id="target" name="target" required placeholder="Enter postcode to sort by location" pattern="@Constants.PostcodeValidationRegex"/>
                 </div>
                 <button type="submit" class="btn btn-outline-primary col">Sort</button>

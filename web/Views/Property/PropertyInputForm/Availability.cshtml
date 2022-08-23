@@ -17,7 +17,7 @@
     <div class="col-auto">
         <label asp-for="Availability" class="form-label">Availability</label>
         <select asp-for="Availability" class="form-select" required
-                id="Select" onclick="checkIfSelectedValueIsTarget('@AvailabilityState.AvailableSoon', 'Select'); makeRequiredIfSelectedValueIsTarget('@AvailabilityState.AvailableSoon', 'Select', 'dateInput')">
+                id="Select" onclick="displayIfSelectedValueIsTarget('@AvailabilityState.AvailableSoon', 'Select', 'ifTrue'); makeRequiredIfSelectedValueIsTarget('@AvailabilityState.AvailableSoon', 'Select', 'dateInput')">
             <option selected>@AvailabilityState.Draft</option>
             <option>@AvailabilityState.Available</option>
             <option>@AvailabilityState.AvailableSoon</option>
