@@ -20,17 +20,15 @@
         <select asp-for="Title" class="form-select" required
                 id="Title" onchange="displayIfSelectedValueIsTarget('Other', 'Title', 'titleOther')">
             <option selected disabled value="">Title</option>
-            <option value="Mr">Mr</option>
-            <option value="Mrs">Mrs</option>
-            <option value="Miss">Miss</option>
-            <option value="Ms">Ms</option>
-            <option value="Dr">Dr</option>
-            <option value="Prof">Prof</option>
+            @foreach (var title in LandlordProfileModel.KnownTitles)
+            {
+                <option value="@title">@title</option>
+            }
             <option value="Other">Other</option>
         </select>
         <div id="titleOther" class="my-3" style="@(Model.TitleInput == null ? "display: none;" : "")">
             <label asp-for="TitleInput" class="form-label">Title (other)*</label>
-            <input id="TitleInput" asp-for="TitleInput" class="form-control empty"/>
+            <input asp-for="TitleInput" class="form-control empty"/>
             <span asp-validation-for="TitleInput" class="text-danger"></span>
         </div>
         <span asp-validation-for="Title" class="text-danger"></span>

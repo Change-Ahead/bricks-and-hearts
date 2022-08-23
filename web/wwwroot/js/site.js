@@ -33,12 +33,6 @@ function insertDefaultPostcodeIfNotSortByLocation(id) {
     }
 }
 
-function clearMembershipIdIfFalse() {
-    if ($("#Select :selected").val() == "false") {
-        $("#MembershipId").val(null);
-    }
-}
-
 function copyLinkToClipboard(linkToCopy) {
     // Copy the text passed into the function plus the rest of the url
     const fullLink = window.location.origin + "/invite/" + linkToCopy
