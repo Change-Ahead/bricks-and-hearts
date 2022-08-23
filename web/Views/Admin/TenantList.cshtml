@@ -98,7 +98,7 @@
     </form>
 </div>
 
-<partial name="_TenantTable"/>
+<partial name="~/Views/Admin/_TenantTable.cshtml"/>
 
 @{ await Html.RenderPartialAsync("_PaginationPartial", new PaginationModel
    {
@@ -111,4 +111,4 @@
        TypeOfData = "tenants"
    }); }
 
-<partial name="_TenantImportModal"/>
+<partial name="~/Views/Admin/_TenantImportModal.cshtml"/>

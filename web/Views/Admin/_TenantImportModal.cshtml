@@ -5,13 +5,13 @@
                 <h5 class="modal-title" id="csvImportModalLabel">Import tenants</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form asp-action="ImportTenants" asp-controller="Admin" method="post" enctype="multipart/form-data">
+            <form asp-action="ImportTenants" asp-controller="Tenant" method="post" enctype="multipart/form-data">
                 <div class="modal-body">
                     <p>
                         To import tenants, please upload a CSV file with their information.
                         <strong>This will replace all existing tenant information.</strong>
                     </p>
-                    <a asp-action="GetSampleTenantCSV" asp-controller="Admin" class="btn btn-outline-primary">Download sample tenant data</a>
+                    <a asp-action="GetSampleTenantCSV" asp-controller="Tenant" class="btn btn-outline-primary">Download sample tenant data</a>
                     <p class="form-text">
                         You may use this sample CSV file as a template for the tenant data you wish to import. The first row is filled in as an example.
                     </p>
