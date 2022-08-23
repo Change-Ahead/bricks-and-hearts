@@ -101,25 +101,6 @@ public class TenantControllerTests : TenantControllerTestsBase
     }
 
     [Fact]
-    public async void TenantMatchList_CalledWithAnyInput_ReturnsTenantMatchListAndGetsNearestTenants()
-    {
-        // Arrange
-        var adminUser = CreateAdminUser();
-        MakeUserPrincipalInController(adminUser, UnderTest);
-        
-        
-        // Act
-        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(A.Fake<PropertyDbModel>());
-        A.CallTo(() => TenantService.GetNearestTenantsToProperty(A.Fake<PropertyViewModel>(), 5)).Returns((A.Fake<List<TenantDbModel>>(), 1));
-        var result = await UnderTest.TenantMatchList(1);
-
-        // Assert
-        A.CallTo(() => TenantService.GetNearestTenantsToProperty(A<PropertyViewModel>.Ignored, 5)).MustHaveHappened();
-        A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
-        result.Should().BeOfType<ViewResult>().Which.ViewName.Should().Be("~/Views/Admin/TenantMatchList.cshtml");
-    }
-
-    [Fact]
     public void SendMatchLinkEmail_CalledWithAnyInput_ReturnsTenantMatchListAndSendsEmail()
     {
         // Arrange

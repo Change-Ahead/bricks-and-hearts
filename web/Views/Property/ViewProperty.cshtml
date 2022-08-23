@@ -26,6 +26,13 @@
     </div>
 
     <div class="col-md d-flex flex-column pb-2">
+        <div class="d-flex">
+            <h3 class="font-h3 d-inline-block">@(User.IsLandlordOrAdmin() ? "Tenant preferences" : "Suitable for")</h3>
+            @if (User.IsLandlordOrAdmin())
+            {
+                <a class="bi bi-pencil ms-auto" asp-action="PropertyInputStepFiveTenantPreferences" asp-controller="Property" asp-route-operationType="edit" asp-route-propertyId="@Model.Property!.PropertyId"></a>
+            }
+        </div>
         <partial name="Details/_TenantPreferences"/>
     </div>
 </div>
@@ -34,7 +41,16 @@
 {
     <div class="row mt-4">
         <div class="col-auto mb-2">
-            <a asp-action="TenantMatchList" asp-controller="Tenant" asp-route-currentPropertyId="@Model.Property.PropertyId" class="btn btn-large btn-outline-primary d-table-cell">View matches</a>
+            @if (Model.Property.Availability is AvailabilityState.Available or AvailabilityState.AvailableSoon)
+            {
+                // Allow matching
+                <a asp-action="TenantMatchList" asp-controller="Tenant" asp-route-currentPropertyId="@Model.Property.PropertyId" class="btn btn-large btn-outline-primary d-table-cell">Find potential tenants</a>
+            }
+            else
+            {
+                // Don't allow matching
+                <a class="btn btn-large btn-primary d-table-cell text-nowrap disabled bg-grey">Find potential tenants</a>
+            }
         </div>
         <div class="col-auto mb-2">
             <button role="button" id="copyBtn" class="btn btn-large btn-outline-primary" onclick="copyShareableLink('@Model.Property.PublicViewLink')">Copy shareable link</button>

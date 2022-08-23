@@ -2,7 +2,7 @@
 
 <div class="d-flex">
     <h3 class="font-h3 d-inline-block">Description</h3>
-    @if (User.IsInRole("Landlord") || User.IsInRole("Admin"))
+    @if (User.IsLandlordOrAdmin())
     {
         <a class="bi bi-pencil ms-auto" asp-action="PropertyInputStepFourDescription" asp-controller="Property" asp-route-operationType="edit" asp-route-propertyId="@Model.Property!.PropertyId"></a>
     }

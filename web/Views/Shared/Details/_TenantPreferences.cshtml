@@ -13,14 +13,6 @@
     }
 }
 
-<div class="d-flex">
-    <h3 class="font-h3 d-inline-block">@(User.IsInRole("Landlord") || User.IsInRole("Admin") ? "Tenant preferences" : "Suitable for")</h3>
-    @if (User.IsInRole("Landlord") || User.IsInRole("Admin"))
-    {
-        <a class="bi bi-pencil ms-auto" asp-action="PropertyInputStepFiveTenantPreferences" asp-controller="Property" asp-route-operationType="edit" asp-route-propertyId="@Model.Property!.PropertyId"></a>
-    }
-</div>
-
 <div class="card custom-card flex-grow-1 mt-2">
     <div class="card-body">
         <div class="@GetPreferenceFont(Model.Property!.LandlordRequirements.AcceptsSingleTenant)">
@@ -39,11 +31,19 @@
             <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsPets)"></i>
             With pets
         </div>
-        @if (User.IsInRole("Landlord") || User.IsInRole("Admin"))
+        @if (User.IsLandlordOrAdmin())
         {
+            <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsOver35)">
+                <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsBenefits)"></i>
+                Is over 35
+            </div>
+            <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsCredit)">
+                <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsBenefits)"></i>
+                On housing benefits
+            </div>
             <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsBenefits)">
                 <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsBenefits)"></i>
-                On Universal Credit or housing benefits
+                On universal credit
             </div>
             <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsNotEET)">
                 <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsNotEET)"></i>

@@ -3,6 +3,6 @@ namespace BricksAndHearts.ViewModels;
 
 public class TenantMatchListModel
 {
-    public List<TenantDbModel>? TenantList { get; set; }
-    public PropertyViewModel CurrentProperty { get; set; } = new();
+    public List<TenantDbModel> TenantList { get; set; } = new();
+    public LandlordAndPropertyViewModel LandlordAndProperty { get; set; } = new();
 }
