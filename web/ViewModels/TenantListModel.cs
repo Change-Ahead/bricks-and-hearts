@@ -1,13 +1,10 @@
 ﻿using BricksAndHearts.Database;
-
 namespace BricksAndHearts.ViewModels;
 
 public class TenantListModel
 {
     public List<TenantDbModel> TenantList { get; set; }
-
     public HousingRequirementModel Filter { get; set; }
-
     public int Page { get; set; }
     public int Total { get; set; }
     public string? TargetPostcode { get; set; }
@@ -52,5 +49,4 @@ public class TenantListModel
         };
         return new RouteValueDictionary(possibleRouteValues.Where(entry => entry.Value != null));
     }
-    
 }

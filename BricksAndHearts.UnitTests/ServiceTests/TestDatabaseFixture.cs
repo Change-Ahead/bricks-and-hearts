@@ -533,6 +533,8 @@ public class TestDatabaseFixture
             HasPet = false,
             ETT = true,
             UniversalCredit = true,
+            HousingBenefits = false,
+            Over35 = false,
             Postcode = Postcodes["LS1 1AZ"]
         };
     }

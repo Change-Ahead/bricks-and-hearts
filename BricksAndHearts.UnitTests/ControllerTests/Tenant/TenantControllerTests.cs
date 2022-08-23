@@ -58,8 +58,8 @@ public class TenantControllerTests : TenantControllerTestsBase
         MakeUserPrincipalInController(adminUser, UnderTest);
         var csvFile = CreateExampleFile("fakeFile.csv", 1);
 
-        List<string> flashTypes = new List<string> { "danger" };
-        List<string> flashMessages = new List<string> { "Import has failed because column MissingColumn is missing. Please add this column to your records before attempting to import them."};
+        var flashTypes = new List<string> { "danger" };
+        var flashMessages = new List<string> { "Import has failed because column MissingColumn is missing. Please add this column to your records before attempting to import them."};
         var flashResponse = (flashTypes, flashMessages);
         A.CallTo(() => CsvImportService.CheckIfImportWorks(csvFile))
             .Returns(flashResponse);
@@ -83,8 +83,8 @@ public class TenantControllerTests : TenantControllerTestsBase
         MakeUserPrincipalInController(adminUser, UnderTest);
         var csvFile = CreateExampleFile("fakeFile.csv", 1);
 
-        List<string> flashTypes = new List<string>();
-        List<string> flashMessages = new List<string>();
+        var flashTypes = new List<string>();
+        var flashMessages = new List<string>();
         var flashResponse = (flashTypes, flashMessages);
         A.CallTo(() => CsvImportService.CheckIfImportWorks(csvFile))
             .Returns(flashResponse);
@@ -110,11 +110,11 @@ public class TenantControllerTests : TenantControllerTestsBase
         
         // Act
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).Returns(A.Fake<PropertyDbModel>());
-        A.CallTo(() => TenantService.GetNearestTenantsToProperty(A.Fake<PropertyViewModel>())).Returns((A.Fake<List<TenantDbModel>>(), 1));
+        A.CallTo(() => TenantService.GetNearestTenantsToProperty(A.Fake<PropertyViewModel>(), 5)).Returns((A.Fake<List<TenantDbModel>>(), 1));
         var result = await UnderTest.TenantMatchList(1);
 
         // Assert
-        A.CallTo(() => TenantService.GetNearestTenantsToProperty(A<PropertyViewModel>.Ignored)).MustHaveHappened();
+        A.CallTo(() => TenantService.GetNearestTenantsToProperty(A<PropertyViewModel>.Ignored, 5)).MustHaveHappened();
         A.CallTo(() => PropertyService.GetPropertyByPropertyId(1)).MustHaveHappened();
         result.Should().BeOfType<ViewResult>().Which.ViewName.Should().Be("~/Views/Admin/TenantMatchList.cshtml");
     }

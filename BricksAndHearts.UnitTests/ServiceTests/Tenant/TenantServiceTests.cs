@@ -121,7 +121,7 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
 
         // Assert
         result.TenantList.Should().BeOfType<List<TenantDbModel>>();
-        result.Count.Should().Be(context.Tenants.Where(t => t.UniversalCredit != true)
+        result.TenantList.Count.Should().Be(context.Tenants.Where(t => t.UniversalCredit != true)
             .Count(t => t.Type == "Single"));
         result.Count.Should().BeLessThan(6);
     }
@@ -156,7 +156,7 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
 
         // Assert
         result.TenantList.Should().BeOfType<List<TenantDbModel>>();
-        result.Count.Should().Be(context.Tenants.Count(t => t.Type =="Single"));
+        result.TenantList.Count.Should().Be(context.Tenants.Count(t => t.Type =="Single"));
     }
     
     #endregion

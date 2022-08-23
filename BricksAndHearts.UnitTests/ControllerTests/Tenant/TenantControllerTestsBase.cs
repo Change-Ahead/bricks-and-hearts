@@ -16,7 +16,7 @@ public class TenantControllerTestsBase : ControllerTestsBase
     protected readonly IPropertyService PropertyService;
     protected readonly IMailService MailService;
     protected readonly ICsvImportService CsvImportService;
-    protected IEnumerable<string>? FlashMessages => UnderTest.TempData["FlashMessages"] as List<string>;
+    protected IEnumerable<string>? FlashMessages => UnderTest.TempData["FlashMessages"] as string[];
     protected readonly TenantController UnderTest;
 
     protected TenantControllerTestsBase()

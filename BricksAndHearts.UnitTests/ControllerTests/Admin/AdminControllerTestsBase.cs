@@ -15,7 +15,7 @@ public class AdminControllerTestsBase : ControllerTestsBase
     protected readonly ILandlordService LandlordService;
     protected readonly IPropertyService PropertyService;
     protected readonly ITenantService TenantService;
-    protected IEnumerable<string>? FlashMessages => UnderTest.TempData["FlashMessages"] as List<string>;
+    protected IEnumerable<string>? FlashMessages => UnderTest.TempData["FlashMessages"] as string[];
     protected readonly AdminController UnderTest;
 
     protected AdminControllerTestsBase()
