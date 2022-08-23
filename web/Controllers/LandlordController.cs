@@ -34,7 +34,7 @@ public class LandlordController : AbstractController
         if (currentUser.LandlordId != null && !currentUser.IsAdmin)
         {
             _logger.LogWarning("User {UserId} is already registered, will redirect to profile", currentUser.Id);
-            return Redirect(Url.Action("MyProfile")!);
+            return RedirectToAction(nameof(MyProfile));
         }
 
         if (currentUser.IsAdmin && createUnassigned)
@@ -99,7 +99,7 @@ public class LandlordController : AbstractController
                               + "\n";
                 var subject = "Bricks&Hearts - landlord registration notification";
                 _mailService.TrySendMsgInBackground(msgBody, subject);
-                return RedirectToAction("Profile", "Landlord", new { landlord!.Id });
+                return RedirectToAction(nameof(Profile), "Landlord", new { landlord!.Id });
 
             case ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered:
                 _logger.LogWarning("Email already registered {Email}", createModel.Email);
@@ -114,7 +114,7 @@ public class LandlordController : AbstractController
             case ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord:
                 _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
                 AddFlashMessage("warning", "Already registered");
-                return Redirect(Url.Action("MyProfile")!);
+                return RedirectToAction(nameof(MyProfile));
 
             default:
                 throw new Exception($"Unknown landlord registration error ${result}");
@@ -162,7 +162,7 @@ public class LandlordController : AbstractController
             var message = "Membership ID is required.";
             _logger.LogInformation(message);
             AddFlashMessage("warning", message);
-            return RedirectToAction("Profile", "Landlord", new { Id = landlord.LandlordId!.Value });
+            return RedirectToAction(nameof(Profile), "Landlord", new { Id = landlord.LandlordId!.Value });
         }
 
         var user = CurrentUser;
@@ -196,7 +196,7 @@ public class LandlordController : AbstractController
 
         _logger.LogInformation(flashMessageBody);
         AddFlashMessage(flashMessageType, flashMessageBody);
-        return RedirectToAction("Profile", "Landlord", new { Id = landlord.LandlordId.Value });
+        return RedirectToAction(nameof(Profile), "Landlord", new { Id = landlord.LandlordId.Value });
     }
 
     [HttpGet]
@@ -282,7 +282,7 @@ public class LandlordController : AbstractController
 
         await _landlordService.EditLandlordDetails(editModel);
         _logger.LogInformation("Successfully edited landlord for landlord {LandlordId}", editModel.LandlordId);
-        return RedirectToAction("Profile", new { id = editModel.LandlordId });
+        return RedirectToAction(nameof(Profile), new { id = editModel.LandlordId });
     }
 
     [HttpGet("/invite/{inviteLink}")]
@@ -367,7 +367,7 @@ public class LandlordController : AbstractController
     {
         return fileNames.Select(fileName =>
             {
-                var url = Url.Action("GetImage", new { propertyId, fileName })!;
+                var url = Url.Action(nameof(GetImage), new { propertyId, fileName })!;
                 return new ImageFileUrlModel(fileName, url);
             })
             .ToList();

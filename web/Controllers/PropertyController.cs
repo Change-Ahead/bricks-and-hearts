@@ -69,10 +69,11 @@ public class PropertyController : AbstractController
             AddFlashMessage("danger", $"Property with Id {propertyId} does not exist");
             if (CurrentUser.LandlordId != null)
             {
-                return RedirectToAction("ViewProperties", "Landlord", new { id = CurrentUser.LandlordId });
+                return RedirectToAction(nameof(LandlordController.ViewProperties), "Landlord",
+                    new { id = CurrentUser.LandlordId });
             }
 
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
         if (CurrentUser.IsAdmin == false && CurrentUser.LandlordId != propDb.LandlordId)
@@ -432,7 +433,7 @@ public class PropertyController : AbstractController
     {
         return fileNames.Select(fileName =>
             {
-                var url = Url.Action("GetImage", new { propertyId, fileName })!;
+                var url = Url.Action(nameof(GetImage), new { propertyId, fileName })!;
                 return new ImageFileUrlModel(fileName, url);
             })
             .ToList();

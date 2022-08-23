@@ -40,7 +40,7 @@ public class AdminController : AbstractController
         var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
         if (!isAuthenticated)
         {
-            return RedirectToAction("Index", "Home");
+            return RedirectToAction(nameof(HomeController.Index), "Home");
         }
 
         var viewModel =

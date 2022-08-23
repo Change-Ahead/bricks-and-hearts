@@ -90,7 +90,7 @@ public class TenantController : AbstractController
     {
         return fileNames.Select(fileName =>
             {
-                var url = Url.Action("GetImage", new { propertyId, fileName })!;
+                var url = Url.Action(nameof(GetImage), new { propertyId, fileName })!;
                 return new ImageFileUrlModel(fileName, url);
             })
             .ToList();
@@ -125,7 +125,7 @@ public class TenantController : AbstractController
         _mailService.TrySendMsgInBackground(propertyLink, tenantEmail, addressToSendTo);
         _logger.LogInformation($"Successfully emailed tenant {tenantEmail}");
         AddFlashMessage("success", $"successfully emailed {tenantEmail}");
-        return RedirectToAction("TenantMatchList", new { currentPropertyId });
+        return RedirectToAction(nameof(TenantMatchList), new { currentPropertyId });
     }
 
     [Authorize(Roles = "Admin")]

@@ -22,12 +22,12 @@ public class HomeController : AbstractController
             var user = CurrentUser;
             if (user.IsAdmin)
             {
-                return RedirectToAction("AdminDashboard", "Admin");
+                return RedirectToAction(nameof(AdminController.AdminDashboard), "Admin");
             }
 
             if (user.LandlordId != null)
             {
-                return RedirectToAction("Dashboard", "Landlord");
+                return RedirectToAction(nameof(LandlordController.Dashboard), "Landlord");
             }
         }
 
