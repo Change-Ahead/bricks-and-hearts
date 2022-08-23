@@ -91,11 +91,38 @@ or launch from your IDE (e.g. Rider).
 
 ## Testing
 
-To run the unit tests:
+### Running unit tests
+
+Unit tests can be run from your IDE or from the terminal:
 
 ```shell
 dotnet test
 ```
 
-or run from your IDE. This should create a `BricksAndHeartsTest` database in SQL Server which is used by some of the
-unit tests.
+or to filter to just controller/service tests:
+
+```shell
+dotnet test --filter "FullyQualifiedName~BricksAndHearts.UnitTests.ControllerTests"
+dotnet test --filter "FullyQualifiedName~BricksAndHearts.UnitTests.ServiceTests"
+```
+
+Running the tests should create a `BricksAndHeartsTest` database in SQL Server which is used by the service tests.
+
+### Writing unit tests
+
+Unit tests can be found in the `BricksAndHearts.UnitTests` project and use the following frameworks:
+
+* [xUnit](https://xunit.net/)
+* [FluentAssertions](https://fluentassertions.com/introduction)
+* [FakeItEasy](https://fakeiteasy.readthedocs.io/en/stable/)
+
+There are currently two categories of unit tests:
+
+* **Controller tests** – These test the correct behaviour of the controller actions in terms of routing, validation,
+  redirects, etc. Real service objects should generally not be used here, and instead mocks should be used to fake their
+  behaviour to check the controller method responds correctly.
+* **Service tests** – These test the functionality of the methods in the service classes, which usually perform database
+  or API operations. They should not test any controller functionality.
+
+Some service tests check whether database operations are executed correctly. Database unit tests work slightly
+differently to normal tests &ndash; see the [guide](DATABASE_UNIT_TESTS.MD) for how to use them.
