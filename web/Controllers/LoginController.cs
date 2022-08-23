@@ -8,13 +8,14 @@ namespace BricksAndHearts.Controllers;
 [AllowAnonymous]
 public class LoginController : Controller
 {
+    [HttpGet("/login/google")]
     public IActionResult Google(string returnUrl = "/")
     {
         var properties = new AuthenticationProperties { RedirectUri = returnUrl };
         return Challenge(properties, GoogleDefaults.AuthenticationScheme);
     }
-    
-    [HttpPost]
+
+    [HttpPost("/logout")]
     public async Task<IActionResult> Logout()
     {
         await HttpContext.SignOutAsync();

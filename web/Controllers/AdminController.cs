@@ -10,6 +10,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BricksAndHearts.Controllers;
 
+[Authorize]
+[Route("admin")]
 public class AdminController : AbstractController
 {
     private readonly IAdminService _adminService;
@@ -32,7 +34,7 @@ public class AdminController : AbstractController
         _tenantService = tenantService;
     }
 
-    [HttpGet("/admin")]
+    [HttpGet("dashboard")]
     public IActionResult AdminDashboard()
     {
         var isAuthenticated = User.Identity?.IsAuthenticated ?? false;
@@ -42,14 +44,14 @@ public class AdminController : AbstractController
         }
 
         var viewModel =
-            new AdminDashboardViewModel(_landlordService.CountLandlords(), _propertyService.CountProperties(), _tenantService.CountTenants());
+            new AdminDashboardViewModel(_landlordService.CountLandlords(), _propertyService.CountProperties(),
+                _tenantService.CountTenants());
         viewModel.CurrentUser = CurrentUser;
 
         return View(viewModel);
     }
 
-    [Authorize]
-    [HttpPost]
+    [HttpPost("request-access")]
     public IActionResult RequestAdminAccess()
     {
         var user = CurrentUser;
@@ -65,6 +67,7 @@ public class AdminController : AbstractController
         return RedirectToAction(nameof(AdminDashboard));
     }
 
+    [HttpPost("cancel-request-access")]
     public IActionResult CancelAdminAccessRequest()
     {
         var user = CurrentUser;
@@ -87,7 +90,7 @@ public class AdminController : AbstractController
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpPost]
+    [HttpPost("lists/admins/accept")]
     public ActionResult AcceptAdminRequest(int userToAcceptId)
     {
         _adminService.ApproveAdminAccessRequest(userToAcceptId);
@@ -96,7 +99,7 @@ public class AdminController : AbstractController
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpPost]
+    [HttpPost("lists/admins/reject")]
     public ActionResult RejectAdminRequest(int userToRejectId)
     {
         _adminService.RejectAdminAccessRequest(userToRejectId);
@@ -105,7 +108,7 @@ public class AdminController : AbstractController
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpPost]
+    [HttpPost("lists/admins/revoke")]
     public ActionResult RemoveAdmin(int userToRemoveId)
     {
         if (userToRemoveId != CurrentUser.Id)
@@ -123,25 +126,26 @@ public class AdminController : AbstractController
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpGet]
+    [HttpGet("lists/admins")]
     public async Task<ActionResult> GetAdminList()
     {
         var adminLists = await _adminService.GetAdminLists();
-        AdminListModel adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
+        var adminListModel = new AdminListModel(adminLists.CurrentAdmins, adminLists.PendingAdmins);
         return View("AdminList", adminListModel);
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpGet]
+    [HttpGet("lists/landlords")]
     public async Task<IActionResult> LandlordList(bool? isApproved = null, bool? isAssigned = null, int page = 1,
         int landlordsPerPage = 10)
     {
         var landlords = await _adminService.GetLandlordList(isApproved, isAssigned, page, landlordsPerPage);
-        return View(new LandlordListModel(landlords.LandlordList, landlords.Count, isApproved, isAssigned, page, landlordsPerPage));
+        return View(new LandlordListModel(landlords.LandlordList, landlords.Count, isApproved, isAssigned, page,
+            landlordsPerPage));
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpPost]
+    [HttpPost("/landlord/invite")]
     public ActionResult GetInviteLink(int landlordId)
     {
         var user = _adminService.FindUserByLandlordId(landlordId);
@@ -166,8 +170,8 @@ public class AdminController : AbstractController
             }
 
             _logger.LogInformation(logMessage);
-            var flashMessage = logMessage +
-                               $": {(HttpContext.Request.IsHttps ? "https" : "http")}://{HttpContext.Request.Host}/invite/{inviteLink}";
+            var flashMessage = logMessage
+                               + $": {(HttpContext.Request.IsHttps ? "https" : "http")}://{HttpContext.Request.Host}/invite/{inviteLink}";
             AddFlashMessage("success", flashMessage);
         }
 
@@ -175,7 +179,7 @@ public class AdminController : AbstractController
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpPost]
+    [HttpPost("/landlord/invite/renew")]
     public ActionResult RenewInviteLink(int landlordId)
     {
         var user = _adminService.FindUserByLandlordId(landlordId);

@@ -87,11 +87,16 @@ public class LandlordController : AbstractController
                 var msgBody = "A Landlord has just registered\n"
                               + "\n"
                               + $"Title: {createModel.Title}\n"
-                              + $"First Name: {createModel.FirstName}" + "\n"
-                              + $"Last Name: {createModel.LastName}" + "\n"
-                              + $"Company Name: {createModel.CompanyName}" + "\n"
-                              + $"Email: {createModel.Email}" + "\n"
-                              + $"Phone: {createModel.Phone}" + "\n";
+                              + $"First Name: {createModel.FirstName}"
+                              + "\n"
+                              + $"Last Name: {createModel.LastName}"
+                              + "\n"
+                              + $"Company Name: {createModel.CompanyName}"
+                              + "\n"
+                              + $"Email: {createModel.Email}"
+                              + "\n"
+                              + $"Phone: {createModel.Phone}"
+                              + "\n";
                 var subject = "Bricks&Hearts - landlord registration notification";
                 _mailService.TrySendMsgInBackground(msgBody, subject);
                 return RedirectToAction("Profile", "Landlord", new { landlord!.Id });
@@ -221,7 +226,7 @@ public class LandlordController : AbstractController
             new PropertyListModel(listOfProperties, properties.Count, landlordProfile, page));
     }
 
-    [HttpGet("{landlordId:int}/edit")]
+    [HttpGet("{landlordId:int}/profile/edit")]
     public async Task<ActionResult> EditProfilePage(int? landlordId)
     {
         var user = CurrentUser;
@@ -239,7 +244,7 @@ public class LandlordController : AbstractController
         return View("EditProfilePage", LandlordProfileModel.FromDbModel(landlordFromDb));
     }
 
-    [HttpPost("edit")]
+    [HttpPost("profile/edit")]
     public async Task<ActionResult> EditProfileUpdate([FromForm] LandlordProfileModel editModel)
     {
         var user = CurrentUser;
@@ -295,7 +300,7 @@ public class LandlordController : AbstractController
         return View(model);
     }
 
-    [HttpPost("/invite/{inviteLink}/accepted")]
+    [HttpPost("/invite/{inviteLink}/accept")]
     public async Task<IActionResult> TieUserWithLandlord(string inviteLink)
     {
         var user = CurrentUser;
@@ -319,16 +324,16 @@ public class LandlordController : AbstractController
         }
     }
 
-    [HttpGet("{id:int}/dashboard")]
-    public async Task<ActionResult> Dashboard([FromRoute] int id)
+    [HttpGet("dashboard")]
+    public async Task<ActionResult> Dashboard()
     {
         var user = CurrentUser;
-        if (user.LandlordId != id && !user.IsAdmin)
+        if (!user.LandlordId.HasValue)
         {
             return StatusCode(403);
         }
 
-        var landlord = await _landlordService.GetLandlordIfExistsWithProperties(id);
+        var landlord = await _landlordService.GetLandlordIfExistsWithProperties(user.LandlordId);
         if (landlord == null)
         {
             return StatusCode(404);
@@ -351,9 +356,10 @@ public class LandlordController : AbstractController
         {
             CurrentLandlord = LandlordProfileModel.FromDbModel(landlord),
             Properties = allPropertyDetails,
-            PropertyTypeCount = _propertyService.CountProperties(id)
+            PropertyTypeCount = _propertyService.CountProperties(user.LandlordId)
         };
-        viewModel.CurrentLandlord.GoogleProfileImageUrl = _landlordService.GetLandlordProfilePicture(id);
+        viewModel.CurrentLandlord.GoogleProfileImageUrl =
+            _landlordService.GetLandlordProfilePicture(user.LandlordId.Value);
         return View("Dashboard", viewModel);
     }
 
@@ -367,23 +373,11 @@ public class LandlordController : AbstractController
             .ToList();
     }
 
-    [HttpGet("{propertyId:int}/{fileName}")]
+    [HttpGet("property/{propertyId:int}/{fileName}")]
     public async Task<IActionResult> GetImage(int propertyId, string fileName)
     {
         var (data, fileType) = await _azureStorage.DownloadFile("property", propertyId, fileName);
 
         return File(data!, $"image/{fileType}");
-    }
-
-    [HttpGet("me/dashboard")]
-    public async Task<ActionResult> MyDashboard()
-    {
-        var landlordId = CurrentUser.LandlordId;
-        if (landlordId == null)
-        {
-            return StatusCode(404);
-        }
-
-        return await Dashboard(landlordId.Value);
     }
 }

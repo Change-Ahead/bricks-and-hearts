@@ -27,7 +27,7 @@ public class HomeController : AbstractController
 
             if (user.LandlordId != null)
             {
-                return RedirectToAction("MyDashboard", "Landlord");
+                return RedirectToAction("Dashboard", "Landlord");
             }
         }
 
@@ -39,20 +39,20 @@ public class HomeController : AbstractController
         return View(model);
     }
 
-    [HttpGet]
+    [HttpGet("privacy")]
     public IActionResult Privacy()
     {
         return View();
     }
 
-    [HttpGet]
+    [HttpGet("contact")]
     public IActionResult ContactUs()
     {
         return View(new ContactUsViewModel());
     }
 
     [HttpGet]
-    [Route("/Error/{status:int}")]
+    [Route("/error/{status:int}")]
     public IActionResult Error(int status)
     {
         ErrorService errorService = new ErrorService();

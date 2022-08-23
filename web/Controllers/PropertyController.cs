@@ -2,7 +2,6 @@ using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using BricksAndHearts.ViewModels.PropertyInput;
-using Microsoft.ApplicationInsights.AspNetCore.Extensions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -118,7 +117,7 @@ public class PropertyController : AbstractController
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpGet("PropertyList")]
+    [HttpGet("/admin/lists/properties")]
     public async Task<IActionResult> PropertyList(string sortBy, string? target, int page = 1, int propPerPage = 10)
     {
         var properties = await _propertyService.GetPropertyList(sortBy, target, page, propPerPage);
@@ -135,42 +134,6 @@ public class PropertyController : AbstractController
         TempData["FullWidthPage"] = true;
         return View("~/Views/Admin/PropertyList.cshtml",
             new PropertyListModel(listOfProperties, properties.Count, null!, page, sortBy, target));
-    }
-
-    [Authorize(Roles = "Admin")]
-    [HttpGet("/admin/get-public-view-link/{propertyId:int}")]
-    public ActionResult GetPublicViewLink(int propertyId)
-    {
-        var property = _propertyService.GetPropertyByPropertyId(propertyId);
-        if (property == null) // If property does not exist
-        {
-            var flashMessageBody = $"Property with ID: {propertyId} does not exist";
-            _logger.LogInformation(flashMessageBody);
-            AddFlashMessage("warning", flashMessageBody);
-        }
-        else
-        {
-            var publicViewLink = property.PublicViewLink;
-            string flashMessageBody;
-            if (string.IsNullOrEmpty(publicViewLink))
-            {
-                flashMessageBody = "Successfully created a new public view link";
-                publicViewLink = _propertyService.CreatePublicViewLink(propertyId);
-                _logger.LogInformation("Created public view link for property {PropertyId}: {PublicViewLink}",
-                    propertyId, publicViewLink);
-            }
-            else
-            {
-                flashMessageBody = "Property already has a public view link";
-            }
-
-            var baseUrl = HttpContext.Request.GetUri().Authority;
-            _logger.LogInformation(flashMessageBody);
-            AddFlashMessage("success",
-                flashMessageBody + ": " + baseUrl + $"/public/propertyid/{propertyId}/{publicViewLink}");
-        }
-
-        return RedirectToAction("ViewProperty", "Property", new { propertyId });
     }
 
     #endregion
@@ -389,9 +352,8 @@ public class PropertyController : AbstractController
     }
 
     [Authorize(Roles = "Landlord, Admin")]
-    [HttpGet(
-        "/landlord/{landlordId:int}/property/{propertyId:int}/cancel")]
-    public async Task<ActionResult> PropertyInputCancel([FromRoute] int propertyId, [FromRoute] int landlordId)
+    [HttpGet("{propertyId:int}/cancel")]
+    public async Task<ActionResult> PropertyInputCancel([FromRoute] int propertyId, int landlordId)
     {
         var property = _propertyService.GetPropertyByPropertyId(propertyId);
 
@@ -477,7 +439,7 @@ public class PropertyController : AbstractController
     }
 
     [Authorize(Roles = "Landlord, Admin")]
-    [HttpGet("{propertyId:int}/{fileName}")]
+    [HttpGet("{propertyId:int}/images/{fileName}")]
     public async Task<IActionResult> GetImage(int propertyId, string fileName)
     {
         if (!_propertyService.IsUserAdminOrCorrectLandlord(CurrentUser, propertyId))
@@ -497,7 +459,7 @@ public class PropertyController : AbstractController
     }
 
     [Authorize(Roles = "Landlord, Admin")]
-    [HttpPost("addImage")]
+    [HttpPost("images/upload")]
     public async Task<IActionResult> AddPropertyImages(List<IFormFile> images, int propertyId)
     {
         if (!_propertyService.IsUserAdminOrCorrectLandlord(CurrentUser, propertyId))
@@ -534,7 +496,7 @@ public class PropertyController : AbstractController
     }
 
     [Authorize(Roles = "Landlord, Admin")]
-    [HttpPost("deleteImage")]
+    [HttpPost("images/delete")]
     public async Task<IActionResult> DeletePropertyImage(int propertyId, string fileName)
     {
         if (!_propertyService.IsUserAdminOrCorrectLandlord(CurrentUser, propertyId))
