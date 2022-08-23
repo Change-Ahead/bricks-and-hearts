@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using BricksAndHearts.Database;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
@@ -7,13 +7,13 @@ namespace BricksAndHearts.ViewModels.PropertyInput;
 public class PropertyInputModelTenantPreferences : PropertyInputModelBase, IValidatableObject
 {
     [Required]
-    public bool? AcceptsSingleTenant { get; set; }
+    public bool AcceptsSingleTenant { get; set; }
 
     [Required]
-    public bool? AcceptsCouple { get; set; }
+    public bool AcceptsCouple { get; set; }
 
     [Required]
-    public bool? AcceptsFamily { get; set; }
+    public bool AcceptsFamily { get; set; }
 
     [Required]
     public bool? AcceptsPets { get; set; }
@@ -49,9 +49,9 @@ public class PropertyInputModelTenantPreferences : PropertyInputModelBase, IVali
         base.InitialiseViewModel(property);
         Step = 5;
         Title = "What kind of tenant would you prefer?";
-        AcceptsSingleTenant = property.AcceptsSingleTenant;
-        AcceptsCouple = property.AcceptsCouple;
-        AcceptsFamily = property.AcceptsFamily;
+        AcceptsSingleTenant = property.AcceptsSingleTenant ?? false;
+        AcceptsCouple = property.AcceptsCouple ?? false;
+        AcceptsFamily = property.AcceptsFamily ?? false;
         AcceptsPets = property.AcceptsPets;
         AcceptsBenefits = property.AcceptsBenefits;
         AcceptsNotInEET = property.AcceptsNotInEET;

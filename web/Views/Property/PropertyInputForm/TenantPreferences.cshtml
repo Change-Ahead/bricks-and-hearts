@@ -7,15 +7,15 @@
 
     <div class="row g-3">
         <div class="col-auto d-grid">
-            @Html.CheckBox("AcceptsSingleTenant", Model.AcceptsSingleTenant ?? false, new { @class = "btn-check" })
+            <input type="checkbox" asp-for="AcceptsSingleTenant" value="@(Model.AcceptsSingleTenant.ToString())" class="check-min-one" onchange="ifNoneCheckedAddRequiredIfAnyCheckedRemoveRequired()"/>
             <label asp-for="AcceptsSingleTenant" class="btn btn-outline-blue shadow-none pill-check">Single tenant</label>
         </div>
         <div class="col-auto d-grid">
-            @Html.CheckBox("AcceptsCouple", Model.AcceptsCouple ?? false, new { @class = "btn-check" })
+            <input type="checkbox" asp-for="AcceptsCouple" value="@(Model.AcceptsCouple.ToString())" class="check-min-one" onchange="ifNoneCheckedAddRequiredIfAnyCheckedRemoveRequired()"/>
             <label asp-for="AcceptsCouple" class="btn btn-outline-blue shadow-none pill-check">Couple</label>
         </div>
         <div class="col-auto d-grid">
-            @Html.CheckBox("AcceptsFamily", Model.AcceptsFamily ?? false, new { @class = "btn-check" })
+            <input type="checkbox" asp-for="AcceptsFamily" value="@(Model.AcceptsFamily.ToString())" class="check-min-one" onchange="ifNoneCheckedAddRequiredIfAnyCheckedRemoveRequired()"/>
             <label asp-for="AcceptsFamily" class="btn btn-outline-blue shadow-none pill-check">Family (3+)</label>
         </div>
     </div>

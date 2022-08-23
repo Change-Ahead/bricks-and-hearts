@@ -17,6 +17,25 @@ function displayIfSelectedValueIsTarget(target, id, idToShow, idToHide = null) {
     }
 }
 
+function ifNoneCheckedAddRequiredIfAnyCheckedRemoveRequired() {
+    let checkboxes = document.getElementsByClassName('check-min-one');
+    let checked = false;
+    checkboxes.forEach(box => {
+        if (box.checked === true) {
+            checked = true;
+        }
+    })
+    if (checked) {
+        checkboxes.forEach(box => {
+            box.removeAttr('required')
+        })
+    } else {
+        checkboxes.forEach(box => {
+            box.prop('required', true)
+        })
+    }
+}
+
 function makeRequiredIfSelectedValueIsTarget(target, id, idToRequire) {
     if ($("#" + id + " :selected").val() == target) {
         $("#" + idToRequire).prop('required', true);
@@ -24,6 +43,15 @@ function makeRequiredIfSelectedValueIsTarget(target, id, idToRequire) {
         $("#" + idToRequire).removeAttr('required');
     }
 }
+
+function makeRequiredIfNoneAreSelected(target, id, idToRequire) {
+    if ($("#" + id + " :selected").val() == target) {
+        $("#" + idToRequire).prop('required', true);
+    } else {
+        $("#" + idToRequire).removeAttr('required');
+    }
+}
+
 
 function insertDefaultPostcodeIfNotSortByLocation(id) {
     if ($("#" + id + " :selected").val() == "Location") {
