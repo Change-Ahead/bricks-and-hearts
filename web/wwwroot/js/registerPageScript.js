@@ -25,8 +25,8 @@ if(localStorage.getItem("storedCurrentTab")!=null){
 showTab(currentTab);
 
 function showTab(currentTab) {
-    document.getElementById("nextBtn").blur()
-    document.getElementById("prevBtn").blur()
+    document.getElementById("nextBtn").blur();
+    document.getElementById("prevBtn").blur();
     let tabList = document.getElementsByClassName("registerTab");
     tabList[currentTab].style.display = "block";
     if (currentTab === 0) {
@@ -40,7 +40,7 @@ function showTab(currentTab) {
     } else {
         document.getElementById("nextBtn").innerHTML = "Next";
     }
-    fixStepIndicator(currentTab)
+    fixStepIndicator(currentTab);
 }
 
 function nextPrev(tabChange) {

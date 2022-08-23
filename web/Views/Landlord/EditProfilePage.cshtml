@@ -3,24 +3,26 @@
 @{
     ViewData["Title"] = "Edit Profile";
 }
-<h1>Edit your Landlord Profile</h1>
 
-<hr/>
 <!-- Circles which indicates the steps of the form: -->
-<div class="d-flex justify-content-center">
-    <span class="step"></span>
-    <span class = "stepline"></span>
-    <span class="step"></span>
-    <span class = "stepline"></span>
-    <span class="step"></span>
-    <span class = "stepline"></span>
-    <span class="step"></span>
+<div class="d-flex my-5">
+    <span class="step">1</span>
+    <span class="stepline"></span>
+    <span class="step">2</span>
+    <span class="stepline"></span>
+    <span class="step">3</span>
+    <span class="stepline"></span>
+    <span class="step">4</span>
 </div>
 
-<div class="row">
-    <form method="post" asp-controller="Landlord" asp-action="EditProfileUpdate" id="landlordEntry">
-        <div asp-validation-summary="All" class="text-danger"></div>
-        @Html.HiddenFor(l=>l.LandlordId, new{value = Model.LandlordId})
-        @{ await Html.RenderPartialAsync("_RegisterPagePartial", Model); }
-    </form>
+<div class="mb-4">
+    <a href="#" id="prevBtn" onclick="nextPrev(-1)">&lt; Back</a>
 </div>
+
+<h1 class="font-h1">Edit landlord profile</h1>
+
+<form method="post" asp-controller="Landlord" asp-action="EditProfileUpdate" id="landlordEntry">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    @Html.HiddenFor(l => l.LandlordId, new { value = Model.LandlordId })
+    @{ await Html.RenderPartialAsync("_RegisterPagePartial", Model); }
+</form>
