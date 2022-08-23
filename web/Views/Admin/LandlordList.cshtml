@@ -1,23 +1,7 @@
-﻿@using Microsoft.Extensions.Primitives
-@model LandlordListModel
+﻿@model LandlordListModel
 
 @{
     ViewData["Title"] = "Landlord List";
-}
-
-@functions
-{
-    string GetCollapseClass()
-    {
-        var isApproved = Context.Request.Query["IsApproved"];
-        var isAssigned = Context.Request.Query["IsAssigned"];
-        if (isApproved == new StringValues("true") || isApproved == new StringValues("false")
-            || isAssigned == new StringValues("true") || isAssigned == new StringValues("false"))
-        {
-            return "show";
-        }
-        return string.Empty;
-    }
 }
 
 <h1 class="font-h1 mt-5">Landlords</h1>
@@ -33,7 +17,7 @@
     </div>
 </div>
 
-<div class="collapse @GetCollapseClass()" id="dropdown-contents">
+<div class="collapse @(Model.IsApproved.HasValue || Model.IsAssigned.HasValue ? "show" : "")" id="dropdown-contents">
     <form asp-action="LandlordList" asp-controller="Admin" method="get">
         <div class="row my-3">
             <div class="col-auto mb-2">
