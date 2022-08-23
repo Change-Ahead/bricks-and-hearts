@@ -36,7 +36,7 @@
     {
         <div class="card custom-card mt-4">
             <div class="card-body">
-                @if (User.IsInRole("Landlord") || User.IsInRole("Admin"))
+                @if (User.IsLandlordOrAdmin())
                 {
                     <form asp-action="AddPropertyImages" asp-controller="Property" method="post" asp-route-propertyId="@Model.Property!.PropertyId" enctype="multipart/form-data">
                         <div class="mb-3">
@@ -85,7 +85,7 @@
                     </button>
                 </div>
             </div>
-            @if (User.IsInRole("Landlord") || User.IsInRole("Admin"))
+            @if (User.IsLandlordOrAdmin())
             {
                 <div class="modal-footer">
                     <form asp-action="AddPropertyImages" asp-controller="Property" method="post" asp-route-propertyId="@Model.Property!.PropertyId" enctype="multipart/form-data" class="me-auto">
@@ -104,7 +104,7 @@
 </div>
 
 <!-- Delete image modal -->
-@if (User.IsInRole("Landlord") || User.IsInRole("Admin"))
+@if (User.IsLandlordOrAdmin())
 {
     <div class="modal fade" id="deleteImageModal" tabindex="-1" aria-labelledby="deleteImageModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">

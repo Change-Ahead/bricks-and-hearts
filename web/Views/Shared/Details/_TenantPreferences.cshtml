@@ -31,7 +31,7 @@
             <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsPets)"></i>
             With pets
         </div>
-        @if (User.IsInRole("Landlord") || User.IsInRole("Admin"))
+        @if (User.IsLandlordOrAdmin())
         {
             <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsOver35)">
                 <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsBenefits)"></i>

@@ -4,6 +4,5 @@
     ViewData["Title"] = "Tenant List";
 }
 
-<partial name="_MatchListPropertyViewPartial" model="@Model.LandlordAndProperty"/>
-
-<partial name="_MatchListTable"/>
+<partial name="~/Views/Admin/_MatchListPropertyViewPartial.cshtml" model="@Model.LandlordAndProperty"/>
+<partial name="~/Views/Admin/_MatchListTable.cshtml"/>

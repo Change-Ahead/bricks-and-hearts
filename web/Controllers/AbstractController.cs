@@ -10,8 +10,6 @@ namespace BricksAndHearts.Controllers;
 public abstract class AbstractController : Controller
 {
     protected BricksAndHeartsUser CurrentUser => GetCurrentUser();
-    
-    protected
 
     private BricksAndHeartsUser GetCurrentUser()
     {

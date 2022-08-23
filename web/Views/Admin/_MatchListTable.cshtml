@@ -64,7 +64,7 @@
                     </div>
                 </td>
                 <td>
-                @using (Html.BeginForm("SendMatchLinkEmail", "Admin", new
+                @using (Html.BeginForm("SendMatchLinkEmail", "Tenant", new
                 {
                     propertyLink = Model.LandlordAndProperty.Property!.PublicViewLink,
                     tenantEmail = tenant.Email,

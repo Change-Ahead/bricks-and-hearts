@@ -7,24 +7,30 @@ namespace BricksAndHearts.Controllers;
 
 public class TenantController : AbstractController
 {
-    private readonly ICsvImportService _csvImportService;
     private readonly ILogger<TenantController> _logger;
-    private readonly IMailService _mailService;
     private readonly IPropertyService _propertyService;
     private readonly ITenantService _tenantService;
+    private readonly ILandlordService _landlordService;
+    private readonly IMailService _mailService;
+    private readonly ICsvImportService _csvImportService;
+    private readonly IAzureStorage _azureStorage;
 
     public TenantController(
         ILogger<TenantController> logger,
         ITenantService tenantService,
         IPropertyService propertyService,
+        ILandlordService landlordService,
         IMailService mailService,
-        ICsvImportService csvImportService)
+        ICsvImportService csvImportService,
+        IAzureStorage azureStorage)
     {
         _logger = logger;
         _tenantService = tenantService;
         _propertyService = propertyService;
+        _landlordService = landlordService;
         _mailService = mailService;
         _csvImportService = csvImportService;
+        _azureStorage = azureStorage;
     }
 
     [Authorize(Roles = "Admin")]
@@ -63,13 +69,50 @@ public class TenantController : AbstractController
     {
         var currentProperty =
             PropertyViewModel.FromDbModel(_propertyService.GetPropertyByPropertyId(currentPropertyId)!);
-
+        var fileNames = await _azureStorage.ListFileNames("property", currentProperty.PropertyId);
         var tenantMatchListModel = new TenantMatchListModel
         {
             TenantList = (await _tenantService.GetNearestTenantsToProperty(currentProperty)).TenantList,
-            CurrentProperty = currentProperty
+            LandlordAndProperty = new LandlordAndPropertyViewModel
+            {
+                Property = currentProperty,
+                Images = GetFilesFromFileNames(fileNames, currentProperty.PropertyId),
+                PropertyTypeCount = _propertyService.CountProperties(currentProperty.LandlordId), 
+                CurrentLandlord = LandlordProfileModel.FromDbModel(await _landlordService.GetLandlordFromId(currentProperty.LandlordId))
+            }
         };
         return View("~/Views/Admin/TenantMatchList.cshtml", tenantMatchListModel);
+    }
+    
+    public List<ImageFileUrlModel> GetFilesFromFileNames(List<string> fileNames, int propertyId)
+    {
+        return fileNames.Select(fileName =>
+            {
+                var url = Url.Action("GetImage", new { propertyId, fileName })!;
+                return new ImageFileUrlModel(fileName, url);
+            })
+            .ToList();
+    }
+
+    [Authorize(Roles = "Landlord, Admin")]
+    [HttpGet]
+    [Route("{propertyId:int}/{fileName}")]
+    public async Task<IActionResult> GetImage(int propertyId, string fileName)
+    {
+        if (!_propertyService.IsUserAdminOrCorrectLandlord(CurrentUser, propertyId))
+        {
+            return StatusCode(403);
+        }
+
+        var image = await _azureStorage.DownloadFile("property", propertyId, fileName);
+        if (image.data == null || image.fileType == null)
+        {
+            return StatusCode(404);
+        }
+
+        var data = image.data;
+        var fileType = image.fileType;
+        return File(data!, $"image/{fileType}");
     }
 
     [Authorize(Roles = "Admin")]
