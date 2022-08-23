@@ -49,8 +49,8 @@
         </label>
     </div>
     <div class="form-check">
-        @Html.CheckBox("AcceptsNotEET", Model.AcceptsNotEET ?? false, new { @class = "form-check-input" })
-        <label asp-for="AcceptsNotEET" class="form-check-label">
+        @Html.CheckBox("AcceptsNotEET", Model.AcceptsNotInEET ?? false, new { @class = "form-check-input" })
+        <label asp-for="AcceptsNotInEET" class="form-check-label">
             not in EET (Employment, Education, or Training)?
         </label>
     </div>
@@ -61,9 +61,9 @@
         </label>
     </div>
     <div class="form-check">
-        @Html.CheckBox("AcceptsOver35", Model.AcceptsOver35 ?? false, new { @class = "form-check-input" })
-        <label asp-for="AcceptsOver35" class="form-check-label">
-            that are over 35?
+        @Html.CheckBox("AcceptsOver35", Model.AcceptsUnder35 ?? false, new { @class = "form-check-input" })
+        <label asp-for="AcceptsUnder35" class="form-check-label">
+            that are under 35?
         </label>
     </div>
 </div>

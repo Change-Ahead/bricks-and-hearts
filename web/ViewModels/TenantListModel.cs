@@ -1,4 +1,5 @@
 ﻿using BricksAndHearts.Database;
+
 namespace BricksAndHearts.ViewModels;
 
 public class TenantListModel
@@ -9,8 +10,27 @@ public class TenantListModel
     public int Total { get; set; }
     public string? TargetPostcode { get; set; }
     public int TenantsPerPage { get; set; } = 10;
-    public RouteValueDictionary PreviousPageRouteValues { get; set; } = new ();
-    public RouteValueDictionary NextPageRouteValues { get; set; } = new ();
+    public RouteValueDictionary PreviousPageRouteValues { get; set; } = new();
+    public RouteValueDictionary NextPageRouteValues { get; set; } = new();
+
+    private RouteValueDictionary GetRouteValueDictionary(int pageChange)
+    {
+        var possibleRouteValues = new RouteValueDictionary
+        {
+            { nameof(Filter.AcceptsSingleTenant), Filter.AcceptsSingleTenant },
+            { nameof(Filter.AcceptsCouple), Filter.AcceptsCouple },
+            { nameof(Filter.AcceptsFamily), Filter.AcceptsFamily },
+            { nameof(Filter.AcceptsPets), Filter.AcceptsPets },
+            { nameof(Filter.AcceptsNotInEET), Filter.AcceptsNotInEET },
+            { nameof(Filter.AcceptsCredit), Filter.AcceptsCredit },
+            { nameof(Filter.AcceptsBenefits), Filter.AcceptsBenefits },
+            { nameof(Filter.AcceptsUnder35), Filter.AcceptsUnder35 },
+            { nameof(Page), Page + pageChange },
+            { nameof(TargetPostcode), TargetPostcode }
+        };
+        return new RouteValueDictionary(possibleRouteValues.Where(entry => entry.Value != null));
+    }
+    
     public TenantListModel()
     {
         TenantList = new List<TenantDbModel>();
@@ -20,7 +40,8 @@ public class TenantListModel
         TargetPostcode = null;
     }
 
-    public TenantListModel(List<TenantDbModel> tenantList, HousingRequirementModel filter, int total, int page = 1, string? targetPostcode = null)
+    public TenantListModel(List<TenantDbModel> tenantList, HousingRequirementModel filter, int total, int page = 1,
+        string? targetPostcode = null)
     {
         TenantList = tenantList;
         Filter = filter;
@@ -30,23 +51,5 @@ public class TenantListModel
 
         PreviousPageRouteValues = GetRouteValueDictionary(-1);
         NextPageRouteValues = GetRouteValueDictionary(1);
-    }
-    
-    private RouteValueDictionary GetRouteValueDictionary(int pageChange)
-    {
-        var possibleRouteValues = new RouteValueDictionary
-        {
-            { nameof(Filter.AcceptsSingleTenant), Filter.AcceptsSingleTenant },
-            { nameof(Filter.AcceptsCouple), Filter.AcceptsCouple },
-            { nameof(Filter.AcceptsFamily), Filter.AcceptsFamily },
-            { nameof(Filter.AcceptsPets), Filter.AcceptsPets },
-            { nameof(Filter.AcceptsNotEET), Filter.AcceptsNotEET },
-            { nameof(Filter.AcceptsCredit), Filter.AcceptsCredit },
-            { nameof(Filter.AcceptsBenefits), Filter.AcceptsBenefits },
-            { nameof(Filter.AcceptsOver35), Filter.AcceptsOver35 },
-            { nameof(Page), Page + pageChange },
-            { nameof(TargetPostcode), TargetPostcode }
-        };
-        return new RouteValueDictionary(possibleRouteValues.Where(entry => entry.Value != null));
     }
 }

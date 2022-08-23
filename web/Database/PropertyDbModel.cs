@@ -37,8 +37,8 @@ public class PropertyDbModel
     public bool? AcceptsPets { get; set; }
     public bool? AcceptsCredit { get; set; }
     public bool? AcceptsBenefits { get; set; }
-    public bool? AcceptsNotEET { get; set; }
-    public bool? AcceptsOver35 { get; set; }
+    public bool? AcceptsNotInEET { get; set; }
+    public bool? AcceptsUnder35 { get; set; }
     public bool? AcceptsWithoutGuarantor { get; set; }
 
     // Rent, deposits, availability and duration

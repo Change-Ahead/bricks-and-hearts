@@ -19,7 +19,7 @@ public class PropertyInputModelTenantPreferences : PropertyInputModelBase, IVali
     public bool? AcceptsPets { get; set; }
 
     [Required]
-    public bool? AcceptsNotEET { get; set; }
+    public bool? AcceptsNotInEET { get; set; }
 
     [Required]
     public bool? AcceptsCredit { get; set; }
@@ -28,13 +28,21 @@ public class PropertyInputModelTenantPreferences : PropertyInputModelBase, IVali
     public bool? AcceptsBenefits { get; set; }
 
     [Required]
-    public bool? AcceptsOver35 { get; set; }
+    public bool? AcceptsUnder35 { get; set; }
 
     [Required]
     public bool? AcceptsWithoutGuarantor { get; set; }
 
     [ValidateNever]
     public override string PreviousAction { get; set; } = "PropertyInputStepFourDescription";
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (AcceptsSingleTenant == false && AcceptsCouple == false && AcceptsFamily == false)
+        {
+            yield return new ValidationResult("At least one type of tenant must be selected");
+        }
+    }
 
     public override void InitialiseViewModel(PropertyDbModel property)
     {
@@ -46,10 +54,10 @@ public class PropertyInputModelTenantPreferences : PropertyInputModelBase, IVali
         AcceptsFamily = property.AcceptsFamily;
         AcceptsPets = property.AcceptsPets;
         AcceptsBenefits = property.AcceptsBenefits;
-        AcceptsNotEET = property.AcceptsNotEET;
+        AcceptsNotInEET = property.AcceptsNotInEET;
         AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor;
         AcceptsCredit = property.AcceptsCredit;
-        AcceptsOver35 = property.AcceptsOver35;
+        AcceptsUnder35 = property.AcceptsUnder35;
     }
 
     public override PropertyViewModel FormToViewModel()
@@ -63,19 +71,11 @@ public class PropertyInputModelTenantPreferences : PropertyInputModelBase, IVali
                 AcceptsFamily = AcceptsFamily,
                 AcceptsPets = AcceptsPets,
                 AcceptsBenefits = AcceptsBenefits,
-                AcceptsNotEET = AcceptsNotEET,
+                AcceptsNotInEET = AcceptsNotInEET,
                 AcceptsWithoutGuarantor = AcceptsWithoutGuarantor,
                 AcceptsCredit = AcceptsCredit,
-                AcceptsOver35 = AcceptsOver35
+                AcceptsUnder35 = AcceptsUnder35
             }
         };
-    }
-
-    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-    {
-        if (AcceptsSingleTenant == false && AcceptsCouple == false && AcceptsFamily == false)
-        {
-            yield return new ValidationResult("At least one type of tenant must be selected");
-        }
     }
 }

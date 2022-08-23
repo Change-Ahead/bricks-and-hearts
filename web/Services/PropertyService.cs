@@ -63,8 +63,8 @@ public class PropertyService : IPropertyService
             AcceptsPets = createModel.LandlordRequirements.AcceptsPets,
             AcceptsCredit = createModel.LandlordRequirements.AcceptsCredit,
             AcceptsBenefits = createModel.LandlordRequirements.AcceptsBenefits,
-            AcceptsNotEET = createModel.LandlordRequirements.AcceptsNotEET,
-            AcceptsOver35 = createModel.LandlordRequirements.AcceptsOver35,
+            AcceptsNotInEET = createModel.LandlordRequirements.AcceptsNotInEET,
+            AcceptsUnder35 = createModel.LandlordRequirements.AcceptsUnder35,
             AcceptsWithoutGuarantor = createModel.LandlordRequirements.AcceptsWithoutGuarantor,
 
             Rent = createModel.Rent,
@@ -113,8 +113,8 @@ public class PropertyService : IPropertyService
         dbModel.AcceptsPets = updateModel.LandlordRequirements.AcceptsPets ?? dbModel.AcceptsPets;
         dbModel.AcceptsCredit = updateModel.LandlordRequirements.AcceptsCredit ?? dbModel.AcceptsCredit;
         dbModel.AcceptsBenefits = updateModel.LandlordRequirements.AcceptsBenefits ?? dbModel.AcceptsBenefits;
-        dbModel.AcceptsNotEET = updateModel.LandlordRequirements.AcceptsNotEET ?? dbModel.AcceptsNotEET;
-        dbModel.AcceptsOver35 = updateModel.LandlordRequirements.AcceptsOver35 ?? dbModel.AcceptsOver35;
+        dbModel.AcceptsNotInEET = updateModel.LandlordRequirements.AcceptsNotInEET ?? dbModel.AcceptsNotInEET;
+        dbModel.AcceptsUnder35 = updateModel.LandlordRequirements.AcceptsUnder35 ?? dbModel.AcceptsUnder35;
         dbModel.AcceptsWithoutGuarantor = updateModel.LandlordRequirements.AcceptsWithoutGuarantor
                                           ?? dbModel.AcceptsWithoutGuarantor;
 
