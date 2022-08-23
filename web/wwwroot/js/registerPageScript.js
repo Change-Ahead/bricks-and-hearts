@@ -70,12 +70,14 @@ function validateForm() {
     for (tabInputIterator = 0; tabInputIterator < tabInputList.length; tabInputIterator++) {
         // Validation checks for the form
         let currentField = tabInputList[tabInputIterator]
-        if ((currentField.name === "MembershipId") && ((tabInputList[tabInputIterator-1]).value === "false"))
+        if ((currentField.name === "MembershipId") && ((tabInputList[tabInputIterator-1]).value === "false")
+            || ((currentField.name === "TitleInput") && (tabInputList[tabInputIterator-1]).value !== "Other"))
         {
            currentField.className = "form-control empty";
         }
         if ((currentField.value === "" && currentField.className!=="form-control empty")
             || ((currentField.name === "MembershipId") && (currentField.value === "") && ((tabInputList[tabInputIterator-1]).value === "true"))
+            || ((currentField.name === "TitleInput") && (currentField.value === "") && ((tabInputList[tabInputIterator-1]).value === "Other"))
             || (currentField.type === "email" && (currentField.value.indexOf("@") === -1))
             || (currentField.type === "tel" && !Number.isInteger(Number(currentField.value.replace(/\+/g,"")))))
         {

@@ -7,13 +7,13 @@ function setValue(elementId, value) {
     document.getElementById(elementId).value = value;
 }
 
-function checkIfSelectedValueIsTarget(target, id) {
+function displayIfSelectedValueIsTarget(target, id, idToShow, idToHide = null) {
     if ($("#" + id + " :selected").val() == target) {
-        $("#ifTrue").show();
-        $("#ifFalse").hide();
+        $("#" + idToShow).show();
+        $("#" + idToHide).hide();
     } else {
-        $("#ifTrue").hide();
-        $("#ifFalse").show();
+        $("#" + idToShow).hide();
+        $("#" + idToHide).show();
     }
 }
 

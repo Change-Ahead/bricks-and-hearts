@@ -14,6 +14,8 @@ public class LandlordProfileModel
     [DisplayName("Title")]
     public string Title { get; set; } = string.Empty;
 
+    public string? TitleInput { get; set; }
+
     [Required]
     [StringLength(255)]
     [DisplayName("First name")]

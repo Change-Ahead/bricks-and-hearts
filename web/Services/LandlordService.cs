@@ -145,7 +145,7 @@ public class LandlordService : ILandlordService
     {
         var dbModel = new LandlordDbModel
         {
-            Title = createModel.Title,
+            Title = createModel.Title == "Other" ? createModel.TitleInput! : createModel.Title,
             FirstName = createModel.FirstName,
             LastName = createModel.LastName,
             CompanyName = createModel.CompanyName,
@@ -240,7 +240,7 @@ public class LandlordService : ILandlordService
     public async Task<ILandlordService.LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel)
     {
         var landlordToEdit = await _dbContext.Landlords.SingleAsync(l => l.Id == editModel.LandlordId);
-        landlordToEdit.Title = editModel.Title;
+        landlordToEdit.Title = editModel.Title == "Other" ? editModel.TitleInput! : editModel.Title;
         landlordToEdit.FirstName = editModel.FirstName;
         landlordToEdit.LastName = editModel.LastName;
         landlordToEdit.CompanyName = editModel.CompanyName;
