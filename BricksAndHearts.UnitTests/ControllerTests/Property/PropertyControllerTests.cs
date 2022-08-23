@@ -312,20 +312,16 @@ public class PropertyControllerTests : PropertyControllerTestsBase
         UnderTest.ViewData.ModelState.AddModelError("Key", "ErrorMessage");
 
         // Act
-        var result =
-            await UnderTest.PropertyInputStepOnePostcode(formResultModel, 999, operationType,
-                    formResultModel.LandlordId)
-                as
-                RedirectToActionResult;
+        var result = await UnderTest.PropertyInputStepOnePostcode(formResultModel, 999, operationType,
+            formResultModel.LandlordId) as ViewResult;
 
         // Assert
         A.CallTo(() => PropertyService.UpdateProperty(1, A<PropertyViewModel>._, true)).WithAnyArguments()
             .MustNotHaveHappened();
         A.CallTo(() => PropertyService.AddNewProperty(1, A<PropertyViewModel>._, true)).WithAnyArguments()
             .MustNotHaveHappened();
-        result!.ActionName.Should().Be("PropertyInputStepOnePostcode");
-        result.RouteValues.Should().ContainKey("propertyId").WhoseValue.Should().Be(999);
-        result.RouteValues.Should().ContainKey("operationType").WhoseValue.Should().Be(operationType);
+        result!.Model.Should().NotBeNull();
+        result!.Model!.GetType().Should().Be(typeof(PropertyInputModelInitialAddress));
     }
 
     [Theory]

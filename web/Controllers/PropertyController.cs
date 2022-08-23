@@ -177,11 +177,6 @@ public class PropertyController : AbstractController
         if (!ModelState.IsValid)
         {
             return View("PropertyInputForm/InitialAddress", model);
-            return RedirectToAction("PropertyInputStepOnePostcode", "Property",
-                new
-                {
-                    propertyId, operationType, landlordId
-                });
         }
 
         var property = _propertyService.GetPropertyByPropertyId(propertyId);

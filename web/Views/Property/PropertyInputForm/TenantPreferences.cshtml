@@ -7,15 +7,15 @@
 
     <div class="row g-3">
         <div class="col-auto d-grid">
-            <input type="checkbox" asp-for="AcceptsSingleTenant" value="@(Model.AcceptsSingleTenant.ToString())" class="check-min-one" onchange="ifNoneCheckedAddRequiredIfAnyCheckedRemoveRequired()"/>
+            <input type="checkbox" asp-for="AcceptsSingleTenant" class="btn-check"/>
             <label asp-for="AcceptsSingleTenant" class="btn btn-outline-blue shadow-none pill-check">Single tenant</label>
         </div>
         <div class="col-auto d-grid">
-            <input type="checkbox" asp-for="AcceptsCouple" value="@(Model.AcceptsCouple.ToString())" class="check-min-one" onchange="ifNoneCheckedAddRequiredIfAnyCheckedRemoveRequired()"/>
+            <input type="checkbox" asp-for="AcceptsCouple" class="btn-check"/>
             <label asp-for="AcceptsCouple" class="btn btn-outline-blue shadow-none pill-check">Couple</label>
         </div>
         <div class="col-auto d-grid">
-            <input type="checkbox" asp-for="AcceptsFamily" value="@(Model.AcceptsFamily.ToString())" class="check-min-one" onchange="ifNoneCheckedAddRequiredIfAnyCheckedRemoveRequired()"/>
+            <input type="checkbox" asp-for="AcceptsFamily" class="btn-check"/>
             <label asp-for="AcceptsFamily" class="btn btn-outline-blue shadow-none pill-check">Family (3+)</label>
         </div>
     </div>
@@ -37,31 +37,31 @@
 <div class="my-4 py-3">
     <label class="form-label">Will you accept tenants:</label>
     <div class="form-check">
-        @Html.CheckBox("AcceptsCredit", Model.AcceptsCredit ?? false, new { @class = "form-check-input" })
+        <input type="checkbox" asp-for="AcceptsCredit" class="form-check-input"/>
         <label asp-for="AcceptsCredit" class="form-check-label">
             on Universal Credit
         </label>
     </div>
     <div class="form-check">
-        @Html.CheckBox("AcceptsBenefits", Model.AcceptsBenefits ?? false, new { @class = "form-check-input" })
+        <input type="checkbox" asp-for="AcceptsBenefits" class="form-check-input"/>
         <label asp-for="AcceptsBenefits" class="form-check-label">
             on Universal Credit or housing benefits?
         </label>
     </div>
     <div class="form-check">
-        @Html.CheckBox("AcceptsNotEET", Model.AcceptsNotInEET ?? false, new { @class = "form-check-input" })
+        <input type="checkbox" asp-for="AcceptsNotInEET" class="form-check-input"/>
         <label asp-for="AcceptsNotInEET" class="form-check-label">
             not in EET (Employment, Education, or Training)?
         </label>
     </div>
     <div class="form-check">
-        @Html.CheckBox("AcceptsWithoutGuarantor", Model.AcceptsWithoutGuarantor ?? false, new { @class = "form-check-input" })
+        <input type="checkbox" asp-for="AcceptsWithoutGuarantor" class="form-check-input"/>
         <label asp-for="AcceptsWithoutGuarantor" class="form-check-label">
             without a rent guarantor?
         </label>
     </div>
     <div class="form-check">
-        @Html.CheckBox("AcceptsOver35", Model.AcceptsUnder35 ?? false, new { @class = "form-check-input" })
+        <input type="checkbox" asp-for="AcceptsUnder35" class="form-check-input"/>
         <label asp-for="AcceptsUnder35" class="form-check-label">
             that are under 35?
         </label>
