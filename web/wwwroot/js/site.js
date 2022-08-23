@@ -17,7 +17,6 @@ function checkIfSelectedValueIsTarget(target, id) {
     }
 }
 
-
 function makeRequiredIfSelectedValueIsTarget(target, id, idToRequire) {
     if ($("#" + id + " :selected").val() == target) {
         $("#" + idToRequire).prop('required', true);
