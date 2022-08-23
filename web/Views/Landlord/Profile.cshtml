@@ -20,7 +20,7 @@
         <div class="mb-4">
             <div class="d-flex">
                 <h3 class="font-h3 d-inline-block">Personal details</h3>
-                <a class="bi bi-pencil ms-auto" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(0);"></a>
+                <a href="#" class="bi bi-pencil ms-auto" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(0);"></a>
             </div>
             <table class="table">
                 <tr>
@@ -37,7 +37,7 @@
         <div class="mb-4">
             <div class="d-flex">
                 <h3 class="font-h3 d-inline-block">Address</h3>
-                <a class="bi bi-pencil ms-auto" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(1);"></a>
+                <a href="#" class="bi bi-pencil ms-auto" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(1);"></a>
             </div>
             <table class="table">
                 <tr>
@@ -70,7 +70,7 @@
         <div class="mb-4">
             <div class="d-flex">
                 <h3 class="font-h3 d-inline-block">Contact</h3>
-                <a class="bi bi-pencil ms-auto" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(1);"></a>
+                <a href="#" class="bi bi-pencil ms-auto" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(1);"></a>
             </div>
             <table class="table">
                 <tr>
@@ -87,7 +87,7 @@
         <div class="mb-4">
             <div class="d-flex">
                 <h3 class="font-h3 d-inline-block">Type</h3>
-                <a class="bi bi-pencil ms-auto" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(2);"></a>
+                <a href="#" class="bi bi-pencil ms-auto" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(2);"></a>
             </div>
             <table class="table">
                 <tr>
@@ -104,7 +104,7 @@
         <div class="mb-4">
             <div class="d-flex">
                 <h3 class="font-h3 d-inline-block">Charter</h3>
-                <a class="bi bi-pencil ms-auto" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(2);"></a>
+                <a href="#" class="bi bi-pencil ms-auto" onclick="location.href='@Url.Action("EditProfilePage", "Landlord", new { landlordId = Model.LandlordId })'; setCurrentTab(2);"></a>
             </div>
             <table class="table">
                 <tr>
@@ -133,11 +133,11 @@
 
 @if (Model.NumOfProperties > 0)
 {
-    <a class="btn btn-primary my-3" href='@Url.Action("ViewProperties", "Landlord", new { id = Model.LandlordId })'>View Properties</a>
+    <a class="btn btn-primary my-3" href='@Url.Action("ViewProperties", "Landlord", new { id = Model.LandlordId })'>View properties</a>
 }
 else
 {
-    <a class="btn btn-primary my-3" href='@Url.Action("PropertyInputStepOnePostcode", "Property", new { landlordId = Model.LandlordId, propertyId = 0, operationType = "add" })'>Add Properties</a>
+    <a class="btn btn-primary my-3" href='@Url.Action("PropertyInputStepOnePostcode", "Property", new { landlordId = Model.LandlordId, propertyId = 0, operationType = "add" })'>Add properties</a>
 }
 
 @if (User.IsInRole("Admin"))
