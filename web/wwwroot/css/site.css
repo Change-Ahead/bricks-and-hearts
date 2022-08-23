@@ -298,15 +298,6 @@ input.invalid, select.invalid {
 
 /*End of javascript form styling*/
 
-.tables {
-    display: inline-block;
-    clear: both;
-}
-
-.tables .table {
-    width: 100%;
-}
-
 .hidden-button {
     display: none;
 }
