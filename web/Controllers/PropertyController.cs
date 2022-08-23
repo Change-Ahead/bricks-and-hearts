@@ -264,8 +264,10 @@ public class PropertyController : AbstractController
         [FromRoute] int propertyId, [FromRoute] string operationType)
     {
         const string nextActionName = "PropertyInputStepThreeDetails";
+        const string currentActionName = "PropertyInputStepTwoAddress";
 
-        return await StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName);
+        return await StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName,
+            currentActionName);
     }
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -288,8 +290,10 @@ public class PropertyController : AbstractController
         [FromRoute] string operationType)
     {
         const string nextActionName = "PropertyInputStepFourDescription";
+        const string currentActionName = "PropertyInputStepThreeDetails";
 
-        return await StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName);
+        return await StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName,
+            currentActionName);
     }
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -311,8 +315,10 @@ public class PropertyController : AbstractController
         [FromRoute] int propertyId, [FromRoute] string operationType)
     {
         const string nextActionName = "PropertyInputStepFiveTenantPreferences";
+        const string currentActionName = "PropertyInputStepFourDescription";
 
-        return await StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName);
+        return await StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName,
+            currentActionName);
     }
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -336,8 +342,10 @@ public class PropertyController : AbstractController
         [FromRoute] int propertyId, [FromRoute] string operationType)
     {
         const string nextActionName = "PropertyInputStepSixAvailability";
+        const string currentActionName = "PropertyInputStepFiveTenantPreferences";
 
-        return await StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName);
+        return await StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName,
+            currentActionName);
     }
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -409,11 +417,11 @@ public class PropertyController : AbstractController
     }
 
     private async Task<ActionResult> StandardPropertyInputPostMethod(PropertyInputModelBase model, int propertyId,
-        string operationType, string nextActionName)
+        string operationType, string nextActionName, string currentActionName)
     {
         if (!ModelState.IsValid)
         {
-            return RedirectToAction("PropertyInputStepTwoAddress", "Property",
+            return RedirectToAction(currentActionName, "Property",
                 new
                 {
                     propertyId,

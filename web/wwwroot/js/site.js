@@ -1,4 +1,4 @@
-function setCurrentTab(inputTab){
+function setCurrentTab(inputTab) {
     currentTab = inputTab
     localStorage.setItem("storedCurrentTab", currentTab);
 }
@@ -7,8 +7,8 @@ function setValue(elementId, value) {
     document.getElementById(elementId).value = value;
 }
 
-function checkIfSelectedValueIsTarget(target, id){
-    if ($("#"+id+" :selected").val() == target) {
+function checkIfSelectedValueIsTarget(target, id) {
+    if ($("#" + id + " :selected").val() == target) {
         $("#ifTrue").show();
         $("#ifFalse").hide();
     } else {
@@ -17,8 +17,16 @@ function checkIfSelectedValueIsTarget(target, id){
     }
 }
 
+function makeRequiredIfSelectedValueIsTarget(target, id, idToRequire) {
+    if ($("#" + id + " :selected").val() == target) {
+        $("#" + idToRequire).prop('required', true);
+    } else {
+        $("#" + idToRequire).removeAttr('required');
+    }
+}
+
 function insertDefaultPostcodeIfNotSortByLocation(id) {
-    if ($("#"+id+" :selected").val() == "Location") {
+    if ($("#" + id + " :selected").val() == "Location") {
         $("#target").val("");
     } else {
         $("#target").val("CB2 1LA");

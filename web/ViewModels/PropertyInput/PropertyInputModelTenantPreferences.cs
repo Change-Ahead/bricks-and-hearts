@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
 namespace BricksAndHearts.ViewModels.PropertyInput;
 
-public class PropertyInputModelTenantPreferences : PropertyInputModelBase
+public class PropertyInputModelTenantPreferences : PropertyInputModelBase, IValidatableObject
 {
     [Required]
     public bool? AcceptsSingleTenant { get; set; }
