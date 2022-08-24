@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
+using BricksAndHearts.Enums;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
@@ -98,7 +99,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         var result = await service.ApproveLandlord(1000, user, membershipId);
 
         // Assert
-        result.Should().Be(ILandlordService.ApproveLandlordResult.ErrorLandlordNotFound);
+        result.Should().Be(ApproveLandlordResult.ErrorLandlordNotFound);
     }
     
     [Fact]
@@ -114,7 +115,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         var result = await service.ApproveLandlord(1, user, membershipId);
 
         // Assert
-        result.Should().Be(ILandlordService.ApproveLandlordResult.ErrorAlreadyApproved);
+        result.Should().Be(ApproveLandlordResult.ErrorAlreadyApproved);
     }
 
     [Fact]
@@ -134,7 +135,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         context.ChangeTracker.Clear();
 
         // Assert
-        result.Should().Be(ILandlordService.ApproveLandlordResult.Success);
+        result.Should().Be(ApproveLandlordResult.Success);
         context.Landlords.Single(u => u.Id == 2).CharterApproved.Should().BeTrue();
         context.Landlords.Single(u => u.Id == 2).ApprovalTime.Should().BeCloseTo(DateTime.Now, 1.Seconds());
         context.Landlords.Single(u => u.Id == 2).ApprovalAdminId.Should().Be(user.Id);
@@ -152,7 +153,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         var result = await service.DisableOrEnableLandlord(1000, "disable");
 
         // Assert
-        result.Should().Be(ILandlordService.DisableOrEnableLandlordResult.ErrorLandlordNotFound);
+        result.Should().Be(DisableOrEnableLandlordResult.ErrorLandlordNotFound);
     }
     
     [Fact]
@@ -166,7 +167,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         var result = await service.DisableOrEnableLandlord(8, "disable");
 
         // Assert
-        result.Should().Be(ILandlordService.DisableOrEnableLandlordResult.ErrorAlreadyInState);
+        result.Should().Be(DisableOrEnableLandlordResult.ErrorAlreadyInState);
     }
     
     [Fact]
@@ -180,7 +181,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         var result = await service.DisableOrEnableLandlord(7, "enable");
 
         // Assert
-        result.Should().Be(ILandlordService.DisableOrEnableLandlordResult.ErrorAlreadyInState);
+        result.Should().Be(DisableOrEnableLandlordResult.ErrorAlreadyInState);
     }
 
     [Fact]
@@ -199,7 +200,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         context.ChangeTracker.Clear();
 
         // Assert
-        result.Should().Be(ILandlordService.DisableOrEnableLandlordResult.Success);
+        result.Should().Be(DisableOrEnableLandlordResult.Success);
         context.Landlords.Single(u => u.Id == 7).Disabled.Should().BeTrue();
     }
     
@@ -219,7 +220,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         context.ChangeTracker.Clear();
 
         // Assert
-        result.Should().Be(ILandlordService.DisableOrEnableLandlordResult.Success);
+        result.Should().Be(DisableOrEnableLandlordResult.Success);
         context.Landlords.Single(u => u.Id == 8).Disabled.Should().BeFalse();
     }
 
@@ -268,7 +269,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
 
         // Assert
         context.Landlords.Single(u => u.Id == 3).Email.Should().BeEquivalentTo("NewEmail@Boring.com");
-        result.Should().Be(ILandlordService.LandlordRegistrationResult.Success);
+        result.Should().Be(LandlordRegistrationResult.Success);
     }
 
     #region CheckForDuplicateEmail
@@ -370,7 +371,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         var result = await service.LinkExistingLandlordWithUser(inviteLink, nonAdminUser);
 
         // Assert
-        result.Should().Be(ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist);
+        result.Should().Be(LinkUserWithLandlordResult.ErrorLinkDoesNotExist);
     }
 
     [Fact]
@@ -404,7 +405,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         var result = await service.LinkExistingLandlordWithUser(inviteLink, user);
 
         // Assert
-        result.Should().Be(ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord);
+        result.Should().Be(LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord);
     }
 
     [Fact]
@@ -423,7 +424,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         // Assert
         context.ChangeTracker.Clear();
 
-        result.Should().Be(ILandlordService.ApproveLandlordResult.Success);
+        result.Should().Be(ApproveLandlordResult.Success);
 
         landlord = context.Landlords.Single(l => l.Email == "test.landlord2@gmail.com");
         landlord.CharterApproved.Should().BeTrue();
@@ -447,7 +448,7 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
         // Assert
         context.ChangeTracker.Clear();
 
-        result.Should().Be(ILandlordService.ApproveLandlordResult.ErrorDuplicateMembershipId);
+        result.Should().Be(ApproveLandlordResult.ErrorDuplicateMembershipId);
 
         landlord = context.Landlords.Single(l => l.Email == "test.landlord2@gmail.com");
         landlord.CharterApproved.Should().BeFalse();

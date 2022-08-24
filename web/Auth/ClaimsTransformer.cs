@@ -35,7 +35,7 @@ public class ClaimsTransformer : IClaimsTransformation
         var googlePhotoUrl = existingClaimsIdentity.Claims.First(c => c.Type == "urn:google:picture").Value;
 
         // Find the user in the DB
-        var databaseUser = await _context.Users.FirstOrDefaultAsync(u => u.GoogleAccountId == googleAccountId);
+        var databaseUser = await _context.Users.Include(u => u.Landlord).FirstOrDefaultAsync(u => u.GoogleAccountId == googleAccountId);
         if (databaseUser == null)
         {
             // If they don't exist yet, create them
@@ -51,11 +51,8 @@ public class ClaimsTransformer : IClaimsTransformation
         var claims = new List<Claim>(existingClaimsIdentity.Claims);
         // If they're an admin in the database, add the role to their claims
         if (databaseUser.IsAdmin) claims.Add(new Claim(ClaimTypes.Role, "Admin"));
-        if (databaseUser.LandlordId != null)
-        {
-            var userLandlord = _context.Landlords.FirstOrDefault(l => l.Id == databaseUser.LandlordId);
-            if (userLandlord != null && !userLandlord.Disabled){ claims.Add(new Claim(ClaimTypes.Role, "Landlord"));}
-        }
+        if (databaseUser.Landlord is { Disabled: false }) claims.Add(new Claim(ClaimTypes.Role, "Landlord"));
+      
         // Build and return our new user principal
         var newClaimsIdentity =
             new BricksAndHeartsUser(databaseUser, claims, existingClaimsIdentity.AuthenticationType);

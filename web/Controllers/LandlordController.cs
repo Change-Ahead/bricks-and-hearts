@@ -1,4 +1,5 @@
 ﻿using BricksAndHearts.Database;
+using BricksAndHearts.Enums;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -64,7 +65,7 @@ public class LandlordController : AbstractController
         }
 
         var user = CurrentUser;
-        ILandlordService.LandlordRegistrationResult result;
+        LandlordRegistrationResult result;
         LandlordDbModel? landlord;
 
         if (createModel.Unassigned == false)
@@ -82,7 +83,7 @@ public class LandlordController : AbstractController
 
         switch (result)
         {
-            case ILandlordService.LandlordRegistrationResult.Success:
+            case LandlordRegistrationResult.Success:
                 _logger.LogInformation("Successfully created landlord for user {UserId}", user.Id);
                 var msgBody = "A Landlord has just registered\n"
                               + "\n"
@@ -101,17 +102,17 @@ public class LandlordController : AbstractController
                 _mailService.TrySendMsgInBackground(msgBody, subject);
                 return RedirectToAction(nameof(Profile), "Landlord", new { landlord!.Id });
 
-            case ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered:
+            case LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered:
                 _logger.LogWarning("Email already registered {Email}", createModel.Email);
                 ModelState.AddModelError("Email", "Email already registered");
                 return View("Register", createModel);
 
-            case ILandlordService.LandlordRegistrationResult.ErrorLandlordMembershipIdAlreadyRegistered:
+            case LandlordRegistrationResult.ErrorLandlordMembershipIdAlreadyRegistered:
                 _logger.LogWarning("Membership Id already registered {MembershipId}", createModel.MembershipId);
                 ModelState.AddModelError("MembershipId", "Membership Id already registered");
                 return View("Register", createModel);
 
-            case ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord:
+            case LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord:
                 _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
                 AddFlashMessage("warning", "Already registered");
                 return RedirectToAction(nameof(MyProfile));
@@ -174,19 +175,19 @@ public class LandlordController : AbstractController
             flashMessageType;
         switch (result)
         {
-            case ILandlordService.ApproveLandlordResult.ErrorLandlordNotFound:
+            case ApproveLandlordResult.ErrorLandlordNotFound:
                 flashMessageBody = "Sorry, it appears that no landlord with this ID exists.";
                 flashMessageType = "warning";
                 break;
-            case ILandlordService.ApproveLandlordResult.ErrorAlreadyApproved:
+            case ApproveLandlordResult.ErrorAlreadyApproved:
                 flashMessageBody = "The charter for this landlord has already been approved.";
                 flashMessageType = "warning";
                 break;
-            case ILandlordService.ApproveLandlordResult.ErrorDuplicateMembershipId:
+            case ApproveLandlordResult.ErrorDuplicateMembershipId:
                 flashMessageBody = "This membership ID already exists for another user.";
                 flashMessageType = "warning";
                 break;
-            case ILandlordService.ApproveLandlordResult.Success:
+            case ApproveLandlordResult.Success:
                 flashMessageBody = "Successfully approved landlord charter.";
                 flashMessageType = "success";
                 break;
@@ -210,15 +211,15 @@ public class LandlordController : AbstractController
         string flashMessageBody, flashMessageType;
         switch (result)
         {
-            case ILandlordService.DisableOrEnableLandlordResult.ErrorLandlordNotFound:
+            case DisableOrEnableLandlordResult.ErrorLandlordNotFound:
                 flashMessageBody = "Sorry, it appears that no landlord with this ID exists.";
                 flashMessageType = "warning";
                 break;
-            case ILandlordService.DisableOrEnableLandlordResult.ErrorAlreadyInState:
+            case DisableOrEnableLandlordResult.ErrorAlreadyInState:
                 flashMessageBody = $"This landlord has already been {action}d.";
                 flashMessageType = "warning";
                 break;
-            case ILandlordService.DisableOrEnableLandlordResult.Success:
+            case DisableOrEnableLandlordResult.Success:
                 flashMessageBody = $"Successfully {action}d landlord.";
                 flashMessageType = "success";
                 break;
@@ -344,14 +345,14 @@ public class LandlordController : AbstractController
         var result = await _landlordService.LinkExistingLandlordWithUser(inviteLink, user);
         switch (result)
         {
-            case ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist:
+            case LinkUserWithLandlordResult.ErrorLinkDoesNotExist:
                 _logger.LogWarning("Invite Link {Link} does not work", inviteLink);
                 return RedirectToAction(nameof(Invite), new { inviteLink });
-            case ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord:
+            case LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord:
                 _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
                 AddFlashMessage("warning", $"User already registered with landlord (landlordId = {user.LandlordId})");
                 return RedirectToAction(nameof(MyProfile));
-            case ILandlordService.LinkUserWithLandlordResult.Success:
+            case LinkUserWithLandlordResult.Success:
                 _logger.LogInformation("Successfully registered landlord with user {UserId}", user.Id);
                 AddFlashMessage("success",
                     $"User {user.Id} successfully linked with landlord (landlordId = {user.LandlordId})");

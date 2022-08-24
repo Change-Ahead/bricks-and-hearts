@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BricksAndHearts.Database;
+using BricksAndHearts.Enums;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
@@ -39,7 +40,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         formResultModel.Address.AddressLine1 = "Test Road";
 
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel, unregisteredUser))
-            .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));
+            .Returns((LandlordRegistrationResult.Success, returnedLandlord));
 
         // Act
         var result = await UnderTest.RegisterPost(formResultModel) as RedirectToActionResult;
@@ -60,7 +61,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var landlordUser = CreateLandlordUser();
         var landlordProfile = new LandlordProfileModel { LandlordId = landlordUser.Id, MembershipId = "abc" };
         A.CallTo(() => LandlordService.ApproveLandlord(landlordUser.Id, adminUser, "abc"))
-            .Returns(ILandlordService.ApproveLandlordResult.Success);
+            .Returns(ApproveLandlordResult.Success);
 
         // Act
         await UnderTest.ApproveCharter(landlordProfile);
@@ -98,7 +99,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var landlordUser = CreateLandlordUser();
         var landlordProfile = new LandlordProfileModel { LandlordId = landlordUser.Id, MembershipId = "abc" };
         A.CallTo(() => LandlordService.DisableOrEnableLandlord(landlordUser.Id, action))
-            .Returns(ILandlordService.DisableOrEnableLandlordResult.Success);
+            .Returns(DisableOrEnableLandlordResult.Success);
 
         // Act
         var result = await UnderTest.DisableOrEnableLandlord(landlordProfile, action);
@@ -120,7 +121,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var landlordUser = CreateLandlordUser();
         var landlordProfile = new LandlordProfileModel { LandlordId = landlordUser.Id, MembershipId = "abc" };
         A.CallTo(() => LandlordService.DisableOrEnableLandlord(landlordUser.Id, action))
-            .Returns(ILandlordService.DisableOrEnableLandlordResult.ErrorLandlordNotFound);
+            .Returns(DisableOrEnableLandlordResult.ErrorLandlordNotFound);
 
         // Act
         var result = await UnderTest.DisableOrEnableLandlord(landlordProfile, action);
@@ -142,7 +143,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var landlordUser = CreateLandlordUser();
         var landlordProfile = new LandlordProfileModel { LandlordId = landlordUser.Id, MembershipId = "abc" };
         A.CallTo(() => LandlordService.DisableOrEnableLandlord(landlordUser.Id, action))
-            .Returns(ILandlordService.DisableOrEnableLandlordResult.ErrorAlreadyInState);
+            .Returns(DisableOrEnableLandlordResult.ErrorAlreadyInState);
 
         // Act
         var result = await UnderTest.DisableOrEnableLandlord(landlordProfile, action);
@@ -208,7 +209,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(false);
         A.CallTo(() => LandlordService.CheckForDuplicateMembershipId(landlordProfileModel)).Returns(false);
         A.CallTo(() => LandlordService.EditLandlordDetails(landlordProfileModel))
-            .Returns(ILandlordService.LandlordRegistrationResult.Success);
+            .Returns(LandlordRegistrationResult.Success);
 
         // Act
         var result = await UnderTest.EditProfileUpdate(landlordProfileModel);
@@ -339,7 +340,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var landlordUser = CreateLandlordUser();
         const string inviteLink = "11111";
         A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink, landlordUser))
-            .Returns(ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist);
+            .Returns(LinkUserWithLandlordResult.ErrorLinkDoesNotExist);
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         // Act
@@ -360,7 +361,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         const string inviteLink = "11111";
 
         A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink, landlordUser))
-            .Returns(ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord);
+            .Returns(LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord);
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         // Act
@@ -380,7 +381,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         const string inviteLink = "11111";
 
         A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink, nonLandlordUser))
-            .Returns(ILandlordService.LinkUserWithLandlordResult.Success);
+            .Returns(LinkUserWithLandlordResult.Success);
         MakeUserPrincipalInController(nonLandlordUser, UnderTest);
 
         // Act

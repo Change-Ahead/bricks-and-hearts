@@ -1,6 +1,7 @@
 ﻿using System.Data;
 using BricksAndHearts.Auth;
 using BricksAndHearts.Database;
+using BricksAndHearts.Enums;
 using BricksAndHearts.ViewModels;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,36 +9,6 @@ namespace BricksAndHearts.Services;
 
 public interface ILandlordService
 {
-    public enum LandlordRegistrationResult
-    {
-        ErrorLandlordMembershipIdAlreadyRegistered,
-        ErrorLandlordEmailAlreadyRegistered,
-        ErrorUserAlreadyHasLandlordRecord,
-        Success
-    }
-
-    public enum LinkUserWithLandlordResult
-    {
-        ErrorLinkDoesNotExist,
-        ErrorUserAlreadyHasLandlordRecord,
-        Success
-    }
-
-    public enum ApproveLandlordResult
-    {
-        ErrorLandlordNotFound,
-        ErrorAlreadyApproved,
-        ErrorDuplicateMembershipId,
-        Success
-    }
-    
-    public enum DisableOrEnableLandlordResult
-    {
-        ErrorLandlordNotFound,
-        ErrorAlreadyInState,
-        Success
-    }
-
     public Task<(LandlordRegistrationResult result, LandlordDbModel? dbModel)> RegisterLandlord(
         LandlordProfileModel createModel,
         BricksAndHeartsUser user);
@@ -74,7 +45,7 @@ public class LandlordService : ILandlordService
         _dbContext = dbContext;
     }
 
-    public async Task<(ILandlordService.LandlordRegistrationResult result, LandlordDbModel? dbModel)> RegisterLandlord(
+    public async Task<(LandlordRegistrationResult result, LandlordDbModel? dbModel)> RegisterLandlord(
         LandlordProfileModel createModel,
         BricksAndHeartsUser user)
     {
@@ -103,7 +74,7 @@ public class LandlordService : ILandlordService
             // This requires Serializable isolation, otherwise it will not lock any rows, and two racing registrations could create duplicate records
             if (await _dbContext.Landlords.AnyAsync(l => l.Email == createModel.Email))
             {
-                return (ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered, null);
+                return (LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered, null);
             }
 
             // If the landlord has a membershipId, check there isn't already a Landlord with that membershipId.
@@ -111,7 +82,7 @@ public class LandlordService : ILandlordService
             {
                 if (await _dbContext.Landlords.AnyAsync(l => l.MembershipId == dbModel.MembershipId))
                 {
-                    return (ILandlordService.LandlordRegistrationResult.ErrorLandlordMembershipIdAlreadyRegistered,
+                    return (LandlordRegistrationResult.ErrorLandlordMembershipIdAlreadyRegistered,
                         null);
                 }
             }
@@ -120,7 +91,7 @@ public class LandlordService : ILandlordService
             var userRecord = _dbContext.Users.Single(u => u.Id == user.Id);
             if (userRecord.LandlordId != null)
             {
-                return (ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord, null);
+                return (LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord, null);
             }
 
             // Insert the landlord and call SaveChanges
@@ -135,7 +106,7 @@ public class LandlordService : ILandlordService
 
         user.LandlordId = dbModel.Id;
 
-        return (ILandlordService.LandlordRegistrationResult.Success, dbModel);
+        return (LandlordRegistrationResult.Success, dbModel);
     }
 
     public Task<LandlordDbModel?> GetLandlordIfExistsFromId(int? id)
@@ -148,7 +119,7 @@ public class LandlordService : ILandlordService
         return _dbContext.Landlords.Include(l => l.Properties).SingleOrDefaultAsync(l => l.Id == id);
     }
 
-    public async Task<(ILandlordService.LandlordRegistrationResult result, LandlordDbModel? landlord)> RegisterLandlord(
+    public async Task<(LandlordRegistrationResult result, LandlordDbModel? landlord)> RegisterLandlord(
         LandlordProfileModel createModel)
     {
         var dbModel = new LandlordDbModel
@@ -176,7 +147,7 @@ public class LandlordService : ILandlordService
             // This requires Serializable isolation, otherwise it will not lock any rows, and two racing registrations could create duplicate records
             if (await _dbContext.Landlords.AnyAsync(l => l.Email == createModel.Email))
             {
-                return (ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered, null);
+                return (LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered, null);
             }
 
             // If the landlord has a membershipId, check there isn't already a Landlord with that membershipId.
@@ -184,7 +155,7 @@ public class LandlordService : ILandlordService
             {
                 if (await _dbContext.Landlords.AnyAsync(l => l.MembershipId == dbModel.MembershipId))
                 {
-                    return (ILandlordService.LandlordRegistrationResult.ErrorLandlordMembershipIdAlreadyRegistered,
+                    return (LandlordRegistrationResult.ErrorLandlordMembershipIdAlreadyRegistered,
                         null);
                 }
             }
@@ -196,27 +167,27 @@ public class LandlordService : ILandlordService
             await transaction.CommitAsync();
         }
 
-        return (ILandlordService.LandlordRegistrationResult.Success, dbModel);
+        return (LandlordRegistrationResult.Success, dbModel);
     }
 
-    public async Task<ILandlordService.ApproveLandlordResult> ApproveLandlord(int landlordId, BricksAndHeartsUser user,
+    public async Task<ApproveLandlordResult> ApproveLandlord(int landlordId, BricksAndHeartsUser user,
         string membershipId)
     {
         var landlord = await GetLandlordIfExistsFromId(landlordId);
         if (landlord is null)
         {
-            return ILandlordService.ApproveLandlordResult.ErrorLandlordNotFound;
+            return ApproveLandlordResult.ErrorLandlordNotFound;
         }
 
         if (landlord.CharterApproved)
         {
-            return ILandlordService.ApproveLandlordResult.ErrorAlreadyApproved;
+            return ApproveLandlordResult.ErrorAlreadyApproved;
         }
 
         if (CheckForDuplicateMembershipId(new LandlordProfileModel
                 { LandlordId = landlordId, MembershipId = membershipId }))
         {
-            return ILandlordService.ApproveLandlordResult.ErrorDuplicateMembershipId;
+            return ApproveLandlordResult.ErrorDuplicateMembershipId;
         }
 
         landlord.CharterApproved = true;
@@ -225,7 +196,7 @@ public class LandlordService : ILandlordService
         landlord.MembershipId = membershipId;
 
         await _dbContext.SaveChangesAsync();
-        return ILandlordService.ApproveLandlordResult.Success;
+        return ApproveLandlordResult.Success;
     }
 
     public async Task UnapproveLandlord(int landlordId)
@@ -239,33 +210,29 @@ public class LandlordService : ILandlordService
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task<ILandlordService.DisableOrEnableLandlordResult> DisableOrEnableLandlord(int landlordId, string action)
+    public async Task<DisableOrEnableLandlordResult> DisableOrEnableLandlord(int landlordId, string action)
     {
         var landlord = await GetLandlordIfExistsFromId(landlordId);
         if (landlord is null)
         {
-            return ILandlordService.DisableOrEnableLandlordResult.ErrorLandlordNotFound;
-        }
-
-        if (action == "disable")
-        {
-            if (landlord.Disabled)
-            {
-                return ILandlordService.DisableOrEnableLandlordResult.ErrorAlreadyInState;
-            }
-            landlord.Disabled = true;
-        }
-        else
-        {
-            if (!landlord.Disabled)
-            {
-                return ILandlordService.DisableOrEnableLandlordResult.ErrorAlreadyInState;
-            }
-            landlord.Disabled = false;
+            return DisableOrEnableLandlordResult.ErrorLandlordNotFound;
         }
         
+        if ((action == "disable" && landlord.Disabled)
+            || (action == "enable" && !landlord.Disabled))
+        {
+            return DisableOrEnableLandlordResult.ErrorAlreadyInState;
+        }
+        
+        landlord.Disabled = action switch
+        {
+            "disable" => true,
+            "enable" => false,
+            _ => landlord.Disabled
+        };
+
         await _dbContext.SaveChangesAsync();
-        return ILandlordService.DisableOrEnableLandlordResult.Success;
+        return DisableOrEnableLandlordResult.Success;
     }
 
     public LandlordDbModel? FindLandlordWithInviteLink(string inviteLink)
@@ -274,7 +241,7 @@ public class LandlordService : ILandlordService
     }
 
 
-    public async Task<ILandlordService.LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel)
+    public async Task<LandlordRegistrationResult> EditLandlordDetails(LandlordProfileModel editModel)
     {
         var landlordToEdit = await _dbContext.Landlords.SingleAsync(l => l.Id == editModel.LandlordId);
         landlordToEdit.Title = editModel.Title == "Other" ? editModel.TitleInput! : editModel.Title;
@@ -294,7 +261,7 @@ public class LandlordService : ILandlordService
         landlordToEdit.Postcode = editModel.Address.Postcode!;
 
         await _dbContext.SaveChangesAsync();
-        return ILandlordService.LandlordRegistrationResult.Success;
+        return LandlordRegistrationResult.Success;
     }
 
     public bool CheckForDuplicateEmail(LandlordProfileModel editModel)
@@ -317,7 +284,7 @@ public class LandlordService : ILandlordService
     }
 
     // Link existing landlord with user
-    public async Task<ILandlordService.LinkUserWithLandlordResult> LinkExistingLandlordWithUser(
+    public async Task<LinkUserWithLandlordResult> LinkExistingLandlordWithUser(
         string inviteLink,
         BricksAndHeartsUser user)
     {
@@ -330,14 +297,14 @@ public class LandlordService : ILandlordService
             var landlord = _dbContext.Landlords.SingleOrDefault(l => l.InviteLink == inviteLink);
             if (landlord == null)
             {
-                return ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist;
+                return LinkUserWithLandlordResult.ErrorLinkDoesNotExist;
             }
 
             // Check the user doesn't already have a landlord associated
             var userRecord = _dbContext.Users.Single(u => u.Id == user.Id);
             if (userRecord.LandlordId != null)
             {
-                return ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord;
+                return LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord;
             }
 
             // Disable invite link
@@ -353,7 +320,7 @@ public class LandlordService : ILandlordService
             user.LandlordId = landlord.Id; // Update the in memory user object
         }
 
-        return ILandlordService.LinkUserWithLandlordResult.Success;
+        return LinkUserWithLandlordResult.Success;
     }
 
     public Task<LandlordDbModel> GetLandlordFromId(int id)
