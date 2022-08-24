@@ -201,14 +201,15 @@ public class LandlordController : AbstractController
         AddFlashMessage(flashMessageType, flashMessageBody);
         return RedirectToAction(nameof(Profile), "Landlord", new { Id = landlord.LandlordId.Value });
     }
-    
+
     [Authorize(Roles = "Admin")]
     [HttpPost("{id:int}/{action}")]
-    public async Task<ActionResult> DisableOrEnableLandlord(LandlordProfileModel landlord, string action)
+    public async Task<ActionResult> DisableOrEnableLandlord(int landlordId, string action)
     {
-        var result = await _landlordService.DisableOrEnableLandlord(landlord.LandlordId!.Value, action);
+        var result = await _landlordService.DisableOrEnableLandlord(landlordId, action);
 
-        string flashMessageBody, flashMessageType;
+        string flashMessageBody,
+            flashMessageType;
         switch (result)
         {
             case DisableOrEnableLandlordResult.ErrorLandlordNotFound:
@@ -231,13 +232,11 @@ public class LandlordController : AbstractController
 
         _logger.LogInformation(flashMessageBody);
         AddFlashMessage(flashMessageType, flashMessageBody);
-        return RedirectToAction("Profile", "Landlord", new { Id = landlord.LandlordId.Value });
+        return RedirectToAction("Profile", "Landlord", new { Id = landlordId });
     }
 
     [Authorize(Roles = "Admin, Landlord")]
-    [HttpGet]
-    [Route("me/properties")]
-    [Route("{id:int}/properties")]
+    [HttpGet("{id:int}/properties")]
     public async Task<IActionResult> ViewProperties(int? id = null, int page = 1, int propPerPage = 10)
     {
         if (id == null)
@@ -270,6 +269,19 @@ public class LandlordController : AbstractController
         TempData["FullWidthPage"] = true;
         return View("Properties",
             new PropertyListModel(propertyDetailsModels, properties.Count, landlordProfile, page));
+    }
+
+    [Authorize(Roles = "Landlord")]
+    [HttpGet("me/properties")]
+    public async Task<IActionResult> ViewMyProperties(int page = 1, int propPerPage = 10)
+    {
+        var id = CurrentUser.LandlordId;
+        if (id == null)
+        {
+            return StatusCode(404);
+        }
+
+        return await ViewProperties(id, page, propPerPage);
     }
 
     [Authorize(Roles = "Admin, Landlord")]
@@ -333,7 +345,7 @@ public class LandlordController : AbstractController
         return RedirectToAction(nameof(Profile), new { id = editModel.LandlordId });
     }
 
-    [HttpGet("/invite/{inviteLink}")]
+    [HttpGet("invite/{inviteLink}")]
     public ActionResult Invite(string inviteLink)
     {
         InviteViewModel model = new();
@@ -348,7 +360,7 @@ public class LandlordController : AbstractController
         return View(model);
     }
 
-    [HttpPost("/invite/{inviteLink}/accept")]
+    [HttpPost("invite/{inviteLink}/accept")]
     public async Task<IActionResult> TieUserWithLandlord(string inviteLink)
     {
         var user = CurrentUser;

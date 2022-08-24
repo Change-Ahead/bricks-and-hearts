@@ -38,20 +38,20 @@
                         {
                             <h6 class="font-body">View your properties</h6>
                             <div>
-                                <a class="btn btn-primary btn-lg mt-3 align-middle" href='@Url.Action("ViewProperties", "Landlord", new { id = Model.CurrentLandlord.LandlordId })'>View Properties</a>
+                                <a class="btn btn-primary btn-lg mt-3 align-middle" href='@Url.Action("ViewMyProperties", "Landlord")'>View properties</a>
                             </div>
                         }
                         else
                         {
-                            <h6 class="font-body">Start adding your properties to the portal, to get matches</h6>
+                            <h6 class="font-body">Start adding your properties to the portal to get matches</h6>
                             <div>
-                                <a class="btn btn-primary btn-lg mt-3 align-middle" href='@Url.Action("PropertyInputStepOnePostcode", "Property", new { landlordId = Model.CurrentLandlord.LandlordId, propertyId = 0, operationType = "add" })'>Add Properties</a>
+                                <a class="btn btn-primary btn-lg mt-3 align-middle" href='@Url.Action("PropertyInputStepOnePostcode", "Property", new { landlordId = Model.CurrentLandlord.LandlordId, propertyId = 0, operationType = "add" })'>Add properties</a>
                             </div>
                         }
                         @if (!Model.CurrentLandlord.CharterApproved)
                         {
                             <p class="font-subtitle font-orange mt-1">
-                                * Your properties won't go live until the ChangeAhead charter signup has been approved by the ChangeAhead admins. You can still add and update draft properties before then.
+                                * Your properties won't go live until the Change Ahead charter signup has been approved by the Change Ahead admins. You can still add and update draft properties before then.
                             </p>
                         }
                     </div>
@@ -64,31 +64,31 @@
                {
                    IconName = Model.CurrentLandlord.CharterApproved ? "bi-check" : "bi-x",
                    Stat = Model.CurrentLandlord.CharterApproved ? "Approved" : "Not Approved",
-                   StatDescription = "Charter Approval State"
+                   StatDescription = "Charter approval state"
                }); }
             @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
                {
                    IconName = "bi-house",
                    Stat = Model.PropertyTypeCount!.RegisteredProperties.ToString(),
-                   StatDescription = "Total Properties"
+                   StatDescription = "Total properties"
                }); }
             @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
                {
                    IconName = "bi-house-door",
                    Stat = Model.PropertyTypeCount.AvailableProperties.ToString(),
-                   StatDescription = "Available Properties"
+                   StatDescription = "Available properties"
                }); }
             @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
                {
                    IconName = "bi-house-heart",
                    Stat = Model.PropertyTypeCount.LiveProperties.ToString(),
-                   StatDescription = "Live Properties"
+                   StatDescription = "Live properties"
                }); }
         </div>
         <div class="col">
             <div class="d-flex">
                 <h6 class="flex-row flex-grow-1 font-h3">My Properties</h6>
-                <a class="flex-row-reverse font-body font-blue" href='@Url.Action("ViewProperties", "Landlord", new { id = Model.CurrentLandlord.LandlordId })'>View All</a>
+                <a class="flex-row-reverse font-body font-blue" href='@Url.Action("ViewMyProperties", "Landlord")'>View all</a>
             </div>
             @foreach (var property in Model.Properties!)
             {
