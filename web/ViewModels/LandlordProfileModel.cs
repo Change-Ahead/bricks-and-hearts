@@ -14,6 +14,8 @@ public class LandlordProfileModel
     [DisplayName("Title")]
     public string Title { get; set; } = string.Empty;
 
+    public static readonly string[] KnownTitles = { "Mr", "Mrs", "Miss", "Ms", "Dr", "Prof" };
+
     public string? TitleInput { get; set; }
 
     [Required]
@@ -62,10 +64,9 @@ public class LandlordProfileModel
 
     public static LandlordProfileModel FromDbModel(LandlordDbModel landlord)
     {
-        return new LandlordProfileModel
+        var profileModel = new LandlordProfileModel
         {
             LandlordId = landlord.Id,
-
             Title = landlord.Title,
             FirstName = landlord.FirstName,
             LastName = landlord.LastName,
@@ -89,5 +90,17 @@ public class LandlordProfileModel
                 Postcode = landlord.Postcode
             }
         };
+
+        if (KnownTitles.Contains(landlord.Title))
+        {
+            profileModel.Title = landlord.Title;
+        }
+        else
+        {
+            profileModel.Title = "Other";
+            profileModel.TitleInput = landlord.Title;
+        }
+
+        return profileModel;
     }
 }
