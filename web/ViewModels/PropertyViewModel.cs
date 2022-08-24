@@ -81,7 +81,7 @@ public class PropertyViewModel : IValidatableObject
 
     public static PropertyViewModel FromDbModel(PropertyDbModel property)
     {
-        return new PropertyViewModel
+        var propertyViewModel = new PropertyViewModel
         {
             PropertyId = property.Id,
             LandlordId = property.LandlordId,
@@ -114,11 +114,18 @@ public class PropertyViewModel : IValidatableObject
                 AcceptsUnder35 = property.AcceptsUnder35,
                 AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor
             },
-            Availability = property.Availability,
-            AvailableFrom = property.AvailableFrom,
             TotalUnits = property.TotalUnits,
             OccupiedUnits = property.OccupiedUnits,
             PublicViewLink = property.PublicViewLink
         };
+
+        propertyViewModel.Availability =
+            property.Availability == AvailabilityState.Available && property.AvailableFrom > DateTime.Now
+                ? AvailabilityState.AvailableSoon
+                : property.Availability;
+        propertyViewModel.AvailableFrom =
+            propertyViewModel.Availability == AvailabilityState.AvailableSoon ? property.AvailableFrom : null;
+        
+        return propertyViewModel;
     }
 }

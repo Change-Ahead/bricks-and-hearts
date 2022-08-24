@@ -68,14 +68,23 @@ public class PropertyService : IPropertyService
             AcceptsWithoutGuarantor = createModel.LandlordRequirements.AcceptsWithoutGuarantor,
 
             Rent = createModel.Rent,
-
-            Availability = createModel.Availability ?? AvailabilityState.Draft,
+            
             TotalUnits = createModel.TotalUnits ?? 1,
             OccupiedUnits = createModel.OccupiedUnits ?? 0,
-            AvailableFrom = createModel.Availability == AvailabilityState.AvailableSoon
-                ? createModel.AvailableFrom
-                : null
+            
         };
+
+        if (createModel.Availability == AvailabilityState.AvailableSoon)
+        {
+            dbModel.Availability = AvailabilityState.Available;
+        }
+        else
+        {
+            dbModel.Availability = createModel.Availability ?? AvailabilityState.Draft;
+        }
+        dbModel.AvailableFrom = dbModel.Availability == AvailabilityState.Available
+            ? createModel.Availability == AvailabilityState.AvailableSoon ? createModel.AvailableFrom : DateTime.Now
+            : null;
 
         // Add the new property to the database
         _dbContext.Properties.Add(dbModel);
@@ -129,19 +138,17 @@ public class PropertyService : IPropertyService
             ? AvailabilityState.Occupied
             : updateModel.Availability ?? dbModel.Availability;
 
-        if (dbModel.Availability == AvailabilityState.AvailableSoon)
+        if (updateModel.Availability == AvailabilityState.AvailableSoon)
         {
-            if (updateModel.Availability == AvailabilityState.AvailableSoon)
-            {
-                // If update succeeds in making the property "available soon", then use its from date
-                dbModel.AvailableFrom = updateModel.AvailableFrom;
-            }
+            dbModel.Availability = AvailabilityState.Available;
         }
         else
         {
-            // If we're not "available soon" then don't have a from date
-            dbModel.AvailableFrom = null;
+            dbModel.Availability = updateModel.Availability ?? AvailabilityState.Draft;
         }
+        dbModel.AvailableFrom = dbModel.Availability == AvailabilityState.Available
+            ? updateModel.Availability == AvailabilityState.AvailableSoon? updateModel.AvailableFrom : DateTime.Now
+            : null;
 
         dbModel.IsIncomplete = isIncomplete;
         await _dbContext.SaveChangesAsync();

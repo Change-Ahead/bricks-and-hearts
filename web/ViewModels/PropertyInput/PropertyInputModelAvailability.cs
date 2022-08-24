@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using BricksAndHearts.Database;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
@@ -51,8 +51,12 @@ public class PropertyInputModelAvailability : PropertyInputModelBase, IValidatab
         Step = 6;
         Title = "Rent, Deposits, Availability, and Duration";
         Rent = property.Rent;
-        Availability = property.Availability;
-        AvailableFrom = property.AvailableFrom;
+        Availability =
+            property.Availability == AvailabilityState.Available && property.AvailableFrom > DateTime.Now
+                ? AvailabilityState.AvailableSoon
+                : property.Availability;
+        AvailableFrom =
+            Availability == AvailabilityState.AvailableSoon ? property.AvailableFrom : null;
         TotalUnits = property.TotalUnits;
         OccupiedUnits = property.OccupiedUnits;
     }
