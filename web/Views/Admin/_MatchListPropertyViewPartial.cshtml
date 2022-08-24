@@ -11,7 +11,7 @@
     }
 }
 
-<div class="border border-primary rounded mb-3 p-2 statBox">
+<div class="border border-primary rounded mb-3 p-4 statBox">
     <div class="row">
         <div class="col">
             <div class="row property-img-row w-100">
@@ -30,8 +30,8 @@
                         </div>
                         <div class="col">
                             <h1 class="font-blue font-h1">@Model.CurrentLandlord.FirstName</h1>
-                            <p class="font-subtitle font-blue">@Model.CurrentLandlord.LandlordType</p>
-                            <p class="font-subtitle">@Model.CurrentLandlord.NumOfProperties current properties</p>
+                            <h2 class="font-subtitle font-blue">@Model.CurrentLandlord.LandlordType</h2>
+                            <h2 class="font-subtitle">@Model.CurrentLandlord.NumOfProperties current properties</h2>
                         </div>
                     </div>
                 </div>
@@ -47,7 +47,7 @@
                     }
                     else
                     {
-                        <p class="flex-row"><i class="bi bi-x"></i>Not yet available</p>
+                        <p class="flex-row flex-grow-1"><i class="bi bi-x"></i>Not yet available</p>
                     }
                     <div class="flex-row-reverse">
                         <p><i class="bi bi-geo-alt"></i>@Model.Property.Address.County, @Model.Property.Address.Postcode</p>
@@ -55,28 +55,14 @@
                 </div>
             </div>
             <div class="row m-0">
-                <div class="card custom-card flex-grow-1 mt-2">
-                    <div class="card-body">
-                        <div class="col">
-                            <p class="font-smallBody">Type</p>
-                            <h2 class="font-h2">@Model.Property.PropertyType</h2>
-                        </div>
-                        <div class="col">
-                            <p class="font-smallBody">Bedrooms</p>
-                            <h2 class="font-h2">@Model.Property.NumOfBedrooms</h2>
-                        </div>
-                        <div class="col">
-                            <p class="font-smallBody">Rent</p>
-                            <h2 class="font-h2">@Model.Property.Rent</h2>
-                        </div>
-                    </div>
-                </div>
+                <partial name="~/Views/Property/Details/_Details.cshtml" model="@Model.Property"/>
             </div>
             <div class="row">
                 <div class="col">
                     <div class="card custom-card flex-grow-1 mt-2">
                         <div class="card-body">
-                            @Model.Property.Description
+                            <p class="collapse property-description font-smallBody" id="descriptionCollapse">@(@Model.Property.Description ?? "Missing description")</p>
+                            <a class="collapsed font-smallBody" role="button" data-bs-toggle="collapse" href="#descriptionCollapse"></a>
                         </div>
                     </div>
                 </div>
