@@ -131,10 +131,21 @@ public class PropertyController : AbstractController
             properties = await _propertyService.GetPropertyList(sortBy, target, page, propPerPage);
         }
 
-        var listOfProperties = properties.PropertyList.Select(PropertyViewModel.FromDbModel).ToList();
+        var propertyViewModels = properties.PropertyList.Select(PropertyViewModel.FromDbModel);
+        var propertyDetailsModels = new List<PropertyDetailsViewModel>();
+
+        foreach (var property in propertyViewModels)
+        {
+            var owner = LandlordProfileModel.FromDbModel(_propertyService.GetPropertyOwner(property.PropertyId));
+            var fileNames = await _azureStorage.ListFileNames("property", property.PropertyId);
+            var imageFiles = GetFilesFromFileNames(fileNames, property.PropertyId);
+            propertyDetailsModels.Add(new PropertyDetailsViewModel
+                { Property = property, Images = imageFiles, Owner = owner });
+        }
+
         TempData["FullWidthPage"] = true;
         return View("~/Views/Admin/PropertyList.cshtml",
-            new PropertyListModel(listOfProperties, properties.Count, null!, page, sortBy, target));
+            new PropertyListModel(propertyDetailsModels, properties.Count, null!, page, sortBy, target));
     }
 
     [Authorize(Roles = "Admin")]

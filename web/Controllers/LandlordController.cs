@@ -87,11 +87,16 @@ public class LandlordController : AbstractController
                 var msgBody = "A Landlord has just registered\n"
                               + "\n"
                               + $"Title: {createModel.Title}\n"
-                              + $"First Name: {createModel.FirstName}" + "\n"
-                              + $"Last Name: {createModel.LastName}" + "\n"
-                              + $"Company Name: {createModel.CompanyName}" + "\n"
-                              + $"Email: {createModel.Email}" + "\n"
-                              + $"Phone: {createModel.Phone}" + "\n";
+                              + $"First Name: {createModel.FirstName}"
+                              + "\n"
+                              + $"Last Name: {createModel.LastName}"
+                              + "\n"
+                              + $"Company Name: {createModel.CompanyName}"
+                              + "\n"
+                              + $"Email: {createModel.Email}"
+                              + "\n"
+                              + $"Phone: {createModel.Phone}"
+                              + "\n";
                 var subject = "Bricks&Hearts - landlord registration notification";
                 _mailService.TrySendMsgInBackground(msgBody, subject);
                 return RedirectToAction("Profile", "Landlord", new { landlord!.Id });
@@ -212,13 +217,23 @@ public class LandlordController : AbstractController
             return StatusCode(403);
         }
 
-        var properties = await _propertyService.GetPropertiesByLandlord(id.Value, page, propPerPage);
-        var listOfProperties = properties.PropertyList.Select(PropertyViewModel.FromDbModel).ToList();
         var landlordProfile = LandlordProfileModel.FromDbModel(await _landlordService.GetLandlordFromId((int)id));
+
+        var properties = await _propertyService.GetPropertiesByLandlord(id.Value, page, propPerPage);
+        var propertyViewModels = properties.PropertyList.Select(PropertyViewModel.FromDbModel);
+        var propertyDetailsModels = new List<PropertyDetailsViewModel>();
+
+        foreach (var property in propertyViewModels)
+        {
+            var fileNames = await _azureStorage.ListFileNames("property", property.PropertyId);
+            var imageFiles = GetFilesFromFileNames(fileNames, property.PropertyId);
+            propertyDetailsModels.Add(new PropertyDetailsViewModel
+                { Property = property, Images = imageFiles, Owner = landlordProfile });
+        }
 
         TempData["FullWidthPage"] = true;
         return View("Properties",
-            new PropertyListModel(listOfProperties, properties.Count, landlordProfile, page));
+            new PropertyListModel(propertyDetailsModels, properties.Count, landlordProfile, page));
     }
 
     [HttpGet("{landlordId:int}/edit")]

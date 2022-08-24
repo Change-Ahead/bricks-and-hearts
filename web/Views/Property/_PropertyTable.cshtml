@@ -28,8 +28,9 @@
         </tr>
         </thead>
         <tbody>
-        @foreach (var prop in Model.Properties)
+        @foreach (var propertyDetails in Model.Properties)
         {
+            var prop = propertyDetails.Property;
             <tr>
                 <td class="text-nowrap">
                     <partial name="../Property/Details/_AvailabilityPill" model="prop"/>
