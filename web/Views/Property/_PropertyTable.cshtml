@@ -33,7 +33,7 @@
             var prop = propertyDetails.Property!;
             <tr>
                 <td class="text-nowrap">
-                    <partial name="../Property/Details/_AvailabilityPill" model="prop"/>
+                    <partial name="../Property/Details/_LivePill" model="propertyDetails"/>
                 </td>
                 <td>
                     @if (propertyDetails.Images.FirstOrDefault() is { } image)
