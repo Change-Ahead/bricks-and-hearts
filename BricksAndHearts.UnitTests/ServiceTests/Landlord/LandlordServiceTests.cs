@@ -353,8 +353,8 @@ public class LandlordServiceTests : IClassFixture<TestDatabaseFixture>
 
         // Assert
         result.Should().BeOfType<LandlordCountModel>();
-        result.RegisteredLandlords.Should().Be(8);
-        result.ApprovedLandlords.Should().Be(5);
+        result.RegisteredLandlords.Should().Be(9);
+        result.ApprovedLandlords.Should().Be(6);
     }
 
     [Fact]

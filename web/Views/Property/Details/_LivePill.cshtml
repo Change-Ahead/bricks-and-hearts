@@ -11,7 +11,7 @@
     }
 }
 
-@if (Model.Property.Availability != AvailabilityState.Draft && Model.Owner.CharterApproved && !Model.Owner.Disabled)
+@if (Model.Property != null && Model.Property.Availability != AvailabilityState.Draft && Model.Owner != null && Model.Owner.CharterApproved && !Model.Owner.Disabled)
 {
     GetLivePill("Live", "live","eye");
 }

@@ -74,14 +74,10 @@ public class PropertyService : IPropertyService
             
         };
 
-        if (createModel.Availability == AvailabilityState.AvailableSoon)
-        {
-            dbModel.Availability = AvailabilityState.Available;
-        }
-        else
-        {
-            dbModel.Availability = createModel.Availability ?? AvailabilityState.Draft;
-        }
+        dbModel.Availability = createModel.Availability == AvailabilityState.AvailableSoon
+            ? AvailabilityState.Available
+            : createModel.Availability ?? AvailabilityState.Draft;
+        
         dbModel.AvailableFrom = dbModel.Availability == AvailabilityState.Available
             ? createModel.Availability == AvailabilityState.AvailableSoon ? createModel.AvailableFrom : DateTime.Now
             : null;
@@ -136,16 +132,10 @@ public class PropertyService : IPropertyService
         // If no update, fallback to current value as usual
         dbModel.Availability = dbModel.OccupiedUnits == dbModel.TotalUnits
             ? AvailabilityState.Occupied
-            : updateModel.Availability ?? dbModel.Availability;
-
-        if (updateModel.Availability == AvailabilityState.AvailableSoon)
-        {
-            dbModel.Availability = AvailabilityState.Available;
-        }
-        else
-        {
-            dbModel.Availability = updateModel.Availability ?? AvailabilityState.Draft;
-        }
+            : updateModel.Availability == AvailabilityState.AvailableSoon
+                ? AvailabilityState.Available
+                : updateModel.Availability ?? AvailabilityState.Draft;
+        
         dbModel.AvailableFrom = dbModel.Availability == AvailabilityState.Available
             ? updateModel.Availability == AvailabilityState.AvailableSoon? updateModel.AvailableFrom : DateTime.Now
             : null;
@@ -189,6 +179,10 @@ public class PropertyService : IPropertyService
     {
         var properties =
             _dbContext.Properties.Where(p => !p.Landlord.Disabled && p.Availability != AvailabilityState.Draft);
+        if (!properties.Any())
+        {
+            return (properties.ToList(), 0);
+        }
         switch (sortBy)
         {
             case "Location":
