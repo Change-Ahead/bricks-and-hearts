@@ -36,9 +36,9 @@
                     <partial name="../Property/Details/_AvailabilityPill" model="prop"/>
                 </td>
                 <td>
-                    @if (propertyDetails.Images.Count > 0)
+                    @if (propertyDetails.Images.FirstOrDefault() is { } image)
                     {
-                        var image = propertyDetails.Images.First();
+
                         <div class="property-img-thumbnail placeholder-glow">
                             <div class="placeholder w-100 h-100" id="image@(prop.PropertyId)Placeholder"></div>
                             <img src="@image.FileUrl" alt="@image.FileName" id="image@(prop.PropertyId)" style="display: none" onload="hidePlaceholder('#image@(prop.PropertyId)')"/>
