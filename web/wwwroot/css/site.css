@@ -39,6 +39,10 @@ body {
     padding-right: 3%;
 }
 
+.profileBox {
+    width: 280px;
+}
+
 .btn-large {
     width: 200px;
     height: 60px;
