@@ -122,7 +122,12 @@ public class TenantController : AbstractController
     public ActionResult SendMatchLinkEmail(string propertyLink, string tenantEmail, int currentPropertyId)
     {
         var addressToSendTo = new List<string> { tenantEmail };
-        _mailService.TrySendMsgInBackground(propertyLink, tenantEmail, addressToSendTo);
+        var body = "Hi,\n\n" +
+                   "We have found a property that we think you might be interested in. Check it out at the link below:\n\n" +
+                   $"https://bricks-and-hearts.changeahead.org.uk/property/public/{propertyLink}\n\n" +
+                   "If you are interested, contact ChangeAhead to arrange a viewing.";
+
+        _mailService.TrySendMsgInBackground(body, "Check out this property from ChangeAhead", addressToSendTo);
         _logger.LogInformation($"Successfully emailed tenant {tenantEmail}");
         AddFlashMessage("success", $"successfully emailed {tenantEmail}");
         return RedirectToAction(nameof(TenantMatchList), new { currentPropertyId });
