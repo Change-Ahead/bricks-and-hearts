@@ -38,7 +38,7 @@
                             @if (User.IsInRole("Landlord"))
                             {
                                 <div class="d-flex align-items-center me-0 py-0 flex-grow-1">
-                                    <a asp-controller="Landlord" asp-action="Profile" asp-route-id="@(((BricksAndHeartsUser)User.Identity).LandlordId!.Value)" class="profile-photo-sm">
+                                    <a asp-controller="Landlord" asp-action="MyProfile" class="profile-photo-sm">
                                         <img src="@(((BricksAndHeartsUser)User.Identity).GoogleProfileImageUrl ?? Url.Content("~/images/profileDefault.png"))" alt="Profile picture" referrerpolicy="no-referrer"/>
                                     </a>
                                 </div>
@@ -69,19 +69,19 @@
                     </div>
                     <div class="vr my-2 hidden-vr"></div>
                     <div class="d-flex justify-content-start nav-sub col-auto">
-                        <a asp-controller="Admin" asp-action="GetAdminList" class="nav-link text-light mx-3">Admin list</a>
+                        <a asp-controller="Property" asp-action="PropertyList" class="nav-link text-light mx-3">Properties</a>
                     </div>
                     <div class="vr my-2 hidden-vr"></div>
                     <div class="d-flex justify-content-start nav-sub col-auto">
-                        <a asp-controller="Admin" asp-action="LandlordList" class="nav-link text-light mx-3">Landlord list</a>
+                        <a asp-controller="Admin" asp-action="LandlordList" class="nav-link text-light mx-3">Landlords</a>
                     </div>
                     <div class="vr my-2 hidden-vr"></div>
                     <div class="d-flex justify-content-start nav-sub col-auto">
-                        <a asp-controller="Tenant" asp-action="TenantList" class="nav-link text-light mx-3">Tenant list</a>
+                        <a asp-controller="Tenant" asp-action="TenantList" class="nav-link text-light mx-3">Tenants</a>
                     </div>
                     <div class="vr my-2 hidden-vr"></div>
                     <div class="d-flex justify-content-start col-auto">
-                        <a asp-controller="Property" asp-action="PropertyList" class="nav-link text-light mx-3">Property list</a>
+                        <a asp-controller="Admin" asp-action="GetAdminList" class="nav-link text-light mx-3">Admins</a>
                     </div>
                 </div>
             </nav>
@@ -94,15 +94,18 @@
                         <a asp-controller="Landlord" asp-action="Dashboard" class="nav-link text-light mx-3">Dashboard</a>
                     </div>
                     <div class="vr my-2 hidden-vr"></div>
+                    <div class="d-flex justify-content-start nav-sub col-auto">
+                        <a asp-controller="Landlord" asp-action="MyProfile" class="nav-link text-light mx-3">Profile</a>
+                    </div>
+                    <div class="vr my-2 hidden-vr"></div>
                     <div class="d-flex justify-content-start col-auto">
-                        <a asp-controller="Landlord" asp-action="ViewProperties" class="nav-link text-light mx-3">Properties</a>
+                        <a asp-controller="Landlord" asp-action="ViewMyProperties" class="nav-link text-light mx-3">Properties</a>
                     </div>
                 </div>
             </nav>
         }
     }
 </header>
-
 
 <main role="main">
     <div class="container@(TempData["FullWidthPage"] is true ? "-fluid" : "") mt-3 pb-4">
@@ -119,7 +122,6 @@
         @RenderBody()
     </div>
 </main>
-
 
 <footer class="mt-auto py-3 border-top footer text-muted bg-white">
     <div class="container">

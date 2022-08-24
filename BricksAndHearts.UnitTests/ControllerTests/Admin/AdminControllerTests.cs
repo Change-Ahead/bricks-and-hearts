@@ -26,7 +26,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Index");
     }
-    
+
     [Fact]
     public void AdminDashboard_WhenCalledByNonAdminUser_ReturnsViewWithLoginLink()
     {
@@ -41,7 +41,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result!.ViewData.Model.Should().BeOfType<AdminDashboardViewModel>()
             .Which.CurrentUser!.IsAdmin.Should().Be(false);
     }
-    
+
     [Fact]
     public void AdminDashboard_WhenCalledByAdminUser_ReturnsViewWithLoginLink()
     {
@@ -73,7 +73,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("AdminDashboard");
     }
-    
+
     [Fact]
     public void RequestAdminAccess_WhenCalledByAdmin_RedirectsToAdminDashboardView()
     {
@@ -90,7 +90,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("AdminDashboard");
     }
-    
+
     [Fact]
     public void CancelAdminAccess_WhenCalledByNonAdmin_CallsCancelAdminAccessRequestAndRedirectsToAdminDashboard()
     {
@@ -107,7 +107,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("AdminDashboard");
     }
-    
+
     [Fact]
     public void CancelAdminAccess_WhenCalledByAdmin_RedirectsToAdminDashboardView()
     {
@@ -158,7 +158,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("GetAdminList");
     }
-    
+
     [Fact]
     public void RemoveAdmin_OnOwnUserId_RedirectsToGetAdminListWithFlash()
     {
@@ -176,7 +176,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         result!.ActionName.Should().BeEquivalentTo("GetAdminList");
         FlashMessages.Should().Contain("You may not remove your own admin status");
     }
-    
+
     [Fact]
     public void RemoveAdmin_OnNonSelfUserId_CallsRemoveAdminAndRedirectsToGetAdminList()
     {
@@ -207,7 +207,7 @@ public class AdminControllerTests : AdminControllerTestsBase
         A.CallTo(() => AdminService.GetAdminLists()).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<AdminListModel>();
     }
-    
+
     [Fact]
     public async void LandlordList_CallsGetLandlordListAndReturnsLandlordListView()
     {
@@ -219,12 +219,13 @@ public class AdminControllerTests : AdminControllerTestsBase
         var result = await UnderTest.LandlordList() as ViewResult;
 
         // Assert
-        A.CallTo(() => AdminService.GetLandlordList(null,null,1,10)).MustHaveHappened();
+        A.CallTo(() => AdminService.GetLandlordList(null, null, 1, 10)).MustHaveHappened();
         result!.ViewData.Model.Should().BeOfType<LandlordListModel?>();
     }
 
     [Fact]
-    public void GetInviteLink_CalledOnLinkedLandlord_CallsFindUserByLandlordIdAndRedirectsToLandlordProfileWithWarningFLash()
+    public void
+        GetInviteLink_CalledOnLinkedLandlord_CallsFindUserByLandlordIdAndRedirectsToLandlordProfileWithWarningFLash()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -243,9 +244,10 @@ public class AdminControllerTests : AdminControllerTestsBase
         result!.ActionName.Should().BeEquivalentTo("Profile");
         FlashMessages.Should().Contain($"Landlord already linked to user {landlordUser.GoogleUserName}");
     }
-    
+
     [Fact]
-    public void GetInviteLink_CalledOnUnlinkedLandlordWithoutExistingLink_CallsFindExistingInviteLinkThenCallsCreateNewInviteLinkAndRedirectsToLandlordProfileWithSuccessFlash()
+    public void
+        GetInviteLink_CalledOnUnlinkedLandlordWithoutExistingLink_CallsFindExistingInviteLinkThenCallsCreateNewInviteLinkAndRedirectsToLandlordProfileWithSuccessFlash()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -264,11 +266,12 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Profile");
-        FlashMessages.Should().Contain("Successfully created a new invite link: http:///invite/new link");
+        FlashMessages.Should().Contain("Successfully created a new invite link: http:///landlord/invite/new link");
     }
-    
+
     [Fact]
-    public void GetInviteLink_CalledOnUnlinkedLandlordWithExistingLink_CallsFindExistingInviteLinkAndRedirectsToLandlordProfileWithSuccessFlash()
+    public void
+        GetInviteLink_CalledOnUnlinkedLandlordWithExistingLink_CallsFindExistingInviteLinkAndRedirectsToLandlordProfileWithSuccessFlash()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -286,9 +289,9 @@ public class AdminControllerTests : AdminControllerTestsBase
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
         result!.ActionName.Should().BeEquivalentTo("Profile");
-        FlashMessages.Should().Contain("Landlord already has an invite link: http:///invite/existing link");
+        FlashMessages.Should().Contain("Landlord already has an invite link: http:///landlord/invite/existing link");
     }
-    
+
     [Fact]
     public void RenewInviteLink_CalledOnLinkedLandlord_CallsFindUserByLandlordIdAndRedirectsToLandlordProfileWithFLash()
     {
@@ -309,9 +312,10 @@ public class AdminControllerTests : AdminControllerTestsBase
         result!.ActionName.Should().BeEquivalentTo("Profile");
         FlashMessages.Should().Contain($"Landlord already linked to user {landlordUser.GoogleUserName}");
     }
-    
+
     [Fact]
-    public void RenewInviteLink_CalledOnUnlinkedLandlordWithoutExistingLink_CallsFindExistingInviteLinkThenCallsCreateNewInviteLinkAndRedirectsToLandlordProfileWithSuccessFlash()
+    public void
+        RenewInviteLink_CalledOnUnlinkedLandlordWithoutExistingLink_CallsFindExistingInviteLinkThenCallsCreateNewInviteLinkAndRedirectsToLandlordProfileWithSuccessFlash()
     {
         // Arrange
         var adminUser = CreateAdminUser();
@@ -333,9 +337,10 @@ public class AdminControllerTests : AdminControllerTestsBase
         result!.ActionName.Should().BeEquivalentTo("Profile");
         FlashMessages.Should().Contain("No existing invite link. Successfully created a new invite link");
     }
-    
+
     [Fact]
-    public void RenewInviteLink_CalledOnUnlinkedLandlordWithExistingLink_CallsFindExistingInviteLinkThenCallsDeleteExistingLinkThenCallsCreateNewInviteLinkAndRedirectsToLandlordProfileWithSuccessFlash()
+    public void
+        RenewInviteLink_CalledOnUnlinkedLandlordWithExistingLink_CallsFindExistingInviteLinkThenCallsDeleteExistingLinkThenCallsCreateNewInviteLinkAndRedirectsToLandlordProfileWithSuccessFlash()
     {
         // Arrange
         var adminUser = CreateAdminUser();

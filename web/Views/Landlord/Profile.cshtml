@@ -133,7 +133,7 @@
 
 @if (Model.NumOfProperties > 0)
 {
-    <a class="btn btn-primary my-3" href='@Url.Action("ViewProperties", "Landlord", new { id = Model.LandlordId })'>View properties</a>
+    <a asp-action="@(User.IsInRole("Landlord") ? "ViewMyProperties" : "ViewProperties")" asp-controller="Landlord" class="btn btn-primary my-3">View properties</a>
 }
 else
 {
@@ -142,21 +142,20 @@ else
 
 @if (User.IsInRole("Admin"))
 {
-    using (Html.BeginForm("GetInviteLink", "Admin", new { landlordId = Model.LandlordId }, FormMethod.Post))
-    {
+    <form asp-action="GetInviteLink" asp-controller="Admin" asp-route-landlordId="@Model.LandlordId" method="post" class="mb-3">
         <button type="submit" class="btn btn-primary"><i class="bi bi-link"></i> Get invite link</button>
-    }
+    </form>
     if (Model.InviteLink != null)
     {
-        <a class="btn btn-primary my-3" type="button" id="copyBtn" onclick="copyLinkToClipboard('@Model.InviteLink');"><i class="bi bi-files"></i> Copy invite link</a>
+        <a class="btn btn-primary mb-3" type="button" id="copyBtn" onclick="copyLinkToClipboard('@Model.InviteLink');"><i class="bi bi-files"></i> Copy invite link</a>
     }
-    using (Html.BeginForm("DisableOrEnableLandlord", "Landlord", new { landlordId = Model.LandlordId}, FormMethod.Post))
-    {
+    <form asp-action="DisableOrEnableLandlord" asp-controller="Landlord" asp-route-landlordId="@Model.LandlordId" method="post" class="mb-3">
         <input type="hidden" asp-for="Action" value=@(Model.Disabled ? "enable" : "disable")>
-        <button type="submit" class="btn btn-primary"><i class="bi bi-link"></i>@(Model.Disabled ? "Re-enable landlord" : "Disable landlord")</button>
-    }
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-link"></i> @(Model.Disabled ? "Re-enable landlord" : "Disable landlord")
+        </button>
+    </form>
 }
-
 
 <!-- Modal -->
 <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">

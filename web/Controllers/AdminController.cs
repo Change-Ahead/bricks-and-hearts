@@ -171,7 +171,7 @@ public class AdminController : AbstractController
 
             _logger.LogInformation(logMessage);
             var flashMessage = logMessage
-                               + $": {(HttpContext.Request.IsHttps ? "https" : "http")}://{HttpContext.Request.Host}/invite/{inviteLink}";
+                               + $": {(HttpContext.Request.IsHttps ? "https" : "http")}://{HttpContext.Request.Host}/landlord/invite/{inviteLink}";
             AddFlashMessage("success", flashMessage);
         }
 
