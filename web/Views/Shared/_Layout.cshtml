@@ -27,7 +27,7 @@
 
             <div class="collapse navbar-collapse">
                 <div class="navbar-nav me-auto">
-                    <a class="nav-link text-dark mx-3" asp-controller="Landlord" asp-action="@(User.IsInRole("Landlord") ? "MyDashboard" : "RegisterGet")">List your properties</a>
+                    <a class="nav-link text-dark mx-3" asp-controller="Landlord" asp-action="@(User.IsInRole("Landlord") ? "Dashboard" : "RegisterGet")">List your properties</a>
                     <a class="nav-link text-dark mx-3" asp-controller="Admin" asp-action="AdminDashboard">Facilitate rentals</a>
                 </div>
 
@@ -75,7 +75,7 @@
         @if (User.IsInRole("Landlord"))
         {
             <nav class="navbar navbar-secondary navbar-expand-sm navbar-dark bg-primary py-1">
-                <a asp-controller="Landlord" asp-action="MyDashboard" class="nav-link text-light mx-3">Dashboard</a>
+                <a asp-controller="Landlord" asp-action="Dashboard" class="nav-link text-light mx-3">Dashboard</a>
                 <div class="vr my-2"></div>
                 <a asp-controller="Landlord" asp-action="ViewProperties" class="nav-link text-light mx-3">Properties</a>
             </nav>

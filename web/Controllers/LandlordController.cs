@@ -34,7 +34,7 @@ public class LandlordController : AbstractController
         if (currentUser.LandlordId != null && !currentUser.IsAdmin)
         {
             _logger.LogWarning("User {UserId} is already registered, will redirect to profile", currentUser.Id);
-            return Redirect(Url.Action("MyProfile")!);
+            return RedirectToAction(nameof(MyProfile));
         }
 
         if (currentUser.IsAdmin && createUnassigned)
@@ -87,14 +87,19 @@ public class LandlordController : AbstractController
                 var msgBody = "A Landlord has just registered\n"
                               + "\n"
                               + $"Title: {createModel.Title}\n"
-                              + $"First Name: {createModel.FirstName}" + "\n"
-                              + $"Last Name: {createModel.LastName}" + "\n"
-                              + $"Company Name: {createModel.CompanyName}" + "\n"
-                              + $"Email: {createModel.Email}" + "\n"
-                              + $"Phone: {createModel.Phone}" + "\n";
+                              + $"First Name: {createModel.FirstName}"
+                              + "\n"
+                              + $"Last Name: {createModel.LastName}"
+                              + "\n"
+                              + $"Company Name: {createModel.CompanyName}"
+                              + "\n"
+                              + $"Email: {createModel.Email}"
+                              + "\n"
+                              + $"Phone: {createModel.Phone}"
+                              + "\n";
                 var subject = "Bricks&Hearts - landlord registration notification";
                 _mailService.TrySendMsgInBackground(msgBody, subject);
-                return RedirectToAction("Profile", "Landlord", new { landlord!.Id });
+                return RedirectToAction(nameof(Profile), "Landlord", new { landlord!.Id });
 
             case ILandlordService.LandlordRegistrationResult.ErrorLandlordEmailAlreadyRegistered:
                 _logger.LogWarning("Email already registered {Email}", createModel.Email);
@@ -109,7 +114,7 @@ public class LandlordController : AbstractController
             case ILandlordService.LandlordRegistrationResult.ErrorUserAlreadyHasLandlordRecord:
                 _logger.LogWarning("User {UserId} already associated with landlord", user.Id);
                 AddFlashMessage("warning", "Already registered");
-                return Redirect(Url.Action("MyProfile")!);
+                return RedirectToAction(nameof(MyProfile));
 
             default:
                 throw new Exception($"Unknown landlord registration error ${result}");
@@ -157,7 +162,7 @@ public class LandlordController : AbstractController
             var message = "Membership ID is required.";
             _logger.LogInformation(message);
             AddFlashMessage("warning", message);
-            return RedirectToAction("Profile", "Landlord", new { Id = landlord.LandlordId!.Value });
+            return RedirectToAction(nameof(Profile), "Landlord", new { Id = landlord.LandlordId!.Value });
         }
 
         var user = CurrentUser;
@@ -191,7 +196,7 @@ public class LandlordController : AbstractController
 
         _logger.LogInformation(flashMessageBody);
         AddFlashMessage(flashMessageType, flashMessageBody);
-        return RedirectToAction("Profile", "Landlord", new { Id = landlord.LandlordId.Value });
+        return RedirectToAction(nameof(Profile), "Landlord", new { Id = landlord.LandlordId.Value });
     }
 
     [HttpGet]
@@ -221,7 +226,7 @@ public class LandlordController : AbstractController
             new PropertyListModel(listOfProperties, properties.Count, landlordProfile, page));
     }
 
-    [HttpGet("{landlordId:int}/edit")]
+    [HttpGet("{landlordId:int}/profile/edit")]
     public async Task<ActionResult> EditProfilePage(int? landlordId)
     {
         var user = CurrentUser;
@@ -239,7 +244,7 @@ public class LandlordController : AbstractController
         return View("EditProfilePage", LandlordProfileModel.FromDbModel(landlordFromDb));
     }
 
-    [HttpPost("edit")]
+    [HttpPost("profile/edit")]
     public async Task<ActionResult> EditProfileUpdate([FromForm] LandlordProfileModel editModel)
     {
         var user = CurrentUser;
@@ -277,7 +282,7 @@ public class LandlordController : AbstractController
 
         await _landlordService.EditLandlordDetails(editModel);
         _logger.LogInformation("Successfully edited landlord for landlord {LandlordId}", editModel.LandlordId);
-        return RedirectToAction("Profile", new { id = editModel.LandlordId });
+        return RedirectToAction(nameof(Profile), new { id = editModel.LandlordId });
     }
 
     [HttpGet("/invite/{inviteLink}")]
@@ -295,7 +300,7 @@ public class LandlordController : AbstractController
         return View(model);
     }
 
-    [HttpPost("/invite/{inviteLink}/accepted")]
+    [HttpPost("/invite/{inviteLink}/accept")]
     public async Task<IActionResult> TieUserWithLandlord(string inviteLink)
     {
         var user = CurrentUser;
@@ -319,16 +324,16 @@ public class LandlordController : AbstractController
         }
     }
 
-    [HttpGet("{id:int}/dashboard")]
-    public async Task<ActionResult> Dashboard([FromRoute] int id)
+    [HttpGet("dashboard")]
+    public async Task<ActionResult> Dashboard()
     {
         var user = CurrentUser;
-        if (user.LandlordId != id && !user.IsAdmin)
+        if (!user.LandlordId.HasValue)
         {
             return StatusCode(403);
         }
 
-        var landlord = await _landlordService.GetLandlordIfExistsWithProperties(id);
+        var landlord = await _landlordService.GetLandlordIfExistsWithProperties(user.LandlordId);
         if (landlord == null)
         {
             return StatusCode(404);
@@ -351,9 +356,10 @@ public class LandlordController : AbstractController
         {
             CurrentLandlord = LandlordProfileModel.FromDbModel(landlord),
             Properties = allPropertyDetails,
-            PropertyTypeCount = _propertyService.CountProperties(id)
+            PropertyTypeCount = _propertyService.CountProperties(user.LandlordId)
         };
-        viewModel.CurrentLandlord.GoogleProfileImageUrl = _landlordService.GetLandlordProfilePicture(id);
+        viewModel.CurrentLandlord.GoogleProfileImageUrl =
+            _landlordService.GetLandlordProfilePicture(user.LandlordId.Value);
         return View("Dashboard", viewModel);
     }
 
@@ -361,29 +367,17 @@ public class LandlordController : AbstractController
     {
         return fileNames.Select(fileName =>
             {
-                var url = Url.Action("GetImage", new { propertyId, fileName })!;
+                var url = Url.Action(nameof(GetImage), new { propertyId, fileName })!;
                 return new ImageFileUrlModel(fileName, url);
             })
             .ToList();
     }
 
-    [HttpGet("{propertyId:int}/{fileName}")]
+    [HttpGet("property/{propertyId:int}/{fileName}")]
     public async Task<IActionResult> GetImage(int propertyId, string fileName)
     {
         var (data, fileType) = await _azureStorage.DownloadFile("property", propertyId, fileName);
 
         return File(data!, $"image/{fileType}");
-    }
-
-    [HttpGet("me/dashboard")]
-    public async Task<ActionResult> MyDashboard()
-    {
-        var landlordId = CurrentUser.LandlordId;
-        if (landlordId == null)
-        {
-            return StatusCode(404);
-        }
-
-        return await Dashboard(landlordId.Value);
     }
 }

@@ -22,12 +22,12 @@ public class HomeController : AbstractController
             var user = CurrentUser;
             if (user.IsAdmin)
             {
-                return RedirectToAction("AdminDashboard", "Admin");
+                return RedirectToAction(nameof(AdminController.AdminDashboard), "Admin");
             }
 
             if (user.LandlordId != null)
             {
-                return RedirectToAction("MyDashboard", "Landlord");
+                return RedirectToAction(nameof(LandlordController.Dashboard), "Landlord");
             }
         }
 
@@ -39,20 +39,20 @@ public class HomeController : AbstractController
         return View(model);
     }
 
-    [HttpGet]
+    [HttpGet("privacy")]
     public IActionResult Privacy()
     {
         return View();
     }
 
-    [HttpGet]
+    [HttpGet("contact")]
     public IActionResult ContactUs()
     {
         return View(new ContactUsViewModel());
     }
 
     [HttpGet]
-    [Route("/Error/{status:int}")]
+    [Route("/error/{status:int}")]
     public IActionResult Error(int status)
     {
         ErrorService errorService = new ErrorService();

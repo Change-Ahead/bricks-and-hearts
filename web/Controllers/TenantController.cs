@@ -34,7 +34,7 @@ public class TenantController : AbstractController
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpGet]
+    [HttpGet("/admin/lists/tenants")]
     public async Task<IActionResult> TenantList(TenantListModel tenantListModel, string? targetPostcode,
         HousingRequirementModel filter, int page = 1)
     {
@@ -64,7 +64,7 @@ public class TenantController : AbstractController
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpGet("{currentPropertyId:int}/Matches")]
+    [HttpGet("/property/{currentPropertyId:int}/match")]
     public async Task<IActionResult> TenantMatchList(int currentPropertyId)
     {
         var currentProperty =
@@ -77,18 +77,20 @@ public class TenantController : AbstractController
             {
                 Property = currentProperty,
                 Images = GetFilesFromFileNames(fileNames, currentProperty.PropertyId),
-                PropertyTypeCount = _propertyService.CountProperties(currentProperty.LandlordId), 
-                CurrentLandlord = LandlordProfileModel.FromDbModel(await _landlordService.GetLandlordFromId(currentProperty.LandlordId))
+                PropertyTypeCount = _propertyService.CountProperties(currentProperty.LandlordId),
+                CurrentLandlord =
+                    LandlordProfileModel.FromDbModel(
+                        await _landlordService.GetLandlordFromId(currentProperty.LandlordId))
             }
         };
         return View("~/Views/Admin/TenantMatchList.cshtml", tenantMatchListModel);
     }
-    
+
     public List<ImageFileUrlModel> GetFilesFromFileNames(List<string> fileNames, int propertyId)
     {
         return fileNames.Select(fileName =>
             {
-                var url = Url.Action("GetImage", new { propertyId, fileName })!;
+                var url = Url.Action(nameof(GetImage), new { propertyId, fileName })!;
                 return new ImageFileUrlModel(fileName, url);
             })
             .ToList();
@@ -96,7 +98,7 @@ public class TenantController : AbstractController
 
     [Authorize(Roles = "Landlord, Admin")]
     [HttpGet]
-    [Route("{propertyId:int}/{fileName}")]
+    [Route("{propertyId:int}/images/{fileName}")]
     public async Task<IActionResult> GetImage(int propertyId, string fileName)
     {
         if (!_propertyService.IsUserAdminOrCorrectLandlord(CurrentUser, propertyId))
@@ -116,18 +118,18 @@ public class TenantController : AbstractController
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpPost("{currentPropertyId:int}/Matches")]
+    [HttpPost("/property/{currentPropertyId:int}/match")]
     public ActionResult SendMatchLinkEmail(string propertyLink, string tenantEmail, int currentPropertyId)
     {
         var addressToSendTo = new List<string> { tenantEmail };
         _mailService.TrySendMsgInBackground(propertyLink, tenantEmail, addressToSendTo);
         _logger.LogInformation($"Successfully emailed tenant {tenantEmail}");
         AddFlashMessage("success", $"successfully emailed {tenantEmail}");
-        return RedirectToAction("TenantMatchList", new { currentPropertyId });
+        return RedirectToAction(nameof(TenantMatchList), new { currentPropertyId });
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpPost]
+    [HttpPost("/admin/lists/tenants/import")]
     public async Task<ActionResult> ImportTenants(IFormFile? csvFile)
     {
         if (csvFile == null)
@@ -174,7 +176,7 @@ public class TenantController : AbstractController
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpGet("/sample-tenant-data")]
+    [HttpGet("/admin/lists/tenants/sample-tenant-data")]
     public ActionResult GetSampleTenantCsv()
     {
         return File("~/TenantImportCSV_Template.csv", "text/csv");

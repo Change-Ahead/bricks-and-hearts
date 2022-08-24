@@ -24,7 +24,7 @@ public class HomeControllerTests : HomeControllerTestsBase
         result!.ViewData.Model.Should().BeOfType<HomeViewModel>()
             .Which.IsLoggedIn.Should().Be(false);
     }
-    
+
     [Fact]
     public void Index_WhenCalledByNonAdminNonLandlordUser_ReturnsIndexViewWithRegisterButtons()
     {
@@ -39,7 +39,7 @@ public class HomeControllerTests : HomeControllerTestsBase
         result!.ViewData.Model.Should().BeOfType<HomeViewModel>()
             .Which.IsLoggedIn.Should().Be(true);
     }
-    
+
     [Fact]
     public void Index_WhenCalledByLandlordUser_RedirectsToLandlordDashboard()
     {
@@ -53,9 +53,9 @@ public class HomeControllerTests : HomeControllerTestsBase
         // Assert
         result.Should().BeOfType<RedirectToActionResult>();
         result.Should().NotBeNull();
-        result!.ActionName.Should().BeEquivalentTo("MyDashboard");
+        result!.ActionName.Should().BeEquivalentTo("Dashboard");
     }
-    
+
     [Fact]
     public void Index_WhenCalledByAdminUser_RedirectsToAmindDashboard()
     {
