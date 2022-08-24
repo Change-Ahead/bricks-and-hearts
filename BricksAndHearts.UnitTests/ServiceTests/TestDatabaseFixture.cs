@@ -47,7 +47,9 @@ public class TestDatabaseFixture
                     CreateLandlordWithLink(), // landlordId = 3
                     CreateUnlinkedLandlordWithLink(), // landlordId = 4
                     CreateLandlordWithMembershipId(5), // landlordId = 5
-                    CreateLandlordWithMembershipId(6) // landlordId = 6
+                    CreateLandlordWithMembershipId(6), // landlordId = 6
+                    CreateEnabledLandlord(),
+                    CreateDisabledLandlord()
                 );
 
                 context.Users.AddRange(
@@ -360,6 +362,46 @@ public class TestDatabaseFixture
                 County = "county",
                 Postcode = "cb2 1la"
             }
+        };
+    }
+    
+    private static LandlordDbModel CreateEnabledLandlord()
+    {
+        return new LandlordDbModel
+        {
+            Email = "test.landlord7@gmail.com",
+            FirstName = "Landlord7Approved",
+            LastName = "Landlord7Sur",
+            Title = "Mr",
+            Phone = "01189998819991197253",
+            LandlordType = "Non profit",
+            AddressLine1 = "adr1",
+            AddressLine2 = "adr2",
+            AddressLine3 = "adr3",
+            TownOrCity = "city",
+            County = "county",
+            Postcode = "cb2 1la",
+            Disabled = false
+        };
+    }
+
+    private static LandlordDbModel CreateDisabledLandlord()
+    {
+        return new LandlordDbModel
+        {
+            Email = "test.landlord8@gmail.com",
+            FirstName = "Landlord8Unapproved",
+            LastName = "Landlord8Sur",
+            Title = "Mr",
+            Phone = "01189998819991197253",
+            LandlordType = "Non profit",
+            AddressLine1 = "adr1",
+            AddressLine2 = "adr2",
+            AddressLine3 = "adr3",
+            TownOrCity = "city",
+            County = "county",
+            Postcode = "cb2 1la",
+            Disabled = true
         };
     }
 

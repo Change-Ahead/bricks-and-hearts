@@ -1,6 +1,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using BricksAndHearts.Database;
+using BricksAndHearts.Enums;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
@@ -39,7 +40,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         formResultModel.Address.AddressLine1 = "Test Road";
 
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel, unregisteredUser))
-            .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));
+            .Returns((LandlordRegistrationResult.Success, returnedLandlord));
 
         // Act
         var result = await UnderTest.RegisterPost(formResultModel) as RedirectToActionResult;
@@ -60,7 +61,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var landlordUser = CreateLandlordUser();
         var landlordProfile = new LandlordProfileModel { LandlordId = landlordUser.Id, MembershipId = "abc" };
         A.CallTo(() => LandlordService.ApproveLandlord(landlordUser.Id, adminUser, "abc"))
-            .Returns(ILandlordService.ApproveLandlordResult.Success);
+            .Returns(ApproveLandlordResult.Success);
 
         // Act
         await UnderTest.ApproveCharter(landlordProfile);
@@ -85,6 +86,72 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         // Assert
         A.CallTo(() => LandlordService.ApproveLandlord(landlordUser.Id, adminUser, null!)).MustNotHaveHappened();
         FlashMessages.Should().Contain("Membership ID is required.");
+    }
+    
+    [Theory]
+    [InlineData("disable")]
+    [InlineData("enable")]
+    public async void DisableOrEnableLandlord_CallsDisableOrEnableLandlord_AndDisplaysSuccessMessageIfReturnsSuccess(string action)
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        var landlordUser = CreateLandlordUser();
+        var landlordProfile = new LandlordProfileModel { LandlordId = landlordUser.Id, MembershipId = "abc" };
+        A.CallTo(() => LandlordService.DisableOrEnableLandlord(landlordUser.Id, action))
+            .Returns(DisableOrEnableLandlordResult.Success);
+
+        // Act
+        var result = await UnderTest.DisableOrEnableLandlord(landlordProfile, action);
+
+        // Assert
+        A.CallTo(() => LandlordService.DisableOrEnableLandlord(landlordUser.Id, action)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("Profile");
+        FlashMessages.Should().Contain($"Successfully {action}d landlord.");
+    }
+    
+    [Theory]
+    [InlineData("disable")]
+    [InlineData("enable")]
+    public async void DisableOrEnableLandlord_CallsDisableOrEnableLandlord_AndDisplaysErrorIfLandlordAbsent(string action)
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        var landlordUser = CreateLandlordUser();
+        var landlordProfile = new LandlordProfileModel { LandlordId = landlordUser.Id, MembershipId = "abc" };
+        A.CallTo(() => LandlordService.DisableOrEnableLandlord(landlordUser.Id, action))
+            .Returns(DisableOrEnableLandlordResult.ErrorLandlordNotFound);
+
+        // Act
+        var result = await UnderTest.DisableOrEnableLandlord(landlordProfile, action);
+
+        // Assert
+        A.CallTo(() => LandlordService.DisableOrEnableLandlord(landlordUser.Id, action)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("Profile");
+        FlashMessages.Should().Contain("Sorry, it appears that no landlord with this ID exists.");
+    }
+    
+    [Theory]
+    [InlineData("disable")]
+    [InlineData("enable")]
+    public async void DisableOrEnableLandlord_CallsDisableOrEnableLandlord_AndDisplaysErrorIfLandlordAlreadyInState(string action)
+    {
+        // Arrange
+        var adminUser = CreateAdminUser();
+        MakeUserPrincipalInController(adminUser, UnderTest);
+        var landlordUser = CreateLandlordUser();
+        var landlordProfile = new LandlordProfileModel { LandlordId = landlordUser.Id, MembershipId = "abc" };
+        A.CallTo(() => LandlordService.DisableOrEnableLandlord(landlordUser.Id, action))
+            .Returns(DisableOrEnableLandlordResult.ErrorAlreadyInState);
+
+        // Act
+        var result = await UnderTest.DisableOrEnableLandlord(landlordProfile, action);
+
+        // Assert
+        A.CallTo(() => LandlordService.DisableOrEnableLandlord(landlordUser.Id, action)).MustHaveHappened();
+        result.Should().BeOfType<RedirectToActionResult>().Which.ActionName.Should().Be("Profile");
+        FlashMessages.Should().Contain($"This landlord has already been {action}d.");
     }
 
     [Fact]
@@ -142,7 +209,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         A.CallTo(() => LandlordService.CheckForDuplicateEmail(landlordProfileModel)).Returns(false);
         A.CallTo(() => LandlordService.CheckForDuplicateMembershipId(landlordProfileModel)).Returns(false);
         A.CallTo(() => LandlordService.EditLandlordDetails(landlordProfileModel))
-            .Returns(ILandlordService.LandlordRegistrationResult.Success);
+            .Returns(LandlordRegistrationResult.Success);
 
         // Act
         var result = await UnderTest.EditProfileUpdate(landlordProfileModel);
@@ -172,7 +239,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
 
     [Fact]
     public async void
-        EditProfileUpdate_CalledUsingLandlordDatabaseModelWithDuplicateMembershipId_ReturnsEditProfileViewWithLandlordProfile()
+    EditProfileUpdate_CalledUsingLandlordDatabaseModelWithDuplicateMembershipId_ReturnsEditProfileViewWithLandlordProfile()
     {
         // Arrange 
         var adminUser = CreateAdminUser();
@@ -273,7 +340,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         var landlordUser = CreateLandlordUser();
         const string inviteLink = "11111";
         A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink, landlordUser))
-            .Returns(ILandlordService.LinkUserWithLandlordResult.ErrorLinkDoesNotExist);
+            .Returns(LinkUserWithLandlordResult.ErrorLinkDoesNotExist);
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         // Act
@@ -294,7 +361,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         const string inviteLink = "11111";
 
         A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink, landlordUser))
-            .Returns(ILandlordService.LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord);
+            .Returns(LinkUserWithLandlordResult.ErrorUserAlreadyHasLandlordRecord);
         MakeUserPrincipalInController(landlordUser, UnderTest);
 
         // Act
@@ -314,7 +381,7 @@ public class LandlordControllerTests : LandlordControllerTestsBase
         const string inviteLink = "11111";
 
         A.CallTo(() => LandlordService.LinkExistingLandlordWithUser(inviteLink, nonLandlordUser))
-            .Returns(ILandlordService.LinkUserWithLandlordResult.Success);
+            .Returns(LinkUserWithLandlordResult.Success);
         MakeUserPrincipalInController(nonLandlordUser, UnderTest);
 
         // Act

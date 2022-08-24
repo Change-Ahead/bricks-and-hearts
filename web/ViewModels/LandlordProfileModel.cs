@@ -49,6 +49,8 @@ public class LandlordProfileModel
 
     public bool CharterApproved { get; set; }
 
+    public bool Disabled { get; set; }
+    public string Action { get; set; } = "";
     public bool Unassigned { get; set; }
 
     public string? InviteLink { get; set; }
@@ -74,6 +76,7 @@ public class LandlordProfileModel
             LandlordType = landlord.LandlordType,
             MembershipId = landlord.MembershipId,
             CharterApproved = landlord.CharterApproved,
+            Disabled = landlord.Disabled,
             IsLandlordForProfit = landlord.IsLandlordForProfit,
             NumOfProperties = landlord.Properties.Count,
             InviteLink = landlord.InviteLink,

@@ -142,15 +142,21 @@ else
 
 @if (User.IsInRole("Admin"))
 {
-    @using (Html.BeginForm("GetInviteLink", "Admin", new { landlordId = Model.LandlordId }, FormMethod.Post))
+    using (Html.BeginForm("GetInviteLink", "Admin", new { landlordId = Model.LandlordId }, FormMethod.Post))
     {
         <button type="submit" class="btn btn-primary"><i class="bi bi-link"></i> Get invite link</button>
     }
+    if (Model.InviteLink != null)
+    {
+        <a class="btn btn-primary my-3" type="button" id="copyBtn" onclick="copyLinkToClipboard('@Model.InviteLink');"><i class="bi bi-files"></i> Copy invite link</a>
+    }
+    using (Html.BeginForm("DisableOrEnableLandlord", "Landlord", new { landlordId = Model.LandlordId}, FormMethod.Post))
+    {
+        <input type="hidden" asp-for="Action" value=@(Model.Disabled ? "enable" : "disable")>
+        <button type="submit" class="btn btn-primary"><i class="bi bi-link"></i>@(Model.Disabled ? "Re-enable landlord" : "Disable landlord")</button>
+    }
 }
-@if (Model.InviteLink != null)
-{
-    <a class="btn btn-primary my-3" type="button" id="copyBtn" onclick="copyLinkToClipboard('@Model.InviteLink');"><i class="bi bi-files"></i> Copy invite link</a>
-}
+
 
 <!-- Modal -->
 <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">

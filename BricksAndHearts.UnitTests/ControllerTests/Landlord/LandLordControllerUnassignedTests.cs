@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using BricksAndHearts.Database;
+using BricksAndHearts.Enums;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
 using FakeItEasy;
@@ -43,7 +44,7 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
                       + "\n";
         var subject = "Bricks&Hearts - landlord registration notification";
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel))
-            .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));
+            .Returns((LandlordRegistrationResult.Success, returnedLandlord));
         A.CallTo(() => MailService.SendMsg(
             A<string>.That.Matches(s => s == msgBody), A<string>.That.Matches(s => s == subject),
             A<List<string>>.Ignored, A<string>.Ignored,
@@ -78,7 +79,7 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
         formResultModel.Address.AddressLine1 = "Test Road";
         // Act
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel))
-            .Returns((ILandlordService.LandlordRegistrationResult.Success, returnedLandlord));
+            .Returns((LandlordRegistrationResult.Success, returnedLandlord));
         A.CallTo(() => MailService.SendMsg(
             A<string>.Ignored, A<string>.Ignored, A<List<string>>.Ignored, A<string>.Ignored, A<string>.Ignored
         )).WithAnyArguments().DoesNothing();
