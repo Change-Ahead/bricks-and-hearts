@@ -31,7 +31,7 @@ public class PropertyInputModelAvailability : PropertyInputModelBase, IValidatab
                 yield return new ValidationResult("Available From must be provided if property is Available Soon");
             }
 
-            if (AvailableFrom < DateTime.Today)
+            if (AvailableFrom <= DateTime.Today)
             {
                 yield return new ValidationResult("Available From must be in the future");
             }
