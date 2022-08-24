@@ -39,6 +39,22 @@ body {
     padding-right: 3%;
 }
 
+.nav-sub {
+    border-bottom: 0;
+}
+.hidden-vr {
+    display: inline;
+}
+
+@media screen and (max-width: 768px) {
+    .nav-sub {
+        border-bottom: 2px solid rgba(236, 242, 255, 0.3);
+    }
+    .hidden-vr {
+        display: none;
+    }
+}
+
 .profileBox {
     width: 280px;
 }
