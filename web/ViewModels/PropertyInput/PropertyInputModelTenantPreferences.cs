@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using BricksAndHearts.Database;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
@@ -7,31 +7,31 @@ namespace BricksAndHearts.ViewModels.PropertyInput;
 public class PropertyInputModelTenantPreferences : PropertyInputModelBase, IValidatableObject
 {
     [Required]
-    public bool? AcceptsSingleTenant { get; set; }
+    public bool AcceptsSingleTenant { get; set; }
 
     [Required]
-    public bool? AcceptsCouple { get; set; }
+    public bool AcceptsCouple { get; set; }
 
     [Required]
-    public bool? AcceptsFamily { get; set; }
+    public bool AcceptsFamily { get; set; }
 
     [Required]
     public bool? AcceptsPets { get; set; }
 
     [Required]
-    public bool? AcceptsNotInEET { get; set; }
+    public bool AcceptsNotInEET { get; set; }
 
     [Required]
-    public bool? AcceptsCredit { get; set; }
+    public bool AcceptsCredit { get; set; }
 
     [Required]
-    public bool? AcceptsBenefits { get; set; }
+    public bool AcceptsBenefits { get; set; }
 
     [Required]
-    public bool? AcceptsUnder35 { get; set; }
+    public bool AcceptsUnder35 { get; set; }
 
     [Required]
-    public bool? AcceptsWithoutGuarantor { get; set; }
+    public bool AcceptsWithoutGuarantor { get; set; }
 
     [ValidateNever]
     public override string PreviousAction { get; set; } = "PropertyInputStepFourDescription";
@@ -49,15 +49,15 @@ public class PropertyInputModelTenantPreferences : PropertyInputModelBase, IVali
         base.InitialiseViewModel(property);
         Step = 5;
         Title = "What kind of tenant would you prefer?";
-        AcceptsSingleTenant = property.AcceptsSingleTenant;
-        AcceptsCouple = property.AcceptsCouple;
-        AcceptsFamily = property.AcceptsFamily;
+        AcceptsSingleTenant = property.AcceptsSingleTenant ?? false;
+        AcceptsCouple = property.AcceptsCouple ?? false;
+        AcceptsFamily = property.AcceptsFamily ?? false;
         AcceptsPets = property.AcceptsPets;
-        AcceptsBenefits = property.AcceptsBenefits;
-        AcceptsNotInEET = property.AcceptsNotInEET;
-        AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor;
-        AcceptsCredit = property.AcceptsCredit;
-        AcceptsUnder35 = property.AcceptsUnder35;
+        AcceptsBenefits = property.AcceptsBenefits ?? false;
+        AcceptsNotInEET = property.AcceptsNotInEET ?? false;
+        AcceptsWithoutGuarantor = property.AcceptsWithoutGuarantor ?? false;
+        AcceptsCredit = property.AcceptsCredit ?? false;
+        AcceptsUnder35 = property.AcceptsUnder35 ?? false;
     }
 
     public override PropertyViewModel FormToViewModel()

@@ -98,7 +98,7 @@ body {
     background: white;
 }
 
-.btn-outline-blue:hover, .btn-outline-blue:focus, .btn-outline-blue:active, .btn-outline-blue:active:focus, .btn-check:checked + .btn-outline-blue, .btn-check:active + .btn-outline-blue, .btn-outline-blue.active, .btn-outline-blue.dropdown-toggle.show {
+.btn-outline-blue:hover, .btn-outline-blue:focus, .btn-outline-blue:active, .btn-outline-blue:active:focus, .btn-check:checked ~ .btn-outline-blue, .pill-check:active, .btn-check:active + .btn-outline-blue, .btn-outline-blue.active, .btn-outline-blue.dropdown-toggle.show {
     background-color: var(--blue);
     border-color: var(--blue);
     color: var(--white);
@@ -114,7 +114,7 @@ body {
     border-color: grey;
 }
 
-.statbox-icon{
+.statbox-icon {
     color: var(--blue);
     background-color: var(--paleBlue);
     border-radius: 20px;
@@ -122,25 +122,25 @@ body {
     text-align: center;
 }
 
-.card-stat{
+.card-stat {
     width: 90%;
     height: 100%;
     background-color: var(--white);
 }
 
-.card-home{
+.card-home {
     width: 80%;
     height: 100%;
     background-color: var(--blue);
 }
 
-.bi-register{
+.bi-register {
     font-size: 85px;
     background-color: var(--blue);
     color: var(--white)
 }
 
-.card-text-home{
+.card-text-home {
     width: 100%;
     height: 40%;
     background-color: var(--white)
@@ -321,7 +321,7 @@ input:checked + .pill-check i {
     text-decoration: none;
 }
 
-.icon-contact{
+.icon-contact {
     font-size: 32px;
 }
 

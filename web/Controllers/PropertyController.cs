@@ -176,11 +176,7 @@ public class PropertyController : AbstractController
     {
         if (!ModelState.IsValid)
         {
-            return RedirectToAction("PropertyInputStepOnePostcode", "Property",
-                new
-                {
-                    propertyId, operationType, landlordId
-                });
+            return View("PropertyInputForm/InitialAddress", model);
         }
 
         var property = _propertyService.GetPropertyByPropertyId(propertyId);
@@ -228,10 +224,10 @@ public class PropertyController : AbstractController
         [FromRoute] int propertyId, [FromRoute] string operationType)
     {
         const string nextActionName = "PropertyInputStepThreeDetails";
-        const string currentActionName = "PropertyInputStepTwoAddress";
+        const string currentViewName = "PropertyInputForm/FullAddress";
 
         return await StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName,
-            currentActionName);
+            currentViewName);
     }
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -254,10 +250,10 @@ public class PropertyController : AbstractController
         [FromRoute] string operationType)
     {
         const string nextActionName = "PropertyInputStepFourDescription";
-        const string currentActionName = "PropertyInputStepThreeDetails";
+        const string currentViewName = "PropertyInputForm/Details";
 
         return await StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName,
-            currentActionName);
+            currentViewName);
     }
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -279,10 +275,10 @@ public class PropertyController : AbstractController
         [FromRoute] int propertyId, [FromRoute] string operationType)
     {
         const string nextActionName = "PropertyInputStepFiveTenantPreferences";
-        const string currentActionName = "PropertyInputStepFourDescription";
+        const string currentViewName = "PropertyInputForm/Description";
 
         return await StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName,
-            currentActionName);
+            currentViewName);
     }
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -306,10 +302,10 @@ public class PropertyController : AbstractController
         [FromRoute] int propertyId, [FromRoute] string operationType)
     {
         const string nextActionName = "PropertyInputStepSixAvailability";
-        const string currentActionName = "PropertyInputStepFiveTenantPreferences";
+        const string currentViewName = "PropertyInputForm/TenantPreferences";
 
         return await StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName,
-            currentActionName);
+            currentViewName);
     }
 
     [Authorize(Roles = "Landlord, Admin")]
@@ -332,12 +328,7 @@ public class PropertyController : AbstractController
     {
         if (!ModelState.IsValid)
         {
-            return RedirectToAction("PropertyInputStepSixAvailability", "Property",
-                new
-                {
-                    propertyId,
-                    operationType
-                });
+            return View("PropertyInputForm/Availability", model);
         }
 
         if (!_propertyService.IsUserAdminOrCorrectLandlord(CurrentUser, propertyId))
@@ -380,16 +371,11 @@ public class PropertyController : AbstractController
     }
 
     private async Task<ActionResult> StandardPropertyInputPostMethod(PropertyInputModelBase model, int propertyId,
-        string operationType, string nextActionName, string currentActionName)
+        string operationType, string nextActionName, string currentViewName)
     {
         if (!ModelState.IsValid)
         {
-            return RedirectToAction(currentActionName, "Property",
-                new
-                {
-                    propertyId,
-                    operationType
-                });
+            return View(currentViewName, model);
         }
 
         if (!_propertyService.IsUserAdminOrCorrectLandlord(CurrentUser, propertyId))
