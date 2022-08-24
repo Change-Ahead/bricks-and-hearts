@@ -33,6 +33,9 @@
         }
     </div>
     <h2 class="font-h2">@Model.Property!.Address.ToShortAddressString()</h2>
-    <p class="font-smallBody">@Model.Property.Description</p>
+    <div>
+        <p class="property-description property-description-table font-smallBody mb-0">@Model.Property.Description</p>
+        <a asp-action="ViewProperty" asp-controller="Property" asp-route-propertyId="@Model.Property.PropertyId" class="font-smallBody">Read more</a>
+    </div>
     <p class="font-subtitle">@Model.Property.Address.Postcode</p>
 </div>
