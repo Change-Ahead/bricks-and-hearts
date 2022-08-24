@@ -29,7 +29,7 @@ function insertDefaultPostcodeIfNotSortByLocation(id) {
     if ($("#" + id + " :selected").val() == "Location") {
         $("#target").val("");
     } else {
-        $("#target").val("CB2 1LA");
+        $("#target").val("HA1 2EY");
     }
 }
 
