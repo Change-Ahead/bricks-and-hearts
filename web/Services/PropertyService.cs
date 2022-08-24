@@ -187,7 +187,8 @@ public class PropertyService : IPropertyService
     public async Task<(List<PropertyDbModel> PropertyList, int Count)> GetPropertyList(string? sortBy, string? target,
         int page, int propPerPage)
     {
-        IQueryable<PropertyDbModel> properties;
+        var properties =
+            _dbContext.Properties.Where(p => !p.Landlord.Disabled && p.Availability != AvailabilityState.Draft);
         switch (sortBy)
         {
             case "Location":
@@ -205,23 +206,23 @@ public class PropertyService : IPropertyService
                     return (new List<PropertyDbModel>(), 0);
                 }
 
-                properties = _dbContext.Properties
+                properties = properties
                     .Include(p => p.Postcode)
                     .Where(p => p.Postcode != null && p.Postcode.Location != null)
                     .OrderBy(p => p.Postcode!.Location!.Distance(model.Location));
                 break;
             case "Rent":
-                properties = _dbContext.Properties
+                properties = properties
                     .Include(p => p.Postcode)
                     .OrderBy(m => m.Rent);
                 break;
-            case "Availability": //TODO once availability state logic is improved (BNH-122), make this a useful sort
-                properties = _dbContext.Properties
+            case "Availability":
+                properties = properties
                     .Include(p => p.Postcode)
-                    .OrderBy(m => m.AvailableFrom);
+                    .OrderBy(p => p.Availability == AvailabilityState.Available).ThenBy(p => p.Availability).ThenBy(p => p.AvailableFrom);
                 break;
             default:
-                properties = _dbContext.Properties.Include(p => p.Postcode);
+                properties = properties.Include(p => p.Postcode);
                 break;
         }
 
