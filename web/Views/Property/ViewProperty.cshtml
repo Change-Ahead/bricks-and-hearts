@@ -21,7 +21,14 @@
 
 <div class="row mt-4">
     <div class="col-md pb-2">
-        <partial name="Details/_Details"/>
+        <div class="d-flex">
+            <h3 class="font-h3 d-inline-block">Details</h3>
+            @if (User.IsLandlordOrAdmin())
+            {
+                <a class="bi bi-pencil ms-auto" asp-action="PropertyInputStepThreeDetails" asp-controller="Property" asp-route-operationType="edit" asp-route-propertyId="@Model.Property!.PropertyId"></a>
+            }
+        </div>
+        <partial name="Details/_Details" model="Model.Property"/>
         <partial name="Details/_Availability"/>
     </div>
 
