@@ -367,9 +367,8 @@ th {
     font-weight: normal;
 }
 
-.table-maxheight {
+.vertical-scroll {
     overflow-y: auto;
-    max-height: 200px;
 }
 
 .bg-pale-blue {
@@ -396,7 +395,7 @@ th {
     }
 }
 
-.property-img-lg img, .property-img-sm img {
+.property-img-lg img, .property-img-sm img, .property-img-thumbnail img {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -417,6 +416,11 @@ th {
 .property-img-sm {
     height: 176px;
     display: block;
+}
+
+.property-img-thumbnail {
+    height: 100px;
+    width: 175px;
 }
 
 .property-img-sm:first-child {
@@ -494,6 +498,12 @@ th {
 
 .property-description {
     white-space: pre-line;
+}
+
+.property-description-table {
+    display: block;
+    overflow: hidden;
+    max-height: calc(100px - 1rem);
 }
 
 #descriptionCollapse.collapse:not(.show) {

@@ -10,6 +10,7 @@
         <thead class="bg-pale-blue">
         <tr>
             <th scope="col">Status</th>
+            <th scope="col">Image</th>
             <th scope="col">Address</th>
             <th scope="col" style="width: 150px">Type</th>
             <th scope="col">Bedrooms</th>
@@ -18,7 +19,6 @@
             <th scope="col">Rent (pcm)</th>
             <th scope="col">Total units</th>
             <th scope="col">Available units</th>
-            <th scope="col">Created</th>
             <th scope="col">Details</th>
             @if (User.IsInRole("Admin"))
             {
@@ -30,10 +30,20 @@
         <tbody>
         @foreach (var propertyDetails in Model.Properties)
         {
-            var prop = propertyDetails.Property;
+            var prop = propertyDetails.Property!;
             <tr>
                 <td class="text-nowrap">
                     <partial name="../Property/Details/_AvailabilityPill" model="prop"/>
+                </td>
+                <td>
+                    @if (propertyDetails.Images.Count > 0)
+                    {
+                        var image = propertyDetails.Images.First();
+                        <div class="property-img-thumbnail placeholder-glow">
+                            <div class="placeholder w-100 h-100" id="image@(prop.PropertyId)Placeholder"></div>
+                            <img src="@image.FileUrl" alt="@image.FileName" id="image@(prop.PropertyId)" style="display: none" onload="hidePlaceholder('#image@(prop.PropertyId)')"/>
+                        </div>
+                    }
                 </td>
                 <td>
                     @prop.Address.AddressLine1,
@@ -46,7 +56,8 @@
                 <td>@prop.PropertyType</td>
                 <td>@prop.NumOfBedrooms</td>
                 <td>
-                    <div class="table-maxheight property-description">@prop.Description</div>
+                    <p class="property-description property-description-table font-smallBody mb-0">@prop.Description</p>
+                    <a asp-action="ViewProperty" asp-controller="Property" asp-route-propertyId="@prop.PropertyId" class="font-smallBody">Read more</a>
                 </td>
                 <td>
                     @if (prop.Availability == AvailabilityState.AvailableSoon && prop.AvailableFrom.HasValue)
@@ -69,9 +80,8 @@
                     <td class="bg-pale-blue">N/A</td>
                     <td class="bg-pale-blue">N/A</td>
                 }
-                <td>@prop.CreationTime?.ToShortDateString()</td>
                 <td>
-                    <a asp-action="ViewProperty" asp-controller="Property" asp-route-propertyId="@prop.PropertyId" class="btn btn-@(User.IsInRole("Admin") ? "outline-" : "")primary">View</a>
+                    <a asp-action="ViewProperty" asp-controller="Property" asp-route-propertyId="@prop.PropertyId" class="btn btn-@(User.IsInRole("Admin") ? "outline-" : "")primary">View/Edit</a>
                 </td>
                 @if (User.IsInRole("Admin"))
                 {
