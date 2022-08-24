@@ -61,6 +61,12 @@ function nextPrev(tabChange) {
     showTab(currentTab);
 }
 
+function clearMembershipIdIfFalse() {
+    if ($("#Select :selected").val() == "false") {
+        $("#MembershipId").val(null);
+    }
+}
+
 function validateForm() {
     // This function deals with validation of the form fields
     let tabList, tabInputList, tabInputIterator, valid = true;
@@ -106,7 +112,12 @@ function fixStepIndicator(currentStep) {
 }
 
 function populateReviewTab() {
-    $("#TitleReview").text($("#Title").val());
+    if (($("#Title").val()) === 'Other'){
+        $("#TitleReview").text($("#TitleInput").val());
+    }
+    else{
+        $("#TitleReview").text($("#Title").val());
+    }
     $("#FirstNameReview").text($("#FirstName").val());
     $("#LastNameReview").text($("#LastName").val());
 
