@@ -47,16 +47,16 @@ function nextPrev(tabChange) {
     let tabList = document.getElementsByClassName("registerTab");
     // Exit the function if any field in the current tab is invalid:
     if (tabChange === 1 && !validateForm()) return false;
-    // Hide the current tab:
-    tabList[currentTab].style.display = "none";
-    // Increase or decrease the current tab by 1:
-    currentTab = currentTab + tabChange;
     // if you have reached the end of the form... :
-    if (currentTab >= tabList.length) {
+    if (currentTab >= tabList.length-1) {
         //...the form gets submitted:
         document.getElementById("landlordEntry").submit();
         return false;
     }
+    // Hide the current tab:
+    tabList[currentTab].style.display = "none";
+    // Increase or decrease the current tab by 1:
+    currentTab = currentTab + tabChange;
     // Otherwise, display the correct tab:
     showTab(currentTab);
 }
