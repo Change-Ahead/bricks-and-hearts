@@ -4,6 +4,11 @@
 }
 <div class="my-3">
     <label asp-for="Description" class="form-label">Description</label>
+    <div class="form-text mb-2">
+        A full description of your property and its key features.
+        You might want to include information such as the number of floors, bedroom sizes, planning permission details, licenses, etc.
+        Details about the property's location and surrounding area should also go here.
+    </div>
     <textarea asp-for="Description" class="form-control textarea-description" rows="12" required></textarea>
     <span asp-validation-for="Description" class="text-danger"></span>
 </div>
