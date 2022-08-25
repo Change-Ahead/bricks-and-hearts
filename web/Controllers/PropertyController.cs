@@ -114,7 +114,11 @@ public class PropertyController : AbstractController
         var fileNames = await _azureStorage.ListFileNames("property", propertyId);
         var imageFiles = GetFilesFromFileNames(fileNames, propertyId);
         var propertyDetailsModel = new PropertyDetailsViewModel
-            { Property = propertyViewModel, Owner = owner, Images = imageFiles };
+        {
+            Property = propertyViewModel,
+            Owner = owner,
+            Images = imageFiles 
+        };
 
         return View(propertyDetailsModel);
     }
