@@ -16,7 +16,7 @@ public class PropertyInputModelDescription : PropertyInputModelBase
     {
         base.InitialiseViewModel(property);
         Step = 4;
-        Title = "Property Description";
+        Title = "Property description";
         Description = property.Description;
     }
 

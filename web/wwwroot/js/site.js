@@ -49,3 +49,13 @@ function hidePlaceholder(imageId) {
     $(imageId + "Placeholder").hide();
     $(imageId).show();
 }
+
+function showNumbersOfUnits() {
+    $("#NumbersOfUnits").show();
+}
+
+function hideNumbersOfUnits() {
+    $("#NumbersOfUnits").hide();
+    $("#TotalUnits").val(1);
+    $("#OccupiedUnits").val(0);
+}

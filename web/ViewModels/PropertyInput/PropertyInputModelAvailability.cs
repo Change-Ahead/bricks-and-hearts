@@ -6,6 +6,7 @@ namespace BricksAndHearts.ViewModels.PropertyInput;
 
 public class PropertyInputModelAvailability : PropertyInputModelBase, IValidatableObject
 {
+    [Required]
     public int OccupiedUnits { get; set; }
 
     [Required]
@@ -15,9 +16,6 @@ public class PropertyInputModelAvailability : PropertyInputModelBase, IValidatab
 
     [Required]
     public string? Availability { get; set; }
-
-    [Required]
-    public int? Rent { get; set; }
 
     [ValidateNever]
     public override string PreviousAction { get; set; } = "PropertyInputStepFiveTenantPreferences";
@@ -49,8 +47,7 @@ public class PropertyInputModelAvailability : PropertyInputModelBase, IValidatab
     {
         base.InitialiseViewModel(property);
         Step = 6;
-        Title = "Rent, Deposits, Availability, and Duration";
-        Rent = property.Rent;
+        Title = "Availability";
         Availability =
             property.Availability == AvailabilityState.Available && property.AvailableFrom > DateTime.Now
                 ? AvailabilityState.AvailableSoon
@@ -89,7 +86,6 @@ public class PropertyInputModelAvailability : PropertyInputModelBase, IValidatab
         {
             Availability = dbAvailability,
             AvailableFrom = dbAvailableFrom,
-            Rent = Rent,
             TotalUnits = TotalUnits,
             OccupiedUnits = OccupiedUnits
         };

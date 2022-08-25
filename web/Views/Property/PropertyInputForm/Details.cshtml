@@ -40,3 +40,13 @@
     <input asp-for="NumOfBedrooms" class="form-control" required/>
     <span asp-validation-for="NumOfBedrooms" class="text-danger"></span>
 </div>
+
+<div class="my-4 py-3">
+    <label asp-for="Rent" class="form-label">Rent amount</label>
+    <div class="input-group">
+        <span class="input-group-text">£</span>
+        <input asp-for="Rent" class="form-control" required/>
+        <span class="input-group-text">per month</span>
+    </div>
+    <span asp-validation-for="Rent" class="text-danger"></span>
+</div>
