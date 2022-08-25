@@ -113,7 +113,8 @@ public class PropertyController : AbstractController
         var owner = LandlordProfileModel.FromDbModel(_propertyService.GetPropertyOwner(propertyId));
         var fileNames = await _azureStorage.ListFileNames("property", propertyId);
         var imageFiles = GetFilesFromFileNames(fileNames, propertyId);
-        var propertyDetailsModel = new PropertyDetailsViewModel { Property = propertyViewModel, Owner = owner, Images = imageFiles };
+        var propertyDetailsModel = new PropertyDetailsViewModel
+            { Property = propertyViewModel, Owner = owner, Images = imageFiles };
 
         return View(propertyDetailsModel);
     }
@@ -437,15 +438,10 @@ public class PropertyController : AbstractController
             .ToList();
     }
 
-    [Authorize(Roles = "Landlord, Admin")]
+    [AllowAnonymous]
     [HttpGet("{propertyId:int}/images/{fileName}")]
     public async Task<IActionResult> GetImage(int propertyId, string fileName)
     {
-        if (!_propertyService.IsUserAdminOrCorrectLandlord(CurrentUser, propertyId))
-        {
-            return StatusCode(403);
-        }
-
         var image = await _azureStorage.DownloadFile("property", propertyId, fileName);
         if (image == (null, null))
         {
