@@ -13,10 +13,10 @@
 
 <div class="registerTab" id="Name">
     <h2 class="font-h3 mb-5">You are just a few steps away</h2>
-
+    
     <div class="my-3">
         @Html.HiddenFor(m => m.Unassigned, new { value = Model.Unassigned })
-        <label asp-for="Title" class="form-label">Title*</label>
+        <label asp-for="Title" class="form-label">Title<text class="text-danger">*</text></label>
         <select asp-for="Title" class="form-select" required
                 id="Title" onchange="displayIfSelectedValueIsTarget('Other', 'Title', 'titleOther')">
             <option selected disabled value="">Title</option>
@@ -27,22 +27,23 @@
             <option value="Other">Other</option>
         </select>
         <div id="titleOther" class="my-3" style="@(Model.TitleInput == null ? "display: none;" : "")">
-            <label asp-for="TitleInput" class="form-label">Title (other)*</label>
+            <label asp-for="TitleInput" class="form-label">Title (other)<text class="text-danger">*</text></label>
             <input asp-for="TitleInput" class="form-control empty"/>
             <span asp-validation-for="TitleInput" class="text-danger"></span>
         </div>
         <span asp-validation-for="Title" class="text-danger"></span>
     </div>
     <div class="my-3">
-        <label asp-for="FirstName" class="form-label">First name*</label>
+        <label asp-for="FirstName" class="form-label">First name<text class="text-danger">*</text></label>
         <input asp-for="FirstName" class="form-control"/>
         <span asp-validation-for="FirstName" class="text-danger"></span>
     </div>
     <div class="my-3">
-        <label asp-for="LastName" class="form-label">Last name*</label>
+        <label asp-for="LastName" class="form-label">Last name<text class="text-danger">*</text></label>
         <input asp-for="LastName" class="form-control"/>
         <span asp-validation-for="LastName" class="text-danger"></span>
     </div>
+    <div class="font-subtitle"><text class="text-danger">*</text> denotes a compulsory field</div>
 </div>
 
 <div class="registerTab" id="Contact details">
@@ -51,7 +52,7 @@
     <div class="row">
         <div class="col-auto">
             <div class="my-3">
-                <label asp-for="Address.AddressLine1" class="form-label">Address line 1*</label>
+                <label asp-for="Address.AddressLine1" class="form-label">Address line 1<text class="text-danger">*</text></label>
                 <input asp-for="Address.AddressLine1" class="form-control" required/>
                 <span asp-validation-for="Address.AddressLine1" class="text-danger"></span>
             </div>
@@ -68,17 +69,17 @@
         </div>
         <div class="col-auto">
             <div class="my-3">
-                <label asp-for="Address.TownOrCity" class="form-label">Town or city*</label>
+                <label asp-for="Address.TownOrCity" class="form-label">Town or city<text class="text-danger">*</text></label>
                 <input asp-for="Address.TownOrCity" class="form-control" required/>
                 <span asp-validation-for="Address.TownOrCity" class="text-danger"></span>
             </div>
             <div class="my-3">
-                <label asp-for="Address.County" class="form-label">County*</label>
+                <label asp-for="Address.County" class="form-label">County<text class="text-danger">*</text></label>
                 <input asp-for="Address.County" class="form-control" required/>
                 <span asp-validation-for="Address.County" class="text-danger"></span>
             </div>
             <div class="my-3">
-                <label asp-for="Address.Postcode" class="form-label">Postcode*</label>
+                <label asp-for="Address.Postcode" class="form-label">Postcode<text class="text-danger">*</text></label>
                 <input asp-for="Address.Postcode" class="form-control" required/>
                 <span asp-validation-for="Address.Postcode" class="text-danger"></span>
             </div>
@@ -88,19 +89,20 @@
     <div class="row mt-3">
         <div class="col-auto">
             <div class="my-3">
-                <label asp-for="Email" class="form-label">Email*</label>
+                <label asp-for="Email" class="form-label">Email<text class="text-danger">*</text></label>
                 <input type="email" asp-for="Email" class="form-control"/>
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
         </div>
         <div class="col-auto">
             <div class="my-3">
-                <label asp-for="Phone" class="form-label">Phone*</label>
+                <label asp-for="Phone" class="form-label">Phone<text class="text-danger">*</text></label>
                 <input type="tel" asp-for="Phone" class="form-control"/>
                 <span asp-validation-for="Phone" class="text-danger"></span>
             </div>
         </div>
     </div>
+    <div class="font-subtitle"><text class="text-danger">*</text> denotes a compulsory field</div>
 </div>
 
 <div class="registerTab" id="Landlord details">
@@ -109,7 +111,7 @@
     <div class="row">
         <div class="col-auto">
             <div class="my-3">
-                <label asp-for="LandlordType" class="form-label">Type of landlord*</label>
+                <label asp-for="LandlordType" class="form-label">Type of landlord<text class="text-danger">*</text></label>
                 <select asp-for="LandlordType" class="form-select" required>
                     <option selected disabled value="">Choose a type</option>
                     <option value="Charity">Charity</option>
@@ -137,7 +139,7 @@
 
         <div class="col-auto">
             <div class="my-3">
-                <label for="Charter" class="form-label">Charter status</label>
+                <label for="Charter" class="form-label">Charter status<text class="text-danger">*</text></label>
                 <select class="form-select" required
                         id="Charter" onchange="displayIfSelectedValueIsTarget('true', 'Charter', 'ifTrue', 'ifFalse'); clearMembershipIdIfFalse('true', 'Charter', 'MembershipId')">
                     <!option @(Model.MembershipId != null ? "selected" : "") value="true">Already approved</!option>
@@ -149,12 +151,13 @@
                 </div>
             </div>
             <div id="ifTrue" class="my-3" style="@(Model.MembershipId == null ? "display: none;" : "")">
-                <label asp-for="MembershipId" class="form-label">Membership ID*</label>
+                <label asp-for="MembershipId" class="form-label">Membership ID<text class="text-danger">*</text></label>
                 <input asp-for="MembershipId" class="form-control empty"/>
                 <span asp-validation-for="MembershipId" class="text-danger"></span>
             </div>
         </div>
     </div>
+    <div class="font-subtitle"><text class="text-danger">*</text> denotes a compulsory field</div>
 </div>
 
 <div class="registerTab" id="Review and submit">
