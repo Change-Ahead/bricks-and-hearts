@@ -34,7 +34,7 @@ public class HomeController : AbstractController
         var model = new HomeViewModel
         {
             IsLoggedIn = isAuthenticated,
-            UserName = User.Identity?.Name,
+            UserName = User.Identity?.Name
         };
         return View(model);
     }
@@ -55,7 +55,7 @@ public class HomeController : AbstractController
     [Route("/error/{status:int}")]
     public IActionResult Error(int status)
     {
-        ErrorService errorService = new ErrorService();
+        var errorService = new ErrorService();
         var errorInfo = errorService.GetStatusMessage(status);
         return View(new ErrorViewModel
         {
@@ -63,12 +63,5 @@ public class HomeController : AbstractController
             StatusName = errorInfo.StatusName,
             StatusMessage = errorInfo.StatusMessage
         });
-    }
-
-    [HttpGet]
-    [Route("/ExceptionTest")]
-    public IActionResult ExceptionTest()
-    {
-        throw new Exception("For testing purposes only");
     }
 }
