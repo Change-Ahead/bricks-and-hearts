@@ -1,4 +1,5 @@
-﻿@model LandlordProfileModel
+﻿@using BricksAndHearts.Auth
+@model LandlordProfileModel
 
 @{
     ViewData["Title"] = "Details";
@@ -133,7 +134,14 @@
 
 @if (Model.NumOfProperties > 0)
 {
-    <a asp-action="@(User.IsInRole("Admin") ? "ViewProperties" : "ViewMyProperties")" asp-controller="Landlord" asp-route-id="@(User.IsInRole("Admin") ? Model.LandlordId : "")" class="btn btn-primary my-3">View properties</a>
+    @if (((BricksAndHeartsUser)User.Identity!).LandlordId == Model.LandlordId)
+    {
+        <a asp-action="ViewMyProperties" asp-controller="Landlord" class="btn btn-primary my-3">My properties</a>
+    }
+    else
+    {
+        <a asp-action="ViewProperties" asp-controller="Landlord" asp-route-id="Model.LandlordId" class="btn btn-primary my-3">View properties</a>
+    }
 }
 else
 {
