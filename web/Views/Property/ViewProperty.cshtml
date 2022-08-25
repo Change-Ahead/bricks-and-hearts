@@ -6,7 +6,14 @@
 
 <div class="mt-5 row">
     <div class="col-auto mb-2">
-        <h1 class="font-h1 d-inline">@Model.Property!.Address.ToShortAddressString()</h1>
+        <h1 class="font-h1 d-inline">
+            @Model.Property!.Address.ToShortAddressString()
+            @if (User.IsLandlordOrAdmin())
+            {
+                <a class="bi bi-pencil" style="display: table-caption" asp-action="PropertyInputStepOnePostcode" asp-controller="Property" asp-route-operationType="edit" asp-route-propertyId="@Model.Property!.PropertyId"></a>
+            }
+        </h1>
+
     </div>
     <div class="col-auto mb-2 d-flex align-items-center">
         <partial name="Details/_LivePill" model="Model"/>
@@ -44,9 +51,9 @@
     </div>
 </div>
 
-@if (User.IsInRole("Admin"))
-{
-    <div class="row mt-4">
+<div class="row mt-4">
+    @if (User.IsInRole("Admin"))
+    {
         <div class="col-auto mb-2">
             @if (Model.Property.Availability is AvailabilityState.Available or AvailabilityState.AvailableSoon)
             {
@@ -62,14 +69,8 @@
         <div class="col-auto mb-2">
             <button role="button" id="copyBtn" class="btn btn-large btn-outline-primary" onclick="copyShareableLink('@Model.Property.PublicViewLink')">Copy shareable link</button>
         </div>
-    </div>
-}
-
-<div class="row mt-4">
+    }
     <div class="col-auto mb-2">
-        <a class="btn btn-primary" asp-controller="Property" asp-action="PropertyInputStepOnePostcode" asp-route-operationType="edit" asp-route-propertyId="@Model.Property.PropertyId" asp-route-landlordId="@Model.Property.LandlordId">Edit Property</a>
-    </div>
-    <div class="col-auto">
         <button type="button" class="btn btn-large btn-outline-primary" data-bs-toggle="modal" data-bs-target="#deletePropertyModal">
             <i class="bi bi-trash"></i>
             Delete property
