@@ -6,7 +6,7 @@
 
 ChangeAhead are an organisation that connects people in a vulnerable state with opportunities to get help and be
 empowered. One of the ways they do this is matching landlords with empty properties with people in need of housing
-assistance. The Bricks and Hearts project is a web platform to facilitate this. It currently consists of a landlord
+assistance. The Bricks & Hearts project is a web platform to facilitate this. It currently consists of a landlord
 portal and an admin portal.
 
 A landlord is able to:
@@ -42,8 +42,6 @@ We also use the following APIs:
 
 The staging and production sites are hosted on Microsoft Azure, and [GitHub Actions](https://docs.github.com/en/actions)
 is used for CI/CD.
-Credentials and other various ‘secrets’ are stored in [Keeper](https://keepersecurity.eu/vault/#) in the ‘Bricks&Hearts’
-folder.
 
 #### Frontend
 
@@ -65,17 +63,19 @@ folder.
     git clone git@github.com:Change-Ahead/bricks-and-hearts.git
     git checkout main
     ```
-3. Go to [Keeper](https://keepersecurity.eu/vault/#) and download `appsettings.Development.json`. Put this file into
-   the `web` folder.
-4. Install the EF Core CLI tools.
+3. You should have access to a collection of 'secrets' (login details, API keys, etc.) for the Bricks & Hearts project.
+   Find the `appsettings.Development.json` file and put it into the `web` folder.
+4. Edit the file and change the `ToAddress` in the `Email` section to your email address. This means any notification
+   emails sent by your local environment will be sent to you.
+5. Install the EF Core CLI tools.
     ```shell
    dotnet tool install --global dotnet-ef
    ```
-5. Build the project.
+6. Build the project.
     ```shell
    dotnet build
     ```
-6. Apply the database migrations. This will create a `BricksAndHearts` database in your local SQL Server if it doesn't
+7. Apply the database migrations. This will create a `BricksAndHearts` database in your local SQL Server if it doesn't
    exist already.
     ```shell
    dotnet ef database update --project web
