@@ -3,7 +3,7 @@
     Layout = "PropertyInputForm/_LayoutPropertyInputForm";
 }
 <div class="my-4 py-3">
-    <label class="form-label mb-3">What is your property type?</label>
+    <label class="form-label mb-3">What is your property type?<text class="text-danger">*</text></label>
 
     <div class="form-check">
         <input type="radio" asp-for="PropertyType" value="Detached" id="TypeDetached" class="form-check-input" required>
@@ -36,16 +36,16 @@
 </div>
 
 <div class="my-4 py-3">
-    <label asp-for="NumOfBedrooms" class="form-label">Number of bedrooms</label>
-    <input asp-for="NumOfBedrooms" class="form-control" required/>
+    <label asp-for="NumOfBedrooms" class="form-label">Number of bedrooms<text class="text-danger">*</text></label>
+    <input asp-for="NumOfBedrooms" class="form-control" min="0" required/>
     <span asp-validation-for="NumOfBedrooms" class="text-danger"></span>
 </div>
 
 <div class="my-4 py-3">
-    <label asp-for="Rent" class="form-label">Rent amount</label>
+    <label asp-for="Rent" class="form-label">Rent amount<text class="text-danger">*</text></label>
     <div class="input-group">
         <span class="input-group-text">£</span>
-        <input asp-for="Rent" class="form-control" required/>
+        <input asp-for="Rent" class="form-control" min="0" required/>
         <span class="input-group-text">per month</span>
     </div>
     <span asp-validation-for="Rent" class="text-danger"></span>
