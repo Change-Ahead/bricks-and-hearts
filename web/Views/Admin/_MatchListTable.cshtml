@@ -58,26 +58,26 @@
                         <i class="bi me-1 @GetPreferenceIcon(tenant.HousingBenefits)"></i>
                         On housing benefits
                     </div>
-                    <div class="@GetPreferenceFont(!tenant.NotInEET)">
-                        <i class="bi me-1 @GetPreferenceIcon(!tenant.NotInEET)"></i>
+                    <div class="@GetPreferenceFont(tenant.InEET)">
+                        <i class="bi me-1 @GetPreferenceIcon(tenant.InEET)"></i>
                         In EET (Employment, Education, or Training)
                     </div>
-                    <div class="@GetPreferenceFont(tenant.NoGuarantor)">
-                        <i class="bi me-1 @GetPreferenceIcon(tenant.NoGuarantor)"></i>
-                        Without rent guarantor
+                    <div class="@GetPreferenceFont(tenant.HasGuarantor)">
+                        <i class="bi me-1 @GetPreferenceIcon(tenant.HasGuarantor)"></i>
+                        Has rent guarantor
                     </div>
                 </td>
                 <td>
-                @using (Html.BeginForm("SendMatchLinkEmail", "Tenant", new
-                {
-                    propertyLink = Model.LandlordAndProperty.Property!.PublicViewLink,
-                    tenantEmail = tenant.Email,
-                    currentPropertyId = Model.LandlordAndProperty.Property.PropertyId
-                },
-                    FormMethod.Post))
-                {
-                    <button type="submit" class="btn btn-thin btn-outline-primary mx-3">Match</button>
-                }
+                    @using (Html.BeginForm("SendMatchLinkEmail", "Tenant", new
+                    {
+                        propertyLink = Model.LandlordAndProperty.Property!.PublicViewLink,
+                        tenantEmail = tenant.Email,
+                        currentPropertyId = Model.LandlordAndProperty.Property.PropertyId
+                    },
+                        FormMethod.Post))
+                    {
+                        <button type="submit" class="btn btn-thin btn-outline-primary mx-3">Match</button>
+                    }
                 </td>
             </tr>
         }

@@ -161,14 +161,14 @@ public class CsvImportService : ICsvImportService
         dbTenant.Type = tenant.Type;
 
         dbTenant.HasPet = CheckBoolInput("HasPet", tenant.HasPet, tenant.Name, flashTypes, flashMessages);
-        dbTenant.NotInEET = CheckBoolInput("NotInEET", tenant.NotInEET, tenant.Name, flashTypes, flashMessages);
+        dbTenant.InEET = CheckBoolInput("InEET", tenant.InEET, tenant.Name, flashTypes, flashMessages);
         dbTenant.UniversalCredit = CheckBoolInput("UniversalCredit", tenant.UniversalCredit, tenant.Name, flashTypes,
             flashMessages);
         dbTenant.HousingBenefits = CheckBoolInput("HousingBenefits", tenant.HousingBenefits, tenant.Name, flashTypes,
             flashMessages);
         dbTenant.Under35 = CheckBoolInput("Under35", tenant.Under35, tenant.Name, flashTypes, flashMessages);
-        dbTenant.NoGuarantor =
-            CheckBoolInput("NoGuarantor", tenant.NoGuarantor, tenant.Name, flashTypes, flashMessages);
+        dbTenant.HasGuarantor =
+            CheckBoolInput("HasGuarantor", tenant.HasGuarantor, tenant.Name, flashTypes, flashMessages);
 
         _dbContext.Tenants.Add(dbTenant);
         return (flashTypes, flashMessages);

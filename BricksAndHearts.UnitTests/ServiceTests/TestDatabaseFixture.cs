@@ -22,7 +22,7 @@ public class TestDatabaseFixture
         { "LS1 1AZ", AddPostcode("LS1 1AZ", -1.564095, 53.796296) },
         { "SE1 9BG", AddPostcode("SE1 9BG", -0.087584, 51.506543) }
     };
-    
+
     public LandlordDbModel PerfectLandlord = new()
     {
         Email = "perfect.landlord1@gmail.com",
@@ -384,7 +384,7 @@ public class TestDatabaseFixture
             }
         };
     }
-    
+
     private static LandlordDbModel CreateEnabledLandlord()
     {
         return new LandlordDbModel
@@ -601,7 +601,7 @@ public class TestDatabaseFixture
             Email = "exampletenant@gmail.com",
             Type = "Single",
             HasPet = false,
-            NotInEET = true,
+            InEET = true,
             UniversalCredit = true,
             HousingBenefits = false,
             Under35 = false,
@@ -617,7 +617,7 @@ public class TestDatabaseFixture
             Email = "exampletenant@gmail.com",
             Type = "Single",
             HasPet = false,
-            NotInEET = false,
+            InEET = false,
             UniversalCredit = false,
             HousingBenefits = false,
             Under35 = false,
