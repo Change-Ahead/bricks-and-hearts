@@ -69,7 +69,9 @@ public class TenantService : ITenantService
                                               || t.UniversalCredit == filters.AcceptsCredit)
                                           && (filters.AcceptsBenefits == null
                                               || t.HousingBenefits == filters.AcceptsBenefits)
-                                          && (filters.AcceptsUnder35 == null || t.Under35 == filters.AcceptsUnder35));
+                                          && (filters.AcceptsUnder35 == null || t.Under35 == filters.AcceptsUnder35) 
+                                          && (filters.AcceptsWithoutGuarantor == null
+                                              || t.NoGuarantor == filters.AcceptsWithoutGuarantor));
             /*Above are EXCLUSIVE filters for the filters page*/
         }
 
@@ -96,6 +98,11 @@ public class TenantService : ITenantService
         if (filters.AcceptsUnder35 == false)
         {
             tenantQuery = tenantQuery.Where(t => t.Under35 == false);
+        }
+        
+        if (filters.AcceptsWithoutGuarantor == false)
+        {
+            tenantQuery = tenantQuery.Where(t => t.NoGuarantor == false);
         }
 
         return tenantQuery;

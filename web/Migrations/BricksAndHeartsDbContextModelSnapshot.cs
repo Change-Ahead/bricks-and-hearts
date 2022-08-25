@@ -245,6 +245,9 @@ namespace BricksAndHearts.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool?>("NoGuarantor")
+                        .HasColumnType("bit");
+
                     b.Property<bool?>("NotInEET")
                         .HasColumnType("bit");
 

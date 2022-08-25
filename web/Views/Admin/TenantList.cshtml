@@ -98,6 +98,18 @@
                     new { @class = "form-select" }
                     )
             </div>
+            <div class="col-auto d-grid">
+                @Html.DropDownListFor(
+                    model => model.Filter.AcceptsWithoutGuarantor,
+                    new List<SelectListItem>
+                    {
+                        new("No guarantor", "true"),
+                        new("Has guarantor", "false")
+                    },
+                    "Filter by guarantor",
+                    new { @class = "form-select" }
+                    )
+            </div>
         </div>
         <input type="submit" value="Apply filters" class="btn btn-large btn-primary my-3"/>
     </form>

@@ -62,6 +62,10 @@
                         <i class="bi me-1 @GetPreferenceIcon(!tenant.NotInEET)"></i>
                         In EET (Employment, Education, or Training)
                     </div>
+                    <div class="@GetPreferenceFont(tenant.NoGuarantor)">
+                        <i class="bi me-1 @GetPreferenceIcon(tenant.NoGuarantor)"></i>
+                        Without rent guarantor
+                    </div>
                 </td>
                 <td>
                 @using (Html.BeginForm("SendMatchLinkEmail", "Tenant", new

@@ -19,4 +19,5 @@ public class TenantDbModel
     public bool? UniversalCredit { get; set; }
     public bool? HousingBenefits { get; set; }
     public bool? Under35 { get; set; }
+    public bool? NoGuarantor { get; set; }
 }

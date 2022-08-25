@@ -13,4 +13,5 @@ public class TenantUploadModel
     public string? UniversalCredit { get; set; }
     public string? HousingBenefits { get; set; }
     public string? Under35 { get; set; }
+    public string? NoGuarantor { get; set; }
 }

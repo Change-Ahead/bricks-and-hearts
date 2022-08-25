@@ -167,6 +167,8 @@ public class CsvImportService : ICsvImportService
         dbTenant.HousingBenefits = CheckBoolInput("HousingBenefits", tenant.HousingBenefits, tenant.Name, flashTypes,
             flashMessages);
         dbTenant.Under35 = CheckBoolInput("Under35", tenant.Under35, tenant.Name, flashTypes, flashMessages);
+        dbTenant.NoGuarantor =
+            CheckBoolInput("NoGuarantor", tenant.NoGuarantor, tenant.Name, flashTypes, flashMessages);
 
         _dbContext.Tenants.Add(dbTenant);
         return (flashTypes, flashMessages);
