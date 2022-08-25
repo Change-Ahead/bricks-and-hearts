@@ -148,7 +148,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         property.AcceptsBenefits.Should().BeFalse();
         context.Properties.Count().Should().Be(propertiesBeforeCount);
     }
-    
+
     [Fact]
     public async Task UpdateProperty_Fails_OccupiedGreaterThanTotal()
     {
@@ -198,7 +198,8 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     }
 
     [Fact]
-    public void FormToViewModel_SetsDbAvailabilityToAvailableAndSetsDbAvailableFromToAvailableFrom_IfAvailabilityIsAvailableSoon()
+    public void
+        FormToViewModel_SetsDbAvailabilityToAvailableAndSetsDbAvailableFromToAvailableFrom_IfAvailabilityIsAvailableSoon()
     {
         // Arrange
         var inputModel = new PropertyInputModelAvailability()
@@ -206,21 +207,21 @@ public class PropertyServiceTests : PropertyServiceTestsBase
             OccupiedUnits = 0,
             TotalUnits = 1,
             AvailableFrom = DateTime.Today.AddDays(1),
-            Availability = AvailabilityState.AvailableSoon,
-            Rent = 100
+            Availability = AvailabilityState.AvailableSoon
         };
-        
+
         // Act
         var result = inputModel.FormToViewModel();
-        
+
         // Assert
         result.Should().BeOfType<PropertyViewModel>();
         result.Availability.Should().Be(AvailabilityState.Available);
         result.AvailableFrom.Should().Be(DateTime.Today.AddDays(1));
     }
-    
+
     [Fact]
-    public void FormToViewModel_SetsDbAvailabilityToAvailableAndSetsDbAvailableFromToCurrentDateIfAvailabilityIsAvailable()
+    public void
+        FormToViewModel_SetsDbAvailabilityToAvailableAndSetsDbAvailableFromToCurrentDateIfAvailabilityIsAvailable()
     {
         // Arrange
         var inputModel = new PropertyInputModelAvailability()
@@ -228,19 +229,18 @@ public class PropertyServiceTests : PropertyServiceTestsBase
             OccupiedUnits = 0,
             TotalUnits = 1,
             AvailableFrom = null,
-            Availability = AvailabilityState.Available,
-            Rent = 100
+            Availability = AvailabilityState.Available
         };
-        
+
         // Act
         var result = inputModel.FormToViewModel();
-        
+
         // Assert
         result.Should().BeOfType<PropertyViewModel>();
         result.Availability.Should().Be(AvailabilityState.Available);
         result.AvailableFrom.Should().Be(DateTime.Today);
     }
-    
+
     [Fact]
     public void FormToViewModel_SetsAvailabilityStateToOccupiedAndAvailableFromToNull_IfAllUnitsOccupied()
     {
@@ -250,13 +250,12 @@ public class PropertyServiceTests : PropertyServiceTestsBase
             OccupiedUnits = 3,
             TotalUnits = 3,
             AvailableFrom = DateTime.Today.AddDays(1),
-            Availability = AvailabilityState.Available,
-            Rent = 100
+            Availability = AvailabilityState.Available
         };
-       
+
         // Act
         var result = inputModel.FormToViewModel();
-        
+
         // Assert
         result.Should().BeOfType<PropertyViewModel>();
         result.Availability.Should().Be(AvailabilityState.Occupied);
