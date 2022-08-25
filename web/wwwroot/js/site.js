@@ -41,7 +41,7 @@ function copyLinkToClipboard(linkToCopy) {
             // Change the button styling to show the link has been copied
             const copyBtn = document.getElementById("copyBtn");
             copyBtn.innerHTML = "<i class='bi bi-check'></i> Invite link copied"
-            copyBtn.className = "btn btn-success my-3"
+            copyBtn.className = "btn btn-large btn-success"
         });
 }
 
