@@ -42,7 +42,7 @@ public class LandLordControllerUnassignedTests : LandlordControllerTestsBase
                       + "\n"
                       + $"Phone: {formResultModel.Phone}"
                       + "\n";
-        var subject = "Bricks&Hearts - landlord registration notification";
+        var subject = "Bricks & Hearts - landlord registration notification";
         A.CallTo(() => LandlordService.RegisterLandlord(formResultModel))
             .Returns((LandlordRegistrationResult.Success, returnedLandlord));
         A.CallTo(() => MailService.SendMsg(
