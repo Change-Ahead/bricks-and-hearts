@@ -81,6 +81,10 @@ public class PropertyViewModel : IValidatableObject
 
     public static PropertyViewModel FromDbModel(PropertyDbModel property)
     {
+        var viewAvailability = property.Availability == AvailabilityState.Available && property.AvailableFrom > DateTime.Now
+            ? AvailabilityState.AvailableSoon
+            : property.Availability;;
+        
         var propertyViewModel = new PropertyViewModel
         {
             PropertyId = property.Id,
@@ -116,16 +120,11 @@ public class PropertyViewModel : IValidatableObject
             },
             TotalUnits = property.TotalUnits,
             OccupiedUnits = property.OccupiedUnits,
+            Availability = viewAvailability,
+            AvailableFrom = viewAvailability == AvailabilityState.AvailableSoon ? property.AvailableFrom : null,
             PublicViewLink = property.PublicViewLink
         };
-
-        propertyViewModel.Availability =
-            property.Availability == AvailabilityState.Available && property.AvailableFrom > DateTime.Now
-                ? AvailabilityState.AvailableSoon
-                : property.Availability;
-        propertyViewModel.AvailableFrom =
-            propertyViewModel.Availability == AvailabilityState.AvailableSoon ? property.AvailableFrom : null;
-        
+            
         return propertyViewModel;
     }
 }

@@ -37,6 +37,7 @@ public class PropertyService : IPropertyService
     public async Task<int> AddNewProperty(int landlordId, PropertyViewModel createModel, bool isIncomplete = true)
     {
         var postcode = await _postcodeService.GetPostcodeAndAddIfAbsent(createModel.Address.Postcode);
+
         var dbModel = new PropertyDbModel
         {
             LandlordId = landlordId,
@@ -72,15 +73,9 @@ public class PropertyService : IPropertyService
             TotalUnits = createModel.TotalUnits ?? 1,
             OccupiedUnits = createModel.OccupiedUnits ?? 0,
             
+            Availability = createModel.Availability ?? AvailabilityState.Draft,
+            AvailableFrom = createModel.AvailableFrom
         };
-
-        dbModel.Availability = createModel.Availability == AvailabilityState.AvailableSoon
-            ? AvailabilityState.Available
-            : createModel.Availability ?? AvailabilityState.Draft;
-        
-        dbModel.AvailableFrom = dbModel.Availability == AvailabilityState.Available
-            ? createModel.Availability == AvailabilityState.AvailableSoon ? createModel.AvailableFrom : DateTime.Now
-            : null;
 
         // Add the new property to the database
         _dbContext.Properties.Add(dbModel);
@@ -124,21 +119,11 @@ public class PropertyService : IPropertyService
                                           ?? dbModel.AcceptsWithoutGuarantor;
 
         dbModel.Rent = updateModel.Rent ?? dbModel.Rent;
-
         dbModel.TotalUnits = updateModel.TotalUnits ?? dbModel.TotalUnits;
         dbModel.OccupiedUnits = updateModel.OccupiedUnits ?? dbModel.OccupiedUnits;
-
-        // Occupied state takes precedence over attempted update
-        // If no update, fallback to current value as usual
-        dbModel.Availability = dbModel.OccupiedUnits == dbModel.TotalUnits
-            ? AvailabilityState.Occupied
-            : updateModel.Availability == AvailabilityState.AvailableSoon
-                ? AvailabilityState.Available
-                : updateModel.Availability ?? AvailabilityState.Draft;
         
-        dbModel.AvailableFrom = dbModel.Availability == AvailabilityState.Available
-            ? updateModel.Availability == AvailabilityState.AvailableSoon? updateModel.AvailableFrom : DateTime.Now
-            : null;
+        dbModel.Availability = updateModel.Availability ?? AvailabilityState.Draft;
+        dbModel.AvailableFrom = updateModel.AvailableFrom;
 
         dbModel.IsIncomplete = isIncomplete;
         await _dbContext.SaveChangesAsync();
@@ -181,7 +166,7 @@ public class PropertyService : IPropertyService
             _dbContext.Properties.Where(p => !p.Landlord.Disabled && p.Availability != AvailabilityState.Draft);
         if (!properties.Any())
         {
-            return (properties.ToList(), 0);
+            return (new List<PropertyDbModel>(), 0);
         }
         switch (sortBy)
         {
@@ -213,7 +198,9 @@ public class PropertyService : IPropertyService
             case "Availability":
                 properties = properties
                     .Include(p => p.Postcode)
-                    .OrderBy(p => p.Availability == AvailabilityState.Available).ThenBy(p => p.Availability).ThenBy(p => p.AvailableFrom);
+                    .OrderBy(p => p.Availability == AvailabilityState.Available)
+                    .ThenBy(p => p.Availability)
+                    .ThenBy(p => p.AvailableFrom);
                 break;
             default:
                 properties = properties.Include(p => p.Postcode);

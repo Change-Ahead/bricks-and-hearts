@@ -110,7 +110,7 @@ public class PropertyController : AbstractController
 
         var propertyViewModel = PropertyViewModel.FromDbModel(model);
 
-        var owner = LandlordProfileModel.FromDbModel(_propertyService.GetPropertyOwner(propertyViewModel.PropertyId));
+        var owner = LandlordProfileModel.FromDbModel(_propertyService.GetPropertyOwner(propertyId));
         var fileNames = await _azureStorage.ListFileNames("property", propertyId);
         var imageFiles = GetFilesFromFileNames(fileNames, propertyId);
         var propertyDetailsModel = new PropertyDetailsViewModel { Property = propertyViewModel, Owner = owner, Images = imageFiles };

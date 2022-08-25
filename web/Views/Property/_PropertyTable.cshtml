@@ -62,7 +62,7 @@
                 <td>
                     @if (prop.Availability == AvailabilityState.AvailableSoon && prop.AvailableFrom.HasValue)
                     {
-                        @("Available" + "\n" + prop.AvailableFrom.Value.ToShortDateString())
+                        @("Available from" + "\n" + prop.AvailableFrom.Value.ToShortDateString())
                     }
                     else
                     {

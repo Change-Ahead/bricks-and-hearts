@@ -63,11 +63,33 @@ public class PropertyInputModelAvailability : PropertyInputModelBase, IValidatab
 
     public override PropertyViewModel FormToViewModel()
     {
+        var dbAvailability = "";
+        if (OccupiedUnits == TotalUnits)
+        {
+            dbAvailability = AvailabilityState.Occupied;
+        }
+        else
+        {
+            dbAvailability = Availability == AvailabilityState.AvailableSoon
+                ? AvailabilityState.Available : Availability;
+        }
+
+        var dbAvailableFrom = new DateTime?();
+        if (dbAvailability == AvailabilityState.Available)
+        {
+            dbAvailableFrom = Availability == AvailabilityState.AvailableSoon
+                ? AvailableFrom : DateTime.Now;
+        }
+        else
+        {
+            dbAvailableFrom = null;
+        }
+
         return new PropertyViewModel
         {
-            Availability = Availability,
+            Availability = dbAvailability,
+            AvailableFrom = dbAvailableFrom,
             Rent = Rent,
-            AvailableFrom = AvailableFrom,
             TotalUnits = TotalUnits,
             OccupiedUnits = OccupiedUnits
         };

@@ -13,9 +13,9 @@
 
 @if (Model.Property != null && Model.Property.Availability != AvailabilityState.Draft && Model.Owner != null && Model.Owner.CharterApproved && !Model.Owner.Disabled)
 {
-    GetLivePill("Live", "live","eye");
+    GetLivePill("Live", "live", "eye");
 }
 else
 {
-    GetLivePill("Pending", "draft","clock");
+    GetLivePill("Pending", "draft", "clock");
 }
