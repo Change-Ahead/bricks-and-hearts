@@ -22,6 +22,25 @@ public class TestDatabaseFixture
         { "LS1 1AZ", AddPostcode("LS1 1AZ", -1.564095, 53.796296) },
         { "SE1 9BG", AddPostcode("SE1 9BG", -0.087584, 51.506543) }
     };
+    
+    public LandlordDbModel PerfectLandlord = new()
+    {
+        Email = "perfect.landlord1@gmail.com",
+        FirstName = "Landlord1Approved",
+        LastName = "Landlord1Sur",
+        Title = "Mr",
+        Phone = "01189998819991197253",
+        LandlordType = "Non profit",
+        CharterApproved = true,
+        MembershipId = "memberbest",
+        AddressLine1 = "adr1",
+        AddressLine2 = "adr2",
+        AddressLine3 = "adr3",
+        TownOrCity = "city",
+        County = "county",
+        Postcode = "cb2 1la",
+        Disabled = false
+    };
 
     public TestDatabaseFixture()
     {
@@ -49,7 +68,8 @@ public class TestDatabaseFixture
                     CreateLandlordWithMembershipId(5), // landlordId = 5
                     CreateLandlordWithMembershipId(6), // landlordId = 6
                     CreateEnabledLandlord(),
-                    CreateDisabledLandlord()
+                    CreateDisabledLandlord(),
+                    PerfectLandlord
                 );
 
                 context.Users.AddRange(
@@ -68,10 +88,10 @@ public class TestDatabaseFixture
                     CreateCompleteProperty(1),
                     CreateCompleteProperty(2),
                     CreateIncompleteProperty(2),
-                    CreateBrightonProperty(3),
-                    CreateLondonProperty(3),
-                    CreatePeterboroughProperty(3),
-                    CreateLeedsProperty(3)
+                    CreateBrightonProperty(PerfectLandlord.Id),
+                    CreateLondonProperty(PerfectLandlord.Id),
+                    CreatePeterboroughProperty(PerfectLandlord.Id),
+                    CreateLeedsProperty(PerfectLandlord.Id)
                 );
                 context.Properties.AddRange(
                     CreateCompleteProperty(),
@@ -463,8 +483,8 @@ public class TestDatabaseFixture
             TownOrCity = "Available Town",
             County = "Available County",
             Postcode = Postcodes["CB2 1LA"],
-            Availability = AvailabilityState.AvailableSoon,
-            AvailableFrom = DateTime.MinValue
+            Availability = AvailabilityState.Available,
+            AvailableFrom = DateTime.Today.AddDays(10)
         };
     }
 
@@ -522,7 +542,9 @@ public class TestDatabaseFixture
             County = "East Sussex",
             TownOrCity = "Brighton",
             Postcode = Postcodes["BN1 1AJ"],
+            Availability = AvailabilityState.Available,
             IsIncomplete = true,
+            Landlord = PerfectLandlord
         };
     }
 
@@ -535,7 +557,9 @@ public class TestDatabaseFixture
             County = "Greater London",
             TownOrCity = "London",
             Postcode = Postcodes["SE1 9BG"],
-            IsIncomplete = true
+            Availability = AvailabilityState.Available,
+            IsIncomplete = true,
+            Landlord = PerfectLandlord
         };
     }
 
@@ -548,7 +572,9 @@ public class TestDatabaseFixture
             County = "Cambridgeshire",
             TownOrCity = "Peterborough",
             Postcode = Postcodes["PE1 1BF"],
-            IsIncomplete = true
+            Availability = AvailabilityState.Available,
+            IsIncomplete = true,
+            Landlord = PerfectLandlord
         };
     }
 
@@ -561,7 +587,9 @@ public class TestDatabaseFixture
             County = "West Yorkshire",
             TownOrCity = "Leeds",
             Postcode = Postcodes["LS1 1AZ"],
-            IsIncomplete = true
+            Availability = AvailabilityState.Available,
+            IsIncomplete = true,
+            Landlord = PerfectLandlord
         };
     }
 

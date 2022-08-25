@@ -559,7 +559,7 @@ th {
 }
 
 #faqCollapse + a:not(.collapsed)::after {
-    content: "See less FAQs";
+    content: "See fewer FAQs";
 }
 
 .placeholder-glow {

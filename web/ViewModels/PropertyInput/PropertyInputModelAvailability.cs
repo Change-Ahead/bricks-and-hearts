@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using BricksAndHearts.Database;
 using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
 
@@ -51,19 +51,45 @@ public class PropertyInputModelAvailability : PropertyInputModelBase, IValidatab
         Step = 6;
         Title = "Rent, Deposits, Availability, and Duration";
         Rent = property.Rent;
-        Availability = property.Availability;
-        AvailableFrom = property.AvailableFrom;
+        Availability =
+            property.Availability == AvailabilityState.Available && property.AvailableFrom > DateTime.Now
+                ? AvailabilityState.AvailableSoon
+                : property.Availability;
+        AvailableFrom =
+            Availability == AvailabilityState.AvailableSoon ? property.AvailableFrom : null;
         TotalUnits = property.TotalUnits;
         OccupiedUnits = property.OccupiedUnits;
     }
 
     public override PropertyViewModel FormToViewModel()
     {
+        string? dbAvailability;
+        if (OccupiedUnits == TotalUnits)
+        {
+            dbAvailability = AvailabilityState.Occupied;
+        }
+        else
+        {
+            dbAvailability = Availability == AvailabilityState.AvailableSoon
+                ? AvailabilityState.Available : Availability;
+        }
+
+        DateTime? dbAvailableFrom;
+        if (dbAvailability == AvailabilityState.Available)
+        {
+            dbAvailableFrom = Availability == AvailabilityState.AvailableSoon
+                ? AvailableFrom : DateTime.Today;
+        }
+        else
+        {
+            dbAvailableFrom = null;
+        }
+
         return new PropertyViewModel
         {
-            Availability = Availability,
+            Availability = dbAvailability,
+            AvailableFrom = dbAvailableFrom,
             Rent = Rent,
-            AvailableFrom = AvailableFrom,
             TotalUnits = TotalUnits,
             OccupiedUnits = OccupiedUnits
         };

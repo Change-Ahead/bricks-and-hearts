@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using BricksAndHearts.Database;
 using BricksAndHearts.Services;
 using BricksAndHearts.ViewModels;
+using BricksAndHearts.ViewModels.PropertyInput;
 using FakeItEasy;
 using FluentAssertions;
 using Microsoft.Data.SqlClient;
@@ -147,29 +148,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         property.AcceptsBenefits.Should().BeFalse();
         context.Properties.Count().Should().Be(propertiesBeforeCount);
     }
-
-    [Fact]
-    public async Task UpdateProperty_SetsStateToOccupied_IfAllUnitsOccupied()
-    {
-        // Arrange
-        await using var context = Fixture.CreateWriteContext();
-        A.CallTo(() => _postcodeService.GetPostcodeAndAddIfAbsent(A<string>.Ignored))!
-            .Returns(Task.FromResult<PostcodeDbModel?>(null));
-        var service = new PropertyService(context, _postcodeService);
-
-        var propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
-        var propertyUpdate = new PropertyViewModel { OccupiedUnits = propertyDb.TotalUnits };
-
-        // Act
-        await service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
-        context.ChangeTracker.Clear();
-
-        // Assert
-        propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
-        propertyDb.Availability.Should().Be(AvailabilityState.Occupied);
-        propertyDb.OccupiedUnits.Should().Be(propertyDb.TotalUnits);
-    }
-
+    
     [Fact]
     public async Task UpdateProperty_Fails_OccupiedGreaterThanTotal()
     {
@@ -204,7 +183,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
         var propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
         var propertyUpdate = new PropertyViewModel
         {
-            Availability = AvailabilityState.AvailableSoon,
+            Availability = AvailabilityState.Available,
             AvailableFrom = date
         };
 
@@ -214,62 +193,75 @@ public class PropertyServiceTests : PropertyServiceTestsBase
 
         // Assert
         propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
-        propertyDb.Availability.Should().Be(AvailabilityState.AvailableSoon);
+        propertyDb.Availability.Should().Be(AvailabilityState.Available);
         propertyDb.AvailableFrom.Should().Be(date);
     }
 
     [Fact]
-    public async Task UpdateProperty_DoesntChangeAvailableFromDate_WhenOccupiedStateOverrides()
+    public void FormToViewModel_SetsDbAvailabilityToAvailableAndSetsDbAvailableFromToAvailableFrom_IfAvailabilityIsAvailableSoon()
     {
         // Arrange
-        await using var context = Fixture.CreateWriteContext();
-        A.CallTo(() => _postcodeService.GetPostcodeAndAddIfAbsent(A<string>.Ignored))!
-            .Returns(Task.FromResult<PostcodeDbModel?>(null));
-        var service = new PropertyService(context, _postcodeService);
-
-        var date = DateTime.Now;
-        var propertyDb = context.Properties.Single(p => p.AddressLine1 == "AvailableSoon Property");
-        var propertyUpdate = new PropertyViewModel
+        var inputModel = new PropertyInputModelAvailability()
         {
-            AvailableFrom = date
-        };
-
-        // Act
-        await service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
-        context.ChangeTracker.Clear();
-
-        // Assert
-        propertyDb = context.Properties.Single(p => p.AddressLine1 == "AvailableSoon Property");
-        propertyDb.Availability.Should().Be(AvailabilityState.AvailableSoon);
-        propertyDb.AvailableFrom.Should().NotBe(date).And.Be(DateTime.MinValue);
-    }
-
-    [Fact]
-    public async Task UpdateProperty_SetsAvailableFromDateToNull_WhenOccupiedStateOverrides()
-    {
-        // Arrange
-        await using var context = Fixture.CreateWriteContext();
-        A.CallTo(() => _postcodeService.GetPostcodeAndAddIfAbsent(A<string>.Ignored))!
-            .Returns(Task.FromResult<PostcodeDbModel?>(null));
-        var service = new PropertyService(context, _postcodeService);
-
-        var date = DateTime.Now;
-        var propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
-        var propertyUpdate = new PropertyViewModel
-        {
-            OccupiedUnits = propertyDb.TotalUnits,
+            OccupiedUnits = 0,
+            TotalUnits = 1,
+            AvailableFrom = DateTime.Today.AddDays(1),
             Availability = AvailabilityState.AvailableSoon,
-            AvailableFrom = date
+            Rent = 100
         };
-
+        
         // Act
-        await service.UpdateProperty(propertyDb.Id, propertyUpdate, isIncomplete: false);
-        context.ChangeTracker.Clear();
-
+        var result = inputModel.FormToViewModel();
+        
         // Assert
-        propertyDb = context.Properties.Single(p => p.AddressLine1 == "MultiUnit Property");
-        propertyDb.Availability.Should().Be(AvailabilityState.Occupied);
-        propertyDb.AvailableFrom.Should().BeNull();
+        result.Should().BeOfType<PropertyViewModel>();
+        result.Availability.Should().Be(AvailabilityState.Available);
+        result.AvailableFrom.Should().Be(DateTime.Today.AddDays(1));
+    }
+    
+    [Fact]
+    public void FormToViewModel_SetsDbAvailabilityToAvailableAndSetsDbAvailableFromToCurrentDateIfAvailabilityIsAvailable()
+    {
+        // Arrange
+        var inputModel = new PropertyInputModelAvailability()
+        {
+            OccupiedUnits = 0,
+            TotalUnits = 1,
+            AvailableFrom = null,
+            Availability = AvailabilityState.Available,
+            Rent = 100
+        };
+        
+        // Act
+        var result = inputModel.FormToViewModel();
+        
+        // Assert
+        result.Should().BeOfType<PropertyViewModel>();
+        result.Availability.Should().Be(AvailabilityState.Available);
+        result.AvailableFrom.Should().Be(DateTime.Today);
+    }
+    
+    [Fact]
+    public void FormToViewModel_SetsAvailabilityStateToOccupiedAndAvailableFromToNull_IfAllUnitsOccupied()
+    {
+        // Arrange
+        var inputModel = new PropertyInputModelAvailability()
+        {
+            OccupiedUnits = 3,
+            TotalUnits = 3,
+            AvailableFrom = DateTime.Today.AddDays(1),
+            Availability = AvailabilityState.Available,
+            Rent = 100
+        };
+       
+        // Act
+        var result = inputModel.FormToViewModel();
+        
+        // Assert
+        result.Should().BeOfType<PropertyViewModel>();
+        result.Availability.Should().Be(AvailabilityState.Occupied);
+        result.AvailableFrom.Should().Be(null);
+        result.OccupiedUnits.Should().Be(inputModel.TotalUnits);
     }
 
     #endregion
@@ -473,6 +465,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
     public async void SortPropertiesByLocation_WhenCalledWithInvalidPostcode_ReturnsEmptyList()
     {
         // Arrange
+        await using var context = Fixture.CreateReadContext();
         var logger = A.Fake<ILogger<PostcodeService>>();
         var messageHandler = A.Fake<HttpMessageHandler>();
         const string postcode = "eeeeee";
@@ -487,7 +480,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
             .Returns(response);
         var httpClient = new HttpClient(messageHandler);
         var postcodeApiService = new PostcodeService(logger, null!, httpClient);
-        var service = new PropertyService(null!, postcodeApiService);
+        var service = new PropertyService(context, postcodeApiService);
 
         // Act
         var result = await service.GetPropertyList("Location", postcode, 1, 10);
@@ -530,7 +523,7 @@ public class PropertyServiceTests : PropertyServiceTestsBase
             context.Properties.Single(p => p.TownOrCity == "London"),
             context.Properties.Single(p => p.TownOrCity == "Brighton"),
         };
-        var propertyDbModelList = result.PropertyList.FindAll(p => p.LandlordId == 3);
+        var propertyDbModelList = result.PropertyList.FindAll(p => p.LandlordId == 9);
         propertyDbModelList.Should().BeEquivalentTo(correctList, options => options.WithStrictOrdering());
     }
 }

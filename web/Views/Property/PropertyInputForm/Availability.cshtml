@@ -17,7 +17,7 @@
     <div class="col-auto">
         <label asp-for="Availability" class="form-label">Availability</label>
         <select asp-for="Availability" class="form-select" required
-                id="Select" onclick="displayIfSelectedValueIsTarget('@AvailabilityState.AvailableSoon', 'Select', 'ifTrue'); makeRequiredIfSelectedValueIsTarget('@AvailabilityState.AvailableSoon', 'Select', 'dateInput')">
+                id="Select" onclick="displayIfSelectedValueIsTarget('@AvailabilityState.Draft', 'Select', 'draftMessage'); displayIfSelectedValueIsTarget('@AvailabilityState.AvailableSoon', 'Select', 'dateInput'); makeRequiredIfSelectedValueIsTarget('@AvailabilityState.AvailableSoon', 'Select', 'dateInput')">
             <option selected>@AvailabilityState.Draft</option>
             <option>@AvailabilityState.Available</option>
             <option>@AvailabilityState.AvailableSoon</option>
@@ -25,12 +25,14 @@
         </select>
         <span asp-validation-for="Availability" class="text-danger"></span>
     </div>
-    <div class="col-auto" id="ifTrue" style="@(Model.Availability == AvailabilityState.AvailableSoon ? "" : "display: none;")">
+    <div class="col-auto" id="dateInput" style="@(Model.Availability == AvailabilityState.AvailableSoon ? "" : "display: none;")">
         <label asp-for="AvailableFrom" class="form-label">Available from</label>
-        <input id="dateInput" asp-for="AvailableFrom" class="form-control empty" type="date" asp-format="{0:yyyy-MM-dd}" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" step="1"/>
+        <input asp-for="AvailableFrom" class="form-control empty" type="date" asp-format="{0:yyyy-MM-dd}" min="@DateTime.Today.AddDays(1).ToString("yyyy-MM-dd")" step="1"/>
         <span asp-validation-for="AvailableFrom" class="text-danger"></span>
     </div>
-    <div class="d-none" id="ifFalse"></div>
+    <div id="draftMessage" class="form-text" style="@(Model.Availability == AvailabilityState.Draft ? "" : "display: none;")">
+        Listings in the 'Draft' state are not included in public lists of properties, and cannot be matched with tenants.
+    </div>
 </div>
 
 <div class="my-4 py-3">
