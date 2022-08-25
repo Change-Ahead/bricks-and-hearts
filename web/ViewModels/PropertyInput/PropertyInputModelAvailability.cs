@@ -63,7 +63,7 @@ public class PropertyInputModelAvailability : PropertyInputModelBase, IValidatab
 
     public override PropertyViewModel FormToViewModel()
     {
-        var dbAvailability = "";
+        string? dbAvailability;
         if (OccupiedUnits == TotalUnits)
         {
             dbAvailability = AvailabilityState.Occupied;
@@ -74,11 +74,11 @@ public class PropertyInputModelAvailability : PropertyInputModelBase, IValidatab
                 ? AvailabilityState.Available : Availability;
         }
 
-        var dbAvailableFrom = new DateTime?();
+        DateTime? dbAvailableFrom;
         if (dbAvailability == AvailabilityState.Available)
         {
             dbAvailableFrom = Availability == AvailabilityState.AvailableSoon
-                ? AvailableFrom : DateTime.Now;
+                ? AvailableFrom : DateTime.Today;
         }
         else
         {
