@@ -203,7 +203,7 @@ public class LandlordController : AbstractController
     }
 
     [Authorize(Roles = "Admin")]
-    [HttpPost("{id:int}/{action}")]
+    [HttpPost("{landlordId:int}/{action}")]
     public async Task<ActionResult> DisableOrEnableLandlord(int landlordId, string action)
     {
         var result = await _landlordService.DisableOrEnableLandlord(landlordId, action);
