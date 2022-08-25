@@ -4,7 +4,7 @@
 {
     void GetImageElement(int propertyId, int id, string size)
     {
-        <div href="#" class="property-img-@(size) placeholder-glow">
+        <div href="#" class="property-img-@(size) noHover placeholder-glow">
             <div class="placeholder w-100 h-100" id="image@(propertyId)@(id)Placeholder"></div>
             <img src="@Model.Images[id].FileUrl" alt="@Model.Images[id].FileName" id="image@(propertyId)@(id)" style="display: none" onload="hidePlaceholder('#image@(propertyId)@(id)')">
         </div>
@@ -17,7 +17,7 @@
             <div class="row property-img-row w-100">
                 @if (Model.Images.Count > 0)
                 {
-                    <div class="col-sm my-3">
+                    <div class="col-sm mb-3">
                         @{ GetImageElement(Model.Property!.PropertyId, 0, "lg"); }
                     </div>
                 }

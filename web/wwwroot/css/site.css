@@ -415,6 +415,10 @@ th {
     }
 }
 
+.noHover {
+    pointer-events: none;
+}
+
 .property-img-lg img, .property-img-sm img, .property-img-thumbnail img {
     width: 100%;
     height: 100%;
