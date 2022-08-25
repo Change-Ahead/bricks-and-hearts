@@ -13,8 +13,8 @@ using NetTopologySuite.Geometries;
 namespace BricksAndHearts.Migrations
 {
     [DbContext(typeof(BricksAndHeartsDbContext))]
-    [Migration("20220825125208_AddNoGuarantorToTenantDb")]
-    partial class AddNoGuarantorToTenantDb
+    [Migration("20220825144120_AddHasGuarantorAndChangeEETInTenants")]
+    partial class AddHasGuarantorAndChangeEETInTenants
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -237,21 +237,21 @@ namespace BricksAndHearts.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool?>("HasGuarantor")
+                        .HasColumnType("bit");
+
                     b.Property<bool?>("HasPet")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("HousingBenefits")
                         .HasColumnType("bit");
 
+                    b.Property<bool?>("InEET")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("NoGuarantor")
-                        .HasColumnType("bit");
-
-                    b.Property<bool?>("NotInEET")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");

@@ -4,12 +4,17 @@
 
 namespace BricksAndHearts.Migrations
 {
-    public partial class AddNoGuarantorToTenantDb : Migration
+    public partial class AddHasGuarantorAndChangeEETInTenants : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.RenameColumn(
+                name: "NotInEET",
+                table: "Tenant",
+                newName: "InEET");
+
             migrationBuilder.AddColumn<bool>(
-                name: "NoGuarantor",
+                name: "HasGuarantor",
                 table: "Tenant",
                 type: "bit",
                 nullable: true);
@@ -18,8 +23,13 @@ namespace BricksAndHearts.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "NoGuarantor",
+                name: "HasGuarantor",
                 table: "Tenant");
+
+            migrationBuilder.RenameColumn(
+                name: "InEET",
+                table: "Tenant",
+                newName: "NotInEET");
         }
     }
 }
