@@ -133,7 +133,7 @@
 
 @if (Model.NumOfProperties > 0)
 {
-    <a asp-action="@(User.IsInRole("Landlord") ? "ViewMyProperties" : "ViewProperties")" asp-controller="Landlord" class="btn btn-primary my-3">View properties</a>
+    <a asp-action="@(User.IsInRole("Admin") ? "ViewProperties" : "ViewMyProperties")" asp-controller="Landlord" asp-route-id="@(User.IsInRole("Admin") ? Model.LandlordId : "")" class="btn btn-primary my-3">View properties</a>
 }
 else
 {
