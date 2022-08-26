@@ -2,38 +2,40 @@
 
 @functions
 {
-    void GetImageElement(int propertyId, int id, string size)
+    void GetImageElement(int propertyId, int id, string size, bool marginBottom = false)
     {
-        <div href="#" class="property-img-@(size) placeholder-glow">
+        <div href="#" class="property-img-@(size) placeholder-glow pe-none @(marginBottom ? "mb-3" : "")">
             <div class="placeholder w-100 h-100" id="image@(propertyId)@(id)Placeholder"></div>
             <img src="@Model.Images[id].FileUrl" alt="@Model.Images[id].FileName" id="image@(propertyId)@(id)" style="display: none" onload="hidePlaceholder('#image@(propertyId)@(id)')">
         </div>
     }
 }
 
-<div class="border border-primary rounded mb-3 p-2 statBox">
-    <div class="row property-img-row w-100">
+<div class="border border-primary rounded-custom mb-3 p-3 pt-0 statBox">
+    <div class="row w-100 mx-0">
         @if (Model.Images.Count > 0)
         {
-            <div class="col-sm my-3">
+            <div class="col-sm my-3 px-0">
                 @{ GetImageElement(Model.Property!.PropertyId, 0, "lg"); }
             </div>
             @if (Model.Images.Count > 1)
             {
-                <div class="col-sm-4 my-3 h-50 property-img-sm-col">
-                    @{ GetImageElement(Model.Property!.PropertyId, 1, "lg"); }
+                <div class="col-sm-4 my-3 h-50 property-img-sm-col pe-0">
+                    @{ GetImageElement(Model.Property!.PropertyId, 1, "lg", true); }
                     @if (Model.Images.Count > 2)
                     {
-                        <div class="my-3 property-img-sm-col">
-                                @{ GetImageElement(Model.Property!.PropertyId, 2, "lg"); }
-                        </div>
+                        GetImageElement(Model.Property!.PropertyId, 2, "lg");
                     }
                 </div>
             }
         }
     </div>
-    <h2 class="font-h2">@Model.Property!.Address.ToShortAddressString()</h2>
-    <div>
+    <div class="row">
+        <div class="col">
+            <h2 class="font-h2">@Model.Property!.Address.ToShortAddressString()</h2>
+        </div>
+    </div>
+    <div class="row">
         <p class="property-description property-description-table font-smallBody mb-0">@Model.Property.Description</p>
         <a asp-action="ViewProperty" asp-controller="Property" asp-route-propertyId="@Model.Property.PropertyId" class="font-smallBody">Read more</a>
     </div>
