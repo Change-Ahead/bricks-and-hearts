@@ -25,6 +25,7 @@ public class TenantListModel
             { nameof(Filter.AcceptsCredit), Filter.AcceptsCredit },
             { nameof(Filter.AcceptsBenefits), Filter.AcceptsBenefits },
             { nameof(Filter.AcceptsUnder35), Filter.AcceptsUnder35 },
+            { nameof(Filter.AcceptsWithoutGuarantor), Filter.AcceptsWithoutGuarantor},
             { nameof(Page), Page + pageChange },
             { nameof(TargetPostcode), TargetPostcode }
         };

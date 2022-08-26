@@ -57,9 +57,13 @@
                         <i class="bi me-1 @GetPreferenceIcon(tenant.HousingBenefits)"></i>
                         On housing benefits
                     </div>
-                    <div class="@GetPreferenceFont(!tenant.NotInEET)">
-                        <i class="bi me-1 @GetPreferenceIcon(!tenant.NotInEET)"></i>
+                    <div class="@GetPreferenceFont(tenant.InEET)">
+                        <i class="bi me-1 @GetPreferenceIcon(tenant.InEET)"></i>
                         In EET (Employment, Education, or Training)
+                    </div>
+                    <div class="@GetPreferenceFont(tenant.HasGuarantor)">
+                        <i class="bi me-1 @GetPreferenceIcon(tenant.HasGuarantor)"></i>
+                        Has rent guarantor
                     </div>
                 </td>
             </tr>

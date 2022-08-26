@@ -41,13 +41,13 @@
 
     <div class="col-md d-flex flex-column pb-2">
         <div class="d-flex">
-            <h3 class="font-h3 d-inline-block">@(User.IsLandlordOrAdmin() ? "Tenant preferences" : "Suitable for")</h3>
+            <h3 class="font-h3 d-inline-block">@(User.IsLandlordOrAdmin() ? "Property accepts" : "Suitable for")</h3>
             @if (User.IsLandlordOrAdmin())
             {
                 <a class="bi bi-pencil ms-auto" asp-action="PropertyInputStepFiveTenantPreferences" asp-controller="Property" asp-route-operationType="edit" asp-route-propertyId="@Model.Property!.PropertyId"></a>
             }
         </div>
-        <partial name="Details/_TenantPreferences"/>
+        <partial name="Details/_PropertyAccepts"/>
     </div>
 </div>
 

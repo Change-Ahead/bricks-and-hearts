@@ -15,8 +15,9 @@ public class TenantDbModel
 
     public string? Type { get; set; }
     public bool? HasPet { get; set; }
-    public bool? NotInEET { get; set; }
+    public bool? InEET { get; set; }
     public bool? UniversalCredit { get; set; }
     public bool? HousingBenefits { get; set; }
     public bool? Under35 { get; set; }
+    public bool? HasGuarantor { get; set; }
 }

@@ -64,12 +64,14 @@ public class TenantService : ITenantService
         if (!isMatching)
         {
             return tenantQuery.Where(t => (filters.AcceptsPets == null || t.HasPet == filters.AcceptsPets)
-                                          && (filters.AcceptsNotInEET == null || t.NotInEET == filters.AcceptsNotInEET)
+                                          && (filters.AcceptsNotInEET == null || t.InEET == !filters.AcceptsNotInEET)
                                           && (filters.AcceptsCredit == null
                                               || t.UniversalCredit == filters.AcceptsCredit)
                                           && (filters.AcceptsBenefits == null
                                               || t.HousingBenefits == filters.AcceptsBenefits)
-                                          && (filters.AcceptsUnder35 == null || t.Under35 == filters.AcceptsUnder35));
+                                          && (filters.AcceptsUnder35 == null || t.Under35 == filters.AcceptsUnder35)
+                                          && (filters.AcceptsWithoutGuarantor == null
+                                              || t.HasGuarantor == !filters.AcceptsWithoutGuarantor));
             /*Above are EXCLUSIVE filters for the filters page*/
         }
 
@@ -80,7 +82,7 @@ public class TenantService : ITenantService
 
         if (filters.AcceptsNotInEET == false)
         {
-            tenantQuery = tenantQuery.Where(t => t.NotInEET == false);
+            tenantQuery = tenantQuery.Where(t => t.InEET == true);
         }
 
         if (filters.AcceptsCredit == false)
@@ -96,6 +98,11 @@ public class TenantService : ITenantService
         if (filters.AcceptsUnder35 == false)
         {
             tenantQuery = tenantQuery.Where(t => t.Under35 == false);
+        }
+
+        if (filters.AcceptsWithoutGuarantor == false)
+        {
+            tenantQuery = tenantQuery.Where(t => t.HasGuarantor == true);
         }
 
         return tenantQuery;

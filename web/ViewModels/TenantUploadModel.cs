@@ -9,8 +9,9 @@ public class TenantUploadModel
 
     public string? Type { get; set; }
     public string? HasPet { get; set; }
-    public string? NotInEET { get; set; }
+    public string? InEET { get; set; }
     public string? UniversalCredit { get; set; }
     public string? HousingBenefits { get; set; }
     public string? Under35 { get; set; }
+    public string? HasGuarantor { get; set; }
 }

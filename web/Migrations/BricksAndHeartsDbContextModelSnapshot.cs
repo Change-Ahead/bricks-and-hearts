@@ -235,18 +235,21 @@ namespace BricksAndHearts.Migrations
                     b.Property<string>("Email")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool?>("HasGuarantor")
+                        .HasColumnType("bit");
+
                     b.Property<bool?>("HasPet")
                         .HasColumnType("bit");
 
                     b.Property<bool?>("HousingBenefits")
                         .HasColumnType("bit");
 
+                    b.Property<bool?>("InEET")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool?>("NotInEET")
-                        .HasColumnType("bit");
 
                     b.Property<string>("Phone")
                         .HasColumnType("nvarchar(max)");

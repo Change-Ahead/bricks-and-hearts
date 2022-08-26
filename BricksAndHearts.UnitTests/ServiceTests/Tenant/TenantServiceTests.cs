@@ -11,12 +11,12 @@ namespace BricksAndHearts.UnitTests.ServiceTests.Tenant;
 
 public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
 {
-    private TestDatabaseFixture Fixture { get; }
-
     public TenantServiceTests(TestDatabaseFixture fixture)
     {
         Fixture = fixture;
     }
+    private TestDatabaseFixture Fixture { get; }
+
     #region TenantListTests
 
     [Fact]
@@ -37,12 +37,12 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
             AcceptsUnder35 = true
         };
         //Act
-        var result = await service.FilterNearestTenantsToProperty(filters, true,"",1,10);
-        
+        var result = await service.FilterNearestTenantsToProperty(filters, true, "", 1, 10);
+
         //Assert
         result.TenantList.Should().BeOfType<List<TenantDbModel>>().Which.Count.Should().Be(context.Tenants.Count());
     }
-    
+
     [Fact]
     public async void FilterNearestTenantsToProperty_WithInvalidPostcodeAndNoMatchingAndAllFilters_ReturnsNoTenants()
     {
@@ -61,12 +61,12 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
             AcceptsUnder35 = true
         };
         //Act
-        var result = await service.FilterNearestTenantsToProperty(filters, false,"",1,10);
-        
+        var result = await service.FilterNearestTenantsToProperty(filters, false, "", 1, 10);
+
         //Assert
         result.TenantList.Should().BeOfType<List<TenantDbModel>>().Which.Count.Should().Be(0);
     }
-    
+
     [Fact]
     public async void FilterNearestTenantsToProperty_WithValidPostcodeAndNoMatching_ReturnsClosestTenantFirst()
     {
@@ -79,18 +79,19 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
             AcceptsCouple = true,
             AcceptsFamily = true,
             AcceptsPets = false,
-            AcceptsNotInEET = false,
+            AcceptsNotInEET = true,
             AcceptsCredit = false,
             AcceptsBenefits = false,
             AcceptsUnder35 = false
         };
         //Act
-        var result = await service.FilterNearestTenantsToProperty(filters, false,"PE11BF",1,10);
-        
+        var result = await service.FilterNearestTenantsToProperty(filters, false, "PE11BF", 1, 10);
+
         //Assert
-        result.TenantList.Should().BeOfType<List<TenantDbModel>>().Which.First().Postcode.Should().BeOfType<PostcodeDbModel>().Which.Postcode.Should().Be("PE1 1BF");
+        result.TenantList.Should().BeOfType<List<TenantDbModel>>().Which.First().Postcode.Should()
+            .BeOfType<PostcodeDbModel>().Which.Postcode.Should().Be("PE1 1BF");
     }
-    
+
     [Fact]
     public async void GetNearestTenantsToProperty_CalledWithFilters_ReturnsCorrectlyFilteredTenantListMaxLength5()
     {
@@ -125,7 +126,7 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
             .Count(t => t.Type == "Single"));
         result.Count.Should().BeLessThan(6);
     }
-    
+
     [Fact]
     public async void GetNearestTenantsToProperty_CalledWithOnlyAcceptsSingle_ReturnsSingleTenants()
     {
@@ -156,8 +157,8 @@ public class TenantServiceTests : IClassFixture<TestDatabaseFixture>
 
         // Assert
         result.TenantList.Should().BeOfType<List<TenantDbModel>>();
-        result.TenantList.Count.Should().Be(context.Tenants.Count(t => t.Type =="Single"));
+        result.TenantList.Count.Should().Be(context.Tenants.Count(t => t.Type == "Single"));
     }
-    
+
     #endregion
 }

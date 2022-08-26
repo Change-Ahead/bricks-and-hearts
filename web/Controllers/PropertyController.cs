@@ -303,7 +303,7 @@ public class PropertyController : AbstractController
     public ActionResult PropertyInputStepFiveTenantPreferences([FromRoute] int propertyId,
         [FromRoute] string operationType)
     {
-        const string viewName = "PropertyInputForm/TenantPreferences";
+        const string viewName = "PropertyInputForm/PropertyAccepts";
         var model = new PropertyInputModelTenantPreferences
         {
             IsEdit = OperationTypeToIsEdit(operationType)
@@ -319,7 +319,7 @@ public class PropertyController : AbstractController
         [FromRoute] int propertyId, [FromRoute] string operationType)
     {
         const string nextActionName = "PropertyInputStepSixAvailability";
-        const string currentViewName = "PropertyInputForm/TenantPreferences";
+        const string currentViewName = "PropertyInputForm/PropertyAccepts";
 
         return await StandardPropertyInputPostMethod(model, propertyId, operationType, nextActionName,
             currentViewName);

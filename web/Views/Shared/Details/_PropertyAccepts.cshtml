@@ -1,4 +1,4 @@
-﻿@model PropertyDetailsViewModel
+@model PropertyDetailsViewModel
 
 @functions
 {
@@ -35,23 +35,23 @@
         {
             <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsUnder35)">
                 <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsUnder35)"></i>
-                Is over 35
+                Is under 35
+            </div>
+            <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsCredit)">
+                <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsCredit)"></i>
+                On universal credit
             </div>
             <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsBenefits)">
                 <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsBenefits)"></i>
                 On housing benefits
             </div>
-            <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsCredit)">
-                <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsCredit)"></i>
-                On Universal Credit
-            </div>
-            <div class="@GetPreferenceFont(!Model.Property.LandlordRequirements.AcceptsNotInEET)">
-                <i class="bi me-1 @GetPreferenceIcon(!Model.Property.LandlordRequirements.AcceptsNotInEET)"></i>
-                In EET (Employment, Education, or Training)
+            <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsNotInEET)">
+                <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsNotInEET)"></i>
+                Not in EET (Employment, Education, or Training)
             </div>
             <div class="@GetPreferenceFont(Model.Property.LandlordRequirements.AcceptsWithoutGuarantor)">
                 <i class="bi me-1 @GetPreferenceIcon(Model.Property.LandlordRequirements.AcceptsWithoutGuarantor)"></i>
-                Without rent guarantor
+                Without guarantor
             </div>
         }
     </div>
