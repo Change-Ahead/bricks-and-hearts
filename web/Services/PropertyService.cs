@@ -69,10 +69,10 @@ public class PropertyService : IPropertyService
             AcceptsWithoutGuarantor = createModel.LandlordRequirements.AcceptsWithoutGuarantor,
 
             Rent = createModel.Rent,
-            
+
             TotalUnits = createModel.TotalUnits ?? 1,
             OccupiedUnits = createModel.OccupiedUnits ?? 0,
-            
+
             Availability = createModel.Availability ?? AvailabilityState.Draft,
             AvailableFrom = createModel.AvailableFrom
         };
@@ -121,8 +121,8 @@ public class PropertyService : IPropertyService
         dbModel.Rent = updateModel.Rent ?? dbModel.Rent;
         dbModel.TotalUnits = updateModel.TotalUnits ?? dbModel.TotalUnits;
         dbModel.OccupiedUnits = updateModel.OccupiedUnits ?? dbModel.OccupiedUnits;
-        
-        dbModel.Availability = updateModel.Availability ?? AvailabilityState.Draft;
+
+        dbModel.Availability = updateModel.Availability ?? dbModel.Availability;
         dbModel.AvailableFrom = updateModel.AvailableFrom;
 
         dbModel.IsIncomplete = isIncomplete;
@@ -168,6 +168,7 @@ public class PropertyService : IPropertyService
         {
             return (new List<PropertyDbModel>(), 0);
         }
+
         switch (sortBy)
         {
             case "Location":
