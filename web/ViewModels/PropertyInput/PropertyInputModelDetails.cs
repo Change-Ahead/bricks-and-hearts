@@ -12,6 +12,9 @@ public class PropertyInputModelDetails : PropertyInputModelBase
     [Required]
     public string? PropertyType { get; set; }
 
+    [Required]
+    public int? Rent { get; set; }
+
     [ValidateNever]
     public override string PreviousAction { get; set; } = "PropertyInputStepTwoAddress";
 
@@ -23,6 +26,7 @@ public class PropertyInputModelDetails : PropertyInputModelBase
         PropertyType = property.PropertyType;
         NumOfBedrooms = property.NumOfBedrooms;
         LandlordId = property.LandlordId;
+        Rent = property.Rent;
     }
 
     public override PropertyViewModel FormToViewModel()
@@ -30,7 +34,8 @@ public class PropertyInputModelDetails : PropertyInputModelBase
         return new PropertyViewModel
         {
             PropertyType = PropertyType,
-            NumOfBedrooms = NumOfBedrooms
+            NumOfBedrooms = NumOfBedrooms,
+            Rent = Rent
         };
     }
 }

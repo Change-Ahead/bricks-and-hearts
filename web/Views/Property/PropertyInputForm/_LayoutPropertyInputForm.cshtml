@@ -44,5 +44,6 @@
 <div asp-validation-summary="All" class="text-danger"></div>
 <form method="post">
     @RenderBody()
+    <div class="font-subtitle"><text class="text-danger">*</text> denotes a compulsory field</div>
     @{ await Html.RenderPartialAsync("PropertyInputForm/_PropertyFormButtons", Model); }
 </form>
