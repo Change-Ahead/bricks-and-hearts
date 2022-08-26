@@ -13,8 +13,8 @@ using NetTopologySuite.Geometries;
 namespace BricksAndHearts.Migrations
 {
     [DbContext(typeof(BricksAndHeartsDbContext))]
-    [Migration("20220825144120_AddHasGuarantorAndChangeEETInTenants")]
-    partial class AddHasGuarantorAndChangeEETInTenants
+    [Migration("20220826101543_AddHasGuarantorAndRenameNotInEET")]
+    partial class AddHasGuarantorAndRenameNotInEET
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

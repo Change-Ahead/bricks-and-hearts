@@ -4,7 +4,7 @@
 
 namespace BricksAndHearts.Migrations
 {
-    public partial class AddHasGuarantorAndChangeEETInTenants : Migration
+    public partial class AddHasGuarantorAndRenameNotInEET : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -12,6 +12,8 @@ namespace BricksAndHearts.Migrations
                 name: "NotInEET",
                 table: "Tenant",
                 newName: "InEET");
+            
+            migrationBuilder.Sql("UPDATE Tenant SET InEET = 1 - InEET WHERE InEET IS NOT NULL;");
 
             migrationBuilder.AddColumn<bool>(
                 name: "HasGuarantor",
@@ -30,6 +32,7 @@ namespace BricksAndHearts.Migrations
                 name: "InEET",
                 table: "Tenant",
                 newName: "NotInEET");
+            migrationBuilder.Sql("UPDATE Tenant SET NotInEET = 1 - NotInEET WHERE NotInEET IS NOT NULL;");
         }
     }
 }
