@@ -98,7 +98,7 @@ public class LandlordController : AbstractController
                               + "\n"
                               + $"Phone: {createModel.Phone}"
                               + "\n";
-                var subject = "Bricks&Hearts - landlord registration notification";
+                var subject = "Bricks & Hearts - landlord registration notification";
                 _mailService.TrySendMsgInBackground(msgBody, subject);
                 return RedirectToAction(nameof(Profile), "Landlord", new { landlord!.Id });
 

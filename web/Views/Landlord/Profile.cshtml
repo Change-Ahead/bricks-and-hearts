@@ -6,12 +6,29 @@
 }
 
 <div class="row py-3">
-    <div class="col-sm-1 profile-photo-lg">
+    <div class="col-sm-auto profile-photo-lg">
         <img src="@(Model.GoogleProfileImageUrl ?? Url.Content("~/images/profileDefault.png"))" alt="profile picture">
     </div>
     <div class="col-sm my-auto">
         <h1 class="font-h1 font-blue">@Html.DisplayFor(model => model.FirstName) @Html.DisplayFor(model => model.LastName)</h1>
         <div class="font-h3">Profile type: Landlord</div>
+    </div>
+    <div class="col-auto ms-sm-auto">
+        @if (Model.NumOfProperties > 0)
+        {
+            @if (((BricksAndHeartsUser)User.Identity!).LandlordId == Model.LandlordId)
+            {
+                <a asp-action="ViewMyProperties" asp-controller="Landlord" class="btn btn-primary">My properties</a>
+            }
+            else
+            {
+                <a asp-action="ViewProperties" asp-controller="Landlord" asp-route-id="@Model.LandlordId" class="btn btn-primary">View properties</a>
+            }
+        }
+        else
+        {
+            <a class="btn btn-primary" href='@Url.Action("PropertyInputStepOnePostcode", "Property", new { landlordId = Model.LandlordId, propertyId = 0, operationType = "add" })'>Add properties</a>
+        }
     </div>
 </div>
 
@@ -111,12 +128,14 @@
                 <tr>
                     <th class="w-25">Status</th>
                     <td>
-                        <div class="d-flex">
-                            @(Model.CharterApproved ? "Approved" : "Pending")
-                            @if (User.IsInRole("Admin") && !Model.CharterApproved)
-                            {
-                                <button type="button" class="btn btn-sm btn-outline-primary ms-auto" data-bs-toggle="modal" data-bs-target="#approveModal">Confirm charter membership</button>
-                            }
+                        <div class="row">
+                            <div class="col-sm-auto"> @(Model.CharterApproved ? "Approved" : "Pending")</div>
+                            <div class="col-sm-auto">
+                                @if (User.IsInRole("Admin") && !Model.CharterApproved)
+                                {
+                                    <button type="button" class="btn btn-sm btn-outline-primary ms-auto ml-2" data-bs-toggle="modal" data-bs-target="#approveModal">Confirm charter membership</button>
+                                }
+                            </div>
                         </div>
                     </td>
                 </tr>
@@ -132,40 +151,37 @@
     </div>
 </div>
 
-@if (Model.NumOfProperties > 0)
-{
-    @if (((BricksAndHeartsUser)User.Identity!).LandlordId == Model.LandlordId)
-    {
-        <a asp-action="ViewMyProperties" asp-controller="Landlord" class="btn btn-primary my-3">My properties</a>
-    }
-    else
-    {
-        <a asp-action="ViewProperties" asp-controller="Landlord" asp-route-id="@Model.LandlordId" class="btn btn-primary my-3">View properties</a>
-    }
-}
-else
-{
-    <a class="btn btn-primary my-3" href='@Url.Action("PropertyInputStepOnePostcode", "Property", new { landlordId = Model.LandlordId, propertyId = 0, operationType = "add" })'>Add properties</a>
-}
-
 @if (User.IsInRole("Admin"))
 {
-    <form asp-action="GetInviteLink" asp-controller="Admin" asp-route-landlordId="@Model.LandlordId" method="post" class="mb-3">
-        <button type="submit" class="btn btn-primary"><i class="bi bi-link"></i> Get invite link</button>
-    </form>
-    if (Model.InviteLink != null)
-    {
-        <a class="btn btn-primary mb-3" type="button" id="copyBtn" onclick="copyLinkToClipboard('@Model.InviteLink');"><i class="bi bi-files"></i> Copy invite link</a>
-    }
-    <form asp-action="DisableOrEnableLandlord" asp-controller="Landlord" asp-route-landlordId="@Model.LandlordId" method="post" class="mb-3">
-        <input type="hidden" asp-for="Action" value=@(Model.Disabled ? "enable" : "disable")>
-        <button type="submit" class="btn btn-primary">
-            <i class="bi bi-link"></i> @(Model.Disabled ? "Re-enable landlord" : "Disable landlord")
-        </button>
-    </form>
+    <div class="row mt-4">
+        <div class="col-auto mb-2">
+            <form asp-action="GetInviteLink" asp-controller="Admin" asp-route-landlordId="@Model.LandlordId" method="post" class="mb-3">
+                <button type="submit" class="btn btn-large btn-primary"><i class="bi bi-link"></i> Get invite link</button>
+            </form>
+        </div>
+        @if (Model.InviteLink != null)
+        {
+            <div class="col-auto mb-2">
+                <button type="button" id="copyBtn" onclick="copyLinkToClipboard('@Model.InviteLink')" class="btn btn-large btn-outline-primary"><i class="bi bi-files"></i> Copy invite link</button>
+            </div>
+        }
+        <div class="col-auto mb-2">
+            <button type="submit" class="btn btn-help mt-3" data-bs-toggle="modal" data-bs-target="#inviteModal"> ? </button>
+        </div>
+    </div>
+    <div class="row mt-4">
+        <div class="col-auto mb-2">
+            <form asp-action="DisableOrEnableLandlord" asp-controller="Landlord" asp-route-landlordId="@Model.LandlordId" method="post" class="mb-3">
+                <input type="hidden" asp-for="Action" value=@(Model.Disabled ? "enable" : "disable")>
+                <button type="submit" class="btn btn-large btn-primary">
+                    <i class="bi bi-link"></i> @(Model.Disabled ? "Re-enable landlord" : "Disable landlord")
+                </button>
+            </form>
+        </div>
+    </div>
 }
 
-<!-- Modal -->
+<!-- ApproveModal -->
 <div class="modal fade" id="approveModal" tabindex="-1" aria-labelledby="approveModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
@@ -184,6 +200,23 @@ else
                     <input type="submit" value="Confirm" class="btn btn-primary"/>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- InviteModal -->
+<div class="modal fade" id="inviteModal" tabindex="-1" aria-labelledby="inviteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="approveModalLabel">Landlord invite links</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                An invite link allows you to assign a landlord profile to a new user of the Bricks &amp; Hearts site.
+                This means that rather than the user going through the landlord sign-up process themselves, they may take over an already-existing landlord identity.
+                This identity may have been created by an admin on their behalf, or inherited from a previous user.
+            </div>
         </div>
     </div>
 </div>

@@ -134,6 +134,14 @@ body {
     border-color: grey;
 }
 
+.btn-help{
+    height: 30px;
+    width: 30px;
+    font-size: 20px;
+    background-color: lightgrey;
+    padding: 0;
+}
+
 .statbox-icon {
     color: var(--blue);
     background-color: var(--paleBlue);
