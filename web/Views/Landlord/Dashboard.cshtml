@@ -13,7 +13,7 @@
         </div>
         <div class="col">
             <div class="row">
-                <h6 class="font-body">Hello</h6>
+                <p class="font-body mb-0">Hello</p>
                 <h2 class="font-blue font-h1">@Model.CurrentLandlord.FirstName</h2>
                 <p class="font-body font-orange mt-1">
                     Your landlord status has been disabled. Please contact Change Ahead for more information.
@@ -32,18 +32,18 @@
             </div>
             <div class="col">
                 <div class="row">
-                    <h6 class="font-body">Hello</h6>
+                    <p class="font-body mb-0">Hello</p>
                     <h2 class="font-blue font-h1">@Model.CurrentLandlord.FirstName</h2>
                     @if (Model.CurrentLandlord.NumOfProperties > 0)
                     {
-                        <h6 class="font-body">View your properties</h6>
+                        <p class="font-body mb-0">View your properties</p>
                         <div>
                             <a class="btn btn-primary btn-lg mt-3 align-middle" href='@Url.Action("ViewMyProperties", "Landlord")'>View properties</a>
                         </div>
                     }
                     else
                     {
-                        <h6 class="font-body">Start adding your properties to the portal to get matches</h6>
+                        <p class="font-body mb-0">Start adding your properties to the portal to get matches</p>
                         <div>
                             <a class="btn btn-primary btn-lg mt-3 align-middle" href='@Url.Action("PropertyInputStepOnePostcode", "Property", new { landlordId = Model.CurrentLandlord.LandlordId, propertyId = 0, operationType = "add" })'>Add properties</a>
                         </div>
@@ -60,12 +60,13 @@
     </div>
 
     <div class="col">
-        <h6 class="font-h3 mb-3">My stats</h6>
+        <h2 class="font-h3 mb-3">My stats</h2>
         @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
            {
                IconName = Model.CurrentLandlord.CharterApproved ? "bi-check" : "bi-x",
                Stat = Model.CurrentLandlord.CharterApproved ? "Approved" : "Not Approved",
-               StatDescription = "Charter approval state"
+               StatDescription = "Charter approval state",
+               HasSmallerText = true
            }); }
         @{ await Html.RenderPartialAsync("_DashboardStatsBoxPartial", new StatBoxModel
            {
@@ -88,7 +89,7 @@
     </div>
     <div class="col">
         <div class="d-flex">
-            <h6 class="flex-row flex-grow-1 font-h3 mb-3">My properties</h6>
+            <h2 class="flex-row flex-grow-1 font-h3 mb-3">My properties</h2>
             <a class="flex-row-reverse font-body font-blue" href='@Url.Action("ViewMyProperties", "Landlord")'>View all</a>
         </div>
         @foreach (var property in Model.Properties!)

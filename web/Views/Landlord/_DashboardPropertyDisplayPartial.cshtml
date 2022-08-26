@@ -15,12 +15,12 @@
     <div class="row w-100 mx-0">
         @if (Model.Images.Count > 0)
         {
-            <div class="col-sm my-3 px-0">
+            <div class="col-sm mt-3 px-0">
                 @{ GetImageElement(Model.Property!.PropertyId, 0, "lg"); }
             </div>
             @if (Model.Images.Count > 1)
             {
-                <div class="col-sm-4 my-3 h-50 property-img-sm-col pe-0">
+                <div class="col-sm-4 mt-3 h-50 property-img-sm-col pe-0">
                     @{ GetImageElement(Model.Property!.PropertyId, 1, "lg", true); }
                     @if (Model.Images.Count > 2)
                     {
@@ -30,14 +30,13 @@
             }
         }
     </div>
-    <div class="row">
+    <div class="row mt-3">
         <div class="col">
             <h2 class="font-h2">@Model.Property!.Address.ToShortAddressString()</h2>
         </div>
     </div>
     <div class="row">
         <p class="property-description property-description-table font-smallBody mb-0">@Model.Property.Description</p>
-        <a asp-action="ViewProperty" asp-controller="Property" asp-route-propertyId="@Model.Property.PropertyId" class="font-smallBody">Read more</a>
+        <a asp-action="ViewProperty" asp-controller="Property" asp-route-propertyId="@Model.Property.PropertyId" class="font-smallBody mt-2">Read more</a>
     </div>
-    <p class="font-subtitle">@Model.Property.Address.Postcode</p>
 </div>
