@@ -59,6 +59,9 @@
             </div>
             <div class="row">
                 <div class="col">
+                    <div class="d-flex">
+                        <h3 class="font-h3 d-inline-block mt-3">Description</h3>
+                    </div>
                     <div class="card custom-card flex-grow-1 mt-2">
                         <div class="card-body">
                             <p class="collapse property-description font-smallBody" id="descriptionCollapse">@(@Model.Property.Description ?? "Missing description")</p>
@@ -67,6 +70,9 @@
                     </div>
                 </div>
                 <div class="col">
+                    <div class="d-flex">
+                        <h3 class="font-h3 d-inline-block mt-3">Property accepts</h3>
+                    </div>
                     <partial name="Details/_PropertyAccepts" model="@(new PropertyDetailsViewModel { Property = Model.Property, Images = Model.Images })"/>
                 </div>
             </div>

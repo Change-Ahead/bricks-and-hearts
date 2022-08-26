@@ -1,5 +1,4 @@
 ﻿using System.IO;
-using System.Net.Http;
 using System.Text;
 using BricksAndHearts.Services;
 using FakeItEasy;
@@ -12,20 +11,16 @@ namespace BricksAndHearts.UnitTests.ServiceTests.CsvImport;
 
 public class CsvImportServiceTests : IClassFixture<TestDatabaseFixture>
 {
-    private HttpClient HttpClient;
-    private readonly HttpMessageHandler MessageHandler;
+    private TestDatabaseFixture Fixture { get; }
+    private ILogger<CsvImportService> Logger { get; }
     private readonly IPostcodeService PostcodeService;
 
     public CsvImportServiceTests(TestDatabaseFixture fixture)
     {
         Fixture = fixture;
-        PostcodeService = A.Fake<PostcodeService>();
         Logger = A.Fake<ILogger<CsvImportService>>();
-        MessageHandler = A.Fake<HttpMessageHandler>();
-        HttpClient = new HttpClient(MessageHandler);
+        PostcodeService = A.Fake<PostcodeService>();
     }
-    private TestDatabaseFixture Fixture { get; }
-    private ILogger<CsvImportService> Logger { get; }
 
     [Fact]
     public async void CheckIfImportWorks_CalledOnFileWithMissingColumn_ReturnsDangerMessage()

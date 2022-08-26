@@ -71,7 +71,7 @@ public class TenantService : ITenantService
                                               || t.HousingBenefits == filters.AcceptsBenefits)
                                           && (filters.AcceptsUnder35 == null || t.Under35 == filters.AcceptsUnder35)
                                           && (filters.AcceptsWithoutGuarantor == null
-                                              || t.HasGuarantor == filters.AcceptsWithoutGuarantor));
+                                              || t.HasGuarantor == !filters.AcceptsWithoutGuarantor));
             /*Above are EXCLUSIVE filters for the filters page*/
         }
 
